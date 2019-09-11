@@ -1,0 +1,34 @@
+{
+  "name": "genetic-py",
+  "productName": "Genetic Py",
+  "version": "0.0.1-alpha",
+  "description": "A Simulator developed with ElectronJS for Genetic Algorithms written in Python",
+  "homepage": "https://github.com/dnory0/genetic-py",
+  "main": "app/main.js",
+  "scripts": {
+    "updeps": "node update-deps.js",
+    "start": "electron .",
+    "tsc": "tsc",
+    "dist": "electron-builder -l --x64"
+  },
+  "keywords": [
+    "genetic",
+    "machine-learning"
+  ],
+  "author": "Hocine Abdellatif Houari <houarihocine99@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "bootstrap": "^4.3.1",
+    "chart.js": "^2.8.0",
+    "colors": "^1.3.3",
+    "os-utils": "0.0.14",
+    "python-shell": "^1.0.8"
+  },
+  "devDependencies": {
+    "@types/bootstrap": "^4.3.1",
+    "@types/chart.js": "^2.8.5",
+    "electron": "^6.0.8",
+    "electron-builder": "^21.2.0",
+    "typescript": "^3.6.3"
+  }
+}
