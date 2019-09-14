@@ -119,64 +119,67 @@ const startPythonShell = () => {
   close = false;
   clearChart(progressChart);
   clearChart(fittestChart);
-  pyshell = new PythonShell('genetic_algorithm.py', {
+  pyshell = new PythonShell('ga.py', {
     scriptPath: path.join(__dirname, 'python'),
     pythonOptions: ['-u'],
-    args: args
+    args: args,
+    mode: 'json'
   });
 
-  pyshell.on('message', (...args: string[]) => {
-    if (close) {
-      console.log('should be closed');
-      pyshell.send('terminate');
-    } else if (args[0].includes('generation')) {
-      if (args[0].includes('found')) {
-        progressChart.data.labels.push(args[0].substr(19));
-        fittestChart.data.labels.push(args[0].substr(19));
-        // currentChart.data.labels.push(args[0].substr(19));
-      } else {
-        progressChart.data.labels.push(args[0].substr(12));
-        fittestChart.data.labels.push(args[0].substr(12));
-        // currentChart.data.labels.push(args[0].substr(12));
-      }
-    } else if (args[0].includes('fitness')) {
-      if (args[0].includes('found')) {
-        progressChart.data.datasets[0].data.push(parseInt(args[0].substr(22)));
-        fittestChart.data.datasets[0].data.push(parseInt(args[0].substr(22)));
-        // currentChart.data.datasets[0].data.push(parseInt(args[0].substr(22)));
-      } else {
-        progressChart.data.datasets[0].data.push(parseInt(args[0].substr(15)));
-        fittestChart.data.datasets[0].data.push(parseInt(args[0].substr(15)));
-        // currentChart.data.datasets[0].data.push(parseInt(args[0].substr(15)));
-      }
-    } else if (args[0].includes('genes')) {
-      clearChart(fittestChart);
-      genesNum = [...Array(64).keys()].map(x => ++x);
-      fittestChart.data.labels = genesNum.map(x => `${x}`);
-      fittestChart.data.datasets[0].data = args[0].includes('found')
-        ? args[0]
-            .substr(20)
-            .split('')
-            .map(x => parseInt(x))
-        : args[0]
-            .substr(13)
-            .split('')
-            .map(x => parseInt(x));
-      progressChart.update();
-      fittestChart.update();
-      // currentChart.update();
-      if (isPyShellRunning && !args[0].includes('found')) pyshell.send('');
-    } else if (args[0].includes('finished')) {
-      console.log('finished');
-      clearChart(progressChart);
-      clearChart(fittestChart);
-      setBtnsClickable(false);
-      terminatePyShell();
-      switchPlayPauseBtn();
-      blinkPlayBtn();
-      resetTime();
-    }
-  });
+  pyshell.on('message', (...args: object[]) => console.log(args[0]));
+
+  // pyshell.on('message', (...args: string[]) => {
+  //   if (close) {
+  //     console.log('should be closed');
+  //     pyshell.send('terminate');
+  //   } else if (args[0].includes('generation')) {
+  //     if (args[0].includes('found')) {
+  //       progressChart.data.labels.push(args[0].substr(19));
+  //       fittestChart.data.labels.push(args[0].substr(19));
+  //       // currentChart.data.labels.push(args[0].substr(19));
+  //     } else {
+  //       progressChart.data.labels.push(args[0].substr(12));
+  //       fittestChart.data.labels.push(args[0].substr(12));
+  //       // currentChart.data.labels.push(args[0].substr(12));
+  //     }
+  //   } else if (args[0].includes('fitness')) {
+  //     if (args[0].includes('found')) {
+  //       progressChart.data.datasets[0].data.push(parseInt(args[0].substr(22)));
+  //       fittestChart.data.datasets[0].data.push(parseInt(args[0].substr(22)));
+  //       // currentChart.data.datasets[0].data.push(parseInt(args[0].substr(22)));
+  //     } else {
+  //       progressChart.data.datasets[0].data.push(parseInt(args[0].substr(15)));
+  //       fittestChart.data.datasets[0].data.push(parseInt(args[0].substr(15)));
+  //       // currentChart.data.datasets[0].data.push(parseInt(args[0].substr(15)));
+  //     }
+  //   } else if (args[0].includes('genes')) {
+  //     clearChart(fittestChart);
+  //     genesNum = [...Array(64).keys()].map(x => ++x);
+  //     fittestChart.data.labels = genesNum.map(x => `${x}`);
+  //     fittestChart.data.datasets[0].data = args[0].includes('found')
+  //       ? args[0]
+  //           .substr(20)
+  //           .split('')
+  //           .map(x => parseInt(x))
+  //       : args[0]
+  //           .substr(13)
+  //           .split('')
+  //           .map(x => parseInt(x));
+  //     progressChart.update();
+  //     fittestChart.update();
+  //     // currentChart.update();
+  //     if (isPyShellRunning && !args[0].includes('found')) pyshell.send('');
+  //   } else if (args[0].includes('finished')) {
+  //     console.log('finished');
+  //     clearChart(progressChart);
+  //     clearChart(fittestChart);
+  //     setBtnsClickable(false);
+  //     terminatePyShell();
+  //     switchPlayPauseBtn();
+  //     blinkPlayBtn();
+  //     resetTime();
+  //   }
+  // });
   pyshell.on('error', err => console.error(`error trace: ${err}`));
   pyshell.on('close', () => console.log('closed: '));
 };
