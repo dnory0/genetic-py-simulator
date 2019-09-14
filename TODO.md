@@ -30,7 +30,7 @@ fix tooltip still off after CGA finished
 
 ### CGA python file not found because it's packed inside app.asar
 
-- this issue is only faced on production and not developement, since
+- this issue is only faced on production and not development, since
   the app needs to be packed inside app.asar file in the end, the
   python file is also going to be there, then when user launch the app
   and hit start button the file is going to be unreachable since
@@ -55,3 +55,6 @@ fix tooltip still off after CGA finished
 - learn venv
 - learn to debug
 - learn using tests
+
+redisign the way the IPC betweem the renderer process and pyshell
+process communicate (see non-blocking-stdin project on py folder)

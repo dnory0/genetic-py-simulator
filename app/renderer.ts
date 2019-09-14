@@ -58,7 +58,7 @@ const createChart = (
     data: {
       datasets: [
         {
-          label: 'Python',
+          label: 'Progress',
           fill: 'rgba(0,0,0,0)',
           backgroundColor: '#3572A5',
           borderColor: '#3572A5',
