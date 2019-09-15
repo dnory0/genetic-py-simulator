@@ -161,7 +161,7 @@ solution = GA(genes_length=int(genes_num)).solution
 # solution = GA().solution
 
 # initial population
-my_pop = Population(solution, int(ind_num), int(genes_num))
+# my_pop = Population(solution, int(ind_num), int(genes_num))
 # my_pop = Population(solution, genes_length=int(genes_num))
 my_pop = Population(solution)
 

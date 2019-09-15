@@ -26,6 +26,8 @@ fix tooltip still off after CGA finished
 - put it inside a while loop, to prevent electron part from terminating
   and forking the CGAprocess everytime user launchs it.
 
+### create fitness calc class to handle fitness cacl for offspring str
+
 # distributing part:
 
 ### CGA python file not found because it's packed inside app.asar
@@ -48,6 +50,7 @@ fix tooltip still off after CGA finished
   sendTime variable, create new time checker when timer resumed.
 - put the whole process work on a class for possibility to instantiate
   more than one timer when needed.
+- move it to be a thread on the renderer process instead of seperate one
 
 # for me:
 
