@@ -13,17 +13,17 @@
 
 import * as os from 'os-utils';
 
-// is initiated when user launch CGA and it's triggered every .07s
+// is initiated when user launch GA and it's triggered every .07s
 let timeChecker: NodeJS.Timeout;
-// holds timerid after calling startTimeCalc() when user launch CGA
+// holds timerid after calling startTimeCalc() when user launch GA
 let timer = null;
 // holds exact time passed after `timer` was initiated everytime timeChecker is triggered
 let tempTimer = null;
-// initialized whenever the user pause the CGA
+// initialized whenever the user pause the GA
 let pauseTimer = null;
 // holds the time that user kept play/pause button state at pause (accumulated)
 let accPauseTimer = [0, 0];
-// controls whether it should send time or not, turned true if the CGA is running
+// controls whether it should send time or not, turned true if the GA is running
 // else it's false
 let sendTime = true;
 

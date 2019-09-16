@@ -1,6 +1,6 @@
 # Genetic Algorithms
 
-[Introduction to Genetic Algorithms — Including Example JAVA Code](https://towardsdatascience.com/introduction-to-genetic-algorithms-including-example-code-e396e98d8bf3 "towardsdatascience.com (Medium)")
+[Introduction to Genetic Algorithms — Including Example JAVA Code](https://towardsdatascience.com/introduction-to-genetic-algorithms-including-example-code-e396e98d8bf3 'towardsdatascience.com (Medium)')
 
 [good video to explain mutation](https://youtu.be/XcinBPhgT7M)
 

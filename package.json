@@ -4,14 +4,16 @@
   "version": "0.0.1-alpha",
   "description": "A Simulator developed with ElectronJS for Genetic Algorithms written in Python",
   "homepage": "https://github.com/dnory0/genetic-py",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dnory0/genetic-py.git"
+  },
   "main": "app/main.js",
   "scripts": {
     "updeps": "node update-deps.js",
     "start": "electron .",
     "tsc": "tsc",
-    "pack": "electron-builder --dir",
-    "dist": "electron-builder -wl --x64 --ia32",
-    "build": "electron-packager ."
+    "dist": "electron-builder -l --x64"
   },
   "keywords": [
     "genetic",
@@ -28,10 +30,9 @@
   },
   "devDependencies": {
     "@types/bootstrap": "^4.3.1",
-    "@types/chart.js": "^2.8.4",
-    "electron": "^6.0.4",
+    "@types/chart.js": "^2.8.5",
+    "electron": "^6.0.8",
     "electron-builder": "^21.2.0",
-    "electron-packager": "^14.0.5",
-    "typescript": "^3.5.3"
+    "typescript": "^3.6.3"
   }
 }
