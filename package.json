@@ -4,6 +4,10 @@
   "version": "0.0.1-alpha",
   "description": "A Simulator developed with ElectronJS for Genetic Algorithms written in Python",
   "homepage": "https://github.com/dnory0/genetic-py",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dnory0/genetic-py.git"
+  },
   "main": "app/main.js",
   "scripts": {
     "updeps": "node update-deps.js",
