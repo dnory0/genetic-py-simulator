@@ -90,7 +90,7 @@ class Evolve:
         for parent_couple, offspring_couple in zip(parents, offsprings):
             for parent, offspring in zip(parent_couple, offspring_couple):
                 # if parent.fitness() < Individual.genes_fitness(offspring):
-                parent.replace_genes(offspring)
+                    parent.replace_genes(offspring)
 
     @staticmethod
     def evolve_population(pop: Population):
@@ -132,23 +132,26 @@ class GAThread(threading.Thread):
         self.__stop_now = False
 
     def run(self):
-        to_json({
-            "started": True
-        })
         pop = Population()
+        to_json({
+            "started": True,
+            "genesNum": pop.genes_num
+        })
 
         # check before entering evolution loop if pause event
         #  was fired before hitting start
         self.__pause_check()
         to_json({
             "fitness": pop.fittest().fitness(),
-            "generation": 0
+            "generation": pop.generation,
+            "genes": pop.fittest().genes
         })
         while not self.__stop_now:
             Evolve.evolve_population(pop)
             to_json({
                 "fitness": pop.fittest().fitness(),
-                "generation": pop.generation
+                "generation": pop.generation,
+                "genes": pop.fittest().genes
             })
             # time.sleep(.1)
 

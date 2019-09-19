@@ -66,8 +66,6 @@ let template: MenuItemConstructorOptions[];
     {
       label: '&View',
       submenu: [
-        { role: 'reload' },
-        { role: 'forcereload' },
         { role: 'toggledevtools' },
         { type: 'separator' },
         { role: 'resetzoom' },

@@ -13,19 +13,11 @@
 
   <body>
     <div class="container-fluid main">
-      <div class="row charts-container">
-        <div id="progress-chart-container" class="col-sm-8">
-          <div>
-            <canvas id="progress-chart" width="170" height="85"></canvas>
-          </div>
-        </div>
-        <div class="col-sm-4" id="genes-charts-container">
-          <div>
-            <canvas id="fittest-chart" width="170" height="85"></canvas>
-          </div>
-          <div>
-            <canvas id="current-chart" width="170" height="85"></canvas>
-          </div>
+      <div class="charts-container">
+        <div id="progress-chart" class="col-sm-12"></div>
+        <div class="row col-sm-12" id="genes-charts-container">
+          <div class="col-sm-6" id="fittest-chart"></div>
+          <div class="col-sm-6" id="current-chart"></div>
         </div>
       </div>
       <div class="row">

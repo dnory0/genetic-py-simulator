@@ -16,26 +16,31 @@ button {
 
 .main {
   overflow: hidden;
+  padding: 0;
 }
 
 .main .charts-container {
-  max-height: calc(100vh - 240px);
+  height: 80%;
 }
 
-.main .charts-container #progress-chart-container {
-  padding-left: 0;
+.main .charts-container #progress-chart {
+  padding: 0;
   position: relative;
-  max-height: calc(100vh - 240px);
+  height: 300px;
 }
 
 .main .charts-container #genes-charts-container {
-  max-height: calc(100vh - 240px);
-  padding-right: 0;
+  height: 200px;
+  padding: 0;
+  margin: 0;
 }
 
 .main .charts-container #genes-charts-container > div {
   position: relative;
-  height: 50%;
+  height: 200px;
+  width: 50%;
+  padding: 0;
+  margin: 0;
 }
 
 .main .controls button {
@@ -58,7 +63,7 @@ button {
 }
 
 .main .controls button.disabled-btn {
-  opacity: .6;
+  opacity: 0.6;
 }
 
 .main .controls button#play-btn img {

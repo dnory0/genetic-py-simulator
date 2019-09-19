@@ -1,129 +1,168 @@
 import { webFrame, ipcRenderer } from 'electron';
 import { PythonShell } from 'python-shell';
 import * as path from 'path';
-import * as Chart from 'chart.js';
+import * as Highcharts from 'highcharts';
+require('highcharts/modules/exporting')(Highcharts);
 
+// document.addEventListener('DOMContentLoaded', function() {});
 let playBtn = <HTMLButtonElement>document.getElementById('play-btn');
 let stopBtn = <HTMLButtonElement>document.getElementById('stop-btn');
 // restart the GA algorithm
 let toStartBtn = <HTMLButtonElement>document.getElementById('to-start-btn');
-// step back button
-let stepBBtn = <HTMLButtonElement>document.getElementById('step-back-btn');
+// step back button (not implemented)
+// let stepBBtn = <HTMLButtonElement>document.getElementById('step-back-btn');
 // step forward button
 let stepFBtn = <HTMLButtonElement>document.getElementById('step-forward-btn');
 // used as args for pyShell
-let args = [
-  '64' /* Default genes number */,
-  '120' /* Default population size */
-];
+// let args = [
+//   '64' /* Default genes number */,
+//   '120' /* Default population size */
+// ];
 // by default user needs to hit the play button to run pyShell
 let isPyShellRunning = false;
 
 /************************ Python & Chart Configuration ************************
  ******************************************************************************/
 // updated with fittest per generation
-let progressChart: Chart;
+let progressChart: Highcharts.Chart;
 // updated with fittest genes
-let fittestChart: Chart;
+let fittestChart: Highcharts.Chart;
 // updated with fittest genes per generation
-let currentChart: Chart;
+let currentChart: Highcharts.Chart;
 
-const initChart = (
-  canvas: HTMLCanvasElement,
-  {
-    options: {
-      title: { text },
-      animation: { duration },
-      devicePixelRatio
-    }
-  }: Chart.ChartConfiguration
-) => {
-  return new Chart(canvas, {
-    type: 'line',
-    data: {
-      datasets: [
-        {
-          label: 'Progress',
-          fill: 'rgba(0,0,0,0)',
-          backgroundColor: '#3572A5',
-          borderColor: '#3572A5',
-          borderWidth: 2,
-          // pointRadius: 0,
-          lineTension: 0
-        }
-      ]
-    },
-    options: {
-      title: {
-        display: true,
-        position: 'top',
-        text
-      },
-      animation: {
-        duration: duration ? duration : 0
-      },
-      devicePixelRatio: devicePixelRatio ? devicePixelRatio : 2,
-      elements: {
-        point: {
-          borderWidth: 3
-        }
-      },
-      tooltips: {
-        enabled: false
+const initChart = (containerId: string, options: Highcharts.Options) => {
+  return Highcharts.chart(containerId, {
+    title: {
+      text: options.title.text,
+      style: {
+        padding: '80px'
       }
+    },
+    xAxis: {
+      title: {
+        text: (<Highcharts.XAxisOptions>options.xAxis).title.text,
+        align: 'high'
+      }
+    },
+    yAxis: {
+      title: {
+        text: (<Highcharts.YAxisOptions>options.yAxis).title.text,
+        align: 'high',
+        rotation: 0,
+        y: -20,
+        x: -5,
+        offset: -35
+      }
+    },
+    series: options.series,
+    legend: {
+      enabled: false
+    },
+    tooltip: {
+      animation: false
+    },
+    credits: {
+      enabled: false
+    },
+    exporting: {
+      enabled: false
     }
   });
 };
 
-let progressCtx = <HTMLCanvasElement>document.getElementById('progress-chart');
-progressChart = initChart(progressCtx, {
-  options: {
+progressChart = initChart('progress-chart', {
+  chart: {
+    type: 'line'
+  },
+  title: {
+    text: 'Fittest Fitness per Generation'
+  },
+  xAxis: {
     title: {
-      text: 'Fittest Fitness per Generation'
-    },
-    maintainAspectRatio: false,
-    responsive: true,
-    animation: {
-      duration: 100
+      text: 'Generation'
     }
-  }
-});
-let fittestCtx = <HTMLCanvasElement>document.getElementById('fittest-chart');
-fittestChart = initChart(fittestCtx, {
-  options: {
+  },
+  yAxis: {
     title: {
-      text: 'Best Fittest Genes'
-    },
-    animation: {
-      duration: 200
+      text: 'Fitness value'
     }
-  }
-});
-let currentCtx = <HTMLCanvasElement>document.getElementById('current-chart');
-currentChart = initChart(currentCtx, {
-  options: {
-    title: {
-      text: 'Current Generation Fittest Genes'
-    },
-    animation: {
-      duration: 0
+  },
+  series: [
+    {
+      name: 'CGA',
+      data: []
+    }
+  ] as Highcharts.SeriesLineOptions[],
+  plotOptions: {
+    series: {
+      animation: false
     }
   }
 });
 
-const activateTooltips = (chart: Chart) => {
-  // chart.options.tooltips.enabled = !isPyShellRunning;
-};
+fittestChart = initChart('fittest-chart', {
+  chart: {
+    type: 'line'
+  },
+  title: {
+    text: 'Best Fittest'
+  },
+  xAxis: {
+    title: {
+      text: 'Genes'
+    }
+  },
+  yAxis: {
+    title: {
+      text: 'Gene value'
+    }
+  },
+  series: [
+    {
+      data: []
+    }
+  ] as Highcharts.SeriesLineOptions[]
+});
+currentChart = initChart('current-chart', {
+  chart: {
+    type: 'line'
+  },
+  title: {
+    text: 'Current Generation Fittest'
+  },
+  xAxis: {
+    title: {
+      text: 'Genes'
+    }
+  },
+  series: [
+    {
+      data: []
+    }
+  ] as Highcharts.SeriesLineOptions[],
+  yAxis: {
+    title: {
+      text: 'Gene value'
+    }
+  }
+});
 
-const clearChart = (chart: Chart) => {
-  chart.data.labels = [];
-  chart.data.datasets[0].data = [];
-  chart.update();
+// an object that holds most fittest fitness with an array of their genes
+let mostFittestInds = { 0: [] };
+// an array of for every generation fittest genes
+let fittestsHistory = [];
+
+const clearChart = (chart: Highcharts.Chart, labels: boolean = true) => {
+  if (labels) chart.xAxis[0].setCategories([]);
+  chart.series[0].setData([]);
+  chart.redraw();
 };
 
 /****************************** Python Part ******************************/
 
-// declared and initialized globally
+/**
+ * declared and initialized globally
+ */
 let pyshell = new PythonShell('ga.py', {
   scriptPath: path.join(__dirname, 'python'),
   pythonOptions: ['-u'],
@@ -131,21 +170,27 @@ let pyshell = new PythonShell('ga.py', {
   mode: 'json'
 });
 pyshell.on('message', (args: object) => {
-  // console.log(args['generation']);
-  if (args['generation'] && args['fitness']) {
-    progressChart.data.labels.push(`${args['generation']}`);
-    progressChart.data.datasets[0].data.push(parseInt(args['fitness']));
-    progressChart.update();
-  } else if (args['started']) {
+  if (
+    args['generation'] !== undefined &&
+    args['fitness'] !== undefined &&
+    args['genes'] !== undefined
+  ) {
+    progressChart.series[0].addPoint(
+      parseInt(args['fitness']),
+      true,
+      false,
+      false
+    );
+  } else if (args['started'] && args['genesNum'] !== undefined) {
     // clear past results
     clearChart(progressChart);
     clearChart(fittestChart);
     clearChart(currentChart);
+    // to be able to change in ga state
+    setBtnsClickable();
   }
 });
-
 pyshell.on('error', (err: Error) => console.error(`error trace: ${err}`));
-pyshell.on('close', () => console.log('closed'));
 /**
  * send play to GA, python side is responsible for whether
  * to start GA for first time are just resume
@@ -182,79 +227,8 @@ const stepForward = () => {
 let deleteTimeResult: boolean = true;
 
 let close = true;
-/***************************** GUI Configuration *****************************
+/************************ GUI & Buttons Configuration ************************
  *****************************************************************************/
-// webFrame.setZoomLevel(0);
-// webFrame.setZoomFactor(1);
-
-/**
- * reset buttons to default, terminate pyShell process and
- * @deprecated
- */
-// const terminatePyShell = (callbackfn?: Function) => {
-//   isPyShellRunning = false;
-//   console.log('closed here');
-//   pyshell.end(() => {
-//     // if (err) throw err;
-//     // pyshell = null;
-//     // pyshell.end is asynchronos
-//     if (callbackfn) callbackfn();
-//   });
-//   // to create new one when user clicks play/pause button
-// };
-
-// pyshell.on('message', (...args: string[]) => {
-//   if (close) {
-//     console.log('should be closed');
-//     pyshell.send('terminate');
-//   } else if (args[0].includes('generation')) {
-//     if (args[0].includes('found')) {
-//       progressChart.data.labels.push(args[0].substr(19));
-//       fittestChart.data.labels.push(args[0].substr(19));
-//       // currentChart.data.labels.push(args[0].substr(19));
-//     } else {
-//       progressChart.data.labels.push(args[0].substr(12));
-//       fittestChart.data.labels.push(args[0].substr(12));
-//       // currentChart.data.labels.push(args[0].substr(12));
-//     }
-//   } else if (args[0].includes('fitness')) {
-//     if (args[0].includes('found')) {
-//       progressChart.data.datasets[0].data.push(parseInt(args[0].substr(22)));
-//       fittestChart.data.datasets[0].data.push(parseInt(args[0].substr(22)));
-//       // currentChart.data.datasets[0].data.push(parseInt(args[0].substr(22)));
-//     } else {
-//       progressChart.data.datasets[0].data.push(parseInt(args[0].substr(15)));
-//       fittestChart.data.datasets[0].data.push(parseInt(args[0].substr(15)));
-//       // currentChart.data.datasets[0].data.push(parseInt(args[0].substr(15)));
-//     }
-//   } else if (args[0].includes('genes')) {
-//     clearChart(fittestChart);
-//     genesNum = [...Array(64).keys()].map(x => ++x);
-//     fittestChart.data.labels = genesNum.map(x => `${x}`);
-//     fittestChart.data.datasets[0].data = args[0].includes('found')
-//       ? args[0]
-//           .substr(20)
-//           .split('')
-//           .map(x => parseInt(x))
-//       : args[0]
-//           .substr(13)
-//           .split('')
-//           .map(x => parseInt(x));
-//     progressChart.update();
-//     fittestChart.update();
-//     // currentChart.update();
-//     if (isPyShellRunning && !args[0].includes('found')) pyshell.send('');
-//   } else if (args[0].includes('finished')) {
-//     console.log('finished');
-//     clearChart(progressChart);
-//     clearChart(fittestChart);
-//     setBtnsClickable(false);
-//     terminatePyShell();
-//     switchPlayPauseBtn();
-//     blinkPlayBtn();
-//     resetTime();
-//   }
-// });
 
 /**
  * switch the play/pause button image depending on
@@ -294,30 +268,13 @@ const setBtnsClickable = (clickable = true) => {
  * clicks the playBtn, pressing playBtn will restart the GA, to avoid that
  * the playBtn is disabled for .4s and than enabled
  */
-const blinkPlayBtn = () => {
-  playBtn.classList.add('disabled-btn');
-  playBtn.disabled = true;
-  setTimeout(() => {
-    playBtn.classList.remove('disabled-btn');
-    playBtn.disabled = false;
-  }, 400);
-};
-
-/**
- * stop timer, called when the GA completed or forced to stop
- * @param v whether to reset time indicator to 00:00:00:00 after end
- */
-// const resetTime = (v: boolean = false) => {
-//   notifyTimer('finish');
-//   deleteTimeResult = v;
-// };
-
-/**
- * sends a ipc message to mainProcess to change state of timer
- * @param state start | pause | resume | finish
- */
-// const notifyTimer = (state: string) => {
-//   ipcRenderer.send('time', state);
+// const blinkPlayBtn = () => {
+//   playBtn.classList.add('disabled-btn');
+//   playBtn.disabled = true;
+//   setTimeout(() => {
+//     playBtn.classList.remove('disabled-btn');
+//     playBtn.disabled = false;
+//   }, 400);
 // };
 
 /**
@@ -330,8 +287,6 @@ playBtn.onclick = () => {
   isPyShellRunning = !isPyShellRunning;
   if (isPyShellRunning) {
     play();
-    // TODO: add global variable to set
-    setBtnsClickable();
   } else {
     pause();
   }
@@ -365,16 +320,6 @@ toStartBtn.onclick = () => {
   // in case pyshell was paused before
   isPyShellRunning = true;
   switchPlayBtn();
-  // kill pyshell process in the state it is in
-  // pyshell.terminate();
-  // close = true;
-  // resetTime();
-  // startPyShell();
-  // terminatePyShell(() => {
-  //   resetTime(true);
-  //   playBtn.click();
-  // });
-  // killing pyshell process takes time
 };
 
 stepFBtn.onclick = () => {
@@ -383,24 +328,8 @@ stepFBtn.onclick = () => {
   isPyShellRunning = false;
   // switch to paused state
   switchPlayBtn();
-  switchPlayBtn();
-  // to pause the process if it's running
-  // if (isPyShellRunning) playBtn.click();
 };
 
-// ipcRenderer.on('time', (_event, time: string) => {
-//   document.getElementById('time').innerHTML = time;
-// });
-
-// ipcRenderer.on('cpuusage', (_event, cpuusage: string) => {
-//   document.getElementById('cpuusage').innerHTML = cpuusage;
-// });
-
-// ipcRenderer.on('time-finished', () => {
-//   if (deleteTimeResult)
-//     document.getElementById('time').innerHTML = '00:00:00:00';
-// });
-
-// triggered to stop time calculating if the user reloads page while GA was running
-// and because deleteTimeResult is true by default it's going to reset time indicator
-// notifyTimer('finish');
+ipcRenderer.on('pyshell', () => {
+  pyshell.terminate();
+});

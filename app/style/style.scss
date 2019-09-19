@@ -2,72 +2,77 @@ textarea,
 input,
 div,
 button {
-	outline: none !important;
-	margin: 0;
+  outline: none !important;
+  margin: 0;
 }
 
 * {
-	user-select: none;
-	-webkit-user-drag: none;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 .main {
-	// padding: 0;
-	overflow: hidden;
+  // padding: 0;
+  overflow: hidden;
+  padding: 0;
 
-	.charts-container {
-		max-height: calc(100vh - 240px);
+  .charts-container {
+    height: 80%;
 
-		#progress-chart-container {
-			padding-left: 0;
-			position: relative;
-			max-height: calc(100vh - 240px);
-			
-		}
+    #progress-chart {
+      padding: 0;
+      position: relative;
+      height: 300px;
+    }
 
-		#genes-charts-container {
-			max-height: calc(100vh - 240px);
-			padding-right: 0;
+    #genes-charts-container {
+      // display: none;
+      height: 200px;
+      padding: 0;
+      margin: 0;
 
-			>div {
-				position: relative;
-				height: 50%;
-			}
-		}
-	}
+      > div {
+        position: relative;
+        height: 200px;
+        width: 50%;
+        padding: 0;
+        margin: 0;
+      }
+    }
+  }
 
-	.controls {
-		button {
-			margin: 1px;
-			padding: 4px 3px 4px 4px;
-			border: none;
-			border-radius: 5px;
-			width: 30px;
-			height: 30px;
-			background-color: white;
+  .controls {
+    button {
+      margin: 1px;
+      padding: 4px 3px 4px 4px;
+      border: none;
+      border-radius: 5px;
+      width: 30px;
+      height: 30px;
+      background-color: white;
 
-			&:hover:not(.disabled-btn) {
-				background-color: #c4c4c4;
-			}
+      &:hover:not(.disabled-btn) {
+        background-color: #c4c4c4;
+      }
 
-			img {
-				width: 22px;
-				float: left;
-			}
+      img {
+        width: 22px;
+        float: left;
+      }
 
-			&.disabled-btn {
-				opacity: .6;
-			}
+      &.disabled-btn {
+        opacity: 0.6;
+      }
 
-			&#play-btn {
-				img {
-					display: none;
+      &#play-btn {
+        img {
+          display: none;
 
-					&.default {
-						display: block;
-					}
-				}
-			}
-		}
-	}
+          &.default {
+            display: block;
+          }
+        }
+      }
+    }
+  }
 }
