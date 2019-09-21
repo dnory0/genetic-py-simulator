@@ -14,63 +14,79 @@ button {
   -webkit-user-drag: none;
 }
 
+html,
+body {
+  overflow: hidden;
+}
+
 .main {
   overflow: hidden;
   padding: 0;
+  height: 100vh;
 }
 
 .main .charts-container {
-  height: 80%;
+  height: calc(100% - 100px);
 }
 
 .main .charts-container #progress-chart {
   padding: 0;
   position: relative;
-  height: 300px;
+  height: 60%;
 }
 
 .main .charts-container #genes-charts-container {
-  height: 200px;
+  height: 40%;
   padding: 0;
   margin: 0;
 }
 
 .main .charts-container #genes-charts-container > div {
   position: relative;
-  height: 200px;
+  height: 100%;
   width: 50%;
   padding: 0;
   margin: 0;
 }
 
-.main .controls button {
-  margin: 1px;
-  padding: 4px 3px 4px 4px;
+.main .controls-container {
+  margin: 0 4px;
+  padding: 4px 0;
+  height: 36px;
+  border-bottom: 1px solid #a37e7e;
+}
+
+.main .controls-container .controls button {
+  padding: 5px 4px 5px 5px;
   border: none;
-  border-radius: 5px;
-  width: 30px;
-  height: 30px;
+  border-radius: 4px;
+  width: 28px;
+  height: 28px;
   background-color: white;
 }
 
-.main .controls button:hover:not(.disabled-btn) {
+.main .controls-container .controls button:hover:not(.disabled-btn) {
   background-color: #c4c4c4;
 }
 
-.main .controls button img {
-  width: 22px;
+.main .controls-container .controls button img {
+  width: 18px;
   float: left;
 }
 
-.main .controls button.disabled-btn {
+.main .controls-container .controls button.disabled-btn {
   opacity: 0.6;
 }
 
-.main .controls button#play-btn img {
+.main .controls-container .controls button#play-btn img {
   display: none;
 }
 
-.main .controls button#play-btn img.default {
+.main .controls-container .controls button#play-btn img.default {
   display: block;
+}
+
+.main div.bottom-bar {
+  height: 20%;
 }
 /*# sourceMappingURL=style.css.map */

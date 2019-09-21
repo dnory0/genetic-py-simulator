@@ -1,8 +1,9 @@
-import { webFrame, ipcRenderer } from 'electron';
+import { ipcRenderer } from 'electron';
 import { PythonShell } from 'python-shell';
 import * as path from 'path';
 import * as Highcharts from 'highcharts';
-require('highcharts/modules/exporting')(Highcharts);
+// require('highcharts/modules/exporting')(Highcharts);
+// require('highcharts/')
 
 // document.addEventListener('DOMContentLoaded', function() {});
 let playBtn = <HTMLButtonElement>document.getElementById('play-btn');
@@ -13,13 +14,6 @@ let toStartBtn = <HTMLButtonElement>document.getElementById('to-start-btn');
 // let stepBBtn = <HTMLButtonElement>document.getElementById('step-back-btn');
 // step forward button
 let stepFBtn = <HTMLButtonElement>document.getElementById('step-forward-btn');
-// used as args for pyShell
-// let args = [
-//   '64' /* Default genes number */,
-//   '120' /* Default population size */
-// ];
-// by default user needs to hit the play button to run pyShell
-let isPyShellRunning = false;
 
 /************************ Python & Chart Configuration ************************
  ******************************************************************************/
@@ -29,6 +23,20 @@ let progressChart: Highcharts.Chart;
 let fittestChart: Highcharts.Chart;
 // updated with fittest genes per generation
 let currentChart: Highcharts.Chart;
+
+// an object that holds most fittest fitness with an array of their genes
+// format {fitness: <number>, [...{generation: [...genes]}]}
+let mostFittest: {
+  fitness: number;
+  individuals?: [
+    {
+      generation: number;
+      genes: any[];
+    }
+  ];
+} = { fitness: -1 };
+// an array of for every generation fittest genes
+let fittestsHistory = [];
 
 const initChart = (containerId: string, options: Highcharts.Options) => {
   return Highcharts.chart(containerId, {
@@ -123,6 +131,7 @@ fittestChart = initChart('fittest-chart', {
     }
   ] as Highcharts.SeriesLineOptions[]
 });
+
 currentChart = initChart('current-chart', {
   chart: {
     type: 'line'
@@ -147,18 +156,30 @@ currentChart = initChart('current-chart', {
   }
 });
 
-// an object that holds most fittest fitness with an array of their genes
-let mostFittestInds = { 0: [] };
-// an array of for every generation fittest genes
-let fittestsHistory = [];
+const settingXaxis = (args, ...charts) => {
+  const genes = [...Array(args['genesNum']).keys()].map(v => `${++v}`);
+  charts.forEach(chart => {
+    chart.xAxis[0].setCategories(genes);
+  });
+};
 
-const clearChart = (chart: Highcharts.Chart, labels: boolean = true) => {
-  if (labels) chart.xAxis[0].setCategories([]);
+const clearChart = (chart: Highcharts.Chart, categories: boolean = true) => {
+  if (categories) chart.xAxis[0].setCategories([]);
   chart.series[0].setData([]);
   chart.redraw();
 };
 
 /****************************** Python Part ******************************/
+
+// used as args for pyShell
+let args = [
+  '64' /* Default genes number */,
+  '120' /* Default population size */
+];
+/**
+ * by default user needs to hit the play button to run pyShell
+ */
+let isPyShellRunning = false;
 
 /**
  * declared and initialized globally
@@ -169,6 +190,7 @@ let pyshell = new PythonShell('ga.py', {
   // args: args,
   mode: 'json'
 });
+
 pyshell.on('message', (args: object) => {
   if (
     args['generation'] !== undefined &&
@@ -181,11 +203,44 @@ pyshell.on('message', (args: object) => {
       false,
       false
     );
+    currentChart.series[0].setData(args['genes'], true, false);
+
+    // register it on fittest history
+    fittestsHistory.push(args['genes']);
+    if (mostFittest['fitness'] < args['fitness']) {
+      mostFittest['fitness'] = args['fitness'];
+      mostFittest['individuals'] = [
+        {
+          generation: args['generation'],
+          genes: args['genes']
+        }
+      ];
+      fittestChart.series[0].setData(
+        mostFittest.individuals[0].genes,
+        true,
+        false
+      );
+    } else if (mostFittest['fitness'] == args['fitness']) {
+      mostFittest['individuals'].unshift({
+        generation: args['generation'],
+        genes: args['genes']
+      });
+      fittestChart.series[0].setData(
+        mostFittest.individuals[0].genes,
+        true,
+        false
+      );
+    }
   } else if (args['started'] && args['genesNum'] !== undefined) {
     // clear past results
     clearChart(progressChart);
     clearChart(fittestChart);
     clearChart(currentChart);
+    // clear fittest individuals history & mostFittest history
+    fittestsHistory = [];
+    mostFittest = { fitness: -1 };
+    // setting up xAxis for fittest and current chart
+    settingXaxis(args, currentChart, fittestChart);
     // to be able to change in ga state
     setBtnsClickable();
   }

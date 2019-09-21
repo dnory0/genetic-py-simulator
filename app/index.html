@@ -13,6 +13,41 @@
 
   <body>
     <div class="container-fluid main">
+      <div class="controls-container">
+        <div class="controls">
+          <button title="play/pause" id="play-btn">
+            <img class="default play" src="img/play-btn.png" />
+            <img class="pause" src="img/pause-btn.png" />
+          </button>
+          <button title="stop" class="disabled-btn" id="stop-btn" disabled>
+            <img src="img/stop-btn.png" />
+          </button>
+          <button
+            title="relaunch the algorithm"
+            class="disabled-btn"
+            id="to-start-btn"
+            disabled
+          >
+            <img src="img/to-start-btn.png" />
+          </button>
+          <button
+            title="step back"
+            class="disabled-btn"
+            id="step-back-btn"
+            disabled
+          >
+            <img src="img/step-back-btn.png" />
+          </button>
+          <button
+            title="step forward"
+            class="disabled-btn"
+            id="step-forward-btn"
+            disabled
+          >
+            <img src="img/step-forward-btn.png" />
+          </button>
+        </div>
+      </div>
       <div class="charts-container">
         <div id="progress-chart" class="col-sm-12"></div>
         <div class="row col-sm-12" id="genes-charts-container">
@@ -20,63 +55,8 @@
           <div class="col-sm-6" id="current-chart"></div>
         </div>
       </div>
-      <div class="row">
-        <div class="col-sm-6 controls-container">
-          <div class="controls">
-            <button title="play/pause" id="play-btn">
-              <img class="default play" src="img/play-btn.png" />
-              <img class="pause" src="img/pause-btn.png" />
-            </button>
-            <button title="stop" class="disabled-btn" id="stop-btn" disabled>
-              <img src="img/stop-btn.png" />
-            </button>
-            <button
-              title="relaunch the algorithm"
-              class="disabled-btn"
-              id="to-start-btn"
-              disabled
-            >
-              <img src="img/to-start-btn.png" />
-            </button>
-            <button
-              title="step back"
-              class="disabled-btn"
-              id="step-back-btn"
-              disabled
-            >
-              <img src="img/step-back-btn.png" />
-            </button>
-            <button
-              title="step forward"
-              class="disabled-btn"
-              id="step-forward-btn"
-              disabled
-            >
-              <img src="img/step-forward-btn.png" />
-            </button>
-          </div>
-          <div class="parameters"></div>
-        </div>
-        <div class="col-sm-6">
-          <div class="info">
-            <div id="cpuusage"></div>
-            <div id="time">00:00:00:00</div>
-          </div>
-        </div>
-      </div>
+      <div class="bottom-bar"></div>
     </div>
-    <!-- <div class="jumbotron">
-    <h1 class="display-4">Hi there</h1>
-    <p class="lead">This is a simple hero unit, a simple jumbotron-style component for calling extra attention to
-      featured content or information.</p>
-    <hr class="my-4">
-    <p>It uses utility classes for typography and spacing to space content out within the larger container.</p>
-    <a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a>
-  </div> -->
-
-    <!-- <script>
-    require('./renderer')
-  </script> -->
     <script>
       let exports = {};
     </script>

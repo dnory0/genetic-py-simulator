@@ -10,6 +10,8 @@
   },
   "main": "app/main.js",
   "scripts": {
+    "dist-py": "pyinstaller --onefile  --specpath app/python/spec --distpath app/python/dist --workpath app/python/build app/python/ga.py",
+    "dist-py-clean": "rm -r app/python/build app/python/spec app/python/__pycache__",
     "updeps": "node update-deps.js",
     "start": "electron .",
     "tsc": "tsc",

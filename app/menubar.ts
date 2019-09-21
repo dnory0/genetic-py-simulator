@@ -5,7 +5,6 @@ let template: MenuItemConstructorOptions[];
 (() => {
   const isMac = process.platform == 'darwin';
   template = [
-    // { role: 'appMenu' }
     ...(isMac
       ? ([
           {
@@ -24,14 +23,12 @@ let template: MenuItemConstructorOptions[];
           }
         ] as MenuItemConstructorOptions[])
       : []),
-    // { role: 'fileMenu' }
     {
       label: '&File',
       submenu: [
         isMac ? { role: 'close' } : { role: 'quit' }
       ] as MenuItemConstructorOptions[]
     },
-    // { role: 'editMenu' }
     {
       label: '&Edit',
       submenu: [
@@ -62,7 +59,6 @@ let template: MenuItemConstructorOptions[];
             ] as MenuItemConstructorOptions[]))
       ] as MenuItemConstructorOptions[]
     },
-    // { role: 'viewMenu' }
     {
       label: '&View',
       submenu: [
@@ -75,7 +71,6 @@ let template: MenuItemConstructorOptions[];
         { role: 'togglefullscreen' }
       ] as MenuItemConstructorOptions[]
     },
-    // { role: 'windowMenu' }
     {
       label: '&Window',
       submenu: [

@@ -2,14 +2,15 @@ import {
   app,
   BrowserWindow,
   BrowserWindowConstructorOptions,
-  // ipcMain,
   Menu,
   MenuItem
 } from 'electron';
-// import { fork, ChildProcess } from 'child_process';
 /******************* MAIN WINDOW HANDLING *******************
  *************************************************************/
-let mainWindow: BrowserWindow = null;
+/**
+ * main window
+ */
+let mainWindow: BrowserWindow;
 // let timeProcess: ChildProcess;
 
 /**
@@ -50,25 +51,31 @@ const createWindow = (
 
   targetWindow.once('ready-to-show', () => targetWindow.show());
 
+  targetWindow.on('enter-full-screen', () => {
+    targetWindow.setAutoHideMenuBar(true);
+    targetWindow.setMenuBarVisibility(false);
+  });
+
+  targetWindow.on('leave-full-screen', () => {
+    targetWindow.setAutoHideMenuBar(false);
+    targetWindow.setMenuBarVisibility(true);
+  });
+
   targetWindow.on('close', () => {
     mainWindow.webContents.send('pyshell');
   });
 
   targetWindow.once('closed', () => {
-    // timeProcess.kill();
     targetWindow = null;
   });
   return targetWindow;
 };
 
-app.on('ready', () => {
+app.once('ready', () => {
   mainWindow = exports.mainWindow = createWindow('app/index.html', {
-    minWidth: 620,
-    minHeight: 480
+    minWidth: 580,
+    minHeight: 430
   });
-
-  // mainWindow.setAutoHideMenuBar(true);
-  // mainWindow.setMenuBarVisibility(false);
 
   const menubar = require('./menubar') as Menu;
   menubar.items[process.platform == 'darwin' ? 3 : 2].submenu.append(
@@ -81,22 +88,6 @@ app.on('ready', () => {
       }
     })
   );
+
   app.applicationMenu = menubar;
-
-  // mainWindow.setFullScreen(true);
-  // Menu.setApplicationMenu(null);
-
-  // timeProcess = fork('app/secondary-process.js');
-  // timeProcess.on('message', (message: string) => {
-  //   if (message.includes('time: '))
-  //     mainWindow.webContents.send('time', `${message.slice(6)}`);
-  //   else if (message.includes('cpuusage: '))
-  //     mainWindow.webContents.send('cpuusage', `${message.slice(10)}%`);
-  //   else if (message === 'time-finished')
-  //     mainWindow.webContents.send('time-finished');
-  // });
-
-  // ipcMain.on('time', (_event, state: string) => {
-  //   timeProcess.send(state);
-  // });
 });
