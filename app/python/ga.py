@@ -137,15 +137,15 @@ class GAThread(threading.Thread):
             "started": True,
             "genesNum": pop.genes_num
         })
-
-        # check before entering evolution loop if pause event
-        #  was fired before hitting start
-        self.__pause_check()
         to_json({
             "fitness": pop.fittest().fitness(),
             "generation": pop.generation,
             "genes": pop.fittest().genes
         })
+
+        # check before entering evolution loop if pause event
+        #  was fired before hitting start
+        self.__pause_check()
         while not self.__stop_now:
             Evolve.evolve_population(pop)
             to_json({
@@ -209,6 +209,7 @@ class GAThread(threading.Thread):
         """
         move one iteration forward
         """
+        self.start()
         self.resume()
         self.pause()
 
@@ -225,7 +226,7 @@ class GAThread(threading.Thread):
 
 # prints a dict to json
 def to_json(word: dict):
-    print(json.dumps(word))
+    print(json.dumps(word), flush=True)
 
 
 if len(sys.argv) > 1:
@@ -257,11 +258,19 @@ while True:
     elif cmd == 'pause':
         if ga_thread is not None:
             ga_thread.pause()
-    elif cmd == 'step_f':
-        if ga_thread is not None:
-            ga_thread.step_forward()
     elif cmd == 'stop':
         if ga_thread is not None:
             ga_thread.stop()
-    elif cmd == 'state':
-        print(ga_thread.is_alive())
+    elif cmd == 'replay':
+        if ga_thread is not None:
+            ga_thread.stop()
+        ga_thread = GAThread()
+        ga_thread.start()
+    elif cmd == 'step_f':
+        if ga_thread is None or not ga_thread.is_alive():
+            ga_thread = GAThread()
+        ga_thread.step_forward()
+    elif cmd == 'exit':
+        if ga_thread is not None:
+            ga_thread.stop()
+        sys.exit(0)

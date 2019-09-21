@@ -1,7 +1,7 @@
 import { ipcRenderer } from 'electron';
-import { PythonShell } from 'python-shell';
-import * as path from 'path';
+import { join } from 'path';
 import * as Highcharts from 'highcharts';
+import { spawn } from 'child_process';
 // require('highcharts/modules/exporting')(Highcharts);
 // require('highcharts/')
 
@@ -25,7 +25,6 @@ let fittestChart: Highcharts.Chart;
 let currentChart: Highcharts.Chart;
 
 // an object that holds most fittest fitness with an array of their genes
-// format {fitness: <number>, [...{generation: [...genes]}]}
 let mostFittest: {
   fitness: number;
   individuals?: [
@@ -156,7 +155,7 @@ currentChart = initChart('current-chart', {
   }
 });
 
-const settingXaxis = (args, ...charts) => {
+const settingXaxis = (args: object, ...charts: Highcharts.Chart[]) => {
   const genes = [...Array(args['genesNum']).keys()].map(v => `${++v}`);
   charts.forEach(chart => {
     chart.xAxis[0].setCategories(genes);
@@ -171,27 +170,26 @@ const clearChart = (chart: Highcharts.Chart, categories: boolean = true) => {
 
 /****************************** Python Part ******************************/
 
-// used as args for pyShell
-let args = [
-  '64' /* Default genes number */,
-  '120' /* Default population size */
-];
+// used as args for pyshell
+// let args = [
+//   '64' /* Default genes number */,
+//   '120' /* Default population size */
+// ];
 /**
- * by default user needs to hit the play button to run pyShell
+ * by default user needs to hit the play button to run pyshell
  */
-let isPyShellRunning = false;
+let isRunning = false;
 
 /**
  * declared and initialized globally
  */
-let pyshell = new PythonShell('ga.py', {
-  scriptPath: path.join(__dirname, 'python'),
-  pythonOptions: ['-u'],
-  // args: args,
-  mode: 'json'
-});
-
-pyshell.on('message', (args: object) => {
+// let pyshell = new PythonShell('ga.py', {
+//   scriptPath: join(__dirname, 'python'),
+//   pythonOptions: ['-u'],
+//   // args: args,
+//   mode: 'json'
+// });
+const addToChart = (args: object) => {
   if (
     args['generation'] !== undefined &&
     args['fitness'] !== undefined &&
@@ -244,28 +242,51 @@ pyshell.on('message', (args: object) => {
     // to be able to change in ga state
     setBtnsClickable();
   }
+};
+
+let pyshell = spawn(join('python', 'dist', 'ga'), {
+  cwd: __dirname
+});
+
+pyshell.stdout.on('data', (passedArgs: Buffer) => {
+  passedArgs
+    .toString()
+    .split('\n')
+    .forEach((args: string) => {
+      // sometimes args == ''(not sure why), those cases need to be ignored
+      if (args) addToChart(JSON.parse(args));
+    });
 });
 pyshell.on('error', (err: Error) => console.error(`error trace: ${err}`));
+
+/************************* Buttons part *************************/
 /**
  * send play to GA, python side is responsible for whether
  * to start GA for first time are just resume
  */
 const play = () => {
-  pyshell.send('play');
+  pyshell.stdin.write('"play"\n');
 };
 
 /**
  * send pause to GA
  */
 const pause = () => {
-  pyshell.send('pause');
+  pyshell.stdin.write('"pause"\n');
 };
 
 /**
  * send stop to GA
  */
 const stop = () => {
-  pyshell.send('stop');
+  pyshell.stdin.write('"stop"\n');
+};
+
+/**
+ * stops current GA and launchs new one
+ */
+const replay = () => {
+  pyshell.stdin.write('"replay"\n');
 };
 
 /**
@@ -273,24 +294,25 @@ const stop = () => {
  * to pause GA if needed
  */
 const stepForward = () => {
-  pyshell.send('step_f');
+  pyshell.stdin.write('"step_f"\n');
 };
 
-// let genesNum: number[];
-// global to avoid sending it to the mainProcess, true by default
-// to reset timer in case user reload window while GA running
-let deleteTimeResult: boolean = true;
+/**
+ * exit the GA and kill spawned process, usually called on exit or reload app.
+ */
+const exit = () => {
+  pyshell.stdin.write('"exit"\n');
+};
 
-let close = true;
 /************************ GUI & Buttons Configuration ************************
  *****************************************************************************/
 
 /**
  * switch the play/pause button image depending on
- * isPyShellRunning state.
+ * isRunning state.
  */
 const switchPlayBtn = () => {
-  if (isPyShellRunning) {
+  if (isRunning) {
     // show playing state
     (<HTMLImageElement>playBtn.querySelector('.play')).style.display = 'none';
     (<HTMLImageElement>playBtn.querySelector('.pause')).style.display = 'block';
@@ -307,8 +329,8 @@ const switchPlayBtn = () => {
 const setBtnsClickable = (clickable = true) => {
   Array.from(document.querySelector('.controls').children).forEach(
     (element, index) => {
-      // to not effect play/pause button.
-      if (index == 0) return;
+      // to not effect play/pause and step forward button.
+      if ([0, 4].includes(index)) return;
       // disabled-btn class sets opacity to 0.6.
       if (clickable)
         (<HTMLButtonElement>element).classList.remove('disabled-btn');
@@ -338,53 +360,47 @@ const setBtnsClickable = (clickable = true) => {
  * a pyshell to start running and enable disabled buttons.
  */
 playBtn.onclick = () => {
-  // isPyShellRunning switched
-  isPyShellRunning = !isPyShellRunning;
-  if (isPyShellRunning) {
+  // isRunning switched
+  isRunning = !isRunning;
+  if (isRunning) {
     play();
   } else {
     pause();
   }
-  // notifyTimer('start');
   switchPlayBtn();
-  // } else {
-  // if (isPyShellRunning) {
-  //   pyshell.send('');
-  //   // notifyTimer('resume');
-  //   switchPlayPauseBtn();
-  // } else {
-  //   // notifyTimer('pause');
-  //   switchPlayPauseBtn();
-  // }
-  // }
-  // activateTooltips(progressChart);
 };
 
 stopBtn.onclick = () => {
   setBtnsClickable(false);
   stop();
   // doesn't effect if pyshell is paused
-  isPyShellRunning = false;
+  isRunning = false;
   // switch play/pause button to play state if needed
   switchPlayBtn();
 };
 
 toStartBtn.onclick = () => {
-  stop();
-  play();
+  replay();
   // in case pyshell was paused before
-  isPyShellRunning = true;
+  isRunning = true;
   switchPlayBtn();
 };
 
 stepFBtn.onclick = () => {
   stepForward();
   // pyshell paused when going next step
-  isPyShellRunning = false;
+  isRunning = false;
   // switch to paused state
   switchPlayBtn();
 };
 
+/**
+ * triggered when app going to exit or reload
+ */
 ipcRenderer.on('pyshell', () => {
-  pyshell.terminate();
+  exit();
 });
+function isDev() {
+  return process.mainModule.filename.indexOf('app.asar') === -1;
+}
+console.log(isDev());
