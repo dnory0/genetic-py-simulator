@@ -1,5 +1,5 @@
-const child_process = require('child_process');
-const fs = require('fs');
+import * as child_process from 'child_process';
+import * as fs from 'fs';
 const readline = require('readline');
 require('colors');
 
@@ -19,7 +19,7 @@ const askUser = (question: string) => {
 };
 const wipeDeps = () => {
   const file = fs.readFileSync('package.json');
-  const content = JSON.parse(file);
+  const content = JSON.parse(file.toString());
   const deps = Object.keys(content.dependencies);
   const devDeps = Object.keys(content.devDependencies);
 

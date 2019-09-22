@@ -1,18 +1,5 @@
 # python part
 
-# distributing part:
-
-### GA python file not found because it's packed inside app.asar
-
-- this issue is only faced on production and not development, since
-  the app needs to be packed inside app.asar file in the end, the
-  python file is also going to be there, then when user launch the app
-  and hit start button the file is going to be unreachable since
-  python has no way to access the app.asar file and will fire a **file
-  not found** error.
-- possible solution: move file to tmp directory on startup. (@deprecated)
-- use pyinstaller to bundle python code into executable file
-
 ### exclude some files that are not of any use in production mode
 
 # timer part:

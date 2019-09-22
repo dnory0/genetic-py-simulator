@@ -11,7 +11,7 @@
  *  note: the process sends time to parrent process in hh:mm:ss:µµ format every .07s,
  */
 
-import * as os from 'os-utils';
+// import * as os from 'os-utils';
 
 // is initiated when user launch GA and it's triggered every .07s
 let timeChecker: NodeJS.Timeout;
@@ -104,17 +104,17 @@ function finishTimeCalc() {
 }
 
 // sends CPU Usage to parentProcess every 1sec
-setInterval(
-  () =>
-    os.cpuUsage((v: number) => {
-      process.send(
-        `cpuusage: ${
-          v < 0.1 ? `0${Math.trunc(v * 100)}` : `${Math.trunc(v * 100)}`
-        }`
-      );
-    }),
-  1000
-);
+// setInterval(
+//   () =>
+//     os.cpuUsage((v: number) => {
+//       process.send(
+//         `cpuusage: ${
+//           v < 0.1 ? `0${Math.trunc(v * 100)}` : `${Math.trunc(v * 100)}`
+//         }`
+//       );
+//     }),
+//   1000
+// );
 
 // handles channel requests to start, pause, resume or stop the timer.
 process.on('message', (message: string) => {

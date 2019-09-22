@@ -1,11 +1,21 @@
-import { ipcRenderer } from 'electron';
+import { ipcRenderer, remote } from 'electron';
 import { join } from 'path';
 import * as Highcharts from 'highcharts';
-import { spawn } from 'child_process';
+import { spawn, ChildProcess } from 'child_process';
+import { copyFileSync } from 'fs';
+
+/**
+ * return true if app on developement, false in production.
+ * NOTE: app needs to be packed on asar (by default) to be possible to detect
+ * if you don't set asar to false on electron-builder.json you're good to go
+ */
+function isDev() {
+  return process.mainModule.filename.indexOf('.asar') === -1;
+}
+
 // require('highcharts/modules/exporting')(Highcharts);
 // require('highcharts/')
 
-// document.addEventListener('DOMContentLoaded', function() {});
 let playBtn = <HTMLButtonElement>document.getElementById('play-btn');
 let stopBtn = <HTMLButtonElement>document.getElementById('stop-btn');
 // restart the GA algorithm
@@ -183,12 +193,12 @@ let isRunning = false;
 /**
  * declared and initialized globally
  */
-// let pyshell = new PythonShell('ga.py', {
-//   scriptPath: join(__dirname, 'python'),
-//   pythonOptions: ['-u'],
-//   // args: args,
-//   mode: 'json'
-// });
+let pyshell: ChildProcess;
+
+/**
+ * update charts based on args passed
+ * @param args point properties to be added | GA started signal
+ */
 const addToChart = (args: object) => {
   if (
     args['generation'] !== undefined &&
@@ -240,13 +250,19 @@ const addToChart = (args: object) => {
     // setting up xAxis for fittest and current chart
     settingXaxis(args, currentChart, fittestChart);
     // to be able to change in ga state
-    setBtnsClickable();
+    setClickable();
   }
 };
 
-let pyshell = spawn(join('python', 'dist', 'ga'), {
-  cwd: __dirname
-});
+if (isDev()) {
+  pyshell = spawn(`python3`, [join(__dirname, 'python', 'ga.py')]);
+} else {
+  copyFileSync(
+    join(__dirname, 'python', 'dist', 'ga'),
+    join(remote.app.getPath('temp'), 'ga')
+  );
+  pyshell = spawn(`${join(remote.app.getPath('temp'), 'ga')}`);
+}
 
 pyshell.stdout.on('data', (passedArgs: Buffer) => {
   passedArgs
@@ -290,8 +306,7 @@ const replay = () => {
 };
 
 /**
- * send step forward signal to GA, python side is responsible
- * to pause GA if needed
+ * send step forward to GA, pyshell pauses GA if needed
  */
 const stepForward = () => {
   pyshell.stdin.write('"step_f"\n');
@@ -311,7 +326,7 @@ const exit = () => {
  * switch the play/pause button image depending on
  * isRunning state.
  */
-const switchPlayBtn = () => {
+const switchBtn = () => {
   if (isRunning) {
     // show playing state
     (<HTMLImageElement>playBtn.querySelector('.play')).style.display = 'none';
@@ -326,7 +341,7 @@ const switchPlayBtn = () => {
 /**
  * Set buttons (except play/pause button) clickable or not. Default is true.
  */
-const setBtnsClickable = (clickable = true) => {
+const setClickable = (clickable = true) => {
   Array.from(document.querySelector('.controls').children).forEach(
     (element, index) => {
       // to not effect play/pause and step forward button.
@@ -367,23 +382,23 @@ playBtn.onclick = () => {
   } else {
     pause();
   }
-  switchPlayBtn();
+  switchBtn();
 };
 
 stopBtn.onclick = () => {
-  setBtnsClickable(false);
+  setClickable(false);
   stop();
   // doesn't effect if pyshell is paused
   isRunning = false;
   // switch play/pause button to play state if needed
-  switchPlayBtn();
+  switchBtn();
 };
 
 toStartBtn.onclick = () => {
   replay();
   // in case pyshell was paused before
   isRunning = true;
-  switchPlayBtn();
+  switchBtn();
 };
 
 stepFBtn.onclick = () => {
@@ -391,7 +406,7 @@ stepFBtn.onclick = () => {
   // pyshell paused when going next step
   isRunning = false;
   // switch to paused state
-  switchPlayBtn();
+  switchBtn();
 };
 
 /**
@@ -400,7 +415,5 @@ stepFBtn.onclick = () => {
 ipcRenderer.on('pyshell', () => {
   exit();
 });
-function isDev() {
-  return process.mainModule.filename.indexOf('app.asar') === -1;
-}
-console.log(isDev());
+
+// document.addEventListener('DOMContentLoaded', function() {});

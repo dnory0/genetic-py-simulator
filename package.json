@@ -10,6 +10,7 @@
   },
   "main": "app/main.js",
   "scripts": {
+    "log": "git log --oneline --graph --all",
     "clean-l": "find dist/ -name '.fuse*' | xargs -d'\n' -I{} mv {} /media/$USER/*/.Trash-1000/files/; rm dist/* -rf; rm dist/.* -rf",
     "dist-py": "pyinstaller --onefile --specpath app/python/spec --distpath app/python/dist --workpath app/python/build app/python/ga.py",
     "dist-py-clean": "rm -r app/python/build app/python/spec app/python/__pycache__",
