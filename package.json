@@ -1,7 +1,7 @@
 {
   "name": "genetic-py",
   "productName": "Genetic Py",
-  "version": "0.1.1-dev3",
+  "version": "0.1.2-dev",
   "description": "A Simulator developed with ElectronJS for Genetic Algorithms written in Python",
   "homepage": "https://github.com/dnory0/genetic-py",
   "repository": {
@@ -10,6 +10,7 @@
   },
   "main": "app/main.js",
   "scripts": {
+    "clean-l": "find dist/ -name '.fuse*' | xargs -d'\n' -I{} mv {} /media/$USER/*/.Trash-1000/files/; rm dist/* -rf; rm dist/.* -rf",
     "dist-py": "pyinstaller --onefile --specpath app/python/spec --distpath app/python/dist --workpath app/python/build app/python/ga.py",
     "dist-py-clean": "rm -r app/python/build app/python/spec app/python/__pycache__",
     "dist-py-both": "yarn dist-py && yarn dist-py-clean",
