@@ -10,7 +10,7 @@ import { copyFileSync } from 'fs';
  * if you don't set asar to false on electron-builder.json you're good to go
  */
 function isDev() {
-  return process.mainModule.filename.indexOf('.asar') === -1;
+	return process.mainModule.filename.indexOf('.asar') === -1;
 }
 
 // require('highcharts/modules/exporting')(Highcharts);
@@ -36,146 +36,146 @@ let currentChart: Highcharts.Chart;
 
 // an object that holds most fittest fitness with an array of their genes
 let mostFittest: {
-  fitness: number;
-  individuals?: [
-    {
-      generation: number;
-      genes: any[];
-    }
-  ];
+	fitness: number;
+	individuals?: [
+		{
+			generation: number;
+			genes: any[];
+		}
+	];
 } = { fitness: -1 };
 // an array of for every generation fittest genes
 let fittestsHistory = [];
 
 const initChart = (containerId: string, options: Highcharts.Options) => {
-  return Highcharts.chart(containerId, {
-    title: {
-      text: options.title.text,
-      style: {
-        padding: '80px'
-      }
-    },
-    xAxis: {
-      title: {
-        text: (<Highcharts.XAxisOptions>options.xAxis).title.text,
-        align: 'high'
-      }
-    },
-    yAxis: {
-      title: {
-        text: (<Highcharts.YAxisOptions>options.yAxis).title.text,
-        align: 'high',
-        rotation: 0,
-        y: -20,
-        x: -5,
-        offset: -35
-      }
-    },
-    series: options.series,
-    legend: {
-      enabled: false
-    },
-    tooltip: {
-      animation: false
-    },
-    credits: {
-      enabled: false
-    },
-    exporting: {
-      enabled: false
-    }
-  });
+	return Highcharts.chart(containerId, {
+		title: {
+			text: options.title.text,
+			style: {
+				padding: '80px'
+			}
+		},
+		xAxis: {
+			title: {
+				text: (<Highcharts.XAxisOptions>options.xAxis).title.text,
+				align: 'high'
+			}
+		},
+		yAxis: {
+			title: {
+				text: (<Highcharts.YAxisOptions>options.yAxis).title.text,
+				align: 'high',
+				rotation: 0,
+				y: -20,
+				x: -5,
+				offset: -35
+			}
+		},
+		series: options.series,
+		legend: {
+			enabled: false
+		},
+		tooltip: {
+			animation: false
+		},
+		credits: {
+			enabled: false
+		},
+		exporting: {
+			enabled: false
+		}
+	});
 };
 
 progressChart = initChart('progress-chart', {
-  chart: {
-    type: 'line'
-  },
-  title: {
-    text: 'Fittest Fitness per Generation'
-  },
-  xAxis: {
-    title: {
-      text: 'Generation'
-    }
-  },
-  yAxis: {
-    title: {
-      text: 'Fitness value'
-    }
-  },
-  series: [
-    {
-      name: 'CGA',
-      data: []
-    }
-  ] as Highcharts.SeriesLineOptions[],
-  plotOptions: {
-    series: {
-      animation: false
-    }
-  }
+	chart: {
+		type: 'line'
+	},
+	title: {
+		text: 'Fittest Fitness per Generation'
+	},
+	xAxis: {
+		title: {
+			text: 'Generation'
+		}
+	},
+	yAxis: {
+		title: {
+			text: 'Fitness value'
+		}
+	},
+	series: [
+		{
+			name: 'CGA',
+			data: []
+		}
+	] as Highcharts.SeriesLineOptions[],
+	plotOptions: {
+		series: {
+			animation: false
+		}
+	}
 });
 
 fittestChart = initChart('fittest-chart', {
-  chart: {
-    type: 'line'
-  },
-  title: {
-    text: 'Best Fittest'
-  },
-  xAxis: {
-    title: {
-      text: 'Genes'
-    }
-  },
-  yAxis: {
-    title: {
-      text: 'Gene value'
-    }
-  },
-  series: [
-    {
-      data: []
-    }
-  ] as Highcharts.SeriesLineOptions[]
+	chart: {
+		type: 'line'
+	},
+	title: {
+		text: 'Best Fittest'
+	},
+	xAxis: {
+		title: {
+			text: 'Genes'
+		}
+	},
+	yAxis: {
+		title: {
+			text: 'Gene value'
+		}
+	},
+	series: [
+		{
+			data: []
+		}
+	] as Highcharts.SeriesLineOptions[]
 });
 
 currentChart = initChart('current-chart', {
-  chart: {
-    type: 'line'
-  },
-  title: {
-    text: 'Current Generation Fittest'
-  },
-  xAxis: {
-    title: {
-      text: 'Genes'
-    }
-  },
-  series: [
-    {
-      data: []
-    }
-  ] as Highcharts.SeriesLineOptions[],
-  yAxis: {
-    title: {
-      text: 'Gene value'
-    }
-  }
+	chart: {
+		type: 'line'
+	},
+	title: {
+		text: 'Current Generation Fittest'
+	},
+	xAxis: {
+		title: {
+			text: 'Genes'
+		}
+	},
+	series: [
+		{
+			data: []
+		}
+	] as Highcharts.SeriesLineOptions[],
+	yAxis: {
+		title: {
+			text: 'Gene value'
+		}
+	}
 });
 
 const settingXaxis = (args: object, ...charts: Highcharts.Chart[]) => {
-  const genes = [...Array(args['genesNum']).keys()].map(v => `${++v}`);
-  charts.forEach(chart => {
-    chart.xAxis[0].setCategories(genes);
-  });
+	const genes = [ ...Array(args['genesNum']).keys() ].map((v) => `${++v}`);
+	charts.forEach((chart) => {
+		chart.xAxis[0].setCategories(genes);
+	});
 };
 
 const clearChart = (chart: Highcharts.Chart, categories: boolean = true) => {
-  if (categories) chart.xAxis[0].setCategories([]);
-  chart.series[0].setData([]);
-  chart.redraw();
+	if (categories) chart.xAxis[0].setCategories([]);
+	chart.series[0].setData([]);
+	chart.redraw();
 };
 
 /****************************** Python Part ******************************/
@@ -200,78 +200,60 @@ let pyshell: ChildProcess;
  * @param args point properties to be added | GA started signal
  */
 const addToChart = (args: object) => {
-  if (
-    args['generation'] !== undefined &&
-    args['fitness'] !== undefined &&
-    args['genes'] !== undefined
-  ) {
-    progressChart.series[0].addPoint(
-      parseInt(args['fitness']),
-      true,
-      false,
-      false
-    );
-    currentChart.series[0].setData(args['genes'], true, false);
+	if (args['generation'] !== undefined && args['fitness'] !== undefined && args['genes'] !== undefined) {
+		progressChart.series[0].addPoint(parseInt(args['fitness']), true, false, false);
+		currentChart.series[0].setData(args['genes'], true, false);
 
-    // register it on fittest history
-    fittestsHistory.push(args['genes']);
-    if (mostFittest['fitness'] < args['fitness']) {
-      mostFittest['fitness'] = args['fitness'];
-      mostFittest['individuals'] = [
-        {
-          generation: args['generation'],
-          genes: args['genes']
-        }
-      ];
-      fittestChart.series[0].setData(
-        mostFittest.individuals[0].genes,
-        true,
-        false
-      );
-    } else if (mostFittest['fitness'] == args['fitness']) {
-      mostFittest['individuals'].unshift({
-        generation: args['generation'],
-        genes: args['genes']
-      });
-      fittestChart.series[0].setData(
-        mostFittest.individuals[0].genes,
-        true,
-        false
-      );
-    }
-  } else if (args['started'] && args['genesNum'] !== undefined) {
-    // clear past results
-    clearChart(progressChart);
-    clearChart(fittestChart);
-    clearChart(currentChart);
-    // clear fittest individuals history & mostFittest history
-    fittestsHistory = [];
-    mostFittest = { fitness: -1 };
-    // setting up xAxis for fittest and current chart
-    settingXaxis(args, currentChart, fittestChart);
-    // to be able to change in ga state
-    setClickable();
-  }
+		// register it on fittest history
+		fittestsHistory.push(args['genes']);
+		if (mostFittest['fitness'] < args['fitness']) {
+			mostFittest['fitness'] = args['fitness'];
+			mostFittest['individuals'] = [
+				{
+					generation: args['generation'],
+					genes: args['genes']
+				}
+			];
+			fittestChart.series[0].setData(mostFittest.individuals[0].genes, true, false);
+		} else if (mostFittest['fitness'] == args['fitness']) {
+			mostFittest['individuals'].unshift({
+				generation: args['generation'],
+				genes: args['genes']
+			});
+			fittestChart.series[0].setData(mostFittest.individuals[0].genes, true, false);
+		}
+	} else if (args['started'] && args['genesNum'] !== undefined) {
+		// clear past results
+		clearChart(progressChart);
+		clearChart(fittestChart);
+		clearChart(currentChart);
+		// clear fittest individuals history & mostFittest history
+		fittestsHistory = [];
+		mostFittest = { fitness: -1 };
+		// setting up xAxis for fittest and current chart
+		settingXaxis(args, currentChart, fittestChart);
+		// to be able to change in ga state
+		setClickable();
+	}
 };
 
 if (isDev()) {
-  pyshell = spawn(`python3`, [join(__dirname, 'python', 'ga.py')]);
+	// works with the script version
+	pyshell = spawn(`python`, [ join(__dirname, 'python', 'ga.py') ]);
 } else {
-  copyFileSync(
-    join(__dirname, 'python', 'dist', 'ga'),
-    join(remote.app.getPath('temp'), 'ga')
-  );
-  pyshell = spawn(`${join(remote.app.getPath('temp'), 'ga')}`);
+	// works with the executable version
+	copyFileSync(
+		join(__dirname, 'python', 'dist', process.platform == 'win32' ? join('win', 'ga.exe') : join('linux', 'ga')),
+		join(remote.app.getPath('temp'), process.platform == 'win32' ? 'ga.exe' : 'ga')
+	);
+	pyshell = spawn(`${join(remote.app.getPath('temp'), 'ga.exe')}`);
 }
 
 pyshell.stdout.on('data', (passedArgs: Buffer) => {
-  passedArgs
-    .toString()
-    .split('\n')
-    .forEach((args: string) => {
-      // sometimes args == ''(not sure why), those cases need to be ignored
-      if (args) addToChart(JSON.parse(args));
-    });
+	passedArgs.toString().split('\n').forEach((args: string) => {
+		// sometimes args == ''(not sure why), those cases need to be ignored
+		if (args) addToChart(JSON.parse(args));
+	});
 });
 pyshell.on('error', (err: Error) => console.error(`error trace: ${err}`));
 
@@ -281,42 +263,42 @@ pyshell.on('error', (err: Error) => console.error(`error trace: ${err}`));
  * to start GA for first time are just resume
  */
 const play = () => {
-  pyshell.stdin.write('"play"\n');
+	pyshell.stdin.write('"play"\n');
 };
 
 /**
  * send pause to GA
  */
 const pause = () => {
-  pyshell.stdin.write('"pause"\n');
+	pyshell.stdin.write('"pause"\n');
 };
 
 /**
  * send stop to GA
  */
 const stop = () => {
-  pyshell.stdin.write('"stop"\n');
+	pyshell.stdin.write('"stop"\n');
 };
 
 /**
  * stops current GA and launchs new one
  */
 const replay = () => {
-  pyshell.stdin.write('"replay"\n');
+	pyshell.stdin.write('"replay"\n');
 };
 
 /**
  * send step forward to GA, pyshell pauses GA if needed
  */
 const stepForward = () => {
-  pyshell.stdin.write('"step_f"\n');
+	pyshell.stdin.write('"step_f"\n');
 };
 
 /**
  * exit the GA and kill spawned process, usually called on exit or reload app.
  */
 const exit = () => {
-  pyshell.stdin.write('"exit"\n');
+	pyshell.stdin.write('"exit"\n');
 };
 
 /************************ GUI & Buttons Configuration ************************
@@ -327,32 +309,29 @@ const exit = () => {
  * isRunning state.
  */
 const switchBtn = () => {
-  if (isRunning) {
-    // show playing state
-    (<HTMLImageElement>playBtn.querySelector('.play')).style.display = 'none';
-    (<HTMLImageElement>playBtn.querySelector('.pause')).style.display = 'block';
-  } else {
-    // show start/paused state
-    (<HTMLImageElement>playBtn.querySelector('.play')).style.display = 'block';
-    (<HTMLImageElement>playBtn.querySelector('.pause')).style.display = 'none';
-  }
+	if (isRunning) {
+		// show playing state
+		(<HTMLImageElement>playBtn.querySelector('.play')).style.display = 'none';
+		(<HTMLImageElement>playBtn.querySelector('.pause')).style.display = 'block';
+	} else {
+		// show start/paused state
+		(<HTMLImageElement>playBtn.querySelector('.play')).style.display = 'block';
+		(<HTMLImageElement>playBtn.querySelector('.pause')).style.display = 'none';
+	}
 };
 
 /**
  * Set buttons (except play/pause button) clickable or not. Default is true.
  */
 const setClickable = (clickable = true) => {
-  Array.from(document.querySelector('.controls').children).forEach(
-    (element, index) => {
-      // to not effect play/pause and step forward button.
-      if ([0, 4].includes(index)) return;
-      // disabled-btn class sets opacity to 0.6.
-      if (clickable)
-        (<HTMLButtonElement>element).classList.remove('disabled-btn');
-      else (<HTMLButtonElement>element).classList.add('disabled-btn');
-      (<HTMLButtonElement>element).disabled = !clickable;
-    }
-  );
+	Array.from(document.querySelector('.controls').children).forEach((element, index) => {
+		// to not effect play/pause and step forward button.
+		if ([ 0, 4 ].includes(index)) return;
+		// disabled-btn class sets opacity to 0.6.
+		if (clickable) (<HTMLButtonElement>element).classList.remove('disabled-btn');
+		else (<HTMLButtonElement>element).classList.add('disabled-btn');
+		(<HTMLButtonElement>element).disabled = !clickable;
+	});
 };
 
 /**
@@ -375,45 +354,45 @@ const setClickable = (clickable = true) => {
  * a pyshell to start running and enable disabled buttons.
  */
 playBtn.onclick = () => {
-  // isRunning switched
-  isRunning = !isRunning;
-  if (isRunning) {
-    play();
-  } else {
-    pause();
-  }
-  switchBtn();
+	// isRunning switched
+	isRunning = !isRunning;
+	if (isRunning) {
+		play();
+	} else {
+		pause();
+	}
+	switchBtn();
 };
 
 stopBtn.onclick = () => {
-  setClickable(false);
-  stop();
-  // doesn't effect if pyshell is paused
-  isRunning = false;
-  // switch play/pause button to play state if needed
-  switchBtn();
+	setClickable(false);
+	stop();
+	// doesn't effect if pyshell is paused
+	isRunning = false;
+	// switch play/pause button to play state if needed
+	switchBtn();
 };
 
 toStartBtn.onclick = () => {
-  replay();
-  // in case pyshell was paused before
-  isRunning = true;
-  switchBtn();
+	replay();
+	// in case pyshell was paused before
+	isRunning = true;
+	switchBtn();
 };
 
 stepFBtn.onclick = () => {
-  stepForward();
-  // pyshell paused when going next step
-  isRunning = false;
-  // switch to paused state
-  switchBtn();
+	stepForward();
+	// pyshell paused when going next step
+	isRunning = false;
+	// switch to paused state
+	switchBtn();
 };
 
 /**
  * triggered when app going to exit or reload
  */
 ipcRenderer.on('pyshell', () => {
-  exit();
+	exit();
 });
 
 // document.addEventListener('DOMContentLoaded', function() {});
