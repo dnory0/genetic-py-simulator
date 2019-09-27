@@ -14,6 +14,8 @@
 
 # for me:
 
+when versioning, remove every deprecated file, function from next minor commit
+
 - learn docker
 - learn venv
 - learn to debug

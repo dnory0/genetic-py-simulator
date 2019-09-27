@@ -6,7 +6,8 @@ import { copyFileSync, existsSync } from 'fs';
 
 /**
  * return true if app on developement, false in production.
- * NOTE: app needs to be packed on asar (by default) to be possible to detect
+ *
+ * NOTE: app needs to be packed on asar (by default) to be possible to detect,
  * if you don't set asar to false on electron-builder.json you're good to go
  */
 function isDev() {

@@ -3,7 +3,9 @@ import {
   BrowserWindow,
   BrowserWindowConstructorOptions,
   Menu,
-  MenuItem
+  MenuItem,
+  BrowserView,
+  Rectangle
 } from 'electron';
 /******************* MAIN WINDOW HANDLING *******************
  *************************************************************/
@@ -76,6 +78,41 @@ app.once('ready', () => {
     minWidth: 580,
     minHeight: 430
   });
+
+  let view = new BrowserView();
+  mainWindow.setBrowserView(view);
+  view.setBounds({ x: 0, y: 36, width: 800, height: 300 });
+
+  mainWindow.on('resize', () => {
+    console.log(mainWindow.getBounds());
+    view.setBounds({
+      x: 0,
+      y: 36,
+      width: mainWindow.getBounds().width,
+      height: mainWindow.getBounds().height
+    } as Rectangle);
+  });
+  mainWindow.on('enter-full-screen', () => {
+    view.setBounds({
+      x: 0,
+      y: 36,
+      width: mainWindow.getBounds().width,
+      height: mainWindow.getBounds().height
+    } as Rectangle);
+  });
+  mainWindow.on('maximize', () => {
+    view.setBounds({
+      x: 0,
+      y: 36,
+      width: mainWindow.getBounds().width,
+      height: mainWindow.getBounds().height
+    } as Rectangle);
+  });
+  // view.setAutoResize({
+  //   height: true,
+  //   width: true
+  // } as AutoResizeOptions);
+  view.webContents.loadURL('https://electronjs.org');
 
   const menubar = require('./menubar') as Menu;
   menubar.items[process.platform == 'darwin' ? 3 : 2].submenu.append(
