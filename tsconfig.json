@@ -4,7 +4,7 @@
     "removeComments": true,
     "target": "es6",
     "watch": true,
-    "inlineSourceMap": true
+    "sourceMap": true
   },
   "exclude": ["node_modules"]
 }

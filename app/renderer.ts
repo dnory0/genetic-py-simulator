@@ -1,11 +1,12 @@
 import { ipcRenderer, remote } from 'electron';
 import { join } from 'path';
 import * as Highcharts from 'highcharts';
-import { spawn, ChildProcess } from 'child_process';
+import { ChildProcess, spawn } from 'child_process';
 import { copyFileSync, existsSync } from 'fs';
 
 /**
- * return true if app on developement, false in production.
+ * return true if app on development, false in production.
+ *
  * NOTE: app needs to be packed on asar (by default) to be possible to detect
  * if you don't set asar to false on electron-builder.json you're good to go
  */
@@ -27,14 +28,22 @@ let stepFBtn = <HTMLButtonElement>document.getElementById('step-forward-btn');
 
 /************************ Python & Chart Configuration ************************
  ******************************************************************************/
-// updated with fittest per generation
+/**
+ * updated with fittest per generation
+ */
 let progressChart: Highcharts.Chart;
-// updated with fittest genes
+/**
+ * updated with fittest genes
+ */
 let fittestChart: Highcharts.Chart;
-// updated with fittest genes per generation
+/**
+ * updated with fittest genes per generation
+ */
 let currentChart: Highcharts.Chart;
 
-// an object that holds most fittest fitness with an array of their genes
+/**
+ * an object that holds most fittest fitness with an array of their genes
+ */
 let mostFittest: {
   fitness: number;
   individuals?: [
@@ -44,9 +53,18 @@ let mostFittest: {
     }
   ];
 } = { fitness: -1 };
-// an array of for every generation fittest genes
-let fittestsHistory = [];
+/**
+ * an array of for every generation fittest genes
+ */
+let fittestHistory = [];
 
+/**
+ * initialize a chart and pass it options
+ * @param containerId id of html div tag that is going to contain chart
+ * @param options chart options, see Highcharts.Options
+ *
+ * @returns set up chart
+ */
 const initChart = (containerId: string, options: Highcharts.Options) => {
   return Highcharts.chart(containerId, {
     title: {
@@ -72,16 +90,25 @@ const initChart = (containerId: string, options: Highcharts.Options) => {
       }
     },
     series: options.series,
+    plotOptions: {
+      series: {
+        // marker: {
+        //   enabled: false,
+        //   radius: null
+        // },
+        states: {
+          hover: {
+            halo: {
+              opacity: 0
+            }
+          }
+        }
+      }
+    },
     legend: {
       enabled: false
     },
-    tooltip: {
-      animation: false
-    },
     credits: {
-      enabled: false
-    },
-    exporting: {
       enabled: false
     }
   });
@@ -109,12 +136,7 @@ progressChart = initChart('progress-chart', {
       name: 'CGA',
       data: []
     }
-  ] as Highcharts.SeriesLineOptions[],
-  plotOptions: {
-    series: {
-      animation: false
-    }
-  }
+  ] as Highcharts.SeriesLineOptions[]
 });
 
 fittestChart = initChart('fittest-chart', {
@@ -165,10 +187,43 @@ currentChart = initChart('current-chart', {
   }
 });
 
+/**
+ * set up X axis with genes numeration 1 2 .. <genes number>
+ * @param args contains genes number that's needed to set up X axis of charts
+ * @param charts charts to set its X axis
+ */
 const settingXaxis = (args: object, ...charts: Highcharts.Chart[]) => {
   const genes = [...Array(args['genesNum']).keys()].map(v => `${++v}`);
   charts.forEach(chart => {
     chart.xAxis[0].setCategories(genes);
+  });
+};
+
+/**
+ * enables or disable the hover settings for the passed charts
+ * @param enable decides if to disable hover settings or enable them.
+ * @param charts charts to apply hover settings on
+ */
+const enableChartHover = (enable: boolean, ...charts: Highcharts.Chart[]) => {
+  charts.forEach((chart: Highcharts.Chart) => {
+    chart.options.tooltip.enabled = enable;
+    chart.update({
+      plotOptions: {
+        series: {
+          marker: {
+            enabled: enable,
+            radius: enable ? 2 : null
+          },
+          states: {
+            hover: {
+              halo: {
+                opacity: enable ? 0.5 : 0
+              }
+            }
+          }
+        }
+      }
+    });
   });
 };
 
@@ -205,16 +260,19 @@ const addToChart = (args: object) => {
     args['fitness'] !== undefined &&
     args['genes'] !== undefined
   ) {
+    // every point is added to progressChart
     progressChart.series[0].addPoint(
       parseInt(args['fitness']),
       true,
       false,
       false
     );
+    // every point arrives override the precedent point
     currentChart.series[0].setData(args['genes'], true, false);
 
     // register it on fittest history
-    fittestsHistory.push(args['genes']);
+    fittestHistory.push(args['genes']);
+
     if (mostFittest['fitness'] < args['fitness']) {
       mostFittest['fitness'] = args['fitness'];
       mostFittest['individuals'] = [
@@ -245,7 +303,7 @@ const addToChart = (args: object) => {
     clearChart(fittestChart);
     clearChart(currentChart);
     // clear fittest individuals history & mostFittest history
-    fittestsHistory = [];
+    fittestHistory = [];
     mostFittest = { fitness: -1 };
     // setting up xAxis for fittest and current chart
     settingXaxis(args, currentChart, fittestChart);
@@ -254,16 +312,24 @@ const addToChart = (args: object) => {
   }
 };
 
-// if in developement
+// if in development
 if (isDev()) {
   // works with the script version
   pyshell = spawn(`${process.platform == 'win32' ? 'python' : 'python3'}`, [
     join(__dirname, 'python', 'ga.py')
   ]);
 } else {
+  /**
+   * path of executable/script to copy
+   */
   let copyFrom: string;
+  /**
+   * temp directory which the executable/script is going to be copied to
+   */
   let copyTo: string;
-  // set to true if executable is available
+  /**
+   * set to true if executable is available
+   */
   let execExist = existsSync(
     join(
       __dirname,
@@ -272,6 +338,7 @@ if (isDev()) {
       process.platform == 'win32' ? join('win', 'ga.exe') : join('linux', 'ga')
     )
   );
+
   if (execExist) {
     copyFrom = join(
       __dirname,
@@ -310,38 +377,44 @@ pyshell.on('error', (err: Error) => console.error(`error trace: ${err}`));
 
 /************************* Buttons part *************************/
 /**
- * send play to GA, python side is responsible for whether
- * to start GA for first time are just resume
+ * send play to GA, python side is responsible for whether to start GA for first time are just resume
+ *
+ * disables hover settings for charts
  */
 const play = () => {
+  enableChartHover(false, progressChart, fittestChart, currentChart);
   pyshell.stdin.write('"play"\n');
 };
 
 /**
- * send pause to GA
+ * send pause to GA, enables hover settings for charts
  */
 const pause = () => {
+  enableChartHover(true, progressChart, fittestChart, currentChart);
   pyshell.stdin.write('"pause"\n');
 };
 
 /**
- * send stop to GA
+ * send stop to GA, enables hover settings for charts
  */
 const stop = () => {
+  enableChartHover(true, progressChart, fittestChart, currentChart);
   pyshell.stdin.write('"stop"\n');
 };
 
 /**
- * stops current GA and launchs new one
+ * stops current GA and launches new one, disables hover settings for charts in case enabled
  */
 const replay = () => {
+  enableChartHover(false, progressChart, fittestChart, currentChart);
   pyshell.stdin.write('"replay"\n');
 };
 
 /**
- * send step forward to GA, pyshell pauses GA if needed
+ * send step forward to GA, pyshell pauses GA if needed, enables tooltip for charts in case disabled
  */
 const stepForward = () => {
+  enableChartHover(true, progressChart, fittestChart, currentChart);
   pyshell.stdin.write('"step_f"\n');
 };
 
@@ -356,8 +429,7 @@ const exit = () => {
  *****************************************************************************/
 
 /**
- * switch the play/pause button image depending on
- * isRunning state.
+ * switch the play/pause button image depending on isRunning state.
  */
 const switchBtn = () => {
   if (isRunning) {
