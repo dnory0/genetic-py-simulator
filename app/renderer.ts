@@ -92,6 +92,7 @@ const initChart = (containerId: string, options: Highcharts.Options) => {
     series: options.series,
     plotOptions: {
       series: {
+        animation: false,
         // marker: {
         //   enabled: false,
         //   radius: null
@@ -382,40 +383,40 @@ pyshell.on('error', (err: Error) => console.error(`error trace: ${err}`));
  * disables hover settings for charts
  */
 const play = () => {
-  enableChartHover(false, progressChart, fittestChart, currentChart);
   pyshell.stdin.write('"play"\n');
+  enableChartHover(false, progressChart, fittestChart, currentChart);
 };
 
 /**
  * send pause to GA, enables hover settings for charts
  */
 const pause = () => {
-  enableChartHover(true, progressChart, fittestChart, currentChart);
   pyshell.stdin.write('"pause"\n');
+  enableChartHover(true, progressChart, fittestChart, currentChart);
 };
 
 /**
  * send stop to GA, enables hover settings for charts
  */
 const stop = () => {
-  enableChartHover(true, progressChart, fittestChart, currentChart);
   pyshell.stdin.write('"stop"\n');
+  enableChartHover(true, progressChart, fittestChart, currentChart);
 };
 
 /**
  * stops current GA and launches new one, disables hover settings for charts in case enabled
  */
 const replay = () => {
-  enableChartHover(false, progressChart, fittestChart, currentChart);
   pyshell.stdin.write('"replay"\n');
+  enableChartHover(false, progressChart, fittestChart, currentChart);
 };
 
 /**
  * send step forward to GA, pyshell pauses GA if needed, enables tooltip for charts in case disabled
  */
 const stepForward = () => {
-  enableChartHover(true, progressChart, fittestChart, currentChart);
   pyshell.stdin.write('"step_f"\n');
+  enableChartHover(true, progressChart, fittestChart, currentChart);
 };
 
 /**

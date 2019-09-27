@@ -44,6 +44,7 @@ const initChart = (containerId, options) => {
         series: options.series,
         plotOptions: {
             series: {
+                animation: false,
                 states: {
                     hover: {
                         halo: {
@@ -235,24 +236,24 @@ pyshell.stdout.on('data', (passedArgs) => {
 });
 pyshell.on('error', (err) => console.error(`error trace: ${err}`));
 const play = () => {
-    enableChartHover(false, progressChart, fittestChart, currentChart);
     pyshell.stdin.write('"play"\n');
+    enableChartHover(false, progressChart, fittestChart, currentChart);
 };
 const pause = () => {
-    enableChartHover(true, progressChart, fittestChart, currentChart);
     pyshell.stdin.write('"pause"\n');
+    enableChartHover(true, progressChart, fittestChart, currentChart);
 };
 const stop = () => {
-    enableChartHover(true, progressChart, fittestChart, currentChart);
     pyshell.stdin.write('"stop"\n');
+    enableChartHover(true, progressChart, fittestChart, currentChart);
 };
 const replay = () => {
-    enableChartHover(false, progressChart, fittestChart, currentChart);
     pyshell.stdin.write('"replay"\n');
+    enableChartHover(false, progressChart, fittestChart, currentChart);
 };
 const stepForward = () => {
-    enableChartHover(true, progressChart, fittestChart, currentChart);
     pyshell.stdin.write('"step_f"\n');
+    enableChartHover(true, progressChart, fittestChart, currentChart);
 };
 const exit = () => {
     pyshell.stdin.write('"exit"\n');
