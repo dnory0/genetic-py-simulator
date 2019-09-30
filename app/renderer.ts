@@ -383,7 +383,7 @@ pyshell.on('error', (err: Error) => console.error(`error trace: ${err}`));
  * disables hover settings for charts
  */
 const play = () => {
-  pyshell.stdin.write('"play"\n');
+  pyshell.stdin.write(`${JSON.stringify({ play: true })}\n`);
   enableChartHover(false, progressChart, fittestChart, currentChart);
 };
 
@@ -391,7 +391,7 @@ const play = () => {
  * send pause to GA, enables hover settings for charts
  */
 const pause = () => {
-  pyshell.stdin.write('"pause"\n');
+  pyshell.stdin.write(`${JSON.stringify({ pause: true })}\n`);
   enableChartHover(true, progressChart, fittestChart, currentChart);
 };
 
@@ -399,7 +399,7 @@ const pause = () => {
  * send stop to GA, enables hover settings for charts
  */
 const stop = () => {
-  pyshell.stdin.write('"stop"\n');
+  pyshell.stdin.write(`${JSON.stringify({ stop: true })}\n`);
   enableChartHover(true, progressChart, fittestChart, currentChart);
 };
 
@@ -407,7 +407,7 @@ const stop = () => {
  * stops current GA and launches new one, disables hover settings for charts in case enabled
  */
 const replay = () => {
-  pyshell.stdin.write('"replay"\n');
+  pyshell.stdin.write(`${JSON.stringify({ replay: true })}\n`);
   enableChartHover(false, progressChart, fittestChart, currentChart);
 };
 
@@ -415,7 +415,7 @@ const replay = () => {
  * send step forward to GA, pyshell pauses GA if needed, enables tooltip for charts in case disabled
  */
 const stepForward = () => {
-  pyshell.stdin.write('"step_f"\n');
+  pyshell.stdin.write(`${JSON.stringify({ step_f: true })}\n`);
   enableChartHover(true, progressChart, fittestChart, currentChart);
 };
 
@@ -423,7 +423,7 @@ const stepForward = () => {
  * exit the GA and kill spawned process, usually called on exit or reload app.
  */
 const exit = () => {
-  pyshell.stdin.write('"exit"\n');
+  pyshell.stdin.write(`${JSON.stringify({ exit: true })}\n`);
 };
 
 /************************ GUI & Buttons Configuration ************************

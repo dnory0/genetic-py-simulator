@@ -66,7 +66,7 @@ class Evolve:
         return parents
 
     @staticmethod
-    def cross_over(parents: list, point: int) -> list:
+    def crossover(parents: list, point: int) -> list:
         offsprings = []
         for couple in parents:
             offspring1 = couple[0].genes[: point]
@@ -98,11 +98,11 @@ class Evolve:
         pop_inds = pop.individuals.copy()
         # list of couples to apply cross over on them
         parents = Evolve.to_couples(pop_inds, len(pop.individuals))
-        # defined here to avoid cross_over_rate being changed
+        # defined here to avoid crossover_rate being changed
         # by user on the cross over process.
-        cross_over_point = int(g_cross_over_rate * pop.genes_num)
+        crossover_point = int(g_crossover_rate * pop.genes_num)
         # list of couples of offsprings.
-        offsprings = Evolve.cross_over(parents, cross_over_point)
+        offsprings = Evolve.crossover(parents, crossover_point)
         # list of couples of offsprings, mutation_rate is passed here
         # to avoid being changed by user on the mutation process.
         offsprings = Evolve.mutate(offsprings, pop.genes_num, g_mutation_rate)
@@ -133,10 +133,12 @@ class GAThread(threading.Thread):
 
     def run(self):
         pop = Population()
+        # started signal to the renderer process
         to_json({
             "started": True,
             "genesNum": pop.genes_num
         })
+        # first generated solutions (generation 0)
         to_json({
             "fitness": pop.fittest().fitness(),
             "generation": pop.generation,
@@ -237,15 +239,16 @@ else:
 
 # change to be passed by renderer process
 # global settings
-g_cross_over_rate = .5
+g_crossover_rate = .5
 g_mutation_rate = .06
-
+# g_pop_size = 200
+# g_genes_num = 120
 ga_thread = None
 
 while True:
     cmd = json.loads(input())
-    # TODO add else for cmd cases if ga_thread is None
-    if cmd == 'play':
+    # GA states handling
+    if cmd.get('play'):
         if ga_thread is not None:
             if ga_thread.is_alive():
                 ga_thread.resume()
@@ -255,22 +258,31 @@ while True:
         else:
             ga_thread = GAThread()
             ga_thread.start()
-    elif cmd == 'pause':
+    elif cmd.get('pause'):
         if ga_thread is not None:
             ga_thread.pause()
-    elif cmd == 'stop':
+    elif cmd.get('stop'):
         if ga_thread is not None:
             ga_thread.stop()
-    elif cmd == 'replay':
+    elif cmd.get('replay'):
         if ga_thread is not None:
             ga_thread.stop()
         ga_thread = GAThread()
         ga_thread.start()
-    elif cmd == 'step_f':
+    elif cmd.get('step_f'):
         if ga_thread is None or not ga_thread.is_alive():
             ga_thread = GAThread()
         ga_thread.step_forward()
-    elif cmd == 'exit':
+    elif cmd.get('exit'):
         if ga_thread is not None:
             ga_thread.stop()
         sys.exit(0)
+    # GA parameters handling
+    # else:
+        # crossover rate change, it should not be 0
+        # g_crossover_rate = cmd.get('crosso_rate') if  or g_crossover_rate
+        # mutation rate change, also it should not be 0
+        # g_mutation_rate = cmd.get('mut_rate') or g_mutation_rate
+        # population size
+        # g_pop_size = cmd.get('pop_size')
+            

@@ -13,6 +13,7 @@
 [N-Queen Problem](https://www.geeksforgeeks.org/printing-solutions-n-queen-problem/)
 
 [Knapsack Problem](https://en.wikipedia.org/wiki/Knapsack_problem#Quadratic_knapsack_problem)
+[](https://www.researchgate.net/publication/220741219_Quantum_Genetic_Algorithms)
 
 # Chart.js
 

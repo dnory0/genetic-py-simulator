@@ -236,27 +236,27 @@ pyshell.stdout.on('data', (passedArgs) => {
 });
 pyshell.on('error', (err) => console.error(`error trace: ${err}`));
 const play = () => {
-    pyshell.stdin.write('"play"\n');
+    pyshell.stdin.write(`${JSON.stringify({ play: true })}\n`);
     enableChartHover(false, progressChart, fittestChart, currentChart);
 };
 const pause = () => {
-    pyshell.stdin.write('"pause"\n');
+    pyshell.stdin.write(`${JSON.stringify({ pause: true })}\n`);
     enableChartHover(true, progressChart, fittestChart, currentChart);
 };
 const stop = () => {
-    pyshell.stdin.write('"stop"\n');
+    pyshell.stdin.write(`${JSON.stringify({ stop: true })}\n`);
     enableChartHover(true, progressChart, fittestChart, currentChart);
 };
 const replay = () => {
-    pyshell.stdin.write('"replay"\n');
+    pyshell.stdin.write(`${JSON.stringify({ replay: true })}\n`);
     enableChartHover(false, progressChart, fittestChart, currentChart);
 };
 const stepForward = () => {
-    pyshell.stdin.write('"step_f"\n');
+    pyshell.stdin.write(`${JSON.stringify({ step_f: true })}\n`);
     enableChartHover(true, progressChart, fittestChart, currentChart);
 };
 const exit = () => {
-    pyshell.stdin.write('"exit"\n');
+    pyshell.stdin.write(`${JSON.stringify({ exit: true })}\n`);
 };
 const switchBtn = () => {
     if (isRunning) {
