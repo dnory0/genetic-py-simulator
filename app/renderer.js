@@ -230,6 +230,7 @@ pyshell.stdout.on('data', (passedArgs) => {
         .toString()
         .split('\n')
         .forEach((args) => {
+        console.log(args);
         if (args)
             addToChart(JSON.parse(args));
     });

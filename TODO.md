@@ -1,8 +1,8 @@
 # python part
 
-### exclude some files that are not of any use in production mode
+make GA accept random flags through sys.argv
 
-# timer part:
+### exclude some files that are not of any use in production mode
 
 ## improvements: (@deprecated for now)
 

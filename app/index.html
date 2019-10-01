@@ -13,34 +13,72 @@
 
   <body>
     <div class="container-fluid main">
-      <div class="controls-container">
-        <div class="controls">
-          <button title="play/pause" id="play-btn">
-            <img class="default play" src="img/play-btn.png" />
-            <img class="pause" src="img/pause-btn.png" />
-          </button>
-          <button title="stop" class="disabled-btn" id="stop-btn" disabled>
-            <img src="img/stop-btn.png" />
-          </button>
-          <button
-            title="relaunch the algorithm"
-            class="disabled-btn"
-            id="to-start-btn"
-            disabled
-          >
-            <img src="img/to-start-btn.png" />
-          </button>
-          <button
-            title="step back"
-            class="disabled-btn"
-            id="step-back-btn"
-            disabled
-          >
-            <img src="img/step-back-btn.png" />
-          </button>
-          <button title="step forward" id="step-forward-btn">
-            <img src="img/step-forward-btn.png" />
-          </button>
+      <div class="top-bar-container">
+        <div class="controls-container">
+          <div class="controls">
+            <button title="play/pause" id="play-btn">
+              <img class="default play" src="img/play-btn.png" />
+              <img class="pause" src="img/pause-btn.png" />
+            </button>
+            <button title="stop" class="disabled-btn" id="stop-btn" disabled>
+              <img src="img/stop-btn.png" />
+            </button>
+            <button
+              title="relaunch the algorithm"
+              class="disabled-btn"
+              id="to-start-btn"
+              disabled
+            >
+              <img src="img/to-start-btn.png" />
+            </button>
+            <button
+              title="step back"
+              class="disabled-btn"
+              id="step-back-btn"
+              disabled
+            >
+              <img src="img/step-back-btn.png" />
+            </button>
+            <button title="step forward" id="step-forward-btn">
+              <img src="img/step-forward-btn.png" />
+            </button>
+          </div>
+        </div>
+        <div class="parameters-container">
+          <div class="parameters">
+            <section>
+              <label>
+                <p>Population size:</p>
+                <input type="number" min="20" step="1" name="pop-size" />
+              </label>
+              <label>
+                <p>Genes number:</p>
+                <input type="number" min="5" step="1" name="genes-number" />
+              </label>
+            </section>
+            <section>
+              <label>
+                <p>Crossover rate:</p>
+                <input
+                  type="number"
+                  min="0.001"
+                  max="1"
+                  step="0.001"
+                  name="crossover-rate"
+                />
+              </label>
+              <label>
+                <p>Mutation rate:</p>
+                <input
+                  type="number"
+                  min="0"
+                  max="1"
+                  step="0.001"
+                  name="mutation-rate"
+                />
+              </label>
+            </section>
+          </div>
         </div>
       </div>
       <div class="charts-container">
@@ -50,7 +88,9 @@
           <div class="col-sm-6" id="current-chart"></div>
         </div>
       </div>
-      <div class="bottom-bar"></div>
+      <div class="bottom-bar-container">
+        <div class="bottom-bar"></div>
+      </div>
     </div>
     <script>
       let exports = {};

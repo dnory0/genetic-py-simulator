@@ -1,4 +1,4 @@
-# import time
+import time
 import threading
 import json
 import random
@@ -10,8 +10,13 @@ class Population:
     Population that has possible solutions
     """
 
-    def __init__(self, pop_size: int = 200, genes_num: int = 120):
+    def __init__(self, pop_size: int, genes_num: int):
+        """
+
+        :rtype: object
+        """
         self.individuals = [Individual(genes_num=genes_num) for _ in range(pop_size)]
+        self.pop_size = pop_size
         self.genes_num = genes_num
 
         # generation set to 0 for every new population
@@ -31,21 +36,19 @@ class Population:
 class Individual:
     """
     Individual of a population, can be instantiated by passing genes to 
-    the constructor or optional genes number, default is 120 genes.
+    the constructor or optional genes number
     """
 
-    def __init__(self, genes=None, genes_num: int = 120):
+    def __init__(self, genes_num, genes=None):
         if genes:
             self.genes = [int(gene) for gene in genes]
         else:
             # rand 0s and 1s list
             self.genes = [1 if random.random() >= .5 else 0 for _ in range(genes_num)]
 
+    # call genes_fitness if possible
     def fitness(self) -> int:
-        return sum(1
-                   for ind_gene, solu_gene in zip(self.genes, solution.genes)
-                   if ind_gene == solu_gene
-                   )
+        return Individual.genes_fitness(self.genes)
 
     @staticmethod
     def genes_fitness(genes) -> int:
@@ -89,7 +92,7 @@ class Evolve:
     def update_population(parents: list, offsprings: list):
         for parent_couple, offspring_couple in zip(parents, offsprings):
             for parent, offspring in zip(parent_couple, offspring_couple):
-                # if parent.fitness() < Individual.genes_fitness(offspring):
+                if parent.fitness() < Individual.genes_fitness(offspring):
                     parent.replace_genes(offspring)
 
     @staticmethod
@@ -97,7 +100,7 @@ class Evolve:
         # copy of same individuals to apply selection on it
         pop_inds = pop.individuals.copy()
         # list of couples to apply cross over on them
-        parents = Evolve.to_couples(pop_inds, len(pop.individuals))
+        parents = Evolve.to_couples(pop_inds, pop.pop_size)
         # defined here to avoid crossover_rate being changed
         # by user on the cross over process.
         crossover_point = int(g_crossover_rate * pop.genes_num)
@@ -132,12 +135,13 @@ class GAThread(threading.Thread):
         self.__stop_now = False
 
     def run(self):
-        pop = Population()
+        pop = Population(g_pop_size, len(solution.genes))
         # started signal to the renderer process
         to_json({
             "started": True,
             "genesNum": pop.genes_num
         })
+        print("pop size: " + str(pop.pop_size))
         # first generated solutions (generation 0)
         to_json({
             "fitness": pop.fittest().fitness(),
@@ -155,7 +159,7 @@ class GAThread(threading.Thread):
                 "generation": pop.generation,
                 "genes": pop.fittest().genes
             })
-            # time.sleep(.1)
+            time.sleep(.1)
 
             # pause check, moved down to avoid another iteration if stop event
             # was triggered after a pause event
@@ -226,37 +230,79 @@ class GAThread(threading.Thread):
             self.join()
 
 
-# prints a dict to json
 def to_json(word: dict):
+    """ prints a dict to json and flush it for instant respond (doesn't buffer output)
+    """
     print(json.dumps(word), flush=True)
 
 
-if len(sys.argv) > 1:
-    solution = Individual(genes=sys.argv[1])
-else:
-    # add genes number can be adjusted
-    solution = Individual()
+# initialized when user sends play, replay or step_f signal if it's first step forward
+ga_thread = None
+solution = None
 
-# change to be passed by renderer process
-# global settings
+# global settings, changed every time user passes them
 g_crossover_rate = .5
 g_mutation_rate = .06
-# g_pop_size = 200
-# g_genes_num = 120
-ga_thread = None
+
+# initialized every time GA is initialized,
+# if user passes them after GA started it will do nothing
+g_pop_size = int(sys.argv[1]) if len(sys.argv) > 1 else random.randint(20, 500)
+g_genes_num = int(sys.argv[2]) if len(sys.argv) > 2 else random.randint(5, 200)
+
+
+def check_value(min_val, given_val, is_random: bool):
+    """ called when a signal is received, if random flag set to True it will return
+    value between min_val and given_val, else it returns given_val 
+    """
+    if is_random:
+        # detects whether should calculate int or float through min_val type
+        return random.randint(min_val, given_val) if (type(min_val) == int) else random.uniform(min_val, given_val)
+    return given_val
+
+
+def update_parameters(command: dict):
+    """ check crossover & mutation rate new updates and apply them
+    """
+    if command.get('pop_size'):
+        # population size
+        global g_pop_size
+        g_pop_size = check_value(20, command.get('pop_size'), command.get('random_pop_size'))
+        print(g_pop_size)
+    if command.get('genes_num'):
+        # genes number
+        global g_genes_num
+        g_genes_num = check_value(5, command.get('genes_num'), command.get('random_genes_num'))
+        print(g_genes_num)
+    if command.get('crossover_rate'):
+        # crossover rate change, it should not be 0
+        global g_crossover_rate
+        g_crossover_rate = check_value(.001, command.get('crossover_rate'), command.get('random_crossover'))
+        print(g_crossover_rate)
+    if command.get('mutation_rate'):
+        # mutation rate change, can be 0
+        global g_mutation_rate
+        g_mutation_rate = check_value(.0, command.get('mutation_rate'), command.get('random_mutation'))
+        print(g_mutation_rate)
+
+
+def init_ga(command: dict):
+    """ Initialize new GA thread with a new solution
+     """
+    global ga_thread
+    ga_thread = GAThread()
+    # initialize solution
+    global solution
+    solution = Individual(genes_num=g_genes_num)
+
 
 while True:
-    cmd = json.loads(input())
-    # GA states handling
+    cmd: dict = json.loads(input())
     if cmd.get('play'):
-        if ga_thread is not None:
-            if ga_thread.is_alive():
-                ga_thread.resume()
-            else:
-                ga_thread = GAThread()
-                ga_thread.start()
+        if ga_thread is not None and ga_thread.is_alive():
+            ga_thread.resume()
         else:
-            ga_thread = GAThread()
+            init_ga(cmd)
+            update_parameters(cmd)
             ga_thread.start()
     elif cmd.get('pause'):
         if ga_thread is not None:
@@ -267,22 +313,17 @@ while True:
     elif cmd.get('replay'):
         if ga_thread is not None:
             ga_thread.stop()
-        ga_thread = GAThread()
+        init_ga(cmd)
+        update_parameters(cmd)
         ga_thread.start()
     elif cmd.get('step_f'):
         if ga_thread is None or not ga_thread.is_alive():
-            ga_thread = GAThread()
+            init_ga(cmd)
+            update_parameters(cmd)
         ga_thread.step_forward()
     elif cmd.get('exit'):
         if ga_thread is not None:
             ga_thread.stop()
         sys.exit(0)
-    # GA parameters handling
-    # else:
-        # crossover rate change, it should not be 0
-        # g_crossover_rate = cmd.get('crosso_rate') if  or g_crossover_rate
-        # mutation rate change, also it should not be 0
-        # g_mutation_rate = cmd.get('mut_rate') or g_mutation_rate
-        # population size
-        # g_pop_size = cmd.get('pop_size')
-            
+    else:
+        update_parameters(cmd)

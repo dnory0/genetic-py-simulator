@@ -17,6 +17,8 @@ function isDev() {
 // require('highcharts/modules/exporting')(Highcharts);
 // require('highcharts/')
 
+/****************************** Control buttons ******************************/
+
 let playBtn = <HTMLButtonElement>document.getElementById('play-btn');
 let stopBtn = <HTMLButtonElement>document.getElementById('stop-btn');
 // restart the GA algorithm
@@ -25,6 +27,8 @@ let toStartBtn = <HTMLButtonElement>document.getElementById('to-start-btn');
 // let stepBBtn = <HTMLButtonElement>document.getElementById('step-back-btn');
 // step forward button
 let stepFBtn = <HTMLButtonElement>document.getElementById('step-forward-btn');
+
+/***************************** Parameters inputs *****************************/
 
 /************************ Python & Chart Configuration ************************
  ******************************************************************************/
@@ -370,6 +374,7 @@ pyshell.stdout.on('data', (passedArgs: Buffer) => {
     .toString()
     .split('\n')
     .forEach((args: string) => {
+      console.log(args);
       // sometimes args == ''(not sure why), those cases need to be ignored
       if (args) addToChart(JSON.parse(args));
     });

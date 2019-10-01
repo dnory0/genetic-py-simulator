@@ -49,14 +49,24 @@ body {
   margin: 0;
 }
 
-.main .controls-container {
+.main .top-bar-container {
   margin: 0 4px;
   padding: 4px 0;
-  height: 36px;
+  height: 76px;
   border-bottom: 1px solid #a37e7e;
+  width: -webkit-fill-available;
+  text-align: center;
 }
 
-.main .controls-container .controls button {
+.main .top-bar-container .controls-container {
+  position: absolute;
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  width: fit-content;
+  left: calc(50% - 79px);
+}
+
+.main .top-bar-container .controls-container button {
   padding: 5px 4px 5px 5px;
   border: none;
   border-radius: 4px;
@@ -65,28 +75,80 @@ body {
   background-color: white;
 }
 
-.main .controls-container .controls button:hover:not(.disabled-btn) {
+.main .top-bar-container .controls-container button:hover:not(.disabled-btn) {
   background-color: #c4c4c4;
 }
 
-.main .controls-container .controls button img {
+.main .top-bar-container .controls-container button img {
   width: 18px;
   float: left;
 }
 
-.main .controls-container .controls button.disabled-btn {
+.main .top-bar-container .controls-container button.disabled-btn {
   opacity: 0.6;
 }
 
-.main .controls-container .controls button#play-btn img {
+.main .top-bar-container .controls-container button#play-btn img {
   display: none;
 }
 
-.main .controls-container .controls button#play-btn img.default {
+.main .top-bar-container .controls-container button#play-btn img.default {
   display: block;
 }
 
-.main div.bottom-bar {
-  height: 20%;
+.main .top-bar-container .parameters-container {
+  height: 100%;
+}
+
+.main .top-bar-container .parameters-container .parameters {
+  height: 100%;
+}
+
+.main .top-bar-container .parameters-container .parameters p {
+  font-size: 13px;
+  width: -webkit-max-content;
+  width: -moz-max-content;
+  width: max-content;
+  float: left;
+  padding-right: 5px;
+  margin: 0;
+  padding: 7.2px;
+}
+
+.main .top-bar-container .parameters-container .parameters input[type='number'] {
+  margin-top: 4px;
+  height: 26px;
+  width: 80px;
+}
+
+.main .top-bar-container .parameters-container .parameters section {
+  height: 50%;
+}
+
+.main .top-bar-container .parameters-container .parameters section label {
+  height: 100%;
+  margin: 0;
+  width: 200px;
+}
+
+.main .top-bar-container .parameters-container .parameters section label:first-child {
+  float: left;
+  margin-left: 4%;
+}
+
+.main .top-bar-container .parameters-container .parameters section label:last-child {
+  float: right;
+  margin-right: 4%;
+}
+
+.main div.bottom-bar-container {
+  bottom: 0;
+  height: 24px;
+  margin: 0 4px;
+  border-top: 1px solid #a37e7e;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
 }
 /*# sourceMappingURL=style.css.map */
