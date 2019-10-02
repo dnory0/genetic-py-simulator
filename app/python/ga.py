@@ -141,7 +141,6 @@ class GAThread(threading.Thread):
             "started": True,
             "genesNum": pop.genes_num
         })
-        print("pop size: " + str(pop.pop_size))
         # first generated solutions (generation 0)
         to_json({
             "fitness": pop.fittest().fitness(),
@@ -159,7 +158,10 @@ class GAThread(threading.Thread):
                 "generation": pop.generation,
                 "genes": pop.fittest().genes
             })
-            time.sleep(.1)
+
+            # if g_sleep is 0 than just ignore it
+            if g_sleep:
+                time.sleep(g_sleep)
 
             # pause check, moved down to avoid another iteration if stop event
             # was triggered after a pause event
@@ -243,11 +245,12 @@ solution = None
 # global settings, changed every time user passes them
 g_crossover_rate = .5
 g_mutation_rate = .06
+g_sleep = 0
 
 # initialized every time GA is initialized,
 # if user passes them after GA started it will do nothing
-g_pop_size = int(sys.argv[1]) if len(sys.argv) > 1 else random.randint(20, 500)
-g_genes_num = int(sys.argv[2]) if len(sys.argv) > 2 else random.randint(5, 200)
+g_pop_size = int(sys.argv[1]) if len(sys.argv) > 1 else random.randint(120, 500)
+g_genes_num = int(sys.argv[2]) if len(sys.argv) > 2 else random.randint(80, 200)
 
 
 def check_value(min_val, given_val, is_random: bool):
@@ -267,22 +270,21 @@ def update_parameters(command: dict):
         # population size
         global g_pop_size
         g_pop_size = check_value(20, command.get('pop_size'), command.get('random_pop_size'))
-        print(g_pop_size)
     if command.get('genes_num'):
         # genes number
         global g_genes_num
         g_genes_num = check_value(5, command.get('genes_num'), command.get('random_genes_num'))
-        print(g_genes_num)
     if command.get('crossover_rate'):
         # crossover rate change, it should not be 0
         global g_crossover_rate
         g_crossover_rate = check_value(.001, command.get('crossover_rate'), command.get('random_crossover'))
-        print(g_crossover_rate)
     if command.get('mutation_rate'):
         # mutation rate change, can be 0
         global g_mutation_rate
         g_mutation_rate = check_value(.0, command.get('mutation_rate'), command.get('random_mutation'))
-        print(g_mutation_rate)
+    if command.get('sleep'):
+        global g_sleep
+        g_sleep = command.get('sleep')
 
 
 def init_ga(command: dict):
@@ -302,7 +304,6 @@ while True:
             ga_thread.resume()
         else:
             init_ga(cmd)
-            update_parameters(cmd)
             ga_thread.start()
     elif cmd.get('pause'):
         if ga_thread is not None:
@@ -314,12 +315,10 @@ while True:
         if ga_thread is not None:
             ga_thread.stop()
         init_ga(cmd)
-        update_parameters(cmd)
         ga_thread.start()
     elif cmd.get('step_f'):
         if ga_thread is None or not ga_thread.is_alive():
             init_ga(cmd)
-            update_parameters(cmd)
         ga_thread.step_forward()
     elif cmd.get('exit'):
         if ga_thread is not None:

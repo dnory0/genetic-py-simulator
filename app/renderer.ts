@@ -30,6 +30,15 @@ let stepFBtn = <HTMLButtonElement>document.getElementById('step-forward-btn');
 
 /***************************** Parameters inputs *****************************/
 
+let popSize = <HTMLInputElement>document.getElementById('pop-size');
+let pSRandom = <HTMLButtonElement>document.getElementById('random-pop-size');
+let genesNum = <HTMLInputElement>document.getElementById('genes-num');
+let gNRandom = <HTMLButtonElement>document.getElementById('random-genes-num');
+let crossover = <HTMLInputElement>document.getElementById('crossover-rate');
+let coRandom = <HTMLButtonElement>document.getElementById('random-crossover');
+let mutation = <HTMLInputElement>document.getElementById('mutation-rate');
+let mutRandom = <HTMLButtonElement>document.getElementById('random-mutation');
+
 /************************ Python & Chart Configuration ************************
  ******************************************************************************/
 /**
@@ -97,10 +106,6 @@ const initChart = (containerId: string, options: Highcharts.Options) => {
     plotOptions: {
       series: {
         animation: false,
-        // marker: {
-        //   enabled: false,
-        //   radius: null
-        // },
         states: {
           hover: {
             halo: {
@@ -374,7 +379,7 @@ pyshell.stdout.on('data', (passedArgs: Buffer) => {
     .toString()
     .split('\n')
     .forEach((args: string) => {
-      console.log(args);
+      // console.log(args);
       // sometimes args == ''(not sure why), those cases need to be ignored
       if (args) addToChart(JSON.parse(args));
     });
@@ -519,6 +524,66 @@ stepFBtn.onclick = () => {
   // switch to paused state
   switchBtn();
 };
+
+popSize.addEventListener('keyup', event => {
+  if (parseInt(popSize.value) >= 120) {
+    popSize.style.backgroundColor = '#fff';
+    pyshell.stdin.write(
+      `${JSON.stringify({
+        pop_size: parseInt(popSize.value)
+        // random_pop_size: popSizeRandom.
+      })}\n`,
+      (error: Error) => {
+        if (error) throw error;
+      }
+    );
+  } else popSize.style.backgroundColor = '#ff5a5a';
+});
+
+genesNum.addEventListener('keyup', event => {
+  if (parseInt(genesNum.value) >= 80) {
+    genesNum.style.backgroundColor = '#fff';
+    pyshell.stdin.write(
+      `${JSON.stringify({
+        genes_num: parseInt(genesNum.value)
+        // random_pop_size: popSizeRandom.
+      })}\n`,
+      (error: Error) => {
+        if (error) throw error;
+      }
+    );
+  } else genesNum.style.backgroundColor = '#ff5a5a';
+});
+
+crossover.addEventListener('keyup', event => {
+  if (parseFloat(crossover.value) > 0 && parseFloat(crossover.value) <= 1) {
+    crossover.style.backgroundColor = '#fff';
+    pyshell.stdin.write(
+      `${JSON.stringify({
+        crossover_rate: parseFloat(crossover.value)
+        // random_pop_size: popSizeRandom.
+      })}\n`,
+      (error: Error) => {
+        if (error) throw error;
+      }
+    );
+  } else crossover.style.backgroundColor = '#ff5a5a';
+});
+
+mutation.addEventListener('keyup', event => {
+  if (parseFloat(mutation.value) >= 0 && parseFloat(mutation.value) <= 1) {
+    mutation.style.backgroundColor = '#fff';
+    pyshell.stdin.write(
+      `${JSON.stringify({
+        mutation_rate: parseFloat(mutation.value)
+        // random_pop_size: popSizeRandom.
+      })}\n`,
+      (error: Error) => {
+        if (error) throw error;
+      }
+    );
+  } else mutation.style.backgroundColor = '#ff5a5a';
+});
 
 /**
  * triggered when app going to exit or reload

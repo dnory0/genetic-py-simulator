@@ -15,6 +15,4 @@
 [Knapsack Problem](https://en.wikipedia.org/wiki/Knapsack_problem#Quadratic_knapsack_problem)
 [](https://www.researchgate.net/publication/220741219_Quantum_Genetic_Algorithms)
 
-# Chart.js
 
-[close and open tooltip programmatically](https://stackoverflow.com/questions/39283177/programmatically-open-and-close-chart-js-tooltip)

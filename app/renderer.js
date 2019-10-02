@@ -12,6 +12,14 @@ let playBtn = document.getElementById('play-btn');
 let stopBtn = document.getElementById('stop-btn');
 let toStartBtn = document.getElementById('to-start-btn');
 let stepFBtn = document.getElementById('step-forward-btn');
+let popSize = document.getElementById('pop-size');
+let pSRandom = document.getElementById('random-pop-size');
+let genesNum = document.getElementById('genes-num');
+let gNRandom = document.getElementById('random-genes-num');
+let crossover = document.getElementById('crossover-rate');
+let coRandom = document.getElementById('random-crossover');
+let mutation = document.getElementById('mutation-rate');
+let mutRandom = document.getElementById('random-mutation');
 let progressChart;
 let fittestChart;
 let currentChart;
@@ -230,7 +238,6 @@ pyshell.stdout.on('data', (passedArgs) => {
         .toString()
         .split('\n')
         .forEach((args) => {
-        console.log(args);
         if (args)
             addToChart(JSON.parse(args));
     });
@@ -306,6 +313,58 @@ stepFBtn.onclick = () => {
     isRunning = false;
     switchBtn();
 };
+popSize.addEventListener('keyup', event => {
+    if (parseInt(popSize.value) >= 120) {
+        popSize.style.backgroundColor = '#fff';
+        pyshell.stdin.write(`${JSON.stringify({
+            pop_size: parseInt(popSize.value)
+        })}\n`, (error) => {
+            if (error)
+                throw error;
+        });
+    }
+    else
+        popSize.style.backgroundColor = '#ff5a5a';
+});
+genesNum.addEventListener('keyup', event => {
+    if (parseInt(genesNum.value) >= 80) {
+        genesNum.style.backgroundColor = '#fff';
+        pyshell.stdin.write(`${JSON.stringify({
+            genes_num: parseInt(genesNum.value)
+        })}\n`, (error) => {
+            if (error)
+                throw error;
+        });
+    }
+    else
+        genesNum.style.backgroundColor = '#ff5a5a';
+});
+crossover.addEventListener('keyup', event => {
+    if (parseFloat(crossover.value) > 0 && parseFloat(crossover.value) <= 1) {
+        crossover.style.backgroundColor = '#fff';
+        pyshell.stdin.write(`${JSON.stringify({
+            crossover_rate: parseFloat(crossover.value)
+        })}\n`, (error) => {
+            if (error)
+                throw error;
+        });
+    }
+    else
+        crossover.style.backgroundColor = '#ff5a5a';
+});
+mutation.addEventListener('keyup', event => {
+    if (parseFloat(mutation.value) >= 0 && parseFloat(mutation.value) <= 1) {
+        mutation.style.backgroundColor = '#fff';
+        pyshell.stdin.write(`${JSON.stringify({
+            mutation_rate: parseFloat(mutation.value)
+        })}\n`, (error) => {
+            if (error)
+                throw error;
+        });
+    }
+    else
+        mutation.style.backgroundColor = '#ff5a5a';
+});
 electron_1.ipcRenderer.on('pyshell', () => {
     exit();
 });
