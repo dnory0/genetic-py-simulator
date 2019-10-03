@@ -269,11 +269,11 @@ def update_parameters(command: dict):
     if command.get('pop_size'):
         # population size
         global g_pop_size
-        g_pop_size = check_value(20, command.get('pop_size'), command.get('random_pop_size'))
+        g_pop_size = check_value(120, command.get('pop_size'), command.get('random_pop_size'))
     if command.get('genes_num'):
         # genes number
         global g_genes_num
-        g_genes_num = check_value(5, command.get('genes_num'), command.get('random_genes_num'))
+        g_genes_num = check_value(80, command.get('genes_num'), command.get('random_genes_num'))
     if command.get('crossover_rate'):
         # crossover rate change, it should not be 0
         global g_crossover_rate

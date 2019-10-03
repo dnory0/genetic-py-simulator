@@ -30,13 +30,41 @@ let stepFBtn = <HTMLButtonElement>document.getElementById('step-forward-btn');
 
 /***************************** Parameters inputs *****************************/
 
+/**
+ * number of individuals in a population, needs to be more than 120
+ */
 let popSize = <HTMLInputElement>document.getElementById('pop-size');
+/**
+ * by Default is set false, if set true the true population size is going to be
+ * randomized between 120 and popSize passed to GA.
+ */
 let pSRandom = <HTMLButtonElement>document.getElementById('random-pop-size');
+/**
+ * number of genes per individual, at least needs to be set to 80.
+ */
 let genesNum = <HTMLInputElement>document.getElementById('genes-num');
+/**
+ * by Default is set false, if set true the true genes number is going to be
+ * randomized between 80 and genesNum passed to GA.
+ */
 let gNRandom = <HTMLButtonElement>document.getElementById('random-genes-num');
+/**
+ * crossover rate, it's in ]0,1] range.
+ */
 let crossover = <HTMLInputElement>document.getElementById('crossover-rate');
+/**
+ * by Default is set false, if set true the true crossover rate is going to be
+ * randomized between 0.001 and crossover passed to GA.
+ */
 let coRandom = <HTMLButtonElement>document.getElementById('random-crossover');
+/**
+ * mutation rate, range of values is [0,1].
+ */
 let mutation = <HTMLInputElement>document.getElementById('mutation-rate');
+/**
+ * by Default is set false, if set true the true mutation rate is going to be
+ * randomized between 0 and mutation passed to GA.
+ */
 let mutRandom = <HTMLButtonElement>document.getElementById('random-mutation');
 
 /************************ Python & Chart Configuration ************************
@@ -524,6 +552,8 @@ stepFBtn.onclick = () => {
   // switch to paused state
   switchBtn();
 };
+
+/**************************** Inputs Event handling ****************************/
 
 popSize.addEventListener('keyup', event => {
   if (parseInt(popSize.value) >= 120) {
