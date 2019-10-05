@@ -80,7 +80,7 @@ class Evolve:
         for couple in offsprings:
             for offspring in couple:
                 for index in range(genes_num):
-                    if random.random() <= mutation_rate:
+                    if random.randint(0, 999)/1000 < mutation_rate:
                         offspring[index] = 0 if offspring[index] else 1
         return offsprings
 
