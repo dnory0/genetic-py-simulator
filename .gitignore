@@ -91,3 +91,10 @@ typings/
 dist
 .idea
 .vscode
+genetic_algorithm.py
+secondary-process.*
+index.ts
+index.js.map
+index.js
+SOURCES.md
+TODO.md

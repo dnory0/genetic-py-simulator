@@ -280,7 +280,8 @@ def update_parameters(command: dict):
         # mutation rate change, can be 0
         global g_mutation_rate
         g_mutation_rate = final_value(.0, command.get('mutation_rate'), command.get('random_mutation'))
-    if command.get('sleep'):
+    if type(command.get('sleep')) is not type(None):
+        # sleep in seconds
         global g_sleep
         g_sleep = command.get('sleep')
 
