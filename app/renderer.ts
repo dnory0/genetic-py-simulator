@@ -19,13 +19,25 @@ function isDev() {
 
 /****************************** Control buttons ******************************/
 
+/**
+ * play/pause button, it's role (to pause/to play) depends on isRunning
+ */
 let playBtn = <HTMLButtonElement>document.getElementById('play-btn');
+/**
+ * stops the GA algorithm
+ */
 let stopBtn = <HTMLButtonElement>document.getElementById('stop-btn');
-// restart the GA algorithm
+/**
+ * restart the GA algorithm
+ */
 let toStartBtn = <HTMLButtonElement>document.getElementById('to-start-btn');
-// step back button (not implemented)
+/**
+ * step back button (not implemented)
+ */
 // let stepBBtn = <HTMLButtonElement>document.getElementById('step-back-btn');
-// step forward button
+/**
+ * step forward button
+ */
 let stepFBtn = <HTMLButtonElement>document.getElementById('step-forward-btn');
 
 /***************************** Parameters inputs *****************************/
@@ -67,18 +79,23 @@ let mutation = <HTMLInputElement>document.getElementById('mutation-rate');
  */
 let mutRandom = <HTMLButtonElement>document.getElementById('random-mutation');
 
-/************************ Python & Chart Configuration ************************
+/************************ Charts & Python Configuration ************************
  ******************************************************************************/
+
+/**************************** Charts Configuration ****************************/
 /**
- * updated with fittest per generation
+ * updated every generation, recieves the generation with its fittest fitness
  */
 let progressChart: Highcharts.Chart;
 /**
- * updated with fittest genes
+ * updated every time a new most fittest appear, recives most fittest genes
+ *
+ * most fittest is a new fittest which its fitness value is better than every
+ * fittest in the previous generations
  */
 let fittestChart: Highcharts.Chart;
 /**
- * updated with fittest genes per generation
+ * updated every generation, recives current generation's fittest genes
  */
 let currentChart: Highcharts.Chart;
 
@@ -554,66 +571,55 @@ stepFBtn.onclick = () => {
 };
 
 /**************************** Inputs Event handling ****************************/
+/**
+ * checks if the changed input has a valid value, if true pass it to pyshell, else
+ * highlight the input in red to indicate invalide value.
+ * @param event keyup | change event passed when user try to change value on parameters
+ */
+const parameterChanged = (event: Event) => {
+  // prevent valueChange from being triggered twice if user used arrow keys,
+  // also ignore other keyboard keys except backspace.
+  if (event.type == 'keyup')
+    if (
+      isNaN(parseInt((<KeyboardEvent>event).key)) &&
+      (<KeyboardEvent>event).key != 'Backspace'
+    )
+      return;
 
-popSize.addEventListener('keyup', event => {
-  if (parseInt(popSize.value) >= 120) {
-    popSize.style.backgroundColor = '#fff';
+  if (
+    (isNaN(parseFloat((<HTMLInputElement>event.target).min)) ||
+      parseFloat((<HTMLInputElement>event.target).value) >=
+        parseFloat((<HTMLInputElement>event.target).min)) &&
+    (isNaN(parseFloat((<HTMLInputElement>event.target).max)) ||
+      parseFloat((<HTMLInputElement>event.target).value) <=
+        parseFloat((<HTMLInputElement>event.target).max))
+  ) {
+    (<HTMLInputElement>event.target).style.backgroundColor = '#fff';
     pyshell.stdin.write(
       `${JSON.stringify({
-        pop_size: parseInt(popSize.value)
+        [(<HTMLInputElement>event.target).name]: parseFloat(
+          (<HTMLInputElement>event.target).value
+        )
         // random_pop_size: popSizeRandom.
       })}\n`,
       (error: Error) => {
         if (error) throw error;
       }
     );
-  } else popSize.style.backgroundColor = '#ff5a5a';
-});
+  } else (<HTMLInputElement>event.target).style.backgroundColor = '#ff5a5a';
+};
 
-genesNum.addEventListener('keyup', event => {
-  if (parseInt(genesNum.value) >= 80) {
-    genesNum.style.backgroundColor = '#fff';
-    pyshell.stdin.write(
-      `${JSON.stringify({
-        genes_num: parseInt(genesNum.value)
-        // random_pop_size: popSizeRandom.
-      })}\n`,
-      (error: Error) => {
-        if (error) throw error;
-      }
-    );
-  } else genesNum.style.backgroundColor = '#ff5a5a';
-});
+popSize.addEventListener('change', parameterChanged);
+popSize.addEventListener('keyup', parameterChanged);
 
-crossover.addEventListener('keyup', event => {
-  if (parseFloat(crossover.value) > 0 && parseFloat(crossover.value) <= 1) {
-    crossover.style.backgroundColor = '#fff';
-    pyshell.stdin.write(
-      `${JSON.stringify({
-        crossover_rate: parseFloat(crossover.value)
-        // random_pop_size: popSizeRandom.
-      })}\n`,
-      (error: Error) => {
-        if (error) throw error;
-      }
-    );
-  } else crossover.style.backgroundColor = '#ff5a5a';
-});
+genesNum.addEventListener('change', parameterChanged);
+genesNum.addEventListener('keyup', parameterChanged);
 
-mutation.addEventListener('keyup', event => {
-  if (parseFloat(mutation.value) >= 0 && parseFloat(mutation.value) <= 1) {
-    mutation.style.backgroundColor = '#fff';
-    pyshell.stdin.write(
-      `${JSON.stringify({
-        mutation_rate: parseFloat(mutation.value)
-        // random_pop_size: popSizeRandom.
-      })}\n`,
-      (error: Error) => {
-        if (error) throw error;
-      }
-    );
-  } else mutation.style.backgroundColor = '#ff5a5a';
-});
+crossover.addEventListener('change', parameterChanged);
+crossover.addEventListener('keyup', parameterChanged);
+
+mutation.addEventListener('change', parameterChanged);
+mutation.addEventListener('keyup', parameterChanged);
 
 /**
  * triggered when app going to exit or reload

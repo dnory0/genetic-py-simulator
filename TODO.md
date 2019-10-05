@@ -1,6 +1,10 @@
 # python part
 
-make GA accept random flags through sys.argv
+use browserview
+add highchart functionalities such as full screen and png saving
+start working on general case ga
+deprecate unused files on next version (expected v0.2)
+add range input as the default way to input parameters
 
 ### exclude some files that are not of any use in production mode
 

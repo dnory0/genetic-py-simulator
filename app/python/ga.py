@@ -11,10 +11,6 @@ class Population:
     """
 
     def __init__(self, pop_size: int, genes_num: int):
-        """
-
-        :rtype: object
-        """
         self.individuals = [Individual(genes_num=genes_num) for _ in range(pop_size)]
         self.pop_size = pop_size
         self.genes_num = genes_num
@@ -168,6 +164,8 @@ class GAThread(threading.Thread):
             self.__pause_check()
 
         # finished event
+        to_json({"finished": True})
+
 
     def __pause_check(self):
         """
@@ -253,7 +251,7 @@ g_pop_size = int(sys.argv[1]) if len(sys.argv) > 1 else random.randint(120, 500)
 g_genes_num = int(sys.argv[2]) if len(sys.argv) > 2 else random.randint(80, 200)
 
 
-def check_value(min_val, given_val, is_random: bool):
+def final_value(min_val, given_val, is_random: bool):
     """ called when a signal is received, if random flag set to True it will return
     value between min_val and given_val, else it returns given_val 
     """
@@ -269,19 +267,19 @@ def update_parameters(command: dict):
     if command.get('pop_size'):
         # population size
         global g_pop_size
-        g_pop_size = check_value(120, command.get('pop_size'), command.get('random_pop_size'))
+        g_pop_size = final_value(120, command.get('pop_size'), command.get('random_pop_size'))
     if command.get('genes_num'):
         # genes number
         global g_genes_num
-        g_genes_num = check_value(80, command.get('genes_num'), command.get('random_genes_num'))
+        g_genes_num = final_value(80, command.get('genes_num'), command.get('random_genes_num'))
     if command.get('crossover_rate'):
         # crossover rate change, it should not be 0
         global g_crossover_rate
-        g_crossover_rate = check_value(.001, command.get('crossover_rate'), command.get('random_crossover'))
-    if command.get('mutation_rate'):
+        g_crossover_rate = final_value(.001, command.get('crossover_rate'), command.get('random_crossover'))
+    if type(command.get('mutation_rate')) is not type(None):
         # mutation rate change, can be 0
         global g_mutation_rate
-        g_mutation_rate = check_value(.0, command.get('mutation_rate'), command.get('random_mutation'))
+        g_mutation_rate = final_value(.0, command.get('mutation_rate'), command.get('random_mutation'))
     if command.get('sleep'):
         global g_sleep
         g_sleep = command.get('sleep')

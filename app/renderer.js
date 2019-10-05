@@ -313,58 +313,36 @@ stepFBtn.onclick = () => {
     isRunning = false;
     switchBtn();
 };
-popSize.addEventListener('keyup', event => {
-    if (parseInt(popSize.value) >= 120) {
-        popSize.style.backgroundColor = '#fff';
+const parameterChanged = (event) => {
+    if (event.type == 'keyup')
+        if (isNaN(parseInt(event.key)) &&
+            event.key != 'Backspace')
+            return;
+    if ((isNaN(parseFloat(event.target.min)) ||
+        parseFloat(event.target.value) >=
+            parseFloat(event.target.min)) &&
+        (isNaN(parseFloat(event.target.max)) ||
+            parseFloat(event.target.value) <=
+                parseFloat(event.target.max))) {
+        event.target.style.backgroundColor = '#fff';
         pyshell.stdin.write(`${JSON.stringify({
-            pop_size: parseInt(popSize.value)
+            [event.target.name]: parseFloat(event.target.value)
         })}\n`, (error) => {
             if (error)
                 throw error;
         });
     }
     else
-        popSize.style.backgroundColor = '#ff5a5a';
-});
-genesNum.addEventListener('keyup', event => {
-    if (parseInt(genesNum.value) >= 80) {
-        genesNum.style.backgroundColor = '#fff';
-        pyshell.stdin.write(`${JSON.stringify({
-            genes_num: parseInt(genesNum.value)
-        })}\n`, (error) => {
-            if (error)
-                throw error;
-        });
-    }
-    else
-        genesNum.style.backgroundColor = '#ff5a5a';
-});
-crossover.addEventListener('keyup', event => {
-    if (parseFloat(crossover.value) > 0 && parseFloat(crossover.value) <= 1) {
-        crossover.style.backgroundColor = '#fff';
-        pyshell.stdin.write(`${JSON.stringify({
-            crossover_rate: parseFloat(crossover.value)
-        })}\n`, (error) => {
-            if (error)
-                throw error;
-        });
-    }
-    else
-        crossover.style.backgroundColor = '#ff5a5a';
-});
-mutation.addEventListener('keyup', event => {
-    if (parseFloat(mutation.value) >= 0 && parseFloat(mutation.value) <= 1) {
-        mutation.style.backgroundColor = '#fff';
-        pyshell.stdin.write(`${JSON.stringify({
-            mutation_rate: parseFloat(mutation.value)
-        })}\n`, (error) => {
-            if (error)
-                throw error;
-        });
-    }
-    else
-        mutation.style.backgroundColor = '#ff5a5a';
-});
+        event.target.style.backgroundColor = '#ff5a5a';
+};
+popSize.addEventListener('change', parameterChanged);
+popSize.addEventListener('keyup', parameterChanged);
+genesNum.addEventListener('change', parameterChanged);
+genesNum.addEventListener('keyup', parameterChanged);
+crossover.addEventListener('change', parameterChanged);
+crossover.addEventListener('keyup', parameterChanged);
+mutation.addEventListener('change', parameterChanged);
+mutation.addEventListener('keyup', parameterChanged);
 electron_1.ipcRenderer.on('pyshell', () => {
     exit();
 });
