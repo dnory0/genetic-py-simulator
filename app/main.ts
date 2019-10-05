@@ -5,8 +5,10 @@ import {
   Menu,
   MenuItem,
   BrowserView,
-  Rectangle
+  Rectangle,
+  AutoResizeOptions
 } from 'electron';
+import { join } from 'path';
 /******************* MAIN WINDOW HANDLING *******************
  *************************************************************/
 /**
@@ -79,41 +81,36 @@ app.once('ready', () => {
     minHeight: 430
   });
 
-  let view = new BrowserView();
+  let view = new BrowserView({
+    webPreferences: {
+      nodeIntegration: true
+    }
+  });
   mainWindow.setBrowserView(view);
-  view.setBounds({ x: 0, y: 36, width: 800, height: 300 });
+  view.setBounds({
+    x: 0,
+    y: 36,
+    width: mainWindow.getBounds().width,
+    height: mainWindow.getBounds().height
+  });
 
-  mainWindow.on('resize', () => {
-    console.log(mainWindow.getBounds());
-    view.setBounds({
-      x: 0,
-      y: 36,
-      width: mainWindow.getBounds().width,
-      height: mainWindow.getBounds().height
-    } as Rectangle);
-  });
-  mainWindow.on('enter-full-screen', () => {
-    view.setBounds({
-      x: 0,
-      y: 36,
-      width: mainWindow.getBounds().width,
-      height: mainWindow.getBounds().height
-    } as Rectangle);
-  });
-  mainWindow.on('maximize', () => {
-    view.setBounds({
-      x: 0,
-      y: 36,
-      width: mainWindow.getBounds().width,
-      height: mainWindow.getBounds().height
-    } as Rectangle);
-  });
-  // view.setAutoResize({
-  //   height: true,
-  //   width: true
-  // } as AutoResizeOptions);
-  view.webContents.loadURL('https://electronjs.org');
+  mainWindow.on(
+    'will-resize',
+    (_event: Electron.Event, newBounds: Rectangle) => {
+      console.log(newBounds);
+    }
+  );
 
+  view.setAutoResize({
+    height: true,
+    width: true
+  } as AutoResizeOptions);
+  view.webContents.loadFile('app/progress-chart.html');
+  view.webContents.toggleDevTools();
+  let i = 0;
+  setInterval(() => {
+    view.webContents.send('data', { [--i]: 'hi', [--i]: 'world' });
+  }, 500);
   const menubar = require('./menubar') as Menu;
   menubar.items[process.platform == 'darwin' ? 3 : 2].submenu.append(
     new MenuItem({
