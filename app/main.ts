@@ -10,15 +10,34 @@ import {
   AutoResizeOptions
 } from 'electron';
 import { join } from 'path';
+import { existsSync, copyFileSync } from 'fs';
+import { spawn, ChildProcess } from 'child_process';
+
 /******************* MAIN WINDOW HANDLING *******************
  *************************************************************/
+
+/**
+ * set to true if app on development, false in production.
+ *
+ * NOTE: app needs to be packed on asar (by default) to detect production mode
+ * if you don't set asar to false on electron-builder.json you're good to go
+ */
+const isDev = __dirname.indexOf('.asar') === -1;
+
 /**
  * main window
  */
 let mainWindow: BrowserWindow;
+/**
+ * progress Chart View
+ */
 let progressView: BrowserView;
-let fittestView: BrowserView;
+// let fittestView: BrowserView;
 
+/**
+ * declared and initialized globally
+ */
+let pyshell: ChildProcess;
 /**
  * @param filePath  string path to an HTML file relative to the root of your application
  * @param options   constructor options for the browser window returned
@@ -55,7 +74,10 @@ const createWindow = (
 
   targetWindow.loadFile(filePath);
 
-  targetWindow.once('ready-to-show', () => targetWindow.show());
+  targetWindow.once('ready-to-show', () => {
+    targetWindow.show();
+    initPyshell();
+  });
 
   targetWindow.once('closed', () => {
     targetWindow = null;
@@ -108,6 +130,69 @@ const createView = (
   return targetView;
 };
 
+/**
+ * initialize pyshell depending on the mode (development/production) and
+ * platform (win32/linux)
+ */
+const initPyshell = () => {
+  // if in development
+  if (isDev) {
+    // works with the script version
+    pyshell = exports.pyshell = spawn(
+      `${process.platform == 'win32' ? 'python' : 'python3'}`,
+      [join(__dirname, 'python', 'ga.py')]
+    );
+  } else {
+    /**
+     * path of executable/script to copy
+     */
+    let copyFrom: string;
+    /**
+     * temp directory which the executable/script is going to be copied to
+     */
+    let copyTo: string;
+    /**
+     * set to true if executable is available
+     */
+    let execExist = existsSync(
+      join(
+        __dirname,
+        'python',
+        'dist',
+        process.platform == 'win32'
+          ? join('win', 'ga.exe')
+          : join('linux', 'ga')
+      )
+    );
+
+    if (execExist) {
+      copyFrom = join(
+        __dirname,
+        'python',
+        'dist',
+        process.platform == 'win32'
+          ? join('win', 'ga.exe')
+          : join('linux', 'ga')
+      );
+      copyTo = join(
+        app.getPath('temp'),
+        process.platform == 'win32' ? 'ga.exe' : 'ga'
+      );
+    } else {
+      copyFrom = join(__dirname, 'python', 'ga.py');
+      copyTo = join(app.getPath('temp'), 'ga.py');
+    }
+    // works with the executable version
+    copyFileSync(copyFrom, copyTo);
+    pyshell = exports.pyshell = spawn(
+      execExist
+        ? copyTo
+        : `${process.platform == 'win32' ? 'python' : 'python3'}`,
+      execExist ? [] : [copyTo]
+    );
+  }
+};
+
 app.once('ready', () => {
   /****************************** Main Window ******************************
    *************************************************************************/
@@ -135,7 +220,7 @@ app.once('ready', () => {
 
   /***************************** Progress View *****************************/
   progressView = createView(
-    join('app', 'progress-chart.html'),
+    join('app', 'progress-chart', 'progress-chart.html'),
     {
       x: 0,
       y: 0,
@@ -145,7 +230,7 @@ app.once('ready', () => {
     {
       webPreferences: {
         preload: join(__dirname, 'preload.js'),
-        nodeIntegration: true
+        nodeIntegration: false
       }
     },
     {
@@ -153,6 +238,8 @@ app.once('ready', () => {
       height: true
     } as AutoResizeOptions
   );
+
+  progressView.webContents.toggleDevTools();
 
   mainWindow.addBrowserView(progressView);
 

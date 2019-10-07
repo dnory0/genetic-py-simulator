@@ -86,7 +86,7 @@ let mutRandom = <HTMLButtonElement>document.getElementById('random-mutation');
 /**
  * updated every generation, recieves the generation with its fittest fitness
  */
-let progressChart: Highcharts.Chart;
+// let progressChart: Highcharts.Chart;
 /**
  * updated every time a new most fittest appear, recives most fittest genes
  *
@@ -169,30 +169,30 @@ const initChart = (containerId: string, options: Highcharts.Options) => {
   });
 };
 
-progressChart = initChart('progress-chart', {
-  chart: {
-    type: 'line'
-  },
-  title: {
-    text: 'Fittest Fitness per Generation'
-  },
-  xAxis: {
-    title: {
-      text: 'Generation'
-    }
-  },
-  yAxis: {
-    title: {
-      text: 'Fitness value'
-    }
-  },
-  series: [
-    {
-      name: 'CGA',
-      data: []
-    }
-  ] as Highcharts.SeriesLineOptions[]
-});
+// progressChart = initChart('progress-chart', {
+//   chart: {
+//     type: 'line'
+//   },
+//   title: {
+//     text: 'Fittest Fitness per Generation'
+//   },
+//   xAxis: {
+//     title: {
+//       text: 'Generation'
+//     }
+//   },
+//   yAxis: {
+//     title: {
+//       text: 'Fitness value'
+//     }
+//   },
+//   series: [
+//     {
+//       name: 'CGA',
+//       data: []
+//     }
+//   ] as Highcharts.SeriesLineOptions[]
+// });
 
 fittestChart = initChart('fittest-chart', {
   chart: {
@@ -303,7 +303,7 @@ let isRunning = false;
 /**
  * declared and initialized globally
  */
-let pyshell: ChildProcess;
+// let pyshell: ChildProcess;
 
 /**
  * update charts based on args passed
@@ -316,12 +316,12 @@ const addToChart = (args: object) => {
     args['genes'] !== undefined
   ) {
     // every point is added to progressChart
-    progressChart.series[0].addPoint(
-      parseInt(args['fitness']),
-      true,
-      false,
-      false
-    );
+    // progressChart.series[0].addPoint(
+    //   parseInt(args['fitness']),
+    //   true,
+    //   false,
+    //   false
+    // );
     // every point arrives override the precedent point
     currentChart.series[0].setData(args['genes'], true, false);
 
@@ -354,7 +354,7 @@ const addToChart = (args: object) => {
     }
   } else if (args['started'] && args['genesNum'] !== undefined) {
     // clear past results
-    clearChart(progressChart);
+    // clearChart(progressChart);
     clearChart(fittestChart);
     clearChart(currentChart);
     // clear fittest individuals history & mostFittest history
@@ -368,68 +368,68 @@ const addToChart = (args: object) => {
 };
 
 // if in development
-if (isDev()) {
-  // works with the script version
-  pyshell = spawn(`${process.platform == 'win32' ? 'python' : 'python3'}`, [
-    join(__dirname, 'python', 'ga.py')
-  ]);
-} else {
-  /**
-   * path of executable/script to copy
-   */
-  let copyFrom: string;
-  /**
-   * temp directory which the executable/script is going to be copied to
-   */
-  let copyTo: string;
-  /**
-   * set to true if executable is available
-   */
-  let execExist = existsSync(
-    join(
-      __dirname,
-      'python',
-      'dist',
-      process.platform == 'win32' ? join('win', 'ga.exe') : join('linux', 'ga')
-    )
-  );
+// if (isDev()) {
+//   // works with the script version
+//   pyshell = spawn(`${process.platform == 'win32' ? 'python' : 'python3'}`, [
+//     join(__dirname, 'python', 'ga.py')
+//   ]);
+// } else {
+//   /**
+//    * path of executable/script to copy
+//    */
+//   let copyFrom: string;
+//   /**
+//    * temp directory which the executable/script is going to be copied to
+//    */
+//   let copyTo: string;
+//   /**
+//    * set to true if executable is available
+//    */
+//   let execExist = existsSync(
+//     join(
+//       __dirname,
+//       'python',
+//       'dist',
+//       process.platform == 'win32' ? join('win', 'ga.exe') : join('linux', 'ga')
+//     )
+//   );
 
-  if (execExist) {
-    copyFrom = join(
-      __dirname,
-      'python',
-      'dist',
-      process.platform == 'win32' ? join('win', 'ga.exe') : join('linux', 'ga')
-    );
-    copyTo = join(
-      remote.app.getPath('temp'),
-      process.platform == 'win32' ? 'ga.exe' : 'ga'
-    );
-  } else {
-    copyFrom = join(__dirname, 'python', 'ga.py');
-    copyTo = join(remote.app.getPath('temp'), 'ga.py');
-  }
-  // works with the executable version
-  copyFileSync(copyFrom, copyTo);
-  pyshell = spawn(
-    execExist
-      ? copyTo
-      : `${process.platform == 'win32' ? 'python' : 'python3'}`,
-    execExist ? [] : [copyTo]
-  );
-}
+//   if (execExist) {
+//     copyFrom = join(
+//       __dirname,
+//       'python',
+//       'dist',
+//       process.platform == 'win32' ? join('win', 'ga.exe') : join('linux', 'ga')
+//     );
+//     copyTo = join(
+//       remote.app.getPath('temp'),
+//       process.platform == 'win32' ? 'ga.exe' : 'ga'
+//     );
+//   } else {
+//     copyFrom = join(__dirname, 'python', 'ga.py');
+//     copyTo = join(remote.app.getPath('temp'), 'ga.py');
+//   }
+//   // works with the executable version
+//   copyFileSync(copyFrom, copyTo);
+//   pyshell = spawn(
+//     execExist
+//       ? copyTo
+//       : `${process.platform == 'win32' ? 'python' : 'python3'}`,
+//     execExist ? [] : [copyTo]
+//   );
+// }
 
-pyshell.stdout.on('data', (passedArgs: Buffer) => {
-  passedArgs
-    .toString()
-    .split('\n')
-    .forEach((args: string) => {
-      // console.log(args);
-      // sometimes args == ''(not sure why), those cases need to be ignored
-      if (args) addToChart(JSON.parse(args));
-    });
-});
-pyshell.on('error', (err: Error) => console.error(`error trace: ${err}`));
+// pyshell.stdout.on('data', (passedArgs: Buffer) => {
+//   passedArgs
+//     .toString()
+//     .split('\n')
+//     .forEach((args: string) => {
+//       // console.log(args);
+//       // sometimes args == ''(not sure why), those cases need to be ignored
+//       if (args) addToChart(JSON.parse(args));
+//     });
+// });
+// pyshell.on('error', (err: Error) => console.error(`error trace: ${err}`));
 
 /************************* Buttons part *************************/
 /**
@@ -438,47 +438,47 @@ pyshell.on('error', (err: Error) => console.error(`error trace: ${err}`));
  * disables hover settings for charts
  */
 const play = () => {
-  pyshell.stdin.write(`${JSON.stringify({ play: true })}\n`);
-  enableChartHover(false, progressChart, fittestChart, currentChart);
+  // pyshell.stdin.write(`${JSON.stringify({ play: true })}\n`);
+  enableChartHover(false, /* progressChart, */ fittestChart, currentChart);
 };
 
 /**
  * send pause to GA, enables hover settings for charts
  */
 const pause = () => {
-  pyshell.stdin.write(`${JSON.stringify({ pause: true })}\n`);
-  enableChartHover(true, progressChart, fittestChart, currentChart);
+  // pyshell.stdin.write(`${JSON.stringify({ pause: true })}\n`);
+  enableChartHover(true, /* progressChart, */ fittestChart, currentChart);
 };
 
 /**
  * send stop to GA, enables hover settings for charts
  */
 const stop = () => {
-  pyshell.stdin.write(`${JSON.stringify({ stop: true })}\n`);
-  enableChartHover(true, progressChart, fittestChart, currentChart);
+  // pyshell.stdin.write(`${JSON.stringify({ stop: true })}\n`);
+  enableChartHover(true, /* progressChart, */ fittestChart, currentChart);
 };
 
 /**
  * stops current GA and launches new one, disables hover settings for charts in case enabled
  */
 const replay = () => {
-  pyshell.stdin.write(`${JSON.stringify({ replay: true })}\n`);
-  enableChartHover(false, progressChart, fittestChart, currentChart);
+  // pyshell.stdin.write(`${JSON.stringify({ replay: true })}\n`);
+  enableChartHover(false, /* progressChart, */ fittestChart, currentChart);
 };
 
 /**
  * send step forward to GA, pyshell pauses GA if needed, enables tooltip for charts in case disabled
  */
 const stepForward = () => {
-  pyshell.stdin.write(`${JSON.stringify({ step_f: true })}\n`);
-  enableChartHover(true, progressChart, fittestChart, currentChart);
+  // pyshell.stdin.write(`${JSON.stringify({ step_f: true })}\n`);
+  enableChartHover(true, /* progressChart, */ fittestChart, currentChart);
 };
 
 /**
  * exit the GA and kill spawned process, usually called on exit or reload app.
  */
 const exit = () => {
-  pyshell.stdin.write(`${JSON.stringify({ exit: true })}\n`);
+  // pyshell.stdin.write(`${JSON.stringify({ exit: true })}\n`);
 };
 
 /************************ GUI & Buttons Configuration ************************
@@ -595,17 +595,17 @@ const parameterChanged = (event: Event) => {
         parseFloat((<HTMLInputElement>event.target).max))
   ) {
     (<HTMLInputElement>event.target).style.backgroundColor = '#fff';
-    pyshell.stdin.write(
-      `${JSON.stringify({
-        [(<HTMLInputElement>event.target).name]: parseFloat(
-          (<HTMLInputElement>event.target).value
-        )
-        // random_pop_size: popSizeRandom.
-      })}\n`,
-      (error: Error) => {
-        if (error) throw error;
-      }
-    );
+    // pyshell.stdin.write(
+    //   `${JSON.stringify({
+    //     [(<HTMLInputElement>event.target).name]: parseFloat(
+    //       (<HTMLInputElement>event.target).value
+    //     )
+    //     // random_pop_size: popSizeRandom.
+    //   })}\n`,
+    //   (error: Error) => {
+    //     if (error) throw error;
+    //   }
+    // );
   } else (<HTMLInputElement>event.target).style.backgroundColor = '#ff5a5a';
 };
 

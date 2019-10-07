@@ -1,10 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const electron_1 = require("electron");
-const path_1 = require("path");
 const Highcharts = require("highcharts");
-const child_process_1 = require("child_process");
-const fs_1 = require("fs");
 function isDev() {
     return process.mainModule.filename.indexOf('.asar') === -1;
 }
@@ -20,7 +17,6 @@ let crossover = document.getElementById('crossover-rate');
 let coRandom = document.getElementById('random-crossover');
 let mutation = document.getElementById('mutation-rate');
 let mutRandom = document.getElementById('random-mutation');
-let progressChart;
 let fittestChart;
 let currentChart;
 let mostFittest = { fitness: -1 };
@@ -70,30 +66,6 @@ const initChart = (containerId, options) => {
         }
     });
 };
-progressChart = initChart('progress-chart', {
-    chart: {
-        type: 'line'
-    },
-    title: {
-        text: 'Fittest Fitness per Generation'
-    },
-    xAxis: {
-        title: {
-            text: 'Generation'
-        }
-    },
-    yAxis: {
-        title: {
-            text: 'Fitness value'
-        }
-    },
-    series: [
-        {
-            name: 'CGA',
-            data: []
-        }
-    ]
-});
 fittestChart = initChart('fittest-chart', {
     chart: {
         type: 'line'
@@ -175,12 +147,10 @@ const clearChart = (chart, categories = true) => {
     chart.redraw();
 };
 let isRunning = false;
-let pyshell;
 const addToChart = (args) => {
     if (args['generation'] !== undefined &&
         args['fitness'] !== undefined &&
         args['genes'] !== undefined) {
-        progressChart.series[0].addPoint(parseInt(args['fitness']), true, false, false);
         currentChart.series[0].setData(args['genes'], true, false);
         fittestHistory.push(args['genes']);
         if (mostFittest['fitness'] < args['fitness']) {
@@ -202,7 +172,6 @@ const addToChart = (args) => {
         }
     }
     else if (args['started'] && args['genesNum'] !== undefined) {
-        clearChart(progressChart);
         clearChart(fittestChart);
         clearChart(currentChart);
         fittestHistory = [];
@@ -211,60 +180,22 @@ const addToChart = (args) => {
         setClickable();
     }
 };
-if (isDev()) {
-    pyshell = child_process_1.spawn(`${process.platform == 'win32' ? 'python' : 'python3'}`, [
-        path_1.join(__dirname, 'python', 'ga.py')
-    ]);
-}
-else {
-    let copyFrom;
-    let copyTo;
-    let execExist = fs_1.existsSync(path_1.join(__dirname, 'python', 'dist', process.platform == 'win32' ? path_1.join('win', 'ga.exe') : path_1.join('linux', 'ga')));
-    if (execExist) {
-        copyFrom = path_1.join(__dirname, 'python', 'dist', process.platform == 'win32' ? path_1.join('win', 'ga.exe') : path_1.join('linux', 'ga'));
-        copyTo = path_1.join(electron_1.remote.app.getPath('temp'), process.platform == 'win32' ? 'ga.exe' : 'ga');
-    }
-    else {
-        copyFrom = path_1.join(__dirname, 'python', 'ga.py');
-        copyTo = path_1.join(electron_1.remote.app.getPath('temp'), 'ga.py');
-    }
-    fs_1.copyFileSync(copyFrom, copyTo);
-    pyshell = child_process_1.spawn(execExist
-        ? copyTo
-        : `${process.platform == 'win32' ? 'python' : 'python3'}`, execExist ? [] : [copyTo]);
-}
-pyshell.stdout.on('data', (passedArgs) => {
-    passedArgs
-        .toString()
-        .split('\n')
-        .forEach((args) => {
-        if (args)
-            addToChart(JSON.parse(args));
-    });
-});
-pyshell.on('error', (err) => console.error(`error trace: ${err}`));
 const play = () => {
-    pyshell.stdin.write(`${JSON.stringify({ play: true })}\n`);
-    enableChartHover(false, progressChart, fittestChart, currentChart);
+    enableChartHover(false, fittestChart, currentChart);
 };
 const pause = () => {
-    pyshell.stdin.write(`${JSON.stringify({ pause: true })}\n`);
-    enableChartHover(true, progressChart, fittestChart, currentChart);
+    enableChartHover(true, fittestChart, currentChart);
 };
 const stop = () => {
-    pyshell.stdin.write(`${JSON.stringify({ stop: true })}\n`);
-    enableChartHover(true, progressChart, fittestChart, currentChart);
+    enableChartHover(true, fittestChart, currentChart);
 };
 const replay = () => {
-    pyshell.stdin.write(`${JSON.stringify({ replay: true })}\n`);
-    enableChartHover(false, progressChart, fittestChart, currentChart);
+    enableChartHover(false, fittestChart, currentChart);
 };
 const stepForward = () => {
-    pyshell.stdin.write(`${JSON.stringify({ step_f: true })}\n`);
-    enableChartHover(true, progressChart, fittestChart, currentChart);
+    enableChartHover(true, fittestChart, currentChart);
 };
 const exit = () => {
-    pyshell.stdin.write(`${JSON.stringify({ exit: true })}\n`);
 };
 const switchBtn = () => {
     if (isRunning) {
@@ -325,12 +256,6 @@ const parameterChanged = (event) => {
             parseFloat(event.target.value) <=
                 parseFloat(event.target.max))) {
         event.target.style.backgroundColor = '#fff';
-        pyshell.stdin.write(`${JSON.stringify({
-            [event.target.name]: parseFloat(event.target.value)
-        })}\n`, (error) => {
-            if (error)
-                throw error;
-        });
     }
     else
         event.target.style.backgroundColor = '#ff5a5a';
