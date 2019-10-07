@@ -8,7 +8,7 @@ let template: MenuItemConstructorOptions[];
     ...(isMac
       ? ([
           {
-            label: '&GeneticPy',
+            label: '&Genetic Py',
             submenu: [
               { role: 'about' },
               { type: 'separator' },
@@ -38,7 +38,7 @@ let template: MenuItemConstructorOptions[];
         { role: 'cut' },
         { role: 'copy' },
         { role: 'paste' },
-        ...(process.platform == 'darwin'
+        ...(isMac
           ? [
               { role: 'pasteAndMatchStyle' },
               { role: 'delete' },
