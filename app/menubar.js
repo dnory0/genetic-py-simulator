@@ -17,7 +17,7 @@ let template;
         ...(isMac
             ? [
                 {
-                    label: '&GeneticPy',
+                    label: '&Genetic Py',
                     submenu: [
                         { role: 'about' },
                         { type: 'separator' },
@@ -47,7 +47,7 @@ let template;
                 { role: 'cut' },
                 { role: 'copy' },
                 { role: 'paste' },
-                ...(process.platform == 'darwin'
+                ...(isMac
                     ? [
                         { role: 'pasteAndMatchStyle' },
                         { role: 'delete' },

@@ -42,7 +42,7 @@ electron_1.app.once('ready', () => {
         minHeight: 430
     });
     const menubar = require('./menubar');
-    menubar.items[process.platform == 'darwin' ? 3 : 2].submenu.append(new electron_1.MenuItem({
+    menubar.items[process.platform == 'darwin' ? 3 : 2].submenu.insert(0, new electron_1.MenuItem({
         label: 'Reload',
         accelerator: 'CmdOrCtrl+R',
         click: () => {

@@ -78,7 +78,8 @@ app.once('ready', () => {
   });
 
   const menubar = require('./menubar') as Menu;
-  menubar.items[process.platform == 'darwin' ? 3 : 2].submenu.append(
+  menubar.items[process.platform == 'darwin' ? 3 : 2].submenu.insert(
+    0,
     new MenuItem({
       label: 'Reload',
       accelerator: 'CmdOrCtrl+R',
