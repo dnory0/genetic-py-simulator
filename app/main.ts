@@ -3,18 +3,24 @@ import {
   BrowserWindow,
   BrowserWindowConstructorOptions,
   Menu,
-  MenuItem
+  MenuItem,
+  BrowserView,
+  BrowserViewConstructorOptions,
+  Rectangle,
+  AutoResizeOptions
 } from 'electron';
+import { join } from 'path';
 /******************* MAIN WINDOW HANDLING *******************
  *************************************************************/
 /**
  * main window
  */
 let mainWindow: BrowserWindow;
-// let timeProcess: ChildProcess;
+let progressView: BrowserView;
+let fittestView: BrowserView;
 
 /**
- * @param filePath  string  path to an HTML file relative to the root of your application
+ * @param filePath  string path to an HTML file relative to the root of your application
  * @param options   constructor options for the browser window returned
  */
 const createWindow = (
@@ -57,8 +63,55 @@ const createWindow = (
   return targetWindow;
 };
 
+/**
+ * @param filePath    string path to an HTML file relative to the root of your application
+ * @param bounds      positioning of the browserView
+ * @param options     constructor options for the browser view returned
+ * @param autoResize  whether to and how to resize the view according to parent window, by Default everything is false
+ */
+const createView = (
+  filePath: string,
+  { x, y, width, height }: Rectangle,
+  {
+    webPreferences: { preload, nodeIntegration }
+  }: BrowserViewConstructorOptions = {},
+  autoResize: AutoResizeOptions = {
+    width: false,
+    height: false,
+    horizontal: false,
+    vertical: false
+  }
+) => {
+  /**
+   * view created with default preload and nodeIntegration
+   */
+  let targetView = new BrowserView({
+    webPreferences: {
+      preload,
+      nodeIntegration
+    }
+  });
+
+  // default bounds
+  targetView.setBounds({
+    x,
+    y,
+    width,
+    height
+  });
+
+  // if user resize window the viw must resize accordingly
+  targetView.setAutoResize(autoResize);
+
+  targetView.webContents.loadFile(filePath);
+
+  return targetView;
+};
+
 app.once('ready', () => {
-  mainWindow = createWindow('app/index.html', {
+  /****************************** Main Window ******************************
+   *************************************************************************/
+  mainWindow = createWindow(join('app', 'index.html'), {
     minWidth: 580,
     minHeight: 430
   });
@@ -76,6 +129,32 @@ app.once('ready', () => {
   mainWindow.on('close', () => {
     mainWindow.webContents.send('pyshell');
   });
+
+  /***************************** Browser Views *****************************
+   *************************************************************************/
+
+  /***************************** Progress View *****************************/
+  progressView = createView(
+    join('app', 'progress-chart.html'),
+    {
+      x: 0,
+      y: 0,
+      width: mainWindow.getBounds().width,
+      height: mainWindow.getBounds().height
+    },
+    {
+      webPreferences: {
+        preload: join(__dirname, 'preload.js'),
+        nodeIntegration: true
+      }
+    },
+    {
+      width: true,
+      height: true
+    } as AutoResizeOptions
+  );
+
+  mainWindow.addBrowserView(progressView);
 
   const menubar = require('./menubar') as Menu;
   menubar.items[process.platform == 'darwin' ? 3 : 2].submenu.insert(
