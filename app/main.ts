@@ -6,8 +6,7 @@ import {
   MenuItem,
   BrowserView,
   BrowserViewConstructorOptions,
-  Rectangle,
-  AutoResizeOptions
+  Rectangle
 } from 'electron';
 import { join } from 'path';
 import { existsSync, copyFileSync } from 'fs';
@@ -79,8 +78,11 @@ const createWindow = (
     initPyshell();
   });
 
-  targetWindow.once('closed', () => {
+  targetWindow.on('close', () => {
     pyshell.stdin.write(`${JSON.stringify({ exit: true })}\n`);
+  });
+
+  targetWindow.once('closed', () => {
     targetWindow = null;
   });
   return targetWindow;
@@ -91,12 +93,32 @@ const createWindow = (
  * @param parentWindow parent window to resize according to
  * @param targetView browser view to resize
  */
-const resizeView = (parentWindow: BrowserWindow, targetView: BrowserView) => {
+const resizeView = (
+  targetView: BrowserView,
+  {
+    x = 0,
+    y = 0,
+    width = mainWindow.getBounds().width,
+    height = mainWindow.getBounds().height
+  } = {}
+) => {
   targetView.setBounds({
-    width: parentWindow.getBounds().width,
-    height: Math.floor(parentWindow.getBounds().height * 0.5),
-    x: 0,
-    y: 0
+    /**
+     * x of target view according to parent window
+     */
+    x,
+    /**
+     * y of target view according to parent window
+     */
+    y,
+    /**
+     * width of target view
+     */
+    width,
+    /**
+     * height of target view
+     */
+    height
   } as Rectangle);
 };
 
@@ -135,7 +157,9 @@ const createView = (
   // if user resize window the viw must resize accordingly
   parentWindow.on('resize', () => {
     setTimeout(() => {
-      resizeView(parentWindow, targetView);
+      resizeView(targetView, {
+        height: Math.floor(mainWindow.getBounds().height * 0.5)
+      });
     }, 100); // 100 ms is relative number that should be revised
   });
 
@@ -244,7 +268,7 @@ app.once('ready', () => {
       x: 0,
       y: 0,
       width: mainWindow.getBounds().width,
-      height: mainWindow.getBounds().height
+      height: mainWindow.getBounds().height * 0.5
     },
     {
       webPreferences: {

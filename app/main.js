@@ -29,18 +29,20 @@ const createWindow = (filePath, { minWidth, minHeight, width, height, resizable,
         targetWindow.show();
         initPyshell();
     });
-    targetWindow.once('closed', () => {
+    targetWindow.on('close', () => {
         pyshell.stdin.write(`${JSON.stringify({ exit: true })}\n`);
+    });
+    targetWindow.once('closed', () => {
         targetWindow = null;
     });
     return targetWindow;
 };
-const resizeView = (parentWindow, targetView) => {
+const resizeView = (targetView, { x = 0, y = 0, width = mainWindow.getBounds().width, height = mainWindow.getBounds().height } = {}) => {
     targetView.setBounds({
-        width: parentWindow.getBounds().width,
-        height: Math.floor(parentWindow.getBounds().height * 0.5),
-        x: 0,
-        y: 0
+        x,
+        y,
+        width,
+        height
     });
 };
 const createView = (parentWindow, filePath, { x, y, width, height }, { webPreferences: { preload, nodeIntegration } } = {}) => {
@@ -58,7 +60,9 @@ const createView = (parentWindow, filePath, { x, y, width, height }, { webPrefer
     });
     parentWindow.on('resize', () => {
         setTimeout(() => {
-            resizeView(parentWindow, targetView);
+            resizeView(targetView, {
+                height: Math.floor(mainWindow.getBounds().height * 0.5)
+            });
         }, 100);
     });
     targetView.webContents.loadFile(filePath);
@@ -111,7 +115,7 @@ electron_1.app.once('ready', () => {
         x: 0,
         y: 0,
         width: mainWindow.getBounds().width,
-        height: mainWindow.getBounds().height
+        height: mainWindow.getBounds().height * 0.5
     }, {
         webPreferences: {
             preload: path_1.join(__dirname, 'preload.js'),
