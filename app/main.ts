@@ -278,7 +278,7 @@ app.once('ready', () => {
     }
   );
 
-  progressView.webContents.toggleDevTools();
+  // progressView.webContents.toggleDevTools();
 
   const menubar = require('./menubar') as Menu;
   menubar.items[process.platform == 'darwin' ? 3 : 2].submenu.insert(

@@ -16,8 +16,13 @@ body {
   overflow: hidden;
 }
 
+// body {
+//   border: 2px solid;
+// }
+
 .charts-container {
   height: 100vh;
+  // height: calc(100vh - 4px);
   #progress-chart {
     padding: 0;
     position: relative;

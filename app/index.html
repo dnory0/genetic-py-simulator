@@ -13,94 +13,91 @@
 
   <body>
     <div class="container-fluid main">
-      <div class="top-bar-container">
+      <div class="progress-process-background"></div>
+      <div class="middle-container">
         <div class="controls-container">
-          <div class="controls">
-            <button title="play/pause" id="play-btn">
-              <img class="default play" src="img/play-btn.png" />
-              <img class="pause" src="img/pause-btn.png" />
-            </button>
-            <button title="stop" class="disabled-btn" id="stop-btn" disabled>
-              <img src="img/stop-btn.png" />
-            </button>
-            <button
-              title="relaunch the algorithm"
-              class="disabled-btn"
-              id="to-start-btn"
-              disabled
-            >
-              <img src="img/to-start-btn.png" />
-            </button>
-            <button
-              title="step back"
-              class="disabled-btn"
-              id="step-back-btn"
-              disabled
-            >
-              <img src="img/step-back-btn.png" />
-            </button>
-            <button title="step forward" id="step-forward-btn">
-              <img src="img/step-forward-btn.png" />
-            </button>
+          <div class="state-controls-container">
+            <div class="state-controls">
+              <button title="play/pause" id="play-btn">
+                <img class="default play" src="img/play-btn.png" />
+                <img class="pause" src="img/pause-btn.png" />
+              </button>
+              <button title="stop" class="disabled-btn" id="stop-btn" disabled>
+                <img src="img/stop-btn.png" />
+              </button>
+              <button
+                title="relaunch the algorithm"
+                class="disabled-btn"
+                id="to-start-btn"
+                disabled
+              >
+                <img src="img/to-start-btn.png" />
+              </button>
+              <button
+                title="step back"
+                class="disabled-btn"
+                id="step-back-btn"
+                disabled
+              >
+                <img src="img/step-back-btn.png" />
+              </button>
+              <button title="step forward" id="step-forward-btn">
+                <img src="img/step-forward-btn.png" />
+              </button>
+            </div>
+          </div>
+          <div class="parameters-container">
+            <div class="parameters">
+              <section>
+                <label>
+                  <p>Population size:</p>
+                  <input
+                    type="number"
+                    min="120"
+                    step="1"
+                    id="pop-size"
+                    name="pop_size"
+                  />
+                </label>
+                <label>
+                  <p>Genes number:</p>
+                  <input
+                    type="number"
+                    min="80"
+                    step="1"
+                    id="genes-num"
+                    name="genes_num"
+                  />
+                </label>
+              </section>
+              <section>
+                <label>
+                  <p>Crossover rate:</p>
+                  <input
+                    type="number"
+                    min="0.001"
+                    max="1"
+                    step="0.001"
+                    id="crossover-rate"
+                    name="crossover_rate"
+                  />
+                </label>
+                <label>
+                  <p>Mutation rate:</p>
+                  <input
+                    type="number"
+                    min="0"
+                    max="1"
+                    step="0.001"
+                    id="mutation-rate"
+                    name="mutation_rate"
+                  />
+                </label>
+              </section>
+            </div>
           </div>
         </div>
-        <div class="parameters-container">
-          <div class="parameters">
-            <section>
-              <label>
-                <p>Population size:</p>
-                <input
-                  type="number"
-                  min="120"
-                  step="1"
-                  id="pop-size"
-                  name="pop_size"
-                />
-              </label>
-              <label>
-                <p>Genes number:</p>
-                <input
-                  type="number"
-                  min="80"
-                  step="1"
-                  id="genes-num"
-                  name="genes_num"
-                />
-              </label>
-            </section>
-            <section>
-              <label>
-                <p>Crossover rate:</p>
-                <input
-                  type="number"
-                  min="0.001"
-                  max="1"
-                  step="0.001"
-                  id="crossover-rate"
-                  name="crossover_rate"
-                />
-              </label>
-              <label>
-                <p>Mutation rate:</p>
-                <input
-                  type="number"
-                  min="0"
-                  max="1"
-                  step="0.001"
-                  id="mutation-rate"
-                  name="mutation_rate"
-                />
-              </label>
-            </section>
-          </div>
-        </div>
-      </div>
-      <div class="charts-container">
-        <div id="progress-chart" class="col-sm-12"></div>
-        <div class="row col-sm-12" id="genes-charts-container">
-          <div class="col-sm-6" id="fittest-chart"></div>
-          <div class="col-sm-6" id="current-chart"></div>
-        </div>
+        <div class="fittest-process-container"></div>
       </div>
       <div class="bottom-bar-container">
         <div class="bottom-bar"></div>

@@ -25,48 +25,40 @@ body {
   height: 100vh;
 }
 
-.main .charts-container {
-  height: calc(100% - 100px);
+.main .progress-process-background {
+  background-color: #fff;
+  height: calc(50% + 13px);
+  border-bottom: 1px solid #a37e7e;
+  margin: 0 4px;
 }
 
-.main .charts-container #progress-chart {
-  padding: 0;
-  position: relative;
-  height: 60%;
+.main .middle-container {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  height: calc(50% - 36px);
 }
 
-.main .charts-container #genes-charts-container {
-  height: 40%;
-  padding: 0;
-  margin: 0;
-}
-
-.main .charts-container #genes-charts-container > div {
-  position: relative;
-  height: 100%;
-  width: 50%;
-  padding: 0;
-  margin: 0;
-}
-
-.main .top-bar-container {
+.main .middle-container .controls-container {
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
   margin: 0 4px;
   padding: 4px 0;
   height: 76px;
-  border-bottom: 1px solid #a37e7e;
-  width: -webkit-fill-available;
+  width: 50vw;
   text-align: center;
 }
 
-.main .top-bar-container .controls-container {
+.main .middle-container .controls-container .state-controls-container {
   position: absolute;
   width: -webkit-fit-content;
   width: -moz-fit-content;
   width: fit-content;
-  left: calc(50% - 79px);
+  left: calc(25% - 79px);
 }
 
-.main .top-bar-container .controls-container button {
+.main .middle-container .controls-container .state-controls-container button {
   padding: 5px 4px 5px 5px;
   border: none;
   border-radius: 4px;
@@ -75,36 +67,36 @@ body {
   background-color: white;
 }
 
-.main .top-bar-container .controls-container button:hover:not(.disabled-btn) {
+.main .middle-container .controls-container .state-controls-container button:hover:not(.disabled-btn) {
   background-color: #c4c4c4;
 }
 
-.main .top-bar-container .controls-container button img {
+.main .middle-container .controls-container .state-controls-container button img {
   width: 18px;
   float: left;
 }
 
-.main .top-bar-container .controls-container button.disabled-btn {
+.main .middle-container .controls-container .state-controls-container button.disabled-btn {
   opacity: 0.6;
 }
 
-.main .top-bar-container .controls-container button#play-btn img {
+.main .middle-container .controls-container .state-controls-container button#play-btn img {
   display: none;
 }
 
-.main .top-bar-container .controls-container button#play-btn img.default {
+.main .middle-container .controls-container .state-controls-container button#play-btn img.default {
   display: block;
 }
 
-.main .top-bar-container .parameters-container {
+.main .middle-container .controls-container .parameters-container {
   height: 100%;
 }
 
-.main .top-bar-container .parameters-container .parameters {
+.main .middle-container .controls-container .parameters-container .parameters {
   height: 100%;
 }
 
-.main .top-bar-container .parameters-container .parameters p {
+.main .middle-container .controls-container .parameters-container .parameters p {
   font-size: 13px;
   width: -webkit-max-content;
   width: -moz-max-content;
@@ -115,33 +107,41 @@ body {
   padding: 7.2px;
 }
 
-.main .top-bar-container .parameters-container .parameters input[type='number'] {
+.main .middle-container .controls-container .parameters-container .parameters input[type='number'] {
   margin-top: 4px;
   height: 26px;
   width: 80px;
 }
 
-.main .top-bar-container .parameters-container .parameters section {
+.main .middle-container .controls-container .parameters-container .parameters section {
   height: 50%;
 }
 
-.main .top-bar-container .parameters-container .parameters section label {
+.main .middle-container .controls-container .parameters-container .parameters section label {
   height: 100%;
   margin: 0;
   width: 200px;
 }
 
-.main .top-bar-container .parameters-container .parameters section label:first-child {
+.main .middle-container .controls-container .parameters-container .parameters section label:first-child {
   float: left;
   margin-left: 4%;
 }
 
-.main .top-bar-container .parameters-container .parameters section label:last-child {
+.main .middle-container .controls-container .parameters-container .parameters section label:last-child {
   float: right;
   margin-right: 4%;
 }
 
-.main div.bottom-bar-container {
+.main .middle-container .fittest-process-container {
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  margin: 4px 0;
+  border-left: 1px solid #a37e7e;
+}
+
+.main .bottom-bar-container {
   bottom: 0;
   height: 24px;
   margin: 0 4px;
