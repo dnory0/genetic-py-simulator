@@ -93,16 +93,9 @@ electron_1.app.once('ready', () => {
         minWidth: 580,
         minHeight: 430
     });
-    if (process.platform != 'win32') {
-        mainWindow.on('enter-full-screen', () => {
-            mainWindow.setAutoHideMenuBar(true);
-            mainWindow.setMenuBarVisibility(false);
-        });
-        mainWindow.on('leave-full-screen', () => {
-            mainWindow.setAutoHideMenuBar(false);
-            mainWindow.setMenuBarVisibility(true);
-        });
-    }
+    mainWindow.on('enter-full-screen', () => {
+        mainWindow.setMenuBarVisibility(true);
+    });
     progressView = createView(mainWindow, path_1.join('app', 'progress-chart', 'progress-chart.html'), {
         x: 0,
         y: 0,

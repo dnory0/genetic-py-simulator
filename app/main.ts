@@ -237,17 +237,9 @@ app.once('ready', () => {
     minHeight: 430
   });
 
-  if (process.platform != 'win32') {
-    mainWindow.on('enter-full-screen', () => {
-      mainWindow.setAutoHideMenuBar(true);
-      mainWindow.setMenuBarVisibility(false);
-    });
-
-    mainWindow.on('leave-full-screen', () => {
-      mainWindow.setAutoHideMenuBar(false);
-      mainWindow.setMenuBarVisibility(true);
-    });
-  }
+  mainWindow.on('enter-full-screen', () => {
+    mainWindow.setMenuBarVisibility(true);
+  });
 
   // mainWindow.on('close', () => {
   //   mainWindow.webContents.send('pyshell');
