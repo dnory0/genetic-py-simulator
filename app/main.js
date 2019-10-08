@@ -58,13 +58,6 @@ const createView = (parentWindow, filePath, { x, y, width, height }, { webPrefer
         width,
         height
     });
-    parentWindow.on('resize', () => {
-        setTimeout(() => {
-            resizeView(targetView, {
-                height: Math.floor(mainWindow.getBounds().height * 0.5)
-            });
-        }, 100);
-    });
     targetView.webContents.loadFile(filePath);
     parentWindow.addBrowserView(targetView);
     return targetView;
@@ -100,27 +93,41 @@ electron_1.app.once('ready', () => {
         minWidth: 580,
         minHeight: 430
     });
-    mainWindow.on('enter-full-screen', () => {
-        mainWindow.setAutoHideMenuBar(true);
-        mainWindow.setMenuBarVisibility(false);
-    });
-    mainWindow.on('leave-full-screen', () => {
-        mainWindow.setAutoHideMenuBar(false);
-        mainWindow.setMenuBarVisibility(true);
-    });
+    if (process.platform != 'win32') {
+        mainWindow.on('enter-full-screen', () => {
+            mainWindow.setAutoHideMenuBar(true);
+            mainWindow.setMenuBarVisibility(false);
+        });
+        mainWindow.on('leave-full-screen', () => {
+            mainWindow.setAutoHideMenuBar(false);
+            mainWindow.setMenuBarVisibility(true);
+        });
+    }
     mainWindow.on('close', () => {
         mainWindow.webContents.send('pyshell');
     });
     progressView = createView(mainWindow, path_1.join('app', 'progress-chart', 'progress-chart.html'), {
         x: 0,
         y: 0,
-        width: mainWindow.getBounds().width,
-        height: mainWindow.getBounds().height * 0.5
+        width: mainWindow.getBounds().width -
+            (process.platform == 'win32' && !mainWindow.isFullScreen() ? 16 : 0),
+        height: Math.floor(mainWindow.getBounds().height * 0.5 -
+            (process.platform == 'win32' && !mainWindow.isFullScreen() ? 17 : 0))
     }, {
         webPreferences: {
             preload: path_1.join(__dirname, 'preload.js'),
             nodeIntegration: false
         }
+    });
+    mainWindow.on('resize', () => {
+        setTimeout(() => {
+            resizeView(progressView, {
+                width: mainWindow.getBounds().width -
+                    (process.platform == 'win32' && !mainWindow.isFullScreen() ? 16 : 0),
+                height: Math.floor(mainWindow.getBounds().height * 0.5 -
+                    (process.platform == 'win32' && !mainWindow.isFullScreen() ? 17 : 0))
+            });
+        }, 100);
     });
     const menubar = require('./menubar');
     menubar.items[process.platform == 'darwin' ? 3 : 2].submenu.insert(0, new electron_1.MenuItem({
@@ -131,6 +138,6 @@ electron_1.app.once('ready', () => {
             mainWindow.webContents.reload();
         }
     }));
-    electron_1.app.applicationMenu = menubar;
+    electron_1.Menu.setApplicationMenu(menubar);
 });
 //# sourceMappingURL=main.js.map

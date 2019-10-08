@@ -6,7 +6,8 @@ import {
   MenuItem,
   BrowserView,
   BrowserViewConstructorOptions,
-  Rectangle
+  Rectangle,
+  globalShortcut
 } from 'electron';
 import { join } from 'path';
 import { existsSync, copyFileSync } from 'fs';
@@ -90,34 +91,34 @@ const createWindow = (
 
 /**
  * resizes browser view
- * @param parentWindow parent window to resize according to
  * @param targetView browser view to resize
+ * @param bounds by default x & y are set to 0, width & height are set to mainWindow width & hight
  */
 const resizeView = (
   targetView: BrowserView,
   {
+    /**
+     * x of target view according to parent window
+     */
     x = 0,
+    /**
+     * y of target view according to parent window
+     */
     y = 0,
+    /**
+     * width of target view
+     */
     width = mainWindow.getBounds().width,
+    /**
+     * height of target view
+     */
     height = mainWindow.getBounds().height
   } = {}
 ) => {
   targetView.setBounds({
-    /**
-     * x of target view according to parent window
-     */
     x,
-    /**
-     * y of target view according to parent window
-     */
     y,
-    /**
-     * width of target view
-     */
     width,
-    /**
-     * height of target view
-     */
     height
   } as Rectangle);
 };
@@ -154,20 +155,13 @@ const createView = (
     height
   });
 
-  // if user resize window the viw must resize accordingly
-  parentWindow.on('resize', () => {
-    setTimeout(() => {
-      resizeView(targetView, {
-        height: Math.floor(mainWindow.getBounds().height * 0.5)
-      });
-    }, 100); // 100 ms is relative number that should be revised
-  });
-
   // load file
   targetView.webContents.loadFile(filePath);
 
   // add to parent window
   parentWindow.addBrowserView(targetView);
+
+  // targetView.webContents.toggleDevTools();
 
   return targetView;
 };
@@ -243,15 +237,17 @@ app.once('ready', () => {
     minHeight: 430
   });
 
-  mainWindow.on('enter-full-screen', () => {
-    mainWindow.setAutoHideMenuBar(true);
-    mainWindow.setMenuBarVisibility(false);
-  });
+  if (process.platform != 'win32') {
+    mainWindow.on('enter-full-screen', () => {
+      mainWindow.setAutoHideMenuBar(true);
+      mainWindow.setMenuBarVisibility(false);
+    });
 
-  mainWindow.on('leave-full-screen', () => {
-    mainWindow.setAutoHideMenuBar(false);
-    mainWindow.setMenuBarVisibility(true);
-  });
+    mainWindow.on('leave-full-screen', () => {
+      mainWindow.setAutoHideMenuBar(false);
+      mainWindow.setMenuBarVisibility(true);
+    });
+  }
 
   mainWindow.on('close', () => {
     mainWindow.webContents.send('pyshell');
@@ -267,8 +263,13 @@ app.once('ready', () => {
     {
       x: 0,
       y: 0,
-      width: mainWindow.getBounds().width,
-      height: mainWindow.getBounds().height * 0.5
+      width:
+        mainWindow.getBounds().width -
+        (process.platform == 'win32' && !mainWindow.isFullScreen() ? 16 : 0),
+      height: Math.floor(
+        mainWindow.getBounds().height * 0.5 -
+          (process.platform == 'win32' && !mainWindow.isFullScreen() ? 17 : 0)
+      )
     },
     {
       webPreferences: {
@@ -278,7 +279,20 @@ app.once('ready', () => {
     }
   );
 
-  // progressView.webContents.toggleDevTools();
+  // if user resize window the viw must resize accordingly
+  mainWindow.on('resize', () => {
+    setTimeout(() => {
+      resizeView(progressView, {
+        width:
+          mainWindow.getBounds().width -
+          (process.platform == 'win32' && !mainWindow.isFullScreen() ? 16 : 0),
+        height: Math.floor(
+          mainWindow.getBounds().height * 0.5 -
+            (process.platform == 'win32' && !mainWindow.isFullScreen() ? 17 : 0)
+        )
+      });
+    }, 100); // 100 ms is relative number that should be revised
+  });
 
   const menubar = require('./menubar') as Menu;
   menubar.items[process.platform == 'darwin' ? 3 : 2].submenu.insert(
@@ -293,5 +307,5 @@ app.once('ready', () => {
     })
   );
 
-  app.applicationMenu = menubar;
+  Menu.setApplicationMenu(menubar);
 });
