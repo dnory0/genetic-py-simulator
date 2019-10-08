@@ -249,9 +249,9 @@ app.once('ready', () => {
     });
   }
 
-  mainWindow.on('close', () => {
-    mainWindow.webContents.send('pyshell');
-  });
+  // mainWindow.on('close', () => {
+  //   mainWindow.webContents.send('pyshell');
+  // });
 
   /***************************** Browser Views *****************************
    *************************************************************************/
@@ -301,8 +301,9 @@ app.once('ready', () => {
       label: 'Reload',
       accelerator: 'CmdOrCtrl+R',
       click: () => {
-        mainWindow.webContents.send('pyshell');
+        // mainWindow.webContents.send('pyshell');
         mainWindow.webContents.reload();
+        progressView.webContents.reload();
       }
     })
   );

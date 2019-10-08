@@ -103,9 +103,6 @@ electron_1.app.once('ready', () => {
             mainWindow.setMenuBarVisibility(true);
         });
     }
-    mainWindow.on('close', () => {
-        mainWindow.webContents.send('pyshell');
-    });
     progressView = createView(mainWindow, path_1.join('app', 'progress-chart', 'progress-chart.html'), {
         x: 0,
         y: 0,
@@ -134,8 +131,8 @@ electron_1.app.once('ready', () => {
         label: 'Reload',
         accelerator: 'CmdOrCtrl+R',
         click: () => {
-            mainWindow.webContents.send('pyshell');
             mainWindow.webContents.reload();
+            progressView.webContents.reload();
         }
     }));
     electron_1.Menu.setApplicationMenu(menubar);
