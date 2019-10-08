@@ -30,16 +30,20 @@ const createWindow = (filePath, { minWidth, minHeight, width, height, resizable,
         initPyshell();
     });
     targetWindow.once('closed', () => {
+        pyshell.stdin.write(`${JSON.stringify({ exit: true })}\n`);
         targetWindow = null;
     });
     return targetWindow;
 };
-const createView = (filePath, { x, y, width, height }, { webPreferences: { preload, nodeIntegration } } = {}, autoResize = {
-    width: false,
-    height: false,
-    horizontal: false,
-    vertical: false
-}) => {
+const resizeView = (parentWindow, targetView) => {
+    targetView.setBounds({
+        width: parentWindow.getBounds().width,
+        height: Math.floor(parentWindow.getBounds().height * 0.5),
+        x: 0,
+        y: 0
+    });
+};
+const createView = (parentWindow, filePath, { x, y, width, height }, { webPreferences: { preload, nodeIntegration } } = {}) => {
     let targetView = new electron_1.BrowserView({
         webPreferences: {
             preload,
@@ -52,8 +56,13 @@ const createView = (filePath, { x, y, width, height }, { webPreferences: { prelo
         width,
         height
     });
-    targetView.setAutoResize(autoResize);
+    parentWindow.on('resize', () => {
+        setTimeout(() => {
+            resizeView(parentWindow, targetView);
+        }, 100);
+    });
     targetView.webContents.loadFile(filePath);
+    parentWindow.addBrowserView(targetView);
     return targetView;
 };
 const initPyshell = () => {
@@ -98,7 +107,7 @@ electron_1.app.once('ready', () => {
     mainWindow.on('close', () => {
         mainWindow.webContents.send('pyshell');
     });
-    progressView = createView(path_1.join('app', 'progress-chart', 'progress-chart.html'), {
+    progressView = createView(mainWindow, path_1.join('app', 'progress-chart', 'progress-chart.html'), {
         x: 0,
         y: 0,
         width: mainWindow.getBounds().width,
@@ -108,12 +117,8 @@ electron_1.app.once('ready', () => {
             preload: path_1.join(__dirname, 'preload.js'),
             nodeIntegration: false
         }
-    }, {
-        width: true,
-        height: true
     });
     progressView.webContents.toggleDevTools();
-    mainWindow.addBrowserView(progressView);
     const menubar = require('./menubar');
     menubar.items[process.platform == 'darwin' ? 3 : 2].submenu.insert(0, new electron_1.MenuItem({
         label: 'Reload',

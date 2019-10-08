@@ -80,29 +80,39 @@ const createWindow = (
   });
 
   targetWindow.once('closed', () => {
+    pyshell.stdin.write(`${JSON.stringify({ exit: true })}\n`);
     targetWindow = null;
   });
   return targetWindow;
 };
 
 /**
- * @param filePath    string path to an HTML file relative to the root of your application
- * @param bounds      positioning of the browserView
- * @param options     constructor options for the browser view returned
- * @param autoResize  whether to and how to resize the view according to parent window, by Default everything is false
+ * resizes browser view
+ * @param parentWindow parent window to resize according to
+ * @param targetView browser view to resize
+ */
+const resizeView = (parentWindow: BrowserWindow, targetView: BrowserView) => {
+  targetView.setBounds({
+    width: parentWindow.getBounds().width,
+    height: Math.floor(parentWindow.getBounds().height * 0.5),
+    x: 0,
+    y: 0
+  } as Rectangle);
+};
+
+/**
+ * @param parentWindow  parent window of the returned view
+ * @param filePath      string path to an HTML file relative to the root of your application
+ * @param bounds        positioning of the browserView
+ * @param options       constructor options for the browser view returned
  */
 const createView = (
+  parentWindow: BrowserWindow,
   filePath: string,
   { x, y, width, height }: Rectangle,
   {
     webPreferences: { preload, nodeIntegration }
-  }: BrowserViewConstructorOptions = {},
-  autoResize: AutoResizeOptions = {
-    width: false,
-    height: false,
-    horizontal: false,
-    vertical: false
-  }
+  }: BrowserViewConstructorOptions = {}
 ) => {
   /**
    * view created with default preload and nodeIntegration
@@ -123,9 +133,17 @@ const createView = (
   });
 
   // if user resize window the viw must resize accordingly
-  targetView.setAutoResize(autoResize);
+  parentWindow.on('resize', () => {
+    setTimeout(() => {
+      resizeView(parentWindow, targetView);
+    }, 100); // 100 ms is relative number that should be revised
+  });
 
+  // load file
   targetView.webContents.loadFile(filePath);
+
+  // add to parent window
+  parentWindow.addBrowserView(targetView);
 
   return targetView;
 };
@@ -220,6 +238,7 @@ app.once('ready', () => {
 
   /***************************** Progress View *****************************/
   progressView = createView(
+    mainWindow,
     join('app', 'progress-chart', 'progress-chart.html'),
     {
       x: 0,
@@ -232,16 +251,10 @@ app.once('ready', () => {
         preload: join(__dirname, 'preload.js'),
         nodeIntegration: false
       }
-    },
-    {
-      width: true,
-      height: true
-    } as AutoResizeOptions
+    }
   );
 
   progressView.webContents.toggleDevTools();
-
-  mainWindow.addBrowserView(progressView);
 
   const menubar = require('./menubar') as Menu;
   menubar.items[process.platform == 'darwin' ? 3 : 2].submenu.insert(
