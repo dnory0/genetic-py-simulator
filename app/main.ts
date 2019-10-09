@@ -12,17 +12,13 @@ import { join } from 'path';
 import { existsSync, copyFileSync } from 'fs';
 import { spawn, ChildProcess } from 'child_process';
 
-/******************* MAIN WINDOW HANDLING *******************
- *************************************************************/
-
 /**
  * set to true if app on development, false in production.
  *
  * NOTE: app needs to be packed on asar (by default) to detect production mode
  * if you don't set asar to false on electron-builder.json you're good to go
  */
-const isDev = __dirname.indexOf('.asar') === -1;
-
+const isDev = app.getAppPath().indexOf('.asar') === -1;
 /**
  * main window
  */
@@ -171,7 +167,6 @@ const createView = (
 /**
  * initialize pyshell depending on the mode (development/production) and
  * platform (win32/linux)
- * @returns GA process ready to start
  */
 const createPyshell = () => {
   // if in development
@@ -233,6 +228,8 @@ const createPyshell = () => {
 };
 
 app.once('ready', () => {
+  /****************************** Pyshell part *****************************
+   *************************************************************************/
   createPyshell();
   /****************************** Main Window ******************************
    *************************************************************************/
@@ -249,10 +246,6 @@ app.once('ready', () => {
   mainWindow.on('enter-full-screen', () => {
     mainWindow.setMenuBarVisibility(true);
   });
-
-  // mainWindow.on('close', () => {
-  //   mainWindow.webContents.send('pyshell');
-  // });
 
   /***************************** Browser Views *****************************
    *************************************************************************/
@@ -281,6 +274,8 @@ app.once('ready', () => {
   );
 
   // progressView.webContents.toggleDevTools();
+
+  /****************************** Fittest View ******************************/
 
   fittestView = createView(
     mainWindow,

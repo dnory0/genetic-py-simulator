@@ -4,7 +4,7 @@ const electron_1 = require("electron");
 const path_1 = require("path");
 const fs_1 = require("fs");
 const child_process_1 = require("child_process");
-const isDev = __dirname.indexOf('.asar') === -1;
+const isDev = electron_1.app.getAppPath().indexOf('.asar') === -1;
 let mainWindow;
 let progressView;
 let fittestView;

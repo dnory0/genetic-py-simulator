@@ -1,6 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 let pyshell = window.pyshell;
+const play = window.play;
+const pause = window.pause;
+const stop = window.stop;
+const replay = window.replay;
+const stepForward = window.stepForward;
 let playBtn = document.getElementById('play-btn');
 let stopBtn = document.getElementById('stop-btn');
 let toStartBtn = document.getElementById('to-start-btn');
@@ -13,10 +18,6 @@ let crossover = document.getElementById('crossover-rate');
 let coRandom = document.getElementById('random-crossover');
 let mutation = document.getElementById('mutation-rate');
 let mutRandom = document.getElementById('random-mutation');
-let fittestChart;
-let currentChart;
-let mostFittest = { fitness: -1 };
-let fittestHistory = [];
 const settingXaxis = (args, ...charts) => {
     const genes = [...Array(args['genesNum']).keys()].map(v => `${++v}`);
     charts.forEach(chart => {
@@ -52,44 +53,6 @@ const clearChart = (chart, categories = true) => {
     chart.redraw();
 };
 let isRunning = false;
-const addToChart = (args) => {
-    if (args['generation'] !== undefined &&
-        args['fitness'] !== undefined &&
-        args['genes'] !== undefined) {
-        currentChart.series[0].setData(args['genes'], true, false);
-        fittestHistory.push(args['genes']);
-        if (mostFittest['fitness'] < args['fitness']) {
-            mostFittest['fitness'] = args['fitness'];
-            mostFittest['individuals'] = [
-                {
-                    generation: args['generation'],
-                    genes: args['genes']
-                }
-            ];
-            fittestChart.series[0].setData(mostFittest.individuals[0].genes, true, false);
-        }
-        else if (mostFittest['fitness'] == args['fitness']) {
-            mostFittest['individuals'].unshift({
-                generation: args['generation'],
-                genes: args['genes']
-            });
-            fittestChart.series[0].setData(mostFittest.individuals[0].genes, true, false);
-        }
-    }
-    else if (args['started'] && args['genesNum'] !== undefined) {
-        clearChart(fittestChart);
-        clearChart(currentChart);
-        fittestHistory = [];
-        mostFittest = { fitness: -1 };
-        settingXaxis(args, currentChart, fittestChart);
-        setClickable();
-    }
-};
-const play = window.play;
-const pause = window.pause;
-const stop = window.stop;
-const replay = window.replay;
-const stepForward = window.stepForward;
 const switchBtn = () => {
     if (isRunning) {
         playBtn.querySelector('.play').style.display = 'none';

@@ -1,11 +1,40 @@
 // import * as Highcharts from 'highcharts';
 import { ChildProcess } from 'child_process';
 
+/********************************* Preloaded *********************************
+ *****************************************************************************/
 /**
  * python process that executes GA
  */
 let pyshell: ChildProcess = (<any>window).pyshell;
-// console.log(require('./main'));
+
+/************************** GA States Changers part **************************/
+/**
+ * send play to GA, python side is responsible for whether to start GA for first time are just resume
+ *
+ * disables hover settings for charts
+ */
+const play: () => void = (<any>window).play;
+/**
+ * send pause to GA, enables hover settings for charts
+ */
+const pause: () => void = (<any>window).pause;
+/**
+ * send stop to GA, enables hover settings for charts
+ */
+const stop: () => void = (<any>window).stop;
+/**
+ * stops current GA and launches new one, disables hover settings for charts in case enabled
+ */
+const replay: () => void = (<any>window).replay;
+/**
+ * send step forward to GA, pyshell pauses GA if needed, enables tooltip for charts in case disabled
+ */
+const stepForward: () => void = (<any>window).stepForward;
+
+/************************************ GUI ************************************
+ *****************************************************************************/
+
 /****************************** Control buttons ******************************/
 
 /**
@@ -82,28 +111,28 @@ let mutRandom = <HTMLButtonElement>document.getElementById('random-mutation');
  * most fittest is a new fittest which its fitness value is better than every
  * fittest in the previous generations
  */
-let fittestChart: Highcharts.Chart;
+// let fittestChart: Highcharts.Chart;
 /**
  * updated every generation, recives current generation's fittest genes
  */
-let currentChart: Highcharts.Chart;
+// let currentChart: Highcharts.Chart;
 
 /**
  * an object that holds most fittest fitness with an array of their genes
  */
-let mostFittest: {
-  fitness: number;
-  individuals?: [
-    {
-      generation: number;
-      genes: any[];
-    }
-  ];
-} = { fitness: -1 };
+// let mostFittest: {
+//   fitness: number;
+//   individuals?: [
+//     {
+//       generation: number;
+//       genes: any[];
+//     }
+//   ];
+// } = { fitness: -1 };
 /**
  * an array of for every generation fittest genes
  */
-let fittestHistory = [];
+// let fittestHistory = [];
 
 /**
  * initialize a chart and pass it options
@@ -293,63 +322,63 @@ let isRunning = false;
  * update charts based on args passed
  * @param args point properties to be added | GA started signal
  */
-const addToChart = (args: object) => {
-  if (
-    args['generation'] !== undefined &&
-    args['fitness'] !== undefined &&
-    args['genes'] !== undefined
-  ) {
-    // every point is added to progressChart
-    // progressChart.series[0].addPoint(
-    //   parseInt(args['fitness']),
-    //   true,
-    //   false,
-    //   false
-    // );
-    // every point arrives override the precedent point
-    currentChart.series[0].setData(args['genes'], true, false);
+// const addToChart = (args: object) => {
+//   if (
+//     args['generation'] !== undefined &&
+//     args['fitness'] !== undefined &&
+//     args['genes'] !== undefined
+//   ) {
+//     // every point is added to progressChart
+//     progressChart.series[0].addPoint(
+//       parseInt(args['fitness']),
+//       true,
+//       false,
+//       false
+//     );
+//     // every point arrives override the precedent point
+//     currentChart.series[0].setData(args['genes'], true, false);
 
-    // register it on fittest history
-    fittestHistory.push(args['genes']);
+//     // register it on fittest history
+//     fittestHistory.push(args['genes']);
 
-    if (mostFittest['fitness'] < args['fitness']) {
-      mostFittest['fitness'] = args['fitness'];
-      mostFittest['individuals'] = [
-        {
-          generation: args['generation'],
-          genes: args['genes']
-        }
-      ];
-      fittestChart.series[0].setData(
-        mostFittest.individuals[0].genes,
-        true,
-        false
-      );
-    } else if (mostFittest['fitness'] == args['fitness']) {
-      mostFittest['individuals'].unshift({
-        generation: args['generation'],
-        genes: args['genes']
-      });
-      fittestChart.series[0].setData(
-        mostFittest.individuals[0].genes,
-        true,
-        false
-      );
-    }
-  } else if (args['started'] && args['genesNum'] !== undefined) {
-    // clear past results
-    // clearChart(progressChart);
-    clearChart(fittestChart);
-    clearChart(currentChart);
-    // clear fittest individuals history & mostFittest history
-    fittestHistory = [];
-    mostFittest = { fitness: -1 };
-    // setting up xAxis for fittest and current chart
-    settingXaxis(args, currentChart, fittestChart);
-    // to be able to change in ga state
-    setClickable();
-  }
-};
+//     if (mostFittest['fitness'] < args['fitness']) {
+//       mostFittest['fitness'] = args['fitness'];
+//       mostFittest['individuals'] = [
+//         {
+//           generation: args['generation'],
+//           genes: args['genes']
+//         }
+//       ];
+//       fittestChart.series[0].setData(
+//         mostFittest.individuals[0].genes,
+//         true,
+//         false
+//       );
+//     } else if (mostFittest['fitness'] == args['fitness']) {
+//       mostFittest['individuals'].unshift({
+//         generation: args['generation'],
+//         genes: args['genes']
+//       });
+//       fittestChart.series[0].setData(
+//         mostFittest.individuals[0].genes,
+//         true,
+//         false
+//       );
+//     }
+//   } else if (args['started'] && args['genesNum'] !== undefined) {
+//     // clear past results
+//     clearChart(progressChart);
+//     clearChart(fittestChart);
+//     clearChart(currentChart);
+//     // clear fittest individuals history & mostFittest history
+//     fittestHistory = [];
+//     mostFittest = { fitness: -1 };
+//     // setting up xAxis for fittest and current chart
+//     settingXaxis(args, currentChart, fittestChart);
+//     // to be able to change in ga state
+//     setClickable();
+//   }
+// };
 
 // if in development
 // if (isDev()) {
@@ -414,35 +443,6 @@ const addToChart = (args: object) => {
 //     });
 // });
 // pyshell.on('error', (err: Error) => console.error(`error trace: ${err}`));
-
-/************************* Buttons part *************************/
-/**
- * send play to GA, python side is responsible for whether to start GA for first time are just resume
- *
- * disables hover settings for charts
- */
-// const play: () => void = () => {};
-const play: () => void = (<any>window).play;
-/**
- * send pause to GA, enables hover settings for charts
- */
-// const pause: () => void = () => {};
-const pause: () => void = (<any>window).pause;
-/**
- * send stop to GA, enables hover settings for charts
- */
-// const stop: () => void = () => {};
-const stop: () => void = (<any>window).stop;
-/**
- * stops current GA and launches new one, disables hover settings for charts in case enabled
- */
-// const replay: () => void = () => {};
-const replay: () => void = (<any>window).replay;
-/**
- * send step forward to GA, pyshell pauses GA if needed, enables tooltip for charts in case disabled
- */
-// const stepForward: () => void = () => {};
-const stepForward: () => void = (<any>window).stepForward;
 
 /************************ GUI & Buttons Configuration ************************
  *****************************************************************************/
