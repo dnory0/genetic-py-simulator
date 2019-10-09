@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const initChart = (window).initChart;
-let progressChart = initChart('progress-chart', {
+const createChart = (window).createChart;
+let progressChart = createChart('progress-chart', {
     chart: {
         type: 'line'
     },

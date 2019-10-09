@@ -1,10 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const electron_1 = require("electron");
-const Highcharts = require("highcharts");
-function isDev() {
-    return process.mainModule.filename.indexOf('.asar') === -1;
-}
+let pyshell = window.pyshell;
 let playBtn = document.getElementById('play-btn');
 let stopBtn = document.getElementById('stop-btn');
 let toStartBtn = document.getElementById('to-start-btn');
@@ -21,97 +17,6 @@ let fittestChart;
 let currentChart;
 let mostFittest = { fitness: -1 };
 let fittestHistory = [];
-const initChart = (containerId, options) => {
-    return Highcharts.chart(containerId, {
-        title: {
-            text: options.title.text,
-            style: {
-                padding: '80px'
-            }
-        },
-        xAxis: {
-            title: {
-                text: options.xAxis.title.text,
-                align: 'high'
-            }
-        },
-        yAxis: {
-            title: {
-                text: options.yAxis.title.text,
-                align: 'high',
-                rotation: 0,
-                y: -20,
-                x: -5,
-                offset: -35
-            }
-        },
-        series: options.series,
-        plotOptions: {
-            series: {
-                animation: false,
-                states: {
-                    hover: {
-                        halo: {
-                            opacity: 0
-                        }
-                    }
-                }
-            }
-        },
-        legend: {
-            enabled: false
-        },
-        credits: {
-            enabled: false
-        }
-    });
-};
-fittestChart = initChart('fittest-chart', {
-    chart: {
-        type: 'line'
-    },
-    title: {
-        text: 'Best Fittest'
-    },
-    xAxis: {
-        title: {
-            text: 'Genes'
-        }
-    },
-    yAxis: {
-        title: {
-            text: 'Gene value'
-        }
-    },
-    series: [
-        {
-            data: []
-        }
-    ]
-});
-currentChart = initChart('current-chart', {
-    chart: {
-        type: 'line'
-    },
-    title: {
-        text: 'Current Generation Fittest'
-    },
-    xAxis: {
-        title: {
-            text: 'Genes'
-        }
-    },
-    series: [
-        {
-            data: []
-        }
-    ],
-    yAxis: {
-        title: {
-            text: 'Gene value'
-        }
-    }
-});
 const settingXaxis = (args, ...charts) => {
     const genes = [...Array(args['genesNum']).keys()].map(v => `${++v}`);
     charts.forEach(chart => {
@@ -180,23 +85,11 @@ const addToChart = (args) => {
         setClickable();
     }
 };
-const play = () => {
-    enableChartHover(false, fittestChart, currentChart);
-};
-const pause = () => {
-    enableChartHover(true, fittestChart, currentChart);
-};
-const stop = () => {
-    enableChartHover(true, fittestChart, currentChart);
-};
-const replay = () => {
-    enableChartHover(false, fittestChart, currentChart);
-};
-const stepForward = () => {
-    enableChartHover(true, fittestChart, currentChart);
-};
-const exit = () => {
-};
+const play = window.play;
+const pause = window.pause;
+const stop = window.stop;
+const replay = window.replay;
+const stepForward = window.stepForward;
 const switchBtn = () => {
     if (isRunning) {
         playBtn.querySelector('.play').style.display = 'none';
@@ -268,7 +161,4 @@ crossover.addEventListener('change', parameterChanged);
 crossover.addEventListener('keyup', parameterChanged);
 mutation.addEventListener('change', parameterChanged);
 mutation.addEventListener('keyup', parameterChanged);
-electron_1.ipcRenderer.on('pyshell', () => {
-    exit();
-});
 //# sourceMappingURL=renderer.js.map

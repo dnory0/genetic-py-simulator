@@ -10,14 +10,14 @@ import { Options, Chart, SeriesLineOptions } from 'highcharts';
  *
  * @returns set up chart
  */
-const initChart: (containerId: string, options: Options) => Chart = (<any>(
+const createChart: (containerId: string, options: Options) => Chart = (<any>(
   window
-)).initChart;
+)).createChart;
 
 /**
  * updated every generation, recieves the generation with its fittest fitness
  */
-let progressChart = initChart('progress-chart', {
+let progressChart = createChart('progress-chart', {
   chart: {
     type: 'line'
   },

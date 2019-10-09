@@ -10,9 +10,9 @@ import { Options, Chart, SeriesLineOptions } from 'highcharts';
  *
  * @returns set up chart
  */
-const initChart: (containerId: string, options: Options) => Chart = (<any>(
+const createChart: (containerId: string, options: Options) => Chart = (<any>(
   window
-)).initChart;
+)).createChart;
 
 /**
  * updated every time a new most fittest appear, recives most fittest genes
@@ -20,7 +20,7 @@ const initChart: (containerId: string, options: Options) => Chart = (<any>(
  * most fittest is a new fittest which its fitness value is better than every
  * fittest in the previous generations
  */
-let fittestChart = initChart('fittest-chart', {
+let fittestChart = createChart('fittest-chart', {
   chart: {
     type: 'line'
   },

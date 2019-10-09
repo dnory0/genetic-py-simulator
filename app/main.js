@@ -9,7 +9,7 @@ let mainWindow;
 let progressView;
 let fittestView;
 let pyshell;
-const createWindow = (filePath, { minWidth, minHeight, width, height, resizable, minimizable, maximizable, parent, frame } = {}) => {
+const createWindow = (filePath, { minWidth, minHeight, width, height, resizable, minimizable, maximizable, parent, frame, webPreferences: { nodeIntegration, preload } } = {}) => {
     let targetWindow = new electron_1.BrowserWindow({
         minWidth,
         minHeight,
@@ -22,19 +22,16 @@ const createWindow = (filePath, { minWidth, minHeight, width, height, resizable,
         frame,
         show: false,
         webPreferences: {
-            nodeIntegration: true
+            nodeIntegration,
+            preload
         }
     });
     targetWindow.loadFile(filePath);
-    targetWindow.once('ready-to-show', () => {
-        targetWindow.show();
-        initPyshell();
-    });
+    targetWindow.once('ready-to-show', targetWindow.show);
     targetWindow.on('close', () => {
         pyshell.stdin.write(`${JSON.stringify({ exit: true })}\n`);
     });
     targetWindow.once('closed', () => {
-        pyshell.stdin.write(`${JSON.stringify({ exit: true })}\n`);
         targetWindow = null;
     });
     return targetWindow;
@@ -64,7 +61,7 @@ const createView = (parentWindow, filePath, { x, y, width, height }, { webPrefer
     parentWindow.addBrowserView(targetView);
     return targetView;
 };
-const initPyshell = () => {
+const createPyshell = () => {
     if (isDev) {
         pyshell = child_process_1.spawn(`${process.platform == 'win32' ? 'python' : 'python3'}`, [
             path_1.join(__dirname, 'python', 'ga.py')
@@ -94,9 +91,14 @@ const initPyshell = () => {
     exports.pyshell = pyshell;
 };
 electron_1.app.once('ready', () => {
+    createPyshell();
     mainWindow = createWindow(path_1.join('app', 'index.html'), {
         minWidth: 580,
-        minHeight: 430
+        minHeight: 430,
+        webPreferences: {
+            preload: path_1.join(__dirname, 'preload.js'),
+            nodeIntegration: true
+        }
     });
     mainWindow.on('enter-full-screen', () => {
         mainWindow.setMenuBarVisibility(true);

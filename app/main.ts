@@ -55,7 +55,8 @@ const createWindow = (
     minimizable,
     maximizable,
     parent,
-    frame
+    frame,
+    webPreferences: { nodeIntegration, preload }
   }: BrowserWindowConstructorOptions = {}
 ): BrowserWindow => {
   let targetWindow = new BrowserWindow({
@@ -70,23 +71,23 @@ const createWindow = (
     frame,
     show: false,
     webPreferences: {
-      nodeIntegration: true
+      nodeIntegration,
+      preload
     }
   });
 
   targetWindow.loadFile(filePath);
 
-  targetWindow.once('ready-to-show', () => {
-    targetWindow.show();
-    initPyshell();
-  });
+  targetWindow.once('ready-to-show', targetWindow.show);
 
   targetWindow.on('close', () => {
+    /**
+     * exit the GA and kill spawned process, usually called on exit or reload app.
+     */
     pyshell.stdin.write(`${JSON.stringify({ exit: true })}\n`);
   });
 
   targetWindow.once('closed', () => {
-    pyshell.stdin.write(`${JSON.stringify({ exit: true })}\n`);
     targetWindow = null;
   });
   return targetWindow;
@@ -170,8 +171,9 @@ const createView = (
 /**
  * initialize pyshell depending on the mode (development/production) and
  * platform (win32/linux)
+ * @returns GA process ready to start
  */
-const initPyshell = () => {
+const createPyshell = () => {
   // if in development
   if (isDev) {
     // works with the script version
@@ -231,13 +233,19 @@ const initPyshell = () => {
 };
 
 app.once('ready', () => {
+  createPyshell();
   /****************************** Main Window ******************************
    *************************************************************************/
   mainWindow = createWindow(join('app', 'index.html'), {
     minWidth: 580,
-    minHeight: 430
+    minHeight: 430,
+    webPreferences: {
+      preload: join(__dirname, 'preload.js'),
+      nodeIntegration: true
+    }
   });
 
+  // to force visibility on linux (in my case)
   mainWindow.on('enter-full-screen', () => {
     mainWindow.setMenuBarVisibility(true);
   });

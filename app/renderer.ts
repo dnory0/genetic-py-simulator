@@ -1,22 +1,11 @@
-import { ipcRenderer, remote } from 'electron';
-import { join } from 'path';
-import * as Highcharts from 'highcharts';
-import { ChildProcess, spawn } from 'child_process';
-import { copyFileSync, existsSync } from 'fs';
+// import * as Highcharts from 'highcharts';
+import { ChildProcess } from 'child_process';
 
 /**
- * return true if app on development, false in production.
- *
- * NOTE: app needs to be packed on asar (by default) to be possible to detect
- * if you don't set asar to false on electron-builder.json you're good to go
+ * python process that executes GA
  */
-function isDev() {
-  return process.mainModule.filename.indexOf('.asar') === -1;
-}
-
-// require('highcharts/modules/exporting')(Highcharts);
-// require('highcharts/')
-
+let pyshell: ChildProcess = (<any>window).pyshell;
+// console.log(require('./main'));
 /****************************** Control buttons ******************************/
 
 /**
@@ -123,53 +112,53 @@ let fittestHistory = [];
  *
  * @returns set up chart
  */
-const initChart = (containerId: string, options: Highcharts.Options) => {
-  return Highcharts.chart(containerId, {
-    title: {
-      text: options.title.text,
-      style: {
-        padding: '80px'
-      }
-    },
-    xAxis: {
-      title: {
-        text: (<Highcharts.XAxisOptions>options.xAxis).title.text,
-        align: 'high'
-      }
-    },
-    yAxis: {
-      title: {
-        text: (<Highcharts.YAxisOptions>options.yAxis).title.text,
-        align: 'high',
-        rotation: 0,
-        y: -20,
-        x: -5,
-        offset: -35
-      }
-    },
-    series: options.series,
-    plotOptions: {
-      series: {
-        animation: false,
-        states: {
-          hover: {
-            halo: {
-              opacity: 0
-            }
-          }
-        }
-      }
-    },
-    legend: {
-      enabled: false
-    },
-    credits: {
-      enabled: false
-    }
-  });
-};
+// const createChart = (containerId: string, options: Highcharts.Options) => {
+//   return Highcharts.chart(containerId, {
+//     title: {
+//       text: options.title.text,
+//       style: {
+//         padding: '80px'
+//       }
+//     },
+//     xAxis: {
+//       title: {
+//         text: (<Highcharts.XAxisOptions>options.xAxis).title.text,
+//         align: 'high'
+//       }
+//     },
+//     yAxis: {
+//       title: {
+//         text: (<Highcharts.YAxisOptions>options.yAxis).title.text,
+//         align: 'high',
+//         rotation: 0,
+//         y: -20,
+//         x: -5,
+//         offset: -35
+//       }
+//     },
+//     series: options.series,
+//     plotOptions: {
+//       series: {
+//         animation: false,
+//         states: {
+//           hover: {
+//             halo: {
+//               opacity: 0
+//             }
+//           }
+//         }
+//       }
+//     },
+//     legend: {
+//       enabled: false
+//     },
+//     credits: {
+//       enabled: false
+//     }
+//   });
+// };
 
-// progressChart = initChart('progress-chart', {
+// progressChart = createChart('progress-chart', {
 //   chart: {
 //     type: 'line'
 //   },
@@ -194,53 +183,53 @@ const initChart = (containerId: string, options: Highcharts.Options) => {
 //   ] as Highcharts.SeriesLineOptions[]
 // });
 
-fittestChart = initChart('fittest-chart', {
-  chart: {
-    type: 'line'
-  },
-  title: {
-    text: 'Best Fittest'
-  },
-  xAxis: {
-    title: {
-      text: 'Genes'
-    }
-  },
-  yAxis: {
-    title: {
-      text: 'Gene value'
-    }
-  },
-  series: [
-    {
-      data: []
-    }
-  ] as Highcharts.SeriesLineOptions[]
-});
+// fittestChart = createChart('fittest-chart', {
+//   chart: {
+//     type: 'line'
+//   },
+//   title: {
+//     text: 'Best Fittest'
+//   },
+//   xAxis: {
+//     title: {
+//       text: 'Genes'
+//     }
+//   },
+//   yAxis: {
+//     title: {
+//       text: 'Gene value'
+//     }
+//   },
+//   series: [
+//     {
+//       data: []
+//     }
+//   ] as Highcharts.SeriesLineOptions[]
+// });
 
-currentChart = initChart('current-chart', {
-  chart: {
-    type: 'line'
-  },
-  title: {
-    text: 'Current Generation Fittest'
-  },
-  xAxis: {
-    title: {
-      text: 'Genes'
-    }
-  },
-  series: [
-    {
-      data: []
-    }
-  ] as Highcharts.SeriesLineOptions[],
-  yAxis: {
-    title: {
-      text: 'Gene value'
-    }
-  }
-});
+// currentChart = createChart('current-chart', {
+//   chart: {
+//     type: 'line'
+//   },
+//   title: {
+//     text: 'Current Generation Fittest'
+//   },
+//   xAxis: {
+//     title: {
+//       text: 'Genes'
+//     }
+//   },
+//   series: [
+//     {
+//       data: []
+//     }
+//   ] as Highcharts.SeriesLineOptions[],
+//   yAxis: {
+//     title: {
+//       text: 'Gene value'
+//     }
+//   }
+// });
 
 /**
  * set up X axis with genes numeration 1 2 .. <genes number>
@@ -299,11 +288,6 @@ const clearChart = (chart: Highcharts.Chart, categories: boolean = true) => {
  * by default user needs to hit the play button to run pyshell
  */
 let isRunning = false;
-
-/**
- * declared and initialized globally
- */
-// let pyshell: ChildProcess;
 
 /**
  * update charts based on args passed
@@ -437,49 +421,28 @@ const addToChart = (args: object) => {
  *
  * disables hover settings for charts
  */
-const play = () => {
-  // pyshell.stdin.write(`${JSON.stringify({ play: true })}\n`);
-  enableChartHover(false, /* progressChart, */ fittestChart, currentChart);
-};
-
+// const play: () => void = () => {};
+const play: () => void = (<any>window).play;
 /**
  * send pause to GA, enables hover settings for charts
  */
-const pause = () => {
-  // pyshell.stdin.write(`${JSON.stringify({ pause: true })}\n`);
-  enableChartHover(true, /* progressChart, */ fittestChart, currentChart);
-};
-
+// const pause: () => void = () => {};
+const pause: () => void = (<any>window).pause;
 /**
  * send stop to GA, enables hover settings for charts
  */
-const stop = () => {
-  // pyshell.stdin.write(`${JSON.stringify({ stop: true })}\n`);
-  enableChartHover(true, /* progressChart, */ fittestChart, currentChart);
-};
-
+// const stop: () => void = () => {};
+const stop: () => void = (<any>window).stop;
 /**
  * stops current GA and launches new one, disables hover settings for charts in case enabled
  */
-const replay = () => {
-  // pyshell.stdin.write(`${JSON.stringify({ replay: true })}\n`);
-  enableChartHover(false, /* progressChart, */ fittestChart, currentChart);
-};
-
+// const replay: () => void = () => {};
+const replay: () => void = (<any>window).replay;
 /**
  * send step forward to GA, pyshell pauses GA if needed, enables tooltip for charts in case disabled
  */
-const stepForward = () => {
-  // pyshell.stdin.write(`${JSON.stringify({ step_f: true })}\n`);
-  enableChartHover(true, /* progressChart, */ fittestChart, currentChart);
-};
-
-/**
- * exit the GA and kill spawned process, usually called on exit or reload app.
- */
-const exit = () => {
-  // pyshell.stdin.write(`${JSON.stringify({ exit: true })}\n`);
-};
+// const stepForward: () => void = () => {};
+const stepForward: () => void = (<any>window).stepForward;
 
 /************************ GUI & Buttons Configuration ************************
  *****************************************************************************/
@@ -620,12 +583,5 @@ crossover.addEventListener('keyup', parameterChanged);
 
 mutation.addEventListener('change', parameterChanged);
 mutation.addEventListener('keyup', parameterChanged);
-
-/**
- * triggered when app going to exit or reload
- */
-ipcRenderer.on('pyshell', () => {
-  exit();
-});
 
 // document.addEventListener('DOMContentLoaded', function() {});

@@ -1,7 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const highcharts_1 = require("highcharts");
-window.initChart = (containerId, options) => {
+const pyshell = require('electron').remote.require('./main').pyshell;
+window.createChart = (containerId, options) => {
     return highcharts_1.chart(containerId, {
         title: {
             text: options.title.text,
@@ -45,5 +46,21 @@ window.initChart = (containerId, options) => {
             enabled: false
         }
     });
+};
+window.pyshell = pyshell;
+window.play = () => {
+    pyshell.stdin.write(`${JSON.stringify({ play: true })}\n`);
+};
+window.pause = () => {
+    pyshell.stdin.write(`${JSON.stringify({ pause: true })}\n`);
+};
+window.stop = () => {
+    pyshell.stdin.write(`${JSON.stringify({ stop: true })}\n`);
+};
+window.replay = () => {
+    pyshell.stdin.write(`${JSON.stringify({ replay: true })}\n`);
+};
+window.stepForward = () => {
+    pyshell.stdin.write(`${JSON.stringify({ step_f: true })}\n`);
 };
 //# sourceMappingURL=preload.js.map

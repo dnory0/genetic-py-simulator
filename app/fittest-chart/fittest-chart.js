@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const initChart = (window).initChart;
-let fittestChart = initChart('fittest-chart', {
+const createChart = (window).createChart;
+let fittestChart = createChart('fittest-chart', {
     chart: {
         type: 'line'
     },
