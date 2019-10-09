@@ -7,10 +7,10 @@ import {
   BrowserView,
   BrowserViewConstructorOptions,
   Rectangle
-} from "electron";
-import { join } from "path";
-import { existsSync, copyFileSync } from "fs";
-import { spawn, ChildProcess } from "child_process";
+} from 'electron';
+import { join } from 'path';
+import { existsSync, copyFileSync } from 'fs';
+import { spawn, ChildProcess } from 'child_process';
 
 /******************* MAIN WINDOW HANDLING *******************
  *************************************************************/
@@ -21,7 +21,7 @@ import { spawn, ChildProcess } from "child_process";
  * NOTE: app needs to be packed on asar (by default) to detect production mode
  * if you don't set asar to false on electron-builder.json you're good to go
  */
-const isDev = __dirname.indexOf(".asar") === -1;
+const isDev = __dirname.indexOf('.asar') === -1;
 
 /**
  * main window
@@ -76,16 +76,16 @@ const createWindow = (
 
   targetWindow.loadFile(filePath);
 
-  targetWindow.once("ready-to-show", () => {
+  targetWindow.once('ready-to-show', () => {
     targetWindow.show();
     initPyshell();
   });
 
-  targetWindow.on("close", () => {
+  targetWindow.on('close', () => {
     pyshell.stdin.write(`${JSON.stringify({ exit: true })}\n`);
   });
 
-  targetWindow.once("closed", () => {
+  targetWindow.once('closed', () => {
     pyshell.stdin.write(`${JSON.stringify({ exit: true })}\n`);
     targetWindow = null;
   });
@@ -175,8 +175,8 @@ const initPyshell = () => {
   // if in development
   if (isDev) {
     // works with the script version
-    pyshell = spawn(`${process.platform == "win32" ? "python" : "python3"}`, [
-      join(__dirname, "python", "ga.py")
+    pyshell = spawn(`${process.platform == 'win32' ? 'python' : 'python3'}`, [
+      join(__dirname, 'python', 'ga.py')
     ]);
   } else {
     /**
@@ -193,52 +193,52 @@ const initPyshell = () => {
     let execExist = existsSync(
       join(
         __dirname,
-        "python",
-        "dist",
-        process.platform == "win32"
-          ? join("win", "ga.exe")
-          : join("linux", "ga")
+        'python',
+        'dist',
+        process.platform == 'win32'
+          ? join('win', 'ga.exe')
+          : join('linux', 'ga')
       )
     );
 
     if (execExist) {
       copyFrom = join(
         __dirname,
-        "python",
-        "dist",
-        process.platform == "win32"
-          ? join("win", "ga.exe")
-          : join("linux", "ga")
+        'python',
+        'dist',
+        process.platform == 'win32'
+          ? join('win', 'ga.exe')
+          : join('linux', 'ga')
       );
       copyTo = join(
-        app.getPath("temp"),
-        process.platform == "win32" ? "ga.exe" : "ga"
+        app.getPath('temp'),
+        process.platform == 'win32' ? 'ga.exe' : 'ga'
       );
     } else {
-      copyFrom = join(__dirname, "python", "ga.py");
-      copyTo = join(app.getPath("temp"), "ga.py");
+      copyFrom = join(__dirname, 'python', 'ga.py');
+      copyTo = join(app.getPath('temp'), 'ga.py');
     }
     // works with the executable version
     copyFileSync(copyFrom, copyTo);
     pyshell = spawn(
       execExist
         ? copyTo
-        : `${process.platform == "win32" ? "python" : "python3"}`,
+        : `${process.platform == 'win32' ? 'python' : 'python3'}`,
       execExist ? [] : [copyTo]
     );
   }
   exports.pyshell = pyshell;
 };
 
-app.once("ready", () => {
+app.once('ready', () => {
   /****************************** Main Window ******************************
    *************************************************************************/
-  mainWindow = createWindow(join("app", "index.html"), {
+  mainWindow = createWindow(join('app', 'index.html'), {
     minWidth: 580,
     minHeight: 430
   });
 
-  mainWindow.on("enter-full-screen", () => {
+  mainWindow.on('enter-full-screen', () => {
     mainWindow.setMenuBarVisibility(true);
   });
 
@@ -252,31 +252,31 @@ app.once("ready", () => {
   /***************************** Progress View *****************************/
   progressView = createView(
     mainWindow,
-    join("app", "progress-chart", "progress-chart.html"),
+    join('app', 'progress-chart', 'progress-chart.html'),
     {
       x: 0,
       y: 0,
       width:
         mainWindow.getBounds().width -
-        (process.platform == "win32" && !mainWindow.isFullScreen() ? 16 : 0),
+        (process.platform == 'win32' && !mainWindow.isFullScreen() ? 16 : 0),
       height: Math.floor(
         mainWindow.getBounds().height * 0.5 -
-          (process.platform == "win32" && !mainWindow.isFullScreen() ? 17 : 0)
+          (process.platform == 'win32' && !mainWindow.isFullScreen() ? 17 : 0)
       )
     },
     {
       webPreferences: {
-        preload: join(__dirname, "preload.js"),
+        preload: join(__dirname, 'preload.js'),
         nodeIntegration: false
       }
     }
   );
 
-  progressView.webContents.toggleDevTools();
+  // progressView.webContents.toggleDevTools();
 
   fittestView = createView(
     mainWindow,
-    join("app", "fittest-chart", "fittest-chart.html"),
+    join('app', 'fittest-chart', 'fittest-chart.html'),
     {
       x: Math.floor(mainWindow.getBounds().width / 2) + 5,
       y: Math.floor(mainWindow.getBounds().height / 2) + 1,
@@ -285,24 +285,24 @@ app.once("ready", () => {
     },
     {
       webPreferences: {
-        preload: join(__dirname, "preload.js"),
+        preload: join(__dirname, 'preload.js'),
         nodeIntegration: false
       }
     }
   );
 
-  fittestView.webContents.toggleDevTools();
+  // fittestView.webContents.toggleDevTools();
 
   // if user resize window views must resize accordingly
-  mainWindow.on("resize", () => {
+  mainWindow.on('resize', () => {
     setTimeout(() => {
       resizeView(progressView, {
         width:
           mainWindow.getBounds().width -
-          (process.platform == "win32" && !mainWindow.isFullScreen() ? 16 : 0),
+          (process.platform == 'win32' && !mainWindow.isFullScreen() ? 16 : 0),
         height: Math.floor(
           mainWindow.getBounds().height * 0.5 -
-            (process.platform == "win32" && !mainWindow.isFullScreen() ? 17 : 0)
+            (process.platform == 'win32' && !mainWindow.isFullScreen() ? 17 : 0)
         )
       });
       resizeView(fittestView, {
@@ -314,12 +314,12 @@ app.once("ready", () => {
     }, 100); // 100 ms is relative number that should be revised
   });
 
-  const menubar = require("./menubar") as Menu;
-  menubar.items[process.platform == "darwin" ? 3 : 2].submenu.insert(
+  const menubar = require('./menubar') as Menu;
+  menubar.items[process.platform == 'darwin' ? 3 : 2].submenu.insert(
     0,
     new MenuItem({
-      label: "Reload",
-      accelerator: "CmdOrCtrl+R",
+      label: 'Reload',
+      accelerator: 'CmdOrCtrl+R',
       click: () => {
         // mainWindow.webContents.send('pyshell');
         mainWindow.webContents.reload();
