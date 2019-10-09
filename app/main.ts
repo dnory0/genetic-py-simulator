@@ -273,12 +273,28 @@ app.once('ready', () => {
     }
   );
 
-  // fittestView = createView(
-  //   mainWindow,
-  //   join()
-  // )
+  progressView.webContents.toggleDevTools();
 
-  // if user resize window the viw must resize accordingly
+  fittestView = createView(
+    mainWindow,
+    join('app', 'fittest-chart', 'fittest-chart.html'),
+    {
+      x: Math.floor(mainWindow.getBounds().width / 2) + 5,
+      y: Math.floor(mainWindow.getBounds().height / 2) + 1,
+      width: Math.floor(mainWindow.getBounds().width / 2) - 5,
+      height: Math.floor(mainWindow.getBounds().height / 2) - 50
+    },
+    {
+      webPreferences: {
+        preload: join(__dirname, 'preload.js'),
+        nodeIntegration: false
+      }
+    }
+  );
+
+  fittestView.webContents.toggleDevTools();
+
+  // if user resize window views must resize accordingly
   mainWindow.on('resize', () => {
     setTimeout(() => {
       resizeView(progressView, {
@@ -289,6 +305,12 @@ app.once('ready', () => {
           mainWindow.getBounds().height * 0.5 -
             (process.platform == 'win32' && !mainWindow.isFullScreen() ? 17 : 0)
         )
+      });
+      resizeView(fittestView, {
+        x: Math.floor(mainWindow.getBounds().width / 2) + 5,
+        y: Math.floor(mainWindow.getBounds().height / 2) + 1,
+        width: Math.floor(mainWindow.getBounds().width / 2) - 5,
+        height: Math.floor(mainWindow.getBounds().height / 2) - 50
       });
     }, 100); // 100 ms is relative number that should be revised
   });
@@ -303,6 +325,7 @@ app.once('ready', () => {
         // mainWindow.webContents.send('pyshell');
         mainWindow.webContents.reload();
         progressView.webContents.reload();
+        fittestView.webContents.reload();
       }
     })
   );

@@ -113,6 +113,19 @@ electron_1.app.once('ready', () => {
             nodeIntegration: false
         }
     });
+    progressView.webContents.toggleDevTools();
+    fittestView = createView(mainWindow, path_1.join('app', 'fittest-chart', 'fittest-chart.html'), {
+        x: Math.floor(mainWindow.getBounds().width / 2) + 5,
+        y: Math.floor(mainWindow.getBounds().height / 2) + 1,
+        width: Math.floor(mainWindow.getBounds().width / 2) - 5,
+        height: Math.floor(mainWindow.getBounds().height / 2) - 50
+    }, {
+        webPreferences: {
+            preload: path_1.join(__dirname, 'preload.js'),
+            nodeIntegration: false
+        }
+    });
+    fittestView.webContents.toggleDevTools();
     mainWindow.on('resize', () => {
         setTimeout(() => {
             resizeView(progressView, {
@@ -120,6 +133,12 @@ electron_1.app.once('ready', () => {
                     (process.platform == 'win32' && !mainWindow.isFullScreen() ? 16 : 0),
                 height: Math.floor(mainWindow.getBounds().height * 0.5 -
                     (process.platform == 'win32' && !mainWindow.isFullScreen() ? 17 : 0))
+            });
+            resizeView(fittestView, {
+                x: Math.floor(mainWindow.getBounds().width / 2) + 5,
+                y: Math.floor(mainWindow.getBounds().height / 2) + 1,
+                width: Math.floor(mainWindow.getBounds().width / 2) - 5,
+                height: Math.floor(mainWindow.getBounds().height / 2) - 50
             });
         }, 100);
     });
@@ -130,6 +149,7 @@ electron_1.app.once('ready', () => {
         click: () => {
             mainWindow.webContents.reload();
             progressView.webContents.reload();
+            fittestView.webContents.reload();
         }
     }));
     electron_1.Menu.setApplicationMenu(menubar);
