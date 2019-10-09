@@ -6,8 +6,7 @@ import {
   MenuItem,
   BrowserView,
   BrowserViewConstructorOptions,
-  Rectangle,
-  globalShortcut
+  Rectangle
 } from 'electron';
 import { join } from 'path';
 import { existsSync, copyFileSync } from 'fs';
@@ -32,7 +31,10 @@ let mainWindow: BrowserWindow;
  * progress Chart View
  */
 let progressView: BrowserView;
-// let fittestView: BrowserView;
+/**
+ * most fittest Chart View
+ */
+let fittestView: BrowserView;
 
 /**
  * declared and initialized globally
@@ -174,10 +176,9 @@ const initPyshell = () => {
   // if in development
   if (isDev) {
     // works with the script version
-    pyshell = exports.pyshell = spawn(
-      `${process.platform == 'win32' ? 'python' : 'python3'}`,
-      [join(__dirname, 'python', 'ga.py')]
-    );
+    pyshell = spawn(`${process.platform == 'win32' ? 'python' : 'python3'}`, [
+      join(__dirname, 'python', 'ga.py')
+    ]);
   } else {
     /**
      * path of executable/script to copy
@@ -220,13 +221,14 @@ const initPyshell = () => {
     }
     // works with the executable version
     copyFileSync(copyFrom, copyTo);
-    pyshell = exports.pyshell = spawn(
+    pyshell = spawn(
       execExist
         ? copyTo
         : `${process.platform == 'win32' ? 'python' : 'python3'}`,
       execExist ? [] : [copyTo]
     );
   }
+  exports.pyshell = pyshell;
 };
 
 app.once('ready', () => {
@@ -270,6 +272,11 @@ app.once('ready', () => {
       }
     }
   );
+
+  // fittestView = createView(
+  //   mainWindow,
+  //   join()
+  // )
 
   // if user resize window the viw must resize accordingly
   mainWindow.on('resize', () => {

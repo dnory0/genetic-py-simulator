@@ -7,6 +7,7 @@ const child_process_1 = require("child_process");
 const isDev = __dirname.indexOf('.asar') === -1;
 let mainWindow;
 let progressView;
+let fittestView;
 let pyshell;
 const createWindow = (filePath, { minWidth, minHeight, width, height, resizable, minimizable, maximizable, parent, frame } = {}) => {
     let targetWindow = new electron_1.BrowserWindow({
@@ -64,7 +65,9 @@ const createView = (parentWindow, filePath, { x, y, width, height }, { webPrefer
 };
 const initPyshell = () => {
     if (isDev) {
-        pyshell = exports.pyshell = child_process_1.spawn(`${process.platform == 'win32' ? 'python' : 'python3'}`, [path_1.join(__dirname, 'python', 'ga.py')]);
+        pyshell = child_process_1.spawn(`${process.platform == 'win32' ? 'python' : 'python3'}`, [
+            path_1.join(__dirname, 'python', 'ga.py')
+        ]);
     }
     else {
         let copyFrom;
@@ -83,10 +86,11 @@ const initPyshell = () => {
             copyTo = path_1.join(electron_1.app.getPath('temp'), 'ga.py');
         }
         fs_1.copyFileSync(copyFrom, copyTo);
-        pyshell = exports.pyshell = child_process_1.spawn(execExist
+        pyshell = child_process_1.spawn(execExist
             ? copyTo
             : `${process.platform == 'win32' ? 'python' : 'python3'}`, execExist ? [] : [copyTo]);
     }
+    exports.pyshell = pyshell;
 };
 electron_1.app.once('ready', () => {
     mainWindow = createWindow(path_1.join('app', 'index.html'), {
