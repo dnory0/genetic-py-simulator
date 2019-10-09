@@ -97,7 +97,7 @@ electron_1.app.once('ready', () => {
         minHeight: 430,
         webPreferences: {
             preload: path_1.join(__dirname, 'preload.js'),
-            nodeIntegration: true
+            nodeIntegration: false
         }
     });
     mainWindow.on('enter-full-screen', () => {
@@ -148,6 +148,7 @@ electron_1.app.once('ready', () => {
         label: 'Reload',
         accelerator: 'CmdOrCtrl+R',
         click: () => {
+            pyshell.stdin.write(`${JSON.stringify({ stop: true })}\n`);
             mainWindow.webContents.reload();
             progressView.webContents.reload();
             fittestView.webContents.reload();

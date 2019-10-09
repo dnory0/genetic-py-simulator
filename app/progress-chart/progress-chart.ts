@@ -1,7 +1,13 @@
 import { Options, Chart, SeriesLineOptions } from 'highcharts';
+import { ChildProcess } from 'child_process';
 
 /****************************** passed by preload ******************************
  *******************************************************************************/
+
+/**
+ * python process that executes GA
+ */
+let pyshell: ChildProcess = (<any>window).pyshell;
 
 /**
  * initialize a chart and pass it options
@@ -13,6 +19,49 @@ import { Options, Chart, SeriesLineOptions } from 'highcharts';
 const createChart: (containerId: string, options: Options) => Chart = (<any>(
   window
 )).createChart;
+
+/**
+ * enables or disable the hover settings for the passed chart
+ * @param enable decides if to disable hover settings or enable them.
+ * @param chart chart to apply hover settings on
+ */
+const enableChartHover: (enable: boolean, chart: Highcharts.Chart) => void = (<
+  any
+>window).enableChartHover;
+
+/**
+ * clears chart data and xAxis if needed and redraw instantly
+ * @param chart chart to clear its data and xAxis
+ * @param categories whether to clear categories, default is false
+ */
+const clearChart: (chart: Chart, categories?: boolean) => void = (<any>window)
+  .clearChart;
+
+/**
+ * figure out what response stands for and act uppon it
+ * @param response response of pyshell
+ */
+const treatResponse = (response: object) => {
+  if (
+    response['generation'] !== undefined &&
+    response['fitness'] !== undefined &&
+    response['genes'] !== undefined
+  ) {
+    // every point is added to progressChart
+    progressChart.series[0].addPoint(
+      parseInt(response['fitness']),
+      true,
+      false,
+      false
+    );
+  } else if (response['started'] && response['genesNum'] !== undefined) {
+    // clear past results
+    clearChart(progressChart);
+    // disable points on hover on chart
+    enableChartHover(false, progressChart);
+  } else if (response['paused']) enableChartHover(true, progressChart);
+  else if (response['resumed']) enableChartHover(false, progressChart);
+};
 
 /**
  * updated every generation, recieves the generation with its fittest fitness
@@ -37,7 +86,19 @@ let progressChart = createChart('progress-chart', {
   series: [
     {
       name: 'CGA',
-      data: [44, 55]
+      data: []
     }
   ] as SeriesLineOptions[]
+});
+
+pyshell.stdout.on('data', (response: Buffer) => {
+  // treatResponse(JSON.parse(response.toString()));
+  response
+    .toString()
+    .split('\n')
+    .forEach((args: string) => {
+      console.log(args);
+      // sometimes args == ''(not sure why), those cases need to be ignored
+      if (args) treatResponse(JSON.parse(args));
+    });
 });

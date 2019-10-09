@@ -126,7 +126,7 @@ class GAThread(threading.Thread):
         # flag to pause thread
         self.__pause_now = False
         # flag to state thread state
-        self.paused = False
+        self.paused = True
         # flag to stop thread
         self.__stop_now = False
 
@@ -143,6 +143,13 @@ class GAThread(threading.Thread):
             "generation": pop.generation,
             "genes": pop.fittest().genes
         })
+
+        # in case user triggered step_f signal instead of play or replay
+        # send paused to enable hover over charts
+        if self.__pause_now:
+            to_json({
+                "paused": True
+            })
 
         # check before entering evolution loop if pause event
         #  was fired before hitting start
@@ -188,6 +195,7 @@ class GAThread(threading.Thread):
         """
         if not self.start_triggered:
             self.start_triggered = True
+            self.paused = False
             threading.Thread.start(self)
 
     def pause(self):
@@ -195,8 +203,12 @@ class GAThread(threading.Thread):
         pause thread if running
         """
         # thread should be running to pause
-        # if not self.paused:
-        self.__pause_now = True
+        if not self.paused:
+            self.__pause_now = True
+            # notify app of the pause
+            to_json({
+                "paused": True
+            })
 
     # should just resume the thread
     def resume(self):
@@ -210,14 +222,36 @@ class GAThread(threading.Thread):
             # Now release the lock
             self.pause_cond.release()
             self.paused = False
+            # notify app
+            to_json({
+                "resumed": True
+            })
 
     def step_forward(self):
         """
         move one iteration forward
         """
-        self.start()
-        self.resume()
-        self.pause()
+        # start it if not started yet
+        if not self.start_triggered:
+            self.start_triggered = True
+            threading.Thread.start(self)
+            self.__pause_now = True
+            return
+        # release if paused, it will lock automatically after one generation
+        # because __pause_now is set to True
+        if not self.paused:
+            self.__pause_now = True
+            to_json({
+                "paused": True
+            })
+        if self.paused:
+            # Notify so thread will wake after lock released
+            self.pause_cond.notify()
+            # Now release the lock
+            self.pause_cond.release()
+            # pause now
+            self.paused = False
+            self.__pause_now = True
 
     def stop(self):
         """
@@ -226,7 +260,12 @@ class GAThread(threading.Thread):
         if self.is_alive():
             self.__stop_now = True
             # resume if paused to break out of running loop
-            self.resume()
+            if self.paused:
+                # Notify so thread will wake after lock released
+                self.pause_cond.notify()
+                # Now release the lock
+                self.pause_cond.release()
+                self.paused = False
             self.join()
 
 
@@ -249,7 +288,7 @@ g_sleep = 0
 # if user passes them after GA started it will do nothing
 g_pop_size = int(sys.argv[1]) if len(sys.argv) > 1 else random.randint(120, 500)
 g_genes_num = int(sys.argv[2]) if len(sys.argv) > 2 else random.randint(80, 200)
-
+g_sleep = int(sys.argv[3]) if len(sys.argv) > 3 else g_sleep
 
 def final_value(min_val, given_val, is_random: bool):
     """ called when a signal is received, if random flag set to True it will return
@@ -305,7 +344,7 @@ while True:
             init_ga(cmd)
             ga_thread.start()
     elif cmd.get('pause'):
-        if ga_thread is not None:
+        if ga_thread is not None and ga_thread.is_alive():
             ga_thread.pause()
     elif cmd.get('stop'):
         if ga_thread is not None:

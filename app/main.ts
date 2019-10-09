@@ -238,11 +238,11 @@ app.once('ready', () => {
     minHeight: 430,
     webPreferences: {
       preload: join(__dirname, 'preload.js'),
-      nodeIntegration: true
+      nodeIntegration: false
     }
   });
 
-  // to force visibility on linux (in my case)
+  // to force visibility on full screen linux (in my case)
   mainWindow.on('enter-full-screen', () => {
     mainWindow.setMenuBarVisibility(true);
   });
@@ -324,7 +324,10 @@ app.once('ready', () => {
       label: 'Reload',
       accelerator: 'CmdOrCtrl+R',
       click: () => {
-        // mainWindow.webContents.send('pyshell');
+        /**
+         * stops the GA if user attemps reload while GA running
+         */
+        pyshell.stdin.write(`${JSON.stringify({ stop: true })}\n`);
         mainWindow.webContents.reload();
         progressView.webContents.reload();
         fittestView.webContents.reload();

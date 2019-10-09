@@ -47,7 +47,39 @@ window.createChart = (containerId, options) => {
         }
     });
 };
+window.enableChartHover = (enable, chart) => {
+    chart.options.tooltip.enabled = enable;
+    chart.update({
+        plotOptions: {
+            series: {
+                marker: {
+                    enabled: enable,
+                    radius: enable ? 2 : null
+                },
+                states: {
+                    hover: {
+                        halo: {
+                            opacity: enable ? 0.5 : 0
+                        }
+                    }
+                }
+            }
+        }
+    });
+};
+window.clearChart = (chart, categories = false) => {
+    if (categories)
+        chart.xAxis[0].setCategories([]);
+    chart.series[0].setData([]);
+    chart.redraw();
+};
+window.settingXAxis = (args, chart) => {
+    const genes = [...Array(args['genesNum']).keys()].map(v => `${++v}`);
+    chart.xAxis[0].setCategories(genes);
+};
 window.pyshell = pyshell;
+window.mostFittest = { fitness: -1 };
+window.fittestHistory = [];
 window.play = () => {
     pyshell.stdin.write(`${JSON.stringify({ play: true })}\n`);
 };

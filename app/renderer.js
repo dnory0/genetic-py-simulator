@@ -18,41 +18,25 @@ let crossover = document.getElementById('crossover-rate');
 let coRandom = document.getElementById('random-crossover');
 let mutation = document.getElementById('mutation-rate');
 let mutRandom = document.getElementById('random-mutation');
-const settingXaxis = (args, ...charts) => {
-    const genes = [...Array(args['genesNum']).keys()].map(v => `${++v}`);
-    charts.forEach(chart => {
-        chart.xAxis[0].setCategories(genes);
-    });
-};
-const enableChartHover = (enable, ...charts) => {
-    charts.forEach((chart) => {
-        chart.options.tooltip.enabled = enable;
-        chart.update({
-            plotOptions: {
-                series: {
-                    marker: {
-                        enabled: enable,
-                        radius: enable ? 2 : null
-                    },
-                    states: {
-                        hover: {
-                            halo: {
-                                opacity: enable ? 0.5 : 0
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    });
-};
-const clearChart = (chart, categories = true) => {
-    if (categories)
-        chart.xAxis[0].setCategories([]);
-    chart.series[0].setData([]);
-    chart.redraw();
-};
 let isRunning = false;
+const treatResponse = (response) => {
+    if (response['started'] && response['genesNum'] !== undefined) {
+        setClickable();
+    }
+    else if (response['finished']) {
+        setClickable(false);
+    }
+};
+pyshell.stdout.on('data', (response) => {
+    response
+        .toString()
+        .split('\n')
+        .forEach((args) => {
+        console.log(args);
+        if (args)
+            treatResponse(JSON.parse(args));
+    });
+});
 const switchBtn = () => {
     if (isRunning) {
         playBtn.querySelector('.play').style.display = 'none';
@@ -64,7 +48,7 @@ const switchBtn = () => {
     }
 };
 const setClickable = (clickable = true) => {
-    Array.from(document.querySelector('.controls').children).forEach((element, index) => {
+    Array.from(document.querySelector('.state-controls').children).forEach((element, index) => {
         if ([0, 4].includes(index))
             return;
         if (clickable)
@@ -112,6 +96,12 @@ const parameterChanged = (event) => {
             parseFloat(event.target.value) <=
                 parseFloat(event.target.max))) {
         event.target.style.backgroundColor = '#fff';
+        pyshell.stdin.write(`${JSON.stringify({
+            [event.target.name]: parseFloat(event.target.value)
+        })}\n`, (error) => {
+            if (error)
+                throw error;
+        });
     }
     else
         event.target.style.backgroundColor = '#ff5a5a';

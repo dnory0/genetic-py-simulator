@@ -1,7 +1,7 @@
 // import * as Highcharts from 'highcharts';
 import { ChildProcess } from 'child_process';
 
-/********************************* Preloaded *********************************
+/***************************** passed by preload *****************************
  *****************************************************************************/
 /**
  * python process that executes GA
@@ -265,46 +265,46 @@ let mutRandom = <HTMLButtonElement>document.getElementById('random-mutation');
  * @param args contains genes number that's needed to set up X axis of charts
  * @param charts charts to set its X axis
  */
-const settingXaxis = (args: object, ...charts: Highcharts.Chart[]) => {
-  const genes = [...Array(args['genesNum']).keys()].map(v => `${++v}`);
-  charts.forEach(chart => {
-    chart.xAxis[0].setCategories(genes);
-  });
-};
+// const settingXAxis = (args: object, ...charts: Highcharts.Chart[]) => {
+//   const genes = [...Array(args['genesNum']).keys()].map(v => `${++v}`);
+//   charts.forEach(chart => {
+//     chart.xAxis[0].setCategories(genes);
+//   });
+// };
 
-/**
- * enables or disable the hover settings for the passed charts
- * @param enable decides if to disable hover settings or enable them.
- * @param charts charts to apply hover settings on
- */
-const enableChartHover = (enable: boolean, ...charts: Highcharts.Chart[]) => {
-  charts.forEach((chart: Highcharts.Chart) => {
-    chart.options.tooltip.enabled = enable;
-    chart.update({
-      plotOptions: {
-        series: {
-          marker: {
-            enabled: enable,
-            radius: enable ? 2 : null
-          },
-          states: {
-            hover: {
-              halo: {
-                opacity: enable ? 0.5 : 0
-              }
-            }
-          }
-        }
-      }
-    });
-  });
-};
+// /**
+//  * enables or disable the hover settings for the passed chart
+//  * @param enable decides if to disable hover settings or enable them.
+//  * @param chart chart to apply hover settings on
+//  */
+// const enableChartHover = (enable: boolean, ...charts: Highcharts.Chart[]) => {
+//   charts.forEach((chart: Highcharts.Chart) => {
+//     chart.options.tooltip.enabled = enable;
+//     chart.update({
+//       plotOptions: {
+//         series: {
+//           marker: {
+//             enabled: enable,
+//             radius: enable ? 2 : null
+//           },
+//           states: {
+//             hover: {
+//               halo: {
+//                 opacity: enable ? 0.5 : 0
+//               }
+//             }
+//           }
+//         }
+//       }
+//     });
+//   });
+// };
 
-const clearChart = (chart: Highcharts.Chart, categories: boolean = true) => {
-  if (categories) chart.xAxis[0].setCategories([]);
-  chart.series[0].setData([]);
-  chart.redraw();
-};
+// const clearChart = (chart: Highcharts.Chart, categories: boolean = true) => {
+//   if (categories) chart.xAxis[0].setCategories([]);
+//   chart.series[0].setData([]);
+//   chart.redraw();
+// };
 
 /****************************** Python Part ******************************/
 
@@ -317,6 +317,32 @@ const clearChart = (chart: Highcharts.Chart, categories: boolean = true) => {
  * by default user needs to hit the play button to run pyshell
  */
 let isRunning = false;
+
+/**
+ * figure out what response stands for and act uppon it
+ * @param response response of pyshell
+ */
+const treatResponse = (response: object) => {
+  if (response['started'] && response['genesNum'] !== undefined) {
+    // to be able to change in ga state
+    setClickable();
+  } else if (response['finished']) {
+    setClickable(false);
+  }
+};
+
+pyshell.stdout.on('data', (response: Buffer) => {
+  // console.log(response.toString());
+  // treatResponse(JSON.parse(response.toString()));
+  response
+    .toString()
+    .split('\n')
+    .forEach((args: string) => {
+      console.log(args);
+      // sometimes args == ''(not sure why), those cases need to be ignored
+      if (args) treatResponse(JSON.parse(args));
+    });
+});
 
 /**
  * update charts based on args passed
@@ -374,7 +400,7 @@ let isRunning = false;
 //     fittestHistory = [];
 //     mostFittest = { fitness: -1 };
 //     // setting up xAxis for fittest and current chart
-//     settingXaxis(args, currentChart, fittestChart);
+//     settingXAxis(args, currentChart, fittestChart);
 //     // to be able to change in ga state
 //     setClickable();
 //   }
@@ -466,7 +492,7 @@ const switchBtn = () => {
  * Set buttons (except play/pause button) clickable or not. Default is true.
  */
 const setClickable = (clickable = true) => {
-  Array.from(document.querySelector('.controls').children).forEach(
+  Array.from(document.querySelector('.state-controls').children).forEach(
     (element, index) => {
       // to not effect play/pause and step forward button.
       if ([0, 4].includes(index)) return;
@@ -558,17 +584,17 @@ const parameterChanged = (event: Event) => {
         parseFloat((<HTMLInputElement>event.target).max))
   ) {
     (<HTMLInputElement>event.target).style.backgroundColor = '#fff';
-    // pyshell.stdin.write(
-    //   `${JSON.stringify({
-    //     [(<HTMLInputElement>event.target).name]: parseFloat(
-    //       (<HTMLInputElement>event.target).value
-    //     )
-    //     // random_pop_size: popSizeRandom.
-    //   })}\n`,
-    //   (error: Error) => {
-    //     if (error) throw error;
-    //   }
-    // );
+    pyshell.stdin.write(
+      `${JSON.stringify({
+        [(<HTMLInputElement>event.target).name]: parseFloat(
+          (<HTMLInputElement>event.target).value
+        )
+        // random_pop_size: popSizeRandom.
+      })}\n`,
+      (error: Error) => {
+        if (error) throw error;
+      }
+    );
   } else (<HTMLInputElement>event.target).style.backgroundColor = '#ff5a5a';
 };
 
