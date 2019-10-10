@@ -59,6 +59,10 @@ const treatResponse = (response: object) => {
     response['fitness'] !== undefined &&
     response['genes'] !== undefined
   ) {
+    // mostFittest processing work is done here instead of being in preload file
+    // is to avoid race conditions because fittestChart latest data is taken of it.
+    // probably needs to moved on another file that imports reload file (when every
+    // view and window has its own preload)
     if (mostFittest['fitness'] < response['fitness']) {
       mostFittest['fitness'] = response['fitness'];
       mostFittest['individuals'] = [
@@ -80,11 +84,13 @@ const treatResponse = (response: object) => {
     );
   } else if (response['started'] && response['genesNum'] !== undefined) {
     clearChart(fittestChart);
+    // clean mostFittest object before start recieving data
+    mostFittest['fitness'] = -1;
+    mostFittest['individuals'] = null;
     // setting up xAxis for fittest and current chart
     fittestChart.xAxis[0].setCategories(
       [...Array(response['genesNum']).keys()].map(v => `${++v}`)
     );
-    // console.log(response['genesNum']);
     // disable points on hover on chart
     enableChartHover(false, fittestChart);
   } else if (response['paused']) enableChartHover(true, fittestChart);

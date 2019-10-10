@@ -70,12 +70,10 @@ window.enableChartHover = (enable, chart) => {
 window.clearChart = (chart, categories = false) => {
     if (categories)
         chart.xAxis[0].setCategories([]);
-    chart.series[0].setData([]);
-    chart.redraw();
+    chart.series[0].setData([], true);
 };
 window.pyshell = pyshell;
 window.mostFittest = { fitness: -1 };
-window.fittestHistory = [];
 window.play = () => {
     pyshell.stdin.write(`${JSON.stringify({ play: true })}\n`);
 };

@@ -29,6 +29,8 @@ const treatResponse = (response) => {
     }
     else if (response['started'] && response['genesNum'] !== undefined) {
         clearChart(fittestChart);
+        mostFittest['fitness'] = -1;
+        mostFittest['individuals'] = null;
         fittestChart.xAxis[0].setCategories([...Array(response['genesNum']).keys()].map(v => `${++v}`));
         enableChartHover(false, fittestChart);
     }

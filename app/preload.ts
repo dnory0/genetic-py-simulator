@@ -106,7 +106,7 @@ const pyshell: ChildProcess = require('electron').remote.require('./main');
 /**
  * an array of for every generation fittest genes
  */
-(<any>window).fittestHistory = [];
+// (<any>window).fittestHistory = [];
 
 /************************* states controller part *************************/
 /**
