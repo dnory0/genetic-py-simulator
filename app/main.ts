@@ -281,10 +281,26 @@ app.once('ready', () => {
     mainWindow,
     join('app', 'fittest-chart', 'fittest-chart.html'),
     {
-      x: Math.floor(mainWindow.getBounds().width / 2) + 5,
-      y: Math.floor(mainWindow.getBounds().height / 2) + 1,
-      width: Math.floor(mainWindow.getBounds().width / 2) - 5,
-      height: Math.floor(mainWindow.getBounds().height / 2) - 50
+      x:
+        Math.floor(mainWindow.getBounds().width / 2) +
+        (process.platform == 'win32' && !mainWindow.isFullScreen() ? -3 : 5),
+      y:
+        Math.floor(mainWindow.getBounds().height / 2) +
+        (process.platform == 'win32'
+          ? mainWindow.isFullScreen()
+            ? 4
+            : -16
+          : 1),
+      width:
+        Math.floor(mainWindow.getBounds().width / 2) -
+        (process.platform == 'win32' && !mainWindow.isFullScreen() ? 14 : 5),
+      height:
+        Math.floor(mainWindow.getBounds().height / 2) -
+        (process.platform == 'win32'
+          ? mainWindow.isFullScreen()
+            ? 48
+            : 67
+          : 50)
     },
     {
       webPreferences: {
@@ -309,10 +325,26 @@ app.once('ready', () => {
         )
       });
       resizeView(fittestView, {
-        x: Math.floor(mainWindow.getBounds().width / 2) + 5,
-        y: Math.floor(mainWindow.getBounds().height / 2) + 1,
-        width: Math.floor(mainWindow.getBounds().width / 2) - 5,
-        height: Math.floor(mainWindow.getBounds().height / 2) - 50
+        x:
+          Math.floor(mainWindow.getBounds().width / 2) +
+          (process.platform == 'win32' && !mainWindow.isFullScreen() ? -3 : 5),
+        y:
+          Math.floor(mainWindow.getBounds().height / 2) +
+          (process.platform == 'win32'
+            ? mainWindow.isFullScreen()
+              ? 4
+              : -16
+            : 1),
+        width:
+          Math.floor(mainWindow.getBounds().width / 2) -
+          (process.platform == 'win32' && !mainWindow.isFullScreen() ? 14 : 5),
+        height:
+          Math.floor(mainWindow.getBounds().height / 2) -
+          (process.platform == 'win32'
+            ? mainWindow.isFullScreen()
+              ? 48
+              : 67
+            : 50)
       });
     }, 100); // 100 ms is relative number that should be revised
   });
