@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const highcharts_1 = require("highcharts");
-const pyshell = require('electron').remote.require('./main').pyshell;
+const pyshell = require('electron').remote.require('./main');
 window.createChart = (containerId, options) => {
     return highcharts_1.chart(containerId, {
         title: {
@@ -72,10 +72,6 @@ window.clearChart = (chart, categories = false) => {
         chart.xAxis[0].setCategories([]);
     chart.series[0].setData([]);
     chart.redraw();
-};
-window.settingXAxis = (args, chart) => {
-    const genes = [...Array(args['genesNum']).keys()].map(v => `${++v}`);
-    chart.xAxis[0].setCategories(genes);
 };
 window.pyshell = pyshell;
 window.mostFittest = { fitness: -1 };

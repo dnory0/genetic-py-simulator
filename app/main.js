@@ -88,7 +88,7 @@ const createPyshell = () => {
             ? copyTo
             : `${process.platform == 'win32' ? 'python' : 'python3'}`, execExist ? [] : [copyTo]);
     }
-    exports.pyshell = pyshell;
+    module.exports = pyshell;
 };
 electron_1.app.once('ready', () => {
     createPyshell();
@@ -172,7 +172,8 @@ electron_1.app.once('ready', () => {
         label: 'Reload',
         accelerator: 'CmdOrCtrl+R',
         click: () => {
-            pyshell.stdin.write(`${JSON.stringify({ stop: true })}\n`);
+            pyshell.stdin.write(`${JSON.stringify({ exit: true })}\n`);
+            createPyshell();
             mainWindow.webContents.reload();
             progressView.webContents.reload();
             fittestView.webContents.reload();

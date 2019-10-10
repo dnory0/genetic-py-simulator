@@ -50,14 +50,6 @@ const clearChart: (chart: Chart, categories?: boolean) => void = (<any>window)
   .clearChart;
 
 /**
- * set up X axis with genes numeration 1 2 .. <genes number>
- * @param args contains genes number that's needed to set up X axis of the chart
- * @param charts chart to set its X axis
- */
-const settingXAxis: (args: object, chart: Chart) => void = (<any>window)
-  .settingXAxis;
-
-/**
  * figure out what response stands for and act uppon it
  * @param response response of pyshell
  */
@@ -89,7 +81,10 @@ const treatResponse = (response: object) => {
   } else if (response['started'] && response['genesNum'] !== undefined) {
     clearChart(fittestChart);
     // setting up xAxis for fittest and current chart
-    settingXAxis(response, fittestChart);
+    fittestChart.xAxis[0].setCategories(
+      [...Array(response['genesNum']).keys()].map(v => `${++v}`)
+    );
+    // console.log(response['genesNum']);
     // disable points on hover on chart
     enableChartHover(false, fittestChart);
   } else if (response['paused']) enableChartHover(true, fittestChart);
@@ -127,7 +122,6 @@ let fittestChart = createChart('fittest-chart', {
 });
 
 pyshell.stdout.on('data', (response: Buffer) => {
-  treatResponse(JSON.parse(response.toString()));
   response
     .toString()
     .split('\n')

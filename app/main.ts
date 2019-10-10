@@ -224,7 +224,7 @@ const createPyshell = () => {
       execExist ? [] : [copyTo]
     );
   }
-  exports.pyshell = pyshell;
+  module.exports = pyshell;
 };
 
 app.once('ready', () => {
@@ -358,8 +358,11 @@ app.once('ready', () => {
       click: () => {
         /**
          * stops the GA if user attemps reload while GA running
+         * recreating pyshell to avoid error of calling released function
+         * on renderer (error by far only appear on windows)
          */
-        pyshell.stdin.write(`${JSON.stringify({ stop: true })}\n`);
+        pyshell.stdin.write(`${JSON.stringify({ exit: true })}\n`);
+        createPyshell();
         mainWindow.webContents.reload();
         progressView.webContents.reload();
         fittestView.webContents.reload();

@@ -1,8 +1,12 @@
-import { chart, Options, XAxisOptions, YAxisOptions } from 'highcharts';
-const pyshell = require('electron').remote.require('./main').pyshell;
+import { chart, Options, XAxisOptions, YAxisOptions, Chart } from 'highcharts';
+import { ChildProcess } from 'child_process';
 
 /************************ Charts & Python Configuration ************************
  ******************************************************************************/
+/**
+ * preloaded globally
+ */
+const pyshell: ChildProcess = require('electron').remote.require('./main');
 /**
  * initialize a chart and pass it options
  * @param containerId id of html div tag that is going to contain chart
@@ -61,7 +65,7 @@ const pyshell = require('electron').remote.require('./main').pyshell;
  * @param enable decides if to disable hover settings or enable them.
  * @param chart chart to apply hover settings on
  */
-(<any>window).enableChartHover = (enable: boolean, chart: Highcharts.Chart) => {
+(<any>window).enableChartHover = (enable: boolean, chart: Chart) => {
   chart.options.tooltip.enabled = enable;
   chart.update({
     plotOptions: {
@@ -87,23 +91,9 @@ const pyshell = require('electron').remote.require('./main').pyshell;
  * @param chart chart to clear its data and xAxis
  * @param categories whether to clear categories, default is false
  */
-(<any>window).clearChart = (
-  chart: Highcharts.Chart,
-  categories: boolean = false
-) => {
+(<any>window).clearChart = (chart: Chart, categories: boolean = false) => {
   if (categories) chart.xAxis[0].setCategories([]);
-  chart.series[0].setData([]);
-  chart.redraw();
-};
-
-/**
- * set up X axis with genes numeration 1 2 .. <genes number>
- * @param args contains genes number that's needed to set up X axis of the chart
- * @param charts chart to set its X axis
- */
-(<any>window).settingXAxis = (args: object, chart: Highcharts.Chart) => {
-  const genes = [...Array(args['genesNum']).keys()].map(v => `${++v}`);
-  chart.xAxis[0].setCategories(genes);
+  chart.series[0].setData([], true);
 };
 
 /*************************** Python part ***************************/

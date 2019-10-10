@@ -6,8 +6,6 @@ const createChart = (window).createChart;
 const enableChartHover = window.enableChartHover;
 const clearChart = window
     .clearChart;
-const settingXAxis = window
-    .settingXAxis;
 const treatResponse = (response) => {
     if (response['generation'] !== undefined &&
         response['fitness'] !== undefined &&
@@ -31,7 +29,7 @@ const treatResponse = (response) => {
     }
     else if (response['started'] && response['genesNum'] !== undefined) {
         clearChart(fittestChart);
-        settingXAxis(response, fittestChart);
+        fittestChart.xAxis[0].setCategories([...Array(response['genesNum']).keys()].map(v => `${++v}`));
         enableChartHover(false, fittestChart);
     }
     else if (response['paused'])
@@ -63,7 +61,6 @@ let fittestChart = createChart('fittest-chart', {
     ]
 });
 pyshell.stdout.on('data', (response) => {
-    treatResponse(JSON.parse(response.toString()));
     response
         .toString()
         .split('\n')
