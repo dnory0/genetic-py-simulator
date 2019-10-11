@@ -120,22 +120,38 @@ const prime = <HTMLDivElement>document.querySelector('.primary-container');
  */
 const second = <HTMLDivElement>document.querySelector('.secondary-container');
 
-// window.onresize = () => {
-//   ipcRenderer.send('resize', {
-//     primary: {
-//       x: prime.getBoundingClientRect().left,
-//       y: prime.getBoundingClientRect().top,
-//       width: prime.getBoundingClientRect().width,
-//       height: prime.getBoundingClientRect().height - 1
-//     },
-//     secondary: {
-//       x: second.getBoundingClientRect().left,
-//       y: second.getBoundingClientRect().top,
-//       width: second.getBoundingClientRect().width,
-//       height: second.getBoundingClientRect().height
-//     }
-//   });
-// };
+window.onresize = () => {
+  ipcRenderer.send('resize', {
+    primary: {
+      x: Math.floor(prime.getBoundingClientRect().left),
+      y: Math.floor(prime.getBoundingClientRect().top),
+      width: Math.floor(prime.getBoundingClientRect().width),
+      height: Math.floor(prime.getBoundingClientRect().height - 1)
+    },
+    secondary: {
+      x: Math.floor(second.getBoundingClientRect().left + 2),
+      y: Math.floor(second.getBoundingClientRect().top + 1),
+      width: Math.floor(second.getBoundingClientRect().width - 2),
+      height: Math.floor(second.getBoundingClientRect().height - 1)
+    },
+    zoom: webFrame.getZoomLevel()
+  });
+  // console.log({
+  //   primary: {
+  //     x: prime.getBoundingClientRect().left,
+  //     y: prime.getBoundingClientRect().top,
+  //     width: prime.getBoundingClientRect().width,
+  //     height: prime.getBoundingClientRect().height - 1
+  //   },
+  //   secondary: {
+  //     x: second.getBoundingClientRect().left,
+  //     y: second.getBoundingClientRect().top,
+  //     width: second.getBoundingClientRect().width,
+  //     height: second.getBoundingClientRect().height
+  //   },
+  //   zoom: webFrame.getZoomLevel()
+  // });
+};
 
 /************************ Charts & Python Configuration ************************
  ******************************************************************************/

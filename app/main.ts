@@ -6,7 +6,9 @@ import {
   MenuItem,
   BrowserView,
   BrowserViewConstructorOptions,
-  Rectangle
+  Rectangle,
+  ipcMain,
+  IpcMainEvent
 } from 'electron';
 import { join } from 'path';
 import { existsSync, copyFileSync } from 'fs';
@@ -159,7 +161,7 @@ const createView = (
   targetView.webContents.loadFile(filePath);
 
   // add to parent window
-  // parentWindow.addBrowserView(targetView);
+  parentWindow.addBrowserView(targetView);
 
   return targetView;
 };
@@ -242,9 +244,19 @@ app.once('ready', () => {
     }
   });
 
-  // to force visibility on full screen linux (in my case)
+  // to force visibility on full screen linux (in my case) (@deprecated)
+  // mainWindow.on('enter-full-screen', () => {
+  //   mainWindow.setMenuBarVisibility(true);
+  // });
+
   mainWindow.on('enter-full-screen', () => {
+    mainWindow.setAutoHideMenuBar(true);
+    mainWindow.setMenuBarVisibility(false);
+  });
+
+  mainWindow.on('leave-full-screen', () => {
     mainWindow.setMenuBarVisibility(true);
+    mainWindow.setAutoHideMenuBar(false);
   });
 
   /***************************** Browser Views *****************************
@@ -313,41 +325,59 @@ app.once('ready', () => {
   // secondaryView.webContents.toggleDevTools();
 
   // if user resize window views must resize accordingly
-  mainWindow.on('resize', () => {
-    setTimeout(() => {
-      resizeView(primaryView, {
-        width:
-          mainWindow.getBounds().width -
-          (process.platform == 'win32' && !mainWindow.isFullScreen() ? 16 : 0),
-        height: Math.floor(
-          mainWindow.getBounds().height * 0.5 -
-            (process.platform == 'win32' && !mainWindow.isFullScreen() ? 17 : 0)
-        )
-      });
-      resizeView(secondaryView, {
-        x:
-          Math.floor(mainWindow.getBounds().width / 2) +
-          (process.platform == 'win32' && !mainWindow.isFullScreen() ? -3 : 5),
-        y:
-          Math.floor(mainWindow.getBounds().height / 2) +
-          (process.platform == 'win32'
-            ? mainWindow.isFullScreen()
-              ? 4
-              : -16
-            : 1),
-        width:
-          Math.floor(mainWindow.getBounds().width / 2) -
-          (process.platform == 'win32' && !mainWindow.isFullScreen() ? 14 : 5),
-        height:
-          Math.floor(mainWindow.getBounds().height / 2) -
-          (process.platform == 'win32'
-            ? mainWindow.isFullScreen()
-              ? 48
-              : 67
-            : 50)
-      });
-    }, 100); // 100 ms is relative number that should be revised
-  });
+  // mainWindow.on('resize', () => {
+  //   setTimeout(() => {
+  //     resizeView(primaryView, {
+  //       width:
+  //         mainWindow.getBounds().width -
+  //         (process.platform == 'win32' && !mainWindow.isFullScreen() ? 16 : 0),
+  //       height: Math.floor(
+  //         mainWindow.getBounds().height * 0.5 -
+  //           (process.platform == 'win32' && !mainWindow.isFullScreen() ? 17 : 0)
+  //       )
+  //     });
+  //     resizeView(secondaryView, {
+  //       x:
+  //         Math.floor(mainWindow.getBounds().width / 2) +
+  //         (process.platform == 'win32' && !mainWindow.isFullScreen() ? -3 : 5),
+  //       y:
+  //         Math.floor(mainWindow.getBounds().height / 2) +
+  //         (process.platform == 'win32'
+  //           ? mainWindow.isFullScreen()
+  //             ? 4
+  //             : -16
+  //           : 1),
+  //       width:
+  //         Math.floor(mainWindow.getBounds().width / 2) -
+  //         (process.platform == 'win32' && !mainWindow.isFullScreen() ? 14 : 5),
+  //       height:
+  //         Math.floor(mainWindow.getBounds().height / 2) -
+  //         (process.platform == 'win32'
+  //           ? mainWindow.isFullScreen()
+  //             ? 48
+  //             : 67
+  //           : 50)
+  //     });
+  //   }, 100); // 100 ms is relative number that should be revised
+  // });
+
+  ipcMain.on(
+    'resize',
+    (
+      _event: IpcMainEvent,
+      args: {
+        primary: Rectangle;
+        secondary: Rectangle;
+        zoom: number;
+      }
+    ) => {
+      setTimeout(() => {
+        resizeView(primaryView, args.primary);
+        resizeView(secondaryView, args.secondary);
+        // console.log(args.zoom);
+      }, 50);
+    }
+  );
 
   const menubar = require('./menubar') as Menu;
   menubar.items[process.platform == 'darwin' ? 3 : 2].submenu.insert(

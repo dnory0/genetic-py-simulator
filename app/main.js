@@ -58,6 +58,7 @@ const createView = (parentWindow, filePath, { x, y, width, height }, { webPrefer
         height
     });
     targetView.webContents.loadFile(filePath);
+    parentWindow.addBrowserView(targetView);
     return targetView;
 };
 const createPyshell = () => {
@@ -100,7 +101,12 @@ electron_1.app.once('ready', () => {
         }
     });
     mainWindow.on('enter-full-screen', () => {
+        mainWindow.setAutoHideMenuBar(true);
+        mainWindow.setMenuBarVisibility(false);
+    });
+    mainWindow.on('leave-full-screen', () => {
         mainWindow.setMenuBarVisibility(true);
+        mainWindow.setAutoHideMenuBar(false);
     });
     primaryView = createView(mainWindow, path_1.join('app', 'primary-chart', 'primary-chart.html'), {
         x: 0,
@@ -138,33 +144,11 @@ electron_1.app.once('ready', () => {
             nodeIntegration: false
         }
     });
-    mainWindow.on('resize', () => {
+    electron_1.ipcMain.on('resize', (_event, args) => {
         setTimeout(() => {
-            resizeView(primaryView, {
-                width: mainWindow.getBounds().width -
-                    (process.platform == 'win32' && !mainWindow.isFullScreen() ? 16 : 0),
-                height: Math.floor(mainWindow.getBounds().height * 0.5 -
-                    (process.platform == 'win32' && !mainWindow.isFullScreen() ? 17 : 0))
-            });
-            resizeView(secondaryView, {
-                x: Math.floor(mainWindow.getBounds().width / 2) +
-                    (process.platform == 'win32' && !mainWindow.isFullScreen() ? -3 : 5),
-                y: Math.floor(mainWindow.getBounds().height / 2) +
-                    (process.platform == 'win32'
-                        ? mainWindow.isFullScreen()
-                            ? 4
-                            : -16
-                        : 1),
-                width: Math.floor(mainWindow.getBounds().width / 2) -
-                    (process.platform == 'win32' && !mainWindow.isFullScreen() ? 14 : 5),
-                height: Math.floor(mainWindow.getBounds().height / 2) -
-                    (process.platform == 'win32'
-                        ? mainWindow.isFullScreen()
-                            ? 48
-                            : 67
-                        : 50)
-            });
-        }, 100);
+            resizeView(primaryView, args.primary);
+            resizeView(secondaryView, args.secondary);
+        }, 50);
     });
     const menubar = require('./menubar');
     menubar.items[process.platform == 'darwin' ? 3 : 2].submenu.insert(0, new electron_1.MenuItem({

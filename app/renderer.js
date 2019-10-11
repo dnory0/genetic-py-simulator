@@ -22,6 +22,23 @@ let mutation = document.getElementById('mutation-rate');
 let mutRandom = document.getElementById('random-mutation');
 const prime = document.querySelector('.primary-container');
 const second = document.querySelector('.secondary-container');
+window.onresize = () => {
+    ipcRenderer.send('resize', {
+        primary: {
+            x: Math.floor(prime.getBoundingClientRect().left),
+            y: Math.floor(prime.getBoundingClientRect().top),
+            width: Math.floor(prime.getBoundingClientRect().width),
+            height: Math.floor(prime.getBoundingClientRect().height - 1)
+        },
+        secondary: {
+            x: Math.floor(second.getBoundingClientRect().left + 2),
+            y: Math.floor(second.getBoundingClientRect().top + 1),
+            width: Math.floor(second.getBoundingClientRect().width - 2),
+            height: Math.floor(second.getBoundingClientRect().height - 1)
+        },
+        zoom: webFrame.getZoomLevel()
+    });
+};
 let isRunning = false;
 const treatResponse = (response) => {
     if (response['started'] && response['genesNum'] !== undefined) {
