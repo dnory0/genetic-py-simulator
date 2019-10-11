@@ -25,18 +25,22 @@ body {
   height: 100vh;
 }
 
-.main .primary-process-background {
+.main .primary-process-container {
   background-color: #fff;
   height: calc(50% + 13px);
-  border-bottom: 1px solid #a37e7e;
+}
+
+.main .primary-process-container .border-container {
   margin: 0 4px;
+  border-bottom: 1px solid #a37e7e;
+  height: 100%;
 }
 
 .main .middle-container {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  height: calc(50% - 36px);
+  height: calc(50% - 37px);
 }
 
 .main .middle-container .controls-container {
@@ -45,7 +49,6 @@ body {
           flex: 1;
   margin: 0 4px;
   padding: 4px 0;
-  height: 76px;
   width: 50vw;
   text-align: center;
 }
@@ -137,18 +140,25 @@ body {
   -webkit-box-flex: 1;
       -ms-flex: 1;
           flex: 1;
-  margin: 5px 0;
+}
+
+.main .middle-container .secondary-process-container .border-container {
+  margin: 4px 0;
   border-left: 1px solid #a37e7e;
+  height: calc(100% - 8px);
 }
 
 .main .bottom-bar-container {
-  bottom: 0;
   height: 24px;
-  margin: 0 4px;
-  border-top: 1px solid #a37e7e;
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
+}
+
+.main .bottom-bar-container .border-container {
+  margin: 0 4px;
+  border-top: 1px solid #a37e7e;
+  height: 100%;
 }
 /*# sourceMappingURL=style.css.map */

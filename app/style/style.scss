@@ -48,22 +48,25 @@ body {
   //     }
   //   }
   // }
-  .primary-process-background {
+  .primary-process-container {
     background-color: #fff;
     height: calc(50% + 13px);
-    border-bottom: 1px solid #a37e7e;
-    margin: 0 4px;
+
+    .border-container {
+      margin: 0 4px;
+      border-bottom: 1px solid #a37e7e;
+      height: 100%;
+    }
   }
 
   .middle-container {
     display: flex;
-    height: calc(50% - 36px);
+    height: calc(50% - 37px);
 
     .controls-container {
       flex: 1;
       margin: 0 4px;
       padding: 4px 0;
-      height: 76px;
       width: 50vw;
       text-align: center;
 
@@ -197,19 +200,26 @@ body {
 
     .secondary-process-container {
       flex: 1;
-      margin: 5px 0;
-      border-left: 1px solid #a37e7e;
+
+      .border-container {
+        margin: 4px 0;
+        border-left: 1px solid #a37e7e;
+        height: calc(100% - 8px);
+      }
     }
   }
 
   .bottom-bar-container {
-    bottom: 0;
     height: 24px;
-    margin: 0 4px;
-    border-top: 1px solid #a37e7e;
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
+
+    .border-container {
+      margin: 0 4px;
+      border-top: 1px solid #a37e7e;
+      height: 100%;
+    }
   }
 }
