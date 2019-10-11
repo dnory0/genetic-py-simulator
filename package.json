@@ -1,7 +1,7 @@
 {
   "name": "genetic-py",
   "productName": "Genetic Py",
-  "version": "0.1.9-beta5",
+  "version": "0.2.0",
   "description": "A Simulator developed with ElectronJS for Genetic Algorithms written in Python",
   "homepage": "https://github.com/dnory0/genetic-py",
   "repository": {
