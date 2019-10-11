@@ -25,7 +25,7 @@ body {
   height: 100vh;
 }
 
-.main .progress-process-background {
+.main .primary-process-background {
   background-color: #fff;
   height: calc(50% + 13px);
   border-bottom: 1px solid #a37e7e;
@@ -133,7 +133,7 @@ body {
   margin-right: 4%;
 }
 
-.main .middle-container .fittest-process-container {
+.main .middle-container .secondary-process-container {
   -webkit-box-flex: 1;
       -ms-flex: 1;
           flex: 1;

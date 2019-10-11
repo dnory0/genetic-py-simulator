@@ -10,6 +10,18 @@ import { ChildProcess } from 'child_process';
 let pyshell: ChildProcess = (<any>window).pyshell;
 
 /**
+ * an object that holds most fittest fitness with an array of their genes
+ */
+let mostFittest: {
+  fitness: number;
+  individuals?: [
+    {
+      generation: number;
+      genes: any[];
+    }
+  ];
+} = (<any>window).mostFittest;
+/**
  * initialize a chart and pass it options
  * @param containerId id of html div tag that is going to contain chart
  * @param options chart options, see Highcharts.Options
@@ -47,57 +59,80 @@ const treatResponse = (response: object) => {
     response['fitness'] !== undefined &&
     response['genes'] !== undefined
   ) {
-    // every point is added to progressChart
-    progressChart.series[0].addPoint(
-      parseInt(response['fitness']),
+    // mostFittest processing work is done here instead of being in preload file
+    // is to avoid race conditions because secondaryChart latest data is taken of it.
+    // probably needs to moved on another file that imports reload file (when every
+    // view and window has its own preload)
+    if (mostFittest['fitness'] < response['fitness']) {
+      mostFittest['fitness'] = response['fitness'];
+      mostFittest['individuals'] = [
+        {
+          generation: response['generation'],
+          genes: response['genes']
+        }
+      ];
+    } else if (mostFittest['fitness'] == response['fitness']) {
+      mostFittest['individuals'].unshift({
+        generation: response['generation'],
+        genes: response['genes']
+      });
+    }
+    secondaryChart.series[0].setData(
+      mostFittest.individuals[0].genes,
       true,
-      false,
       false
     );
   } else if (response['started'] && response['genesNum'] !== undefined) {
-    // clear past results
-    clearChart(progressChart);
+    clearChart(secondaryChart);
+    // clean mostFittest object before start recieving data
+    mostFittest['fitness'] = -1;
+    mostFittest['individuals'] = null;
+    // setting up xAxis for fittest and current chart
+    secondaryChart.xAxis[0].setCategories(
+      [...Array(response['genesNum']).keys()].map(v => `${++v}`)
+    );
     // disable points on hover on chart
-    enableChartHover(false, progressChart);
-  } else if (response['paused']) enableChartHover(true, progressChart);
-  else if (response['resumed']) enableChartHover(false, progressChart);
+    enableChartHover(false, secondaryChart);
+  } else if (response['paused']) enableChartHover(true, secondaryChart);
+  else if (response['resumed']) enableChartHover(false, secondaryChart);
 };
 
 /**
- * updated every generation, recieves the generation with its fittest fitness
+ * updated every time a new most fittest appear, recives most fittest genes
+ *
+ * most fittest is a new fittest which its fitness value is better than every
+ * fittest in the previous generations
  */
-let progressChart = createChart('progress-chart', {
+let secondaryChart = createChart('secondary-chart', {
   chart: {
     type: 'line'
   },
   title: {
-    text: 'Fittest Fitness per Generation'
+    text: 'Best Fittest'
   },
   xAxis: {
     title: {
-      text: 'Generation'
+      text: 'Genes'
     }
   },
   yAxis: {
     title: {
-      text: 'Fitness value'
+      text: 'Gene value'
     }
   },
   series: [
     {
-      name: 'CGA',
       data: []
     }
   ] as SeriesLineOptions[]
 });
 
 pyshell.stdout.on('data', (response: Buffer) => {
-  // treatResponse(JSON.parse(response.toString()));
   response
     .toString()
     .split('\n')
     .forEach((args: string) => {
-      console.log(args);
+      // console.log(args);
       // sometimes args == ''(not sure why), those cases need to be ignored
       if (args) treatResponse(JSON.parse(args));
     });

@@ -6,8 +6,8 @@ const fs_1 = require("fs");
 const child_process_1 = require("child_process");
 const isDev = electron_1.app.getAppPath().indexOf('.asar') === -1;
 let mainWindow;
-let progressView;
-let fittestView;
+let primaryView;
+let secondaryView;
 let pyshell;
 const createWindow = (filePath, { minWidth, minHeight, width, height, resizable, minimizable, maximizable, parent, frame, webPreferences: { nodeIntegration, preload } } = {}) => {
     let targetWindow = new electron_1.BrowserWindow({
@@ -103,7 +103,7 @@ electron_1.app.once('ready', () => {
     mainWindow.on('enter-full-screen', () => {
         mainWindow.setMenuBarVisibility(true);
     });
-    progressView = createView(mainWindow, path_1.join('app', 'progress-chart', 'progress-chart.html'), {
+    primaryView = createView(mainWindow, path_1.join('app', 'primary-chart', 'primary-chart.html'), {
         x: 0,
         y: 0,
         width: mainWindow.getBounds().width -
@@ -116,7 +116,7 @@ electron_1.app.once('ready', () => {
             nodeIntegration: false
         }
     });
-    fittestView = createView(mainWindow, path_1.join('app', 'fittest-chart', 'fittest-chart.html'), {
+    secondaryView = createView(mainWindow, path_1.join('app', 'secondary-chart', 'secondary-chart.html'), {
         x: Math.floor(mainWindow.getBounds().width / 2) +
             (process.platform == 'win32' && !mainWindow.isFullScreen() ? -3 : 5),
         y: Math.floor(mainWindow.getBounds().height / 2) +
@@ -141,13 +141,13 @@ electron_1.app.once('ready', () => {
     });
     mainWindow.on('resize', () => {
         setTimeout(() => {
-            resizeView(progressView, {
+            resizeView(primaryView, {
                 width: mainWindow.getBounds().width -
                     (process.platform == 'win32' && !mainWindow.isFullScreen() ? 16 : 0),
                 height: Math.floor(mainWindow.getBounds().height * 0.5 -
                     (process.platform == 'win32' && !mainWindow.isFullScreen() ? 17 : 0))
             });
-            resizeView(fittestView, {
+            resizeView(secondaryView, {
                 x: Math.floor(mainWindow.getBounds().width / 2) +
                     (process.platform == 'win32' && !mainWindow.isFullScreen() ? -3 : 5),
                 y: Math.floor(mainWindow.getBounds().height / 2) +
@@ -175,8 +175,8 @@ electron_1.app.once('ready', () => {
             pyshell.stdin.write(`${JSON.stringify({ exit: true })}\n`);
             createPyshell();
             mainWindow.webContents.reload();
-            progressView.webContents.reload();
-            fittestView.webContents.reload();
+            primaryView.webContents.reload();
+            secondaryView.webContents.reload();
         }
     }));
     electron_1.Menu.setApplicationMenu(menubar);

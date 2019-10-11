@@ -25,21 +25,21 @@ const treatResponse = (response) => {
                 genes: response['genes']
             });
         }
-        fittestChart.series[0].setData(mostFittest.individuals[0].genes, true, false);
+        secondaryChart.series[0].setData(mostFittest.individuals[0].genes, true, false);
     }
     else if (response['started'] && response['genesNum'] !== undefined) {
-        clearChart(fittestChart);
+        clearChart(secondaryChart);
         mostFittest['fitness'] = -1;
         mostFittest['individuals'] = null;
-        fittestChart.xAxis[0].setCategories([...Array(response['genesNum']).keys()].map(v => `${++v}`));
-        enableChartHover(false, fittestChart);
+        secondaryChart.xAxis[0].setCategories([...Array(response['genesNum']).keys()].map(v => `${++v}`));
+        enableChartHover(false, secondaryChart);
     }
     else if (response['paused'])
-        enableChartHover(true, fittestChart);
+        enableChartHover(true, secondaryChart);
     else if (response['resumed'])
-        enableChartHover(false, fittestChart);
+        enableChartHover(false, secondaryChart);
 };
-let fittestChart = createChart('fittest-chart', {
+let secondaryChart = createChart('secondary-chart', {
     chart: {
         type: 'line'
     },
@@ -71,4 +71,4 @@ pyshell.stdout.on('data', (response) => {
             treatResponse(JSON.parse(args));
     });
 });
-//# sourceMappingURL=fittest-chart.js.map
+//# sourceMappingURL=secondary-chart.js.map

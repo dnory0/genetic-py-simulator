@@ -24,13 +24,13 @@ const isDev = app.getAppPath().indexOf('.asar') === -1;
  */
 let mainWindow: BrowserWindow;
 /**
- * progress Chart View
+ * primary Chart View (as progress Chart)
  */
-let progressView: BrowserView;
+let primaryView: BrowserView;
 /**
- * most fittest Chart View
+ * most secondary Chart View (working on making it either most fittest/current fittest)
  */
-let fittestView: BrowserView;
+let secondaryView: BrowserView;
 
 /**
  * declared and initialized globally
@@ -250,10 +250,10 @@ app.once('ready', () => {
   /***************************** Browser Views *****************************
    *************************************************************************/
 
-  /***************************** Progress View *****************************/
-  progressView = createView(
+  /***************************** Primary View *****************************/
+  primaryView = createView(
     mainWindow,
-    join('app', 'progress-chart', 'progress-chart.html'),
+    join('app', 'primary-chart', 'primary-chart.html'),
     {
       x: 0,
       y: 0,
@@ -273,13 +273,13 @@ app.once('ready', () => {
     }
   );
 
-  // progressView.webContents.toggleDevTools();
+  // primaryView.webContents.toggleDevTools();
 
-  /****************************** Fittest View ******************************/
+  /****************************** Secondary View ******************************/
 
-  fittestView = createView(
+  secondaryView = createView(
     mainWindow,
-    join('app', 'fittest-chart', 'fittest-chart.html'),
+    join('app', 'secondary-chart', 'secondary-chart.html'),
     {
       x:
         Math.floor(mainWindow.getBounds().width / 2) +
@@ -310,12 +310,12 @@ app.once('ready', () => {
     }
   );
 
-  // fittestView.webContents.toggleDevTools();
+  // secondaryView.webContents.toggleDevTools();
 
   // if user resize window views must resize accordingly
   mainWindow.on('resize', () => {
     setTimeout(() => {
-      resizeView(progressView, {
+      resizeView(primaryView, {
         width:
           mainWindow.getBounds().width -
           (process.platform == 'win32' && !mainWindow.isFullScreen() ? 16 : 0),
@@ -324,7 +324,7 @@ app.once('ready', () => {
             (process.platform == 'win32' && !mainWindow.isFullScreen() ? 17 : 0)
         )
       });
-      resizeView(fittestView, {
+      resizeView(secondaryView, {
         x:
           Math.floor(mainWindow.getBounds().width / 2) +
           (process.platform == 'win32' && !mainWindow.isFullScreen() ? -3 : 5),
@@ -364,8 +364,8 @@ app.once('ready', () => {
         pyshell.stdin.write(`${JSON.stringify({ exit: true })}\n`);
         createPyshell();
         mainWindow.webContents.reload();
-        progressView.webContents.reload();
-        fittestView.webContents.reload();
+        primaryView.webContents.reload();
+        secondaryView.webContents.reload();
       }
     })
   );

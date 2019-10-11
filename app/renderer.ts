@@ -134,7 +134,6 @@ let mutRandom = <HTMLButtonElement>document.getElementById('random-mutation');
  */
 // let fittestHistory = [];
 
-
 /****************************** Python Part ******************************/
 
 // used as args for pyshell
@@ -167,7 +166,7 @@ pyshell.stdout.on('data', (response: Buffer) => {
     .toString()
     .split('\n')
     .forEach((args: string) => {
-      console.log(args);
+      // console.log(args);
       // sometimes args == ''(not sure why), those cases need to be ignored
       if (args) treatResponse(JSON.parse(args));
     });
@@ -234,7 +233,6 @@ pyshell.stdout.on('data', (response: Buffer) => {
 //     setClickable();
 //   }
 // };
-
 
 /************************ GUI & Buttons Configuration ************************
  *****************************************************************************/

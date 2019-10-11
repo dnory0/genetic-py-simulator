@@ -48,7 +48,7 @@ body {
   //     }
   //   }
   // }
-  .progress-process-background {
+  .primary-process-background {
     background-color: #fff;
     height: calc(50% + 13px);
     border-bottom: 1px solid #a37e7e;
@@ -104,6 +104,7 @@ body {
           }
         }
       }
+
       .parameters-container {
         height: 100%;
 
@@ -143,6 +144,7 @@ body {
                 margin-right: 4%;
               }
             }
+
             // float: left;
           }
 
@@ -193,7 +195,7 @@ body {
       }
     }
 
-    .fittest-process-container {
+    .secondary-process-container {
       flex: 1;
       margin: 5px 0;
       border-left: 1px solid #a37e7e;

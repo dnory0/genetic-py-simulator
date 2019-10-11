@@ -32,7 +32,6 @@ pyshell.stdout.on('data', (response) => {
         .toString()
         .split('\n')
         .forEach((args) => {
-        console.log(args);
         if (args)
             treatResponse(JSON.parse(args));
     });

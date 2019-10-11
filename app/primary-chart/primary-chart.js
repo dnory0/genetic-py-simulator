@@ -9,18 +9,18 @@ const treatResponse = (response) => {
     if (response['generation'] !== undefined &&
         response['fitness'] !== undefined &&
         response['genes'] !== undefined) {
-        progressChart.series[0].addPoint(parseInt(response['fitness']), true, false, false);
+        primaryChart.series[0].addPoint(parseInt(response['fitness']), true, false, false);
     }
     else if (response['started'] && response['genesNum'] !== undefined) {
-        clearChart(progressChart);
-        enableChartHover(false, progressChart);
+        clearChart(primaryChart);
+        enableChartHover(false, primaryChart);
     }
     else if (response['paused'])
-        enableChartHover(true, progressChart);
+        enableChartHover(true, primaryChart);
     else if (response['resumed'])
-        enableChartHover(false, progressChart);
+        enableChartHover(false, primaryChart);
 };
-let progressChart = createChart('progress-chart', {
+let primaryChart = createChart('primary-chart', {
     chart: {
         type: 'line'
     },
@@ -49,9 +49,8 @@ pyshell.stdout.on('data', (response) => {
         .toString()
         .split('\n')
         .forEach((args) => {
-        console.log(args);
         if (args)
             treatResponse(JSON.parse(args));
     });
 });
-//# sourceMappingURL=progress-chart.js.map
+//# sourceMappingURL=primary-chart.js.map

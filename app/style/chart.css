@@ -23,8 +23,8 @@ body {
   height: 100vh;
 }
 
-.charts-container #progress-chart,
-.charts-container #fittest-chart {
+.charts-container #primary-chart,
+.charts-container #secondary-chart {
   padding: 0;
   position: relative;
   width: 100%;
