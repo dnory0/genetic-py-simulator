@@ -1,17 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
-
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Genetic Py</title>
-    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css" />
+    <link
+      rel="stylesheet"
+      href="../node_modules/bootstrap/dist/css/bootstrap.min.css"
+    />
     <link rel="stylesheet" href="style/style.css" />
   </head>
 
   <body>
     <div class="container-fluid main">
-      <div class="primary-process-container">
+      <div class="primary-container">
         <div class="border-container"></div>
       </div>
       <div class="middle-container">
@@ -25,10 +27,20 @@
               <button title="stop" class="disabled-btn" id="stop-btn" disabled>
                 <img src="img/stop-btn.png" />
               </button>
-              <button title="relaunch the algorithm" class="disabled-btn" id="to-start-btn" disabled>
+              <button
+                title="relaunch the algorithm"
+                class="disabled-btn"
+                id="to-start-btn"
+                disabled
+              >
                 <img src="img/to-start-btn.png" />
               </button>
-              <button title="step back" class="disabled-btn" id="step-back-btn" disabled>
+              <button
+                title="step back"
+                class="disabled-btn"
+                id="step-back-btn"
+                disabled
+              >
                 <img src="img/step-back-btn.png" />
               </button>
               <button title="step forward" id="step-forward-btn">
@@ -40,24 +52,57 @@
           <div class="parameters-container">
             <div class="parameters">
               <p>Population size:</p>
-              <input type="number" min="120" step="1" id="pop-size" name="pop_size" />
-              <input type="checkbox" name="" id="">
+              <input
+                type="number"
+                min="120"
+                step="1"
+                id="pop-size"
+                name="pop_size"
+              />
+              <input type="checkbox" name="" id="" />
               <p>Genes number:</p>
-              <input type="number" min="80" step="1" id="genes-num" name="genes_num" />
-              <input type="checkbox" name="" id="">
+              <input
+                type="number"
+                min="80"
+                step="1"
+                id="genes-num"
+                name="genes_num"
+              />
+              <input type="checkbox" name="" id="" />
               <p>Crossover rate:</p>
-              <input type="number" min="0.001" max="1" step="0.001" id="crossover-rate" name="crossover_rate" />
-              <input type="checkbox" name="" id="">
+              <input
+                type="number"
+                min="0.001"
+                max="1"
+                step="0.001"
+                id="crossover-rate"
+                name="crossover_rate"
+              />
+              <input type="checkbox" name="" id="" />
               <p>Mutation rate:</p>
-              <input type="number" min="0" max="1" step="0.001" id="mutation-rate" name="mutation_rate" />
-              <input type="checkbox" name="" id="">
+              <input
+                type="number"
+                min="0"
+                max="1"
+                step="0.001"
+                id="mutation-rate"
+                name="mutation_rate"
+              />
+              <input type="checkbox" name="" id="" />
               <p>delay rate:</p>
-              <input type="number" min="0" max="5" step="0.05" id="delay-rate" name="delay_rate" />
-              <input type="checkbox" name="" id="">
+              <input
+                type="number"
+                min="0"
+                max="5"
+                step="0.05"
+                id="delay-rate"
+                name="delay_rate"
+              />
+              <input type="checkbox" name="" id="" />
             </div>
           </div>
         </div>
-        <div class="secondary-process-container">
+        <div class="secondary-container">
           <div class="border-container"></div>
         </div>
       </div>
@@ -67,9 +112,7 @@
     </div>
     <script>
       let exports = {};
-
     </script>
     <script src="renderer.js"></script>
   </body>
-
 </html>

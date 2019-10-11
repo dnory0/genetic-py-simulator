@@ -1,6 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 let pyshell = window.pyshell;
+const webFrame = window.webFrame;
+const ipcRenderer = window.ipcRenderer;
 const play = window.play;
 const pause = window.pause;
 const stop = window.stop;
@@ -18,6 +20,8 @@ let crossover = document.getElementById('crossover-rate');
 let coRandom = document.getElementById('random-crossover');
 let mutation = document.getElementById('mutation-rate');
 let mutRandom = document.getElementById('random-mutation');
+const prime = document.querySelector('.primary-container');
+const second = document.querySelector('.secondary-container');
 let isRunning = false;
 const treatResponse = (response) => {
     if (response['started'] && response['genesNum'] !== undefined) {

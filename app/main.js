@@ -58,7 +58,6 @@ const createView = (parentWindow, filePath, { x, y, width, height }, { webPrefer
         height
     });
     targetView.webContents.loadFile(filePath);
-    parentWindow.addBrowserView(targetView);
     return targetView;
 };
 const createPyshell = () => {

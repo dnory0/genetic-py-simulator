@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const highcharts_1 = require("highcharts");
+const electron_1 = require("electron");
 const pyshell = require('electron').remote.require('./main');
 window.createChart = (containerId, options) => {
     return highcharts_1.chart(containerId, {
@@ -47,6 +48,8 @@ window.createChart = (containerId, options) => {
         }
     });
 };
+window.webFrame = electron_1.webFrame;
+window.ipcRenderer = electron_1.ipcRenderer;
 window.enableChartHover = (enable, chart) => {
     chart.options.tooltip.enabled = enable;
     chart.update({

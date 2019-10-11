@@ -25,13 +25,13 @@ body {
   height: 100vh;
 }
 
-.main .primary-process-container {
+.main .primary-container {
   background-color: #fff;
   height: calc(50% + 13px);
   padding: 0 4px;
 }
 
-.main .primary-process-container .border-container {
+.main .primary-container .border-container {
   border-bottom: 1px solid #a37e7e;
   height: 100%;
 }
@@ -128,14 +128,14 @@ body {
   max-width: 70%;
 }
 
-.main .middle-container .secondary-process-container {
+.main .middle-container .secondary-container {
   -webkit-box-flex: 1;
       -ms-flex: 1;
           flex: 1;
   padding: 4px 0;
 }
 
-.main .middle-container .secondary-process-container .border-container {
+.main .middle-container .secondary-container .border-container {
   border-left: 1px solid #a37e7e;
   height: 100%;
 }

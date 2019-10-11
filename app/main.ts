@@ -159,7 +159,7 @@ const createView = (
   targetView.webContents.loadFile(filePath);
 
   // add to parent window
-  parentWindow.addBrowserView(targetView);
+  // parentWindow.addBrowserView(targetView);
 
   return targetView;
 };

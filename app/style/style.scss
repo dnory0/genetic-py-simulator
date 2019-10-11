@@ -48,7 +48,7 @@ body {
   //     }
   //   }
   // }
-  .primary-process-container {
+  .primary-container {
     background-color: #fff;
     height: calc(50% + 13px);
     padding: 0 4px;
@@ -116,7 +116,6 @@ body {
         height: calc(100% - 37px);
         overflow-y: auto;
 
-
         .parameters {
           height: 200px;
           display: grid;
@@ -182,7 +181,7 @@ body {
       }
     }
 
-    .secondary-process-container {
+    .secondary-container {
       flex: 1;
       padding: 4px 0;
 

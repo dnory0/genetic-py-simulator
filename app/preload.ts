@@ -1,5 +1,6 @@
 import { chart, Options, XAxisOptions, YAxisOptions, Chart } from 'highcharts';
 import { ChildProcess } from 'child_process';
+import { webFrame, ipcRenderer } from 'electron';
 
 /************************ Charts & Python Configuration ************************
  ******************************************************************************/
@@ -59,6 +60,9 @@ const pyshell: ChildProcess = require('electron').remote.require('./main');
     }
   });
 };
+
+(<any>window).webFrame = webFrame;
+(<any>window).ipcRenderer = ipcRenderer;
 
 /**
  * enables or disable the hover settings for the passed chart

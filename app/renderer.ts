@@ -1,5 +1,6 @@
 // import * as Highcharts from 'highcharts';
 import { ChildProcess } from 'child_process';
+import { WebFrame, IpcRenderer } from 'electron';
 
 /***************************** passed by preload *****************************
  *****************************************************************************/
@@ -8,6 +9,17 @@ import { ChildProcess } from 'child_process';
  */
 let pyshell: ChildProcess = (<any>window).pyshell;
 
+/**
+ * needed to extract the value of the current frame zoom level, default is 0,
+ * and each zoom in/out is addition/minus of 0.5 respectively.
+ */
+const webFrame: WebFrame = (<any>window).webFrame;
+
+/**
+ * allows sending resizing information to main process to resize primary &
+ * secondary view
+ */
+const ipcRenderer: IpcRenderer = (<any>window).ipcRenderer;
 /************************** GA States Changers part **************************/
 /**
  * send play to GA, python side is responsible for whether to start GA for first time are just resume
@@ -96,6 +108,34 @@ let mutation = <HTMLInputElement>document.getElementById('mutation-rate');
  * randomized between 0 and mutation passed to GA.
  */
 let mutRandom = <HTMLButtonElement>document.getElementById('random-mutation');
+
+/******************************* Views Containers ********************************/
+/**
+ * the holder of the space occupied by primary chart view
+ */
+const prime = <HTMLDivElement>document.querySelector('.primary-container');
+
+/**
+ * the holder of the space occupied by secondary chart view
+ */
+const second = <HTMLDivElement>document.querySelector('.secondary-container');
+
+// window.onresize = () => {
+//   ipcRenderer.send('resize', {
+//     primary: {
+//       x: prime.getBoundingClientRect().left,
+//       y: prime.getBoundingClientRect().top,
+//       width: prime.getBoundingClientRect().width,
+//       height: prime.getBoundingClientRect().height - 1
+//     },
+//     secondary: {
+//       x: second.getBoundingClientRect().left,
+//       y: second.getBoundingClientRect().top,
+//       width: second.getBoundingClientRect().width,
+//       height: second.getBoundingClientRect().height
+//     }
+//   });
+// };
 
 /************************ Charts & Python Configuration ************************
  ******************************************************************************/
