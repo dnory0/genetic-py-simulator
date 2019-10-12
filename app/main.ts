@@ -128,13 +128,11 @@ const resizeView = (
 /**
  * @param parentWindow  parent window of the returned view
  * @param filePath      string path to an HTML file relative to the root of your application
- * @param bounds        positioning of the browserView
  * @param options       constructor options for the browser view returned
  */
 const createView = (
   parentWindow: BrowserWindow,
   filePath: string,
-  { x, y, width, height }: Rectangle,
   {
     webPreferences: { preload, nodeIntegration }
   }: BrowserViewConstructorOptions = {}
@@ -147,14 +145,6 @@ const createView = (
       preload,
       nodeIntegration
     }
-  });
-
-  // default bounds
-  targetView.setBounds({
-    x,
-    y,
-    width,
-    height
   });
 
   // load file
@@ -230,6 +220,9 @@ const createPyshell = () => {
 };
 
 app.once('ready', () => {
+  ipcMain.once('views-ready', (_event: IpcMainEvent) => {
+    mainWindow.webContents.send('views-ready');
+  });
   /****************************** Pyshell part *****************************
    *************************************************************************/
   createPyshell();
@@ -243,11 +236,6 @@ app.once('ready', () => {
       nodeIntegration: false
     }
   });
-
-  // to force visibility on full screen linux (in my case) (@deprecated)
-  // mainWindow.on('enter-full-screen', () => {
-  //   mainWindow.setMenuBarVisibility(true);
-  // });
 
   mainWindow.on('enter-full-screen', () => {
     mainWindow.setAutoHideMenuBar(true);
@@ -267,17 +255,6 @@ app.once('ready', () => {
     mainWindow,
     join('app', 'primary-chart', 'primary-chart.html'),
     {
-      x: 0,
-      y: 0,
-      width:
-        mainWindow.getBounds().width -
-        (process.platform == 'win32' && !mainWindow.isFullScreen() ? 16 : 0),
-      height: Math.floor(
-        mainWindow.getBounds().height * 0.5 -
-          (process.platform == 'win32' && !mainWindow.isFullScreen() ? 17 : 0)
-      )
-    },
-    {
       webPreferences: {
         preload: join(__dirname, 'preload.js'),
         nodeIntegration: false
@@ -293,28 +270,6 @@ app.once('ready', () => {
     mainWindow,
     join('app', 'secondary-chart', 'secondary-chart.html'),
     {
-      x:
-        Math.floor(mainWindow.getBounds().width / 2) +
-        (process.platform == 'win32' && !mainWindow.isFullScreen() ? -3 : 5),
-      y:
-        Math.floor(mainWindow.getBounds().height / 2) +
-        (process.platform == 'win32'
-          ? mainWindow.isFullScreen()
-            ? 4
-            : -16
-          : 1),
-      width:
-        Math.floor(mainWindow.getBounds().width / 2) -
-        (process.platform == 'win32' && !mainWindow.isFullScreen() ? 14 : 5),
-      height:
-        Math.floor(mainWindow.getBounds().height / 2) -
-        (process.platform == 'win32'
-          ? mainWindow.isFullScreen()
-            ? 48
-            : 67
-          : 50)
-    },
-    {
       webPreferences: {
         preload: join(__dirname, 'preload.js'),
         nodeIntegration: false
@@ -325,42 +280,6 @@ app.once('ready', () => {
   // secondaryView.webContents.toggleDevTools();
 
   // if user resize window views must resize accordingly
-  // mainWindow.on('resize', () => {
-  //   setTimeout(() => {
-  //     resizeView(primaryView, {
-  //       width:
-  //         mainWindow.getBounds().width -
-  //         (process.platform == 'win32' && !mainWindow.isFullScreen() ? 16 : 0),
-  //       height: Math.floor(
-  //         mainWindow.getBounds().height * 0.5 -
-  //           (process.platform == 'win32' && !mainWindow.isFullScreen() ? 17 : 0)
-  //       )
-  //     });
-  //     resizeView(secondaryView, {
-  //       x:
-  //         Math.floor(mainWindow.getBounds().width / 2) +
-  //         (process.platform == 'win32' && !mainWindow.isFullScreen() ? -3 : 5),
-  //       y:
-  //         Math.floor(mainWindow.getBounds().height / 2) +
-  //         (process.platform == 'win32'
-  //           ? mainWindow.isFullScreen()
-  //             ? 4
-  //             : -16
-  //           : 1),
-  //       width:
-  //         Math.floor(mainWindow.getBounds().width / 2) -
-  //         (process.platform == 'win32' && !mainWindow.isFullScreen() ? 14 : 5),
-  //       height:
-  //         Math.floor(mainWindow.getBounds().height / 2) -
-  //         (process.platform == 'win32'
-  //           ? mainWindow.isFullScreen()
-  //             ? 48
-  //             : 67
-  //           : 50)
-  //     });
-  //   }, 100); // 100 ms is relative number that should be revised
-  // });
-
   ipcMain.on(
     'resize',
     (
@@ -371,11 +290,9 @@ app.once('ready', () => {
         zoom: number;
       }
     ) => {
-      setTimeout(() => {
-        resizeView(primaryView, args.primary);
-        resizeView(secondaryView, args.secondary);
-        // console.log(args.zoom);
-      }, 50);
+      resizeView(primaryView, args.primary);
+      resizeView(secondaryView, args.secondary);
+      // console.log(args.zoom);
     }
   );
 

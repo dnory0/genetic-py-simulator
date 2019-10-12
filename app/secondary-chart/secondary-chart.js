@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const ipcRenderer = window.ipcRenderer;
 let pyshell = window.pyshell;
 let mostFittest = window.mostFittest;
 const createChart = (window).createChart;
@@ -71,4 +72,5 @@ pyshell.stdout.on('data', (response) => {
             treatResponse(JSON.parse(args));
     });
 });
+ipcRenderer.send('views-ready');
 //# sourceMappingURL=secondary-chart.js.map

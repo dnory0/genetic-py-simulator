@@ -22,7 +22,8 @@ let mutation = document.getElementById('mutation-rate');
 let mutRandom = document.getElementById('random-mutation');
 const prime = document.querySelector('.primary-container');
 const second = document.querySelector('.secondary-container');
-window.onresize = () => {
+let resizeTimeout;
+const resizeReporter = () => {
     ipcRenderer.send('resize', {
         primary: {
             x: Math.floor(prime.getBoundingClientRect().left),
@@ -39,6 +40,11 @@ window.onresize = () => {
         zoom: webFrame.getZoomLevel()
     });
 };
+window.onresize = () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(resizeReporter, 40);
+};
+ipcRenderer.once('views-ready', resizeReporter);
 let isRunning = false;
 const treatResponse = (response) => {
     if (response['started'] && response['genesNum'] !== undefined) {

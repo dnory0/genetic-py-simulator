@@ -1,8 +1,11 @@
 import { Options, Chart, SeriesLineOptions } from 'highcharts';
 import { ChildProcess } from 'child_process';
+import { IpcRenderer } from 'electron';
 
 /****************************** passed by preload ******************************
  *******************************************************************************/
+
+const ipcRenderer: IpcRenderer = (<any>window).ipcRenderer;
 
 /**
  * python process that executes GA
@@ -137,3 +140,10 @@ pyshell.stdout.on('data', (response: Buffer) => {
       if (args) treatResponse(JSON.parse(args));
     });
 });
+
+/**
+ * since secondary process is loaded after primary process it is safe to say that
+ * all processes are fully loaded, and send main process that all views are ready
+ * to resize.
+ */
+ipcRenderer.send('views-ready');

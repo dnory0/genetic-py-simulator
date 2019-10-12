@@ -110,6 +110,7 @@ let mutation = <HTMLInputElement>document.getElementById('mutation-rate');
 let mutRandom = <HTMLButtonElement>document.getElementById('random-mutation');
 
 /******************************* Views Containers ********************************/
+
 /**
  * the holder of the space occupied by primary chart view
  */
@@ -120,7 +121,19 @@ const prime = <HTMLDivElement>document.querySelector('.primary-container');
  */
 const second = <HTMLDivElement>document.querySelector('.secondary-container');
 
-window.onresize = () => {
+/**
+ * timeout to initialize if user resizes the window, if user is resizing fast enough,
+ * this timeout is cleared before sending resize signal to main process thus sending
+ * enly last resize signal(s), which may enhance performance (could be deprecated
+ * since it is bad user experience)
+ */
+let resizeTimeout: NodeJS.Timeout;
+
+/**
+ * sends resize signal to main process, with primary & secondary position info, zoom
+ * level of the window.
+ */
+const resizeReporter = () => {
   ipcRenderer.send('resize', {
     primary: {
       x: Math.floor(prime.getBoundingClientRect().left),
@@ -136,67 +149,17 @@ window.onresize = () => {
     },
     zoom: webFrame.getZoomLevel()
   });
-  // console.log({
-  //   primary: {
-  //     x: prime.getBoundingClientRect().left,
-  //     y: prime.getBoundingClientRect().top,
-  //     width: prime.getBoundingClientRect().width,
-  //     height: prime.getBoundingClientRect().height - 1
-  //   },
-  //   secondary: {
-  //     x: second.getBoundingClientRect().left,
-  //     y: second.getBoundingClientRect().top,
-  //     width: second.getBoundingClientRect().width,
-  //     height: second.getBoundingClientRect().height
-  //   },
-  //   zoom: webFrame.getZoomLevel()
-  // });
 };
 
-/************************ Charts & Python Configuration ************************
- ******************************************************************************/
+window.onresize = () => {
+  clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(resizeReporter, 40);
+};
 
-/**************************** Charts Configuration ****************************/
-/**
- * updated every generation, recieves the generation with its fittest fitness
- */
-// let progressChart: Highcharts.Chart;
-/**
- * updated every time a new most fittest appear, recives most fittest genes
- *
- * most fittest is a new fittest which its fitness value is better than every
- * fittest in the previous generations
- */
-// let fittestChart: Highcharts.Chart;
-/**
- * updated every generation, recives current generation's fittest genes
- */
-// let currentChart: Highcharts.Chart;
-
-/**
- * an object that holds most fittest fitness with an array of their genes
- */
-// let mostFittest: {
-//   fitness: number;
-//   individuals?: [
-//     {
-//       generation: number;
-//       genes: any[];
-//     }
-//   ];
-// } = { fitness: -1 };
-/**
- * an array of for every generation fittest genes
- */
-// let fittestHistory = [];
+ipcRenderer.once('views-ready', resizeReporter);
 
 /****************************** Python Part ******************************/
 
-// used as args for pyshell
-// let args = [
-//   '64' /* Default genes number */,
-//   '120' /* Default population size */
-// ];
 /**
  * by default user needs to hit the play button to run pyshell
  */
@@ -216,8 +179,6 @@ const treatResponse = (response: object) => {
 };
 
 pyshell.stdout.on('data', (response: Buffer) => {
-  // console.log(response.toString());
-  // treatResponse(JSON.parse(response.toString()));
   response
     .toString()
     .split('\n')
@@ -227,68 +188,6 @@ pyshell.stdout.on('data', (response: Buffer) => {
       if (args) treatResponse(JSON.parse(args));
     });
 });
-
-/**
- * update charts based on args passed
- * @param args point properties to be added | GA started signal
- */
-// const addToChart = (args: object) => {
-//   if (
-//     args['generation'] !== undefined &&
-//     args['fitness'] !== undefined &&
-//     args['genes'] !== undefined
-//   ) {
-//     // every point is added to progressChart
-//     progressChart.series[0].addPoint(
-//       parseInt(args['fitness']),
-//       true,
-//       false,
-//       false
-//     );
-//     // every point arrives override the precedent point
-//     currentChart.series[0].setData(args['genes'], true, false);
-
-//     // register it on fittest history
-//     fittestHistory.push(args['genes']);
-
-//     if (mostFittest['fitness'] < args['fitness']) {
-//       mostFittest['fitness'] = args['fitness'];
-//       mostFittest['individuals'] = [
-//         {
-//           generation: args['generation'],
-//           genes: args['genes']
-//         }
-//       ];
-//       fittestChart.series[0].setData(
-//         mostFittest.individuals[0].genes,
-//         true,
-//         false
-//       );
-//     } else if (mostFittest['fitness'] == args['fitness']) {
-//       mostFittest['individuals'].unshift({
-//         generation: args['generation'],
-//         genes: args['genes']
-//       });
-//       fittestChart.series[0].setData(
-//         mostFittest.individuals[0].genes,
-//         true,
-//         false
-//       );
-//     }
-//   } else if (args['started'] && args['genesNum'] !== undefined) {
-//     // clear past results
-//     clearChart(progressChart);
-//     clearChart(fittestChart);
-//     clearChart(currentChart);
-//     // clear fittest individuals history & mostFittest history
-//     fittestHistory = [];
-//     mostFittest = { fitness: -1 };
-//     // setting up xAxis for fittest and current chart
-//     settingXAxis(args, currentChart, fittestChart);
-//     // to be able to change in ga state
-//     setClickable();
-//   }
-// };
 
 /************************ GUI & Buttons Configuration ************************
  *****************************************************************************/
