@@ -22,7 +22,6 @@ let mutation = document.getElementById('mutation-rate');
 let mutRandom = document.getElementById('random-mutation');
 const prime = document.querySelector('.primary-container');
 const second = document.querySelector('.secondary-container');
-let resizeTimeout;
 const resizeReporter = () => {
     ipcRenderer.send('resize', {
         primary: {
@@ -41,8 +40,7 @@ const resizeReporter = () => {
     });
 };
 window.onresize = () => {
-    clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(resizeReporter, 40);
+    setTimeout(resizeReporter, 40);
 };
 ipcRenderer.once('views-ready', resizeReporter);
 let isRunning = false;

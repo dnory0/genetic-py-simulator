@@ -122,14 +122,6 @@ const prime = <HTMLDivElement>document.querySelector('.primary-container');
 const second = <HTMLDivElement>document.querySelector('.secondary-container');
 
 /**
- * timeout to initialize if user resizes the window, if user is resizing fast enough,
- * this timeout is cleared before sending resize signal to main process thus sending
- * enly last resize signal(s), which may enhance performance (could be deprecated
- * since it is bad user experience)
- */
-let resizeTimeout: NodeJS.Timeout;
-
-/**
  * sends resize signal to main process, with primary & secondary position info, zoom
  * level of the window.
  */
@@ -152,8 +144,7 @@ const resizeReporter = () => {
 };
 
 window.onresize = () => {
-  clearTimeout(resizeTimeout);
-  resizeTimeout = setTimeout(resizeReporter, 40);
+  setTimeout(resizeReporter, 40);
 };
 
 ipcRenderer.once('views-ready', resizeReporter);

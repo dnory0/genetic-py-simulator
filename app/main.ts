@@ -87,6 +87,8 @@ const createWindow = (
 
   targetWindow.once('closed', () => {
     targetWindow = null;
+    primaryView.destroy();
+    secondaryView.destroy();
   });
   return targetWindow;
 };

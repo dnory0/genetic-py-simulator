@@ -33,6 +33,8 @@ const createWindow = (filePath, { minWidth, minHeight, width, height, resizable,
     });
     targetWindow.once('closed', () => {
         targetWindow = null;
+        primaryView.destroy();
+        secondaryView.destroy();
     });
     return targetWindow;
 };
