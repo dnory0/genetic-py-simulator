@@ -33,9 +33,9 @@ const resizeReporter = () => {
         },
         secondary: {
             x: Math.floor(second.getBoundingClientRect().left + 2),
-            y: Math.floor(second.getBoundingClientRect().top + 1),
+            y: Math.floor(second.getBoundingClientRect().top + 2),
             width: Math.floor(second.getBoundingClientRect().width - 2),
-            height: Math.floor(second.getBoundingClientRect().height - 1)
+            height: Math.floor(second.getBoundingClientRect().height - 2)
         },
         zoom: webFrame.getZoomLevel()
     });

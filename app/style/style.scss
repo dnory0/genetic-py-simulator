@@ -13,13 +13,15 @@ button {
 
 html,
 body {
+  margin: 0;
+  padding: 0;
   overflow: hidden;
 }
 
 .main {
-  // padding: 0;
-  overflow: hidden;
   padding: 0;
+  margin: 0;
+  overflow: hidden;
   height: 100vh;
   // background-color: #e8e8e8;
 
