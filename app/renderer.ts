@@ -73,21 +73,21 @@ let stepFBtn = <HTMLButtonElement>document.getElementById('step-forward-btn');
 /***************************** Parameters inputs *****************************/
 
 /**
- * number of individuals in a population, needs to be more than 120
+ * number of individuals in a population, needs to be more than 1
  */
 let popSize = <HTMLInputElement>document.getElementById('pop-size');
 /**
  * by Default is set false, if set true the true population size is going to be
- * randomized between 120 and popSize passed to GA.
+ * randomized between 1 and popSize passed to GA.
  */
 let pSRandom = <HTMLButtonElement>document.getElementById('random-pop-size');
 /**
- * number of genes per individual, at least needs to be set to 80.
+ * number of genes per individual, at least needs to be set to 1.
  */
 let genesNum = <HTMLInputElement>document.getElementById('genes-num');
 /**
  * by Default is set false, if set true the true genes number is going to be
- * randomized between 80 and genesNum passed to GA.
+ * randomized between 1 and genesNum passed to GA.
  */
 let gNRandom = <HTMLButtonElement>document.getElementById('random-genes-num');
 /**

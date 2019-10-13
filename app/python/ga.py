@@ -286,8 +286,8 @@ g_sleep = 0
 
 # initialized every time GA is initialized,
 # if user passes them after GA started it will do nothing
-g_pop_size = int(sys.argv[1]) if len(sys.argv) > 1 else random.randint(120, 500)
-g_genes_num = int(sys.argv[2]) if len(sys.argv) > 2 else random.randint(80, 200)
+g_pop_size = int(sys.argv[1]) if len(sys.argv) > 1 else random.randint(1, 500)
+g_genes_num = int(sys.argv[2]) if len(sys.argv) > 2 else random.randint(1, 200)
 g_sleep = int(sys.argv[3]) if len(sys.argv) > 3 else g_sleep
 
 def final_value(min_val, given_val, is_random: bool):
@@ -303,14 +303,14 @@ def final_value(min_val, given_val, is_random: bool):
 def update_parameters(command: dict):
     """ check crossover & mutation rate new updates and apply them
     """
+    global g_pop_size
+    global g_genes_num
     if command.get('pop_size'):
         # population size
-        global g_pop_size
-        g_pop_size = final_value(120, command.get('pop_size'), command.get('random_pop_size'))
+        g_pop_size = final_value(1, command.get('pop_size'), command.get('random_pop_size'))
     if command.get('genes_num'):
         # genes number
-        global g_genes_num
-        g_genes_num = final_value(80, command.get('genes_num'), command.get('random_genes_num'))
+        g_genes_num = final_value(1, command.get('genes_num'), command.get('random_genes_num'))
     if command.get('crossover_rate'):
         # crossover rate change, it should not be 0
         global g_crossover_rate
@@ -319,10 +319,14 @@ def update_parameters(command: dict):
         # mutation rate change, can be 0
         global g_mutation_rate
         g_mutation_rate = final_value(.0, command.get('mutation_rate'), command.get('random_mutation'))
+    # to_json({
+    #     "pop": g_pop_size,
+    #     "genes": g_genes_num
+    # })
     if type(command.get('sleep')) is not type(None):
         # sleep in seconds
         global g_sleep
-        g_sleep = command.get('sleep')
+        g_sleep = command.get('sleep') or 0.05
 
 
 def init_ga(command: dict):
