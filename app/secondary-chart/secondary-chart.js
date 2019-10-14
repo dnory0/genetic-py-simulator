@@ -35,7 +35,7 @@ const treatResponse = (response) => {
         secondaryChart.xAxis[0].setCategories([...Array(response['genesNum']).keys()].map(v => `${++v}`));
         enableChartHover(false, secondaryChart);
     }
-    else if (response['paused'])
+    else if (response['paused'] || response['finished'])
         enableChartHover(true, secondaryChart);
     else if (response['resumed'])
         enableChartHover(false, secondaryChart);

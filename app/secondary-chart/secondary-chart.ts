@@ -96,7 +96,8 @@ const treatResponse = (response: object) => {
     );
     // disable points on hover on chart
     enableChartHover(false, secondaryChart);
-  } else if (response['paused']) enableChartHover(true, secondaryChart);
+  } else if (response['paused'] || response['finished'])
+    enableChartHover(true, secondaryChart);
   else if (response['resumed']) enableChartHover(false, secondaryChart);
 };
 

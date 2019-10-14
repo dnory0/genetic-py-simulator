@@ -15,7 +15,7 @@ const treatResponse = (response) => {
         clearChart(primaryChart);
         enableChartHover(false, primaryChart);
     }
-    else if (response['paused'])
+    else if (response['paused'] || response['finished'])
         enableChartHover(true, primaryChart);
     else if (response['resumed'])
         enableChartHover(false, primaryChart);
