@@ -56,10 +56,10 @@ body {
 
 .main .middle-container .controls-container .state-controls-container {
   margin-top: 4px;
-  position: absolute;
   width: -webkit-fit-content;
   width: -moz-fit-content;
   width: fit-content;
+  position: absolute;
   left: calc(25% - 79px);
 }
 
@@ -105,30 +105,71 @@ body {
 
 .main .middle-container .controls-container .parameters-container .parameters {
   height: 200px;
-  display: -ms-grid;
-  display: grid;
-  -ms-grid-columns: 1.75fr 1fr 40px;
-      grid-template-columns: 1.75fr 1fr 40px;
 }
 
-.main .middle-container .controls-container .parameters-container .parameters p {
+.main .middle-container .controls-container .parameters-container .parameters .parameter {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.main .middle-container .controls-container .parameters-container .parameters .parameter p {
   font-size: 13px;
-  width: -webkit-max-content;
-  width: -moz-max-content;
-  width: max-content;
   float: left;
-  padding-right: 5px;
   margin: 0;
-  padding: 10px;
+  padding: 10px 5px;
+  font-family: sans-serif;
+  text-align: left;
+  min-width: 100px;
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
 }
 
-.main .middle-container .controls-container .parameters-container .parameters input[type='number'] {
-  margin: 9px 9px 5px;
+.main .middle-container .controls-container .parameters-container .parameters .parameter input[type='number'] {
+  margin: 7px 5px 7px 2px;
+  height: 17px;
+  font-size: 16px;
+  -webkit-box-flex: 2;
+      -ms-flex: 2;
+          flex: 2;
+  min-width: 100px;
+}
+
+.main .middle-container .controls-container .parameters-container .parameters .parameter .checkbox_wrapper {
+  position: relative;
+  min-width: 40px;
+  height: 40px;
+  -webkit-box-flex: 0.5;
+      -ms-flex: 0.5;
+          flex: 0.5;
+}
+
+.main .middle-container .controls-container .parameters-container .parameters .parameter input[type='checkbox'] {
+  opacity: 0;
+  height: 40px;
+  width: 40px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+}
+
+.main .middle-container .controls-container .parameters-container .parameters .parameter input[type='checkbox'] + label {
+  background: url("../img/random.png") no-repeat;
+  margin: 5px 12px 12px 5px;
   height: 26px;
-  width: -webkit-fit-content;
-  width: -moz-fit-content;
-  width: fit-content;
-  max-width: 70%;
+  width: 26px;
+  display: inline-block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  opacity: 0.6;
+}
+
+.main .middle-container .controls-container .parameters-container .parameters .parameter input[type='checkbox']:checked + label {
+  opacity: 1;
 }
 
 .main .middle-container .secondary-container {

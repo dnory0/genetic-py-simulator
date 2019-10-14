@@ -47,54 +47,79 @@
           <div class="controls-background"></div>
           <div class="parameters-container">
             <div class="parameters">
-              <p>Population size:</p>
-              <input
-                type="number"
-                min="1"
-                step="1"
-                id="pop-size"
-                name="pop_size"
-              />
-              <input type="checkbox" name="" id="" />
-              <p>Genes number:</p>
-              <input
-                type="number"
-                min="1"
-                step="1"
-                id="genes-num"
-                name="genes_num"
-              />
-              <input type="checkbox" name="" id="" />
-              <p>Crossover rate:</p>
-              <input
-                type="number"
-                min="0.001"
-                max="1"
-                step="0.001"
-                id="crossover-rate"
-                name="crossover_rate"
-              />
-              <input type="checkbox" name="" id="" />
-              <p>Mutation rate:</p>
-              <input
-                type="number"
-                min="0"
-                max="1"
-                step="0.001"
-                id="mutation-rate"
-                name="mutation_rate"
-              />
-              <input type="checkbox" name="" id="" />
-              <p>delay rate:</p>
-              <input
-                type="number"
-                min="0"
-                max="5"
-                step="0.05"
-                id="delay-rate"
-                name="delay_rate"
-              />
-              <input type="checkbox" name="" id="" />
+              <div class="parameter">
+                <p>Population size:</p>
+                <input
+                  type="number"
+                  min="1"
+                  step="1"
+                  id="pop-size"
+                  name="pop_size"
+                />
+                <div class="checkbox_wrapper" title="random">
+                  <input type="checkbox" name="random_pop_size" id="" />
+                  <label for="random_pop_size"></label>
+                </div>
+              </div>
+              <div class="parameter">
+                <p>Genes number:</p>
+                <input
+                  type="number"
+                  min="1"
+                  step="1"
+                  id="genes-num"
+                  name="genes_num"
+                />
+                <div class="checkbox_wrapper" title="random">
+                  <input type="checkbox" name="random-genes-num" id="" />
+                  <label for="random-genes-num"></label>
+                </div>
+              </div>
+              <div class="parameter">
+                <p>Crossover rate:</p>
+                <input
+                  type="number"
+                  min="0.001"
+                  max="1"
+                  step="0.001"
+                  id="crossover-rate"
+                  name="crossover_rate"
+                />
+                <div class="checkbox_wrapper" title="random">
+                  <input type="checkbox" name="random-crossover-rate" id="" />
+                  <label for="random-crossover-rate"></label>
+                </div>
+              </div>
+              <div class="parameter">
+                <p>Mutation rate:</p>
+                <input
+                  type="number"
+                  min="0"
+                  max="1"
+                  step="0.001"
+                  id="mutation-rate"
+                  name="mutation_rate"
+                />
+                <div class="checkbox_wrapper" title="random">
+                  <input type="checkbox" name="random-mutation-rate" id="" />
+                  <label for="random-mutation-rate"></label>
+                </div>
+              </div>
+              <div class="parameter">
+                <p>delay rate:</p>
+                <input
+                  type="number"
+                  min="0"
+                  max="5"
+                  step="0.05"
+                  id="delay-rate"
+                  name="delay_rate"
+                />
+                <div class="checkbox_wrapper" title="random">
+                  <input type="checkbox" name="random-delay-rate" id="" />
+                  <label for="random-delay-rate"></label>
+                </div>
+              </div>
             </div>
           </div>
         </div>
