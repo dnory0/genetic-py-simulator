@@ -77,4 +77,5 @@ ipcRenderer.send('views-ready');
 ipcRenderer.on('zoom', (_event, args) => {
     webFrame.setZoomLevel(args.zoom);
 });
+webFrame.setZoomLevel(0);
 //# sourceMappingURL=secondary-chart.js.map

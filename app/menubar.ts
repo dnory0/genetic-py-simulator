@@ -65,8 +65,8 @@ let template: MenuItemConstructorOptions[];
         { role: 'toggledevtools' },
         { type: 'separator' },
         { role: 'resetzoom' },
-        { role: 'zoomin' },
-        { role: 'zoomout' },
+        { role: 'zoomin', accelerator: 'CmdOrCtrl+numadd' },
+        { role: 'zoomout', accelerator: 'CmdOrCtrl+numsub' },
         { type: 'separator' },
         { role: 'togglefullscreen' }
       ] as MenuItemConstructorOptions[]

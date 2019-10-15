@@ -58,4 +58,5 @@ pyshell.stdout.on('data', (response) => {
 ipcRenderer.on('zoom', (_event, args) => {
     webFrame.setZoomLevel(args.zoom);
 });
+webFrame.setZoomLevel(0);
 //# sourceMappingURL=primary-chart.js.map

@@ -116,3 +116,5 @@ pyshell.stdout.on('data', (response: Buffer) => {
 ipcRenderer.on('zoom', (_event: IpcRendererEvent, args: { zoom: number }) => {
   webFrame.setZoomLevel(args.zoom);
 });
+
+webFrame.setZoomLevel(0);

@@ -27,14 +27,14 @@ const resizeReporter = () => {
         primary: {
             x: Math.floor(prime.getBoundingClientRect().left),
             y: Math.floor(prime.getBoundingClientRect().top),
-            width: Math.floor(prime.getBoundingClientRect().width),
-            height: Math.floor(prime.getBoundingClientRect().height - 1)
+            width: Math.floor(prime.offsetWidth * webFrame.getZoomFactor()),
+            height: Math.floor(prime.offsetHeight * webFrame.getZoomFactor())
         },
         secondary: {
-            x: Math.floor(second.getBoundingClientRect().left + 2),
-            y: Math.floor(second.getBoundingClientRect().top + 2),
-            width: Math.floor(second.getBoundingClientRect().width - 2),
-            height: Math.floor(second.getBoundingClientRect().height - 2)
+            x: Math.floor(second.getBoundingClientRect().left * webFrame.getZoomFactor() + 2),
+            y: Math.floor(second.getBoundingClientRect().top * webFrame.getZoomFactor() + 2),
+            width: Math.floor(second.getBoundingClientRect().width * webFrame.getZoomFactor() - 2),
+            height: Math.floor(second.getBoundingClientRect().height * webFrame.getZoomFactor() - 2)
         },
         zoom: webFrame.getZoomLevel()
     });
@@ -138,4 +138,5 @@ crossover.addEventListener('change', parameterChanged);
 crossover.addEventListener('keyup', parameterChanged);
 mutation.addEventListener('change', parameterChanged);
 mutation.addEventListener('keyup', parameterChanged);
+webFrame.setZoomLevel(0);
 //# sourceMappingURL=renderer.js.map
