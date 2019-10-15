@@ -294,6 +294,12 @@ app.once('ready', () => {
     ) => {
       resizeView(primaryView, args.primary);
       resizeView(secondaryView, args.secondary);
+      primaryView.webContents.send('zoom', {
+        zoom: args.zoom
+      });
+      secondaryView.webContents.send('zoom', {
+        zoom: args.zoom
+      });
       // console.log(args.zoom);
     }
   );

@@ -122,6 +122,12 @@ electron_1.app.once('ready', () => {
     electron_1.ipcMain.on('resize', (_event, args) => {
         resizeView(primaryView, args.primary);
         resizeView(secondaryView, args.secondary);
+        primaryView.webContents.send('zoom', {
+            zoom: args.zoom
+        });
+        secondaryView.webContents.send('zoom', {
+            zoom: args.zoom
+        });
     });
     const menubar = require('./menubar');
     menubar.items[process.platform == 'darwin' ? 3 : 2].submenu.insert(0, new electron_1.MenuItem({

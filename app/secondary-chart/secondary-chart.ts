@@ -1,11 +1,17 @@
 import { Options, Chart, SeriesLineOptions } from 'highcharts';
 import { ChildProcess } from 'child_process';
-import { IpcRenderer } from 'electron';
+import { IpcRenderer, IpcRendererEvent, WebFrame } from 'electron';
 
 /****************************** passed by preload ******************************
  *******************************************************************************/
 
 const ipcRenderer: IpcRenderer = (<any>window).ipcRenderer;
+
+/**
+ * needed to extract the value of the current frame zoom level, default is 0,
+ * and each zoom in/out is addition/minus of 0.5 respectively.
+ */
+const webFrame: WebFrame = (<any>window).webFrame;
 
 /**
  * python process that executes GA
@@ -148,3 +154,7 @@ pyshell.stdout.on('data', (response: Buffer) => {
  * to resize.
  */
 ipcRenderer.send('views-ready');
+
+ipcRenderer.on('zoom', (_event: IpcRendererEvent, args: { zoom: number }) => {
+  webFrame.setZoomLevel(args.zoom);
+});

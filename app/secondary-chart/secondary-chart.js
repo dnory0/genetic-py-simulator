@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const ipcRenderer = window.ipcRenderer;
+const webFrame = window.webFrame;
 let pyshell = window.pyshell;
 let mostFittest = window.mostFittest;
 const createChart = (window).createChart;
@@ -73,4 +74,7 @@ pyshell.stdout.on('data', (response) => {
     });
 });
 ipcRenderer.send('views-ready');
+ipcRenderer.on('zoom', (_event, args) => {
+    webFrame.setZoomLevel(args.zoom);
+});
 //# sourceMappingURL=secondary-chart.js.map
