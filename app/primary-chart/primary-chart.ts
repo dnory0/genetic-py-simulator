@@ -5,6 +5,10 @@ import { IpcRenderer, WebFrame, IpcRendererEvent } from 'electron';
 /****************************** passed by preload ******************************
  *******************************************************************************/
 
+/**
+ * allows sending resizing information to main process to resize primary &
+ * secondary view
+ */
 const ipcRenderer: IpcRenderer = (<any>window).ipcRenderer;
 
 /**
@@ -74,7 +78,7 @@ const treatResponse = (response: object) => {
 };
 
 /**
- * updated every generation, recieves the generation with its fittest fitness
+ * updated every generation, receives the generation with its fittest fitness
  */
 let primaryChart = createChart('primary-chart', {
   chart: {
@@ -102,7 +106,6 @@ let primaryChart = createChart('primary-chart', {
 });
 
 pyshell.stdout.on('data', (response: Buffer) => {
-  // treatResponse(JSON.parse(response.toString()));
   response
     .toString()
     .split('\n')
@@ -113,8 +116,15 @@ pyshell.stdout.on('data', (response: Buffer) => {
     });
 });
 
+/**
+ * receives zoom signal to update window/view size to maintain same size as
+ * the main window
+ */
 ipcRenderer.on('zoom', (_event: IpcRendererEvent, args: { zoom: number }) => {
   webFrame.setZoomLevel(args.zoom);
 });
 
+/**
+ * reset zoom level on first load or reload
+ */
 webFrame.setZoomLevel(0);

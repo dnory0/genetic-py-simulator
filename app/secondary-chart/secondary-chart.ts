@@ -5,6 +5,10 @@ import { IpcRenderer, IpcRendererEvent, WebFrame } from 'electron';
 /****************************** passed by preload ******************************
  *******************************************************************************/
 
+/**
+ * allows sending resizing information to main process to resize primary &
+ * secondary view
+ */
 const ipcRenderer: IpcRenderer = (<any>window).ipcRenderer;
 
 /**
@@ -108,7 +112,7 @@ const treatResponse = (response: object) => {
 };
 
 /**
- * updated every time a new most fittest appear, recives most fittest genes
+ * updated every time a new most fittest appear, receives most fittest genes
  *
  * most fittest is a new fittest which its fitness value is better than every
  * fittest in the previous generations
@@ -155,8 +159,15 @@ pyshell.stdout.on('data', (response: Buffer) => {
  */
 ipcRenderer.send('views-ready');
 
+/**
+ * receives zoom signal to update window/view size to maintain same size as
+ * the main window
+ */
 ipcRenderer.on('zoom', (_event: IpcRendererEvent, args: { zoom: number }) => {
   webFrame.setZoomLevel(args.zoom);
 });
 
+/**
+ * reset zoom level on first load or reload
+ */
 webFrame.setZoomLevel(0);

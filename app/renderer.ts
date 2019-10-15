@@ -330,4 +330,7 @@ mutation.addEventListener('keyup', parameterChanged);
 
 // document.addEventListener('DOMContentLoaded', function() {});
 
+/**
+ * reset zoom level on first load or reload
+ */
 webFrame.setZoomLevel(0);
