@@ -80,7 +80,7 @@ let popSize = <HTMLInputElement>document.getElementById('pop-size');
  * by Default is set false, if set true the true population size is going to be
  * randomized between 1 and popSize passed to GA.
  */
-let pSRandom = <HTMLButtonElement>document.getElementById('random-pop-size');
+let pSRandom = <HTMLInputElement>document.getElementById('random-pop-size');
 /**
  * number of genes per individual, at least needs to be set to 1.
  */
@@ -89,7 +89,7 @@ let genesNum = <HTMLInputElement>document.getElementById('genes-num');
  * by Default is set false, if set true the true genes number is going to be
  * randomized between 1 and genesNum passed to GA.
  */
-let gNRandom = <HTMLButtonElement>document.getElementById('random-genes-num');
+let gNRandom = <HTMLInputElement>document.getElementById('random-genes-num');
 /**
  * crossover rate, it's in ]0,1] range.
  */
@@ -98,7 +98,7 @@ let crossover = <HTMLInputElement>document.getElementById('crossover-rate');
  * by Default is set false, if set true the true crossover rate is going to be
  * randomized between 0.001 and crossover passed to GA.
  */
-let coRandom = <HTMLButtonElement>document.getElementById('random-crossover');
+let coRandom = <HTMLInputElement>document.getElementById('random-crossover-rate');
 /**
  * mutation rate, range of values is [0,1].
  */
@@ -107,7 +107,7 @@ let mutation = <HTMLInputElement>document.getElementById('mutation-rate');
  * by Default is set false, if set true the true mutation rate is going to be
  * randomized between 0 and mutation passed to GA.
  */
-let mutRandom = <HTMLButtonElement>document.getElementById('random-mutation');
+let mutRandom = <HTMLInputElement>document.getElementById('random-mutation-rate');
 
 /******************************* Views Containers ********************************/
 
@@ -182,7 +182,7 @@ pyshell.stdout.on('data', (response: Buffer) => {
     .toString()
     .split('\n')
     .forEach((args: string) => {
-      // console.log(args);
+      console.log(args);
       // sometimes args == ''(not sure why), those cases need to be ignored
       if (args) treatResponse(JSON.parse(args));
     });
@@ -281,52 +281,59 @@ stepFBtn.onclick = () => {
 /**
  * checks if the changed input has a valid value, if true pass it to pyshell, else
  * highlight the input in red to indicate invalide value.
- * @param event keyup | change event passed when user try to change value on parameters
+ * @param numInput    input of type number that has changed or its random flag changed
+ * @param checkInput  input of type checkbox flag attached to numInput to specify whether it is random or not
+ * @param evType      keyup | change event passed when user try to change value on one of parameters
+ * @param key         keyboard key pressed on keyup event, if event type is change key is ignored
  */
-const parameterChanged = (event: Event) => {
-  // prevent valueChange from being triggered twice if user used arrow keys,
+const parameterChanged = (numInput: HTMLInputElement, checkInput: HTMLInputElement, evType: string, key?: string) => {
+  // prevent parameterChanged from being triggered twice if user used arrow keys,
   // also ignore other keyboard keys except backspace.
-  if (event.type == 'keyup')
+  if (evType == 'keyup')
     if (
-      isNaN(parseInt((<KeyboardEvent>event).key)) &&
-      (<KeyboardEvent>event).key != 'Backspace'
+      isNaN(parseInt(key)) &&
+      key != 'Backspace'
     )
       return;
 
   if (
-    (isNaN(parseFloat((<HTMLInputElement>event.target).min)) ||
-      parseFloat((<HTMLInputElement>event.target).value) >=
-        parseFloat((<HTMLInputElement>event.target).min)) &&
-    (isNaN(parseFloat((<HTMLInputElement>event.target).max)) ||
-      parseFloat((<HTMLInputElement>event.target).value) <=
-        parseFloat((<HTMLInputElement>event.target).max))
+    (isNaN(parseFloat(numInput.min)) ||
+      parseFloat(numInput.value) >=
+        parseFloat(numInput.min)) &&
+    (isNaN(parseFloat(numInput.max)) ||
+      parseFloat(numInput.value) <=
+        parseFloat(numInput.max))
   ) {
-    (<HTMLInputElement>event.target).style.backgroundColor = '#fff';
+    numInput.style.backgroundColor = '#fff';
     pyshell.stdin.write(
       `${JSON.stringify({
-        [(<HTMLInputElement>event.target).name]: parseFloat(
-          (<HTMLInputElement>event.target).value
-        )
-        // random_pop_size: popSizeRandom.
+        [numInput.name]: parseFloat(
+          numInput.value
+        ),
+        [checkInput.name]: checkInput.checked
       })}\n`,
       (error: Error) => {
         if (error) throw error;
       }
     );
-  } else (<HTMLInputElement>event.target).style.backgroundColor = '#ff5a5a';
+  } else numInput.style.backgroundColor = '#ff5a5a';
 };
 
-popSize.addEventListener('change', parameterChanged);
-popSize.addEventListener('keyup', parameterChanged);
+popSize.onkeyup = popSize.onchange = pSRandom.onchange = (event: Event) => {
+  parameterChanged(popSize, pSRandom, event.type, (<KeyboardEvent>event).key)
+};
 
-genesNum.addEventListener('change', parameterChanged);
-genesNum.addEventListener('keyup', parameterChanged);
+genesNum.onkeyup = genesNum.onchange = gNRandom.onchange = (event: Event) => {
+  parameterChanged(genesNum, gNRandom, event.type, (<KeyboardEvent>event).key)
+};
 
-crossover.addEventListener('change', parameterChanged);
-crossover.addEventListener('keyup', parameterChanged);
+crossover.onkeyup = crossover.onchange = coRandom.onchange = (event: Event) => {
+  parameterChanged(crossover, coRandom, event.type, (<KeyboardEvent>event).key)
+};
 
-mutation.addEventListener('change', parameterChanged);
-mutation.addEventListener('keyup', parameterChanged);
+mutation.onkeyup = mutation.onchange = mutRandom.onchange = (event: Event) => {
+  parameterChanged(mutation, mutRandom, event.type, (<KeyboardEvent>event).key)
+};
 
 // document.addEventListener('DOMContentLoaded', function() {});
 
