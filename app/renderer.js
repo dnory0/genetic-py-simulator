@@ -17,9 +17,9 @@ let pSRandom = document.getElementById('random-pop-size');
 let genesNum = document.getElementById('genes-num');
 let gNRandom = document.getElementById('random-genes-num');
 let crossover = document.getElementById('crossover-rate');
-let coRandom = document.getElementById('random-crossover');
+let coRandom = document.getElementById('random-crossover-rate');
 let mutation = document.getElementById('mutation-rate');
-let mutRandom = document.getElementById('random-mutation');
+let mutRandom = document.getElementById('random-mutation-rate');
 const prime = document.querySelector('.primary-container');
 const second = document.querySelector('.secondary-container');
 const resizeReporter = () => {
@@ -57,6 +57,7 @@ pyshell.stdout.on('data', (response) => {
         .toString()
         .split('\n')
         .forEach((args) => {
+        console.log(args);
         if (args)
             treatResponse(JSON.parse(args));
     });
@@ -108,35 +109,40 @@ stepFBtn.onclick = () => {
     isRunning = false;
     switchBtn();
 };
-const parameterChanged = (event) => {
-    if (event.type == 'keyup')
-        if (isNaN(parseInt(event.key)) &&
-            event.key != 'Backspace')
+const parameterChanged = (numInput, checkInput, evType, key) => {
+    if (evType == 'keyup')
+        if (isNaN(parseInt(key)) &&
+            key != 'Backspace')
             return;
-    if ((isNaN(parseFloat(event.target.min)) ||
-        parseFloat(event.target.value) >=
-            parseFloat(event.target.min)) &&
-        (isNaN(parseFloat(event.target.max)) ||
-            parseFloat(event.target.value) <=
-                parseFloat(event.target.max))) {
-        event.target.style.backgroundColor = '#fff';
+    if ((isNaN(parseFloat(numInput.min)) ||
+        parseFloat(numInput.value) >=
+            parseFloat(numInput.min)) &&
+        (isNaN(parseFloat(numInput.max)) ||
+            parseFloat(numInput.value) <=
+                parseFloat(numInput.max))) {
+        numInput.style.backgroundColor = '#fff';
         pyshell.stdin.write(`${JSON.stringify({
-            [event.target.name]: parseFloat(event.target.value)
+            [numInput.name]: parseFloat(numInput.value),
+            [checkInput.name]: checkInput.checked
         })}\n`, (error) => {
             if (error)
                 throw error;
         });
     }
     else
-        event.target.style.backgroundColor = '#ff5a5a';
+        numInput.style.backgroundColor = '#ff5a5a';
 };
-popSize.addEventListener('change', parameterChanged);
-popSize.addEventListener('keyup', parameterChanged);
-genesNum.addEventListener('change', parameterChanged);
-genesNum.addEventListener('keyup', parameterChanged);
-crossover.addEventListener('change', parameterChanged);
-crossover.addEventListener('keyup', parameterChanged);
-mutation.addEventListener('change', parameterChanged);
-mutation.addEventListener('keyup', parameterChanged);
+popSize.onkeyup = popSize.onchange = pSRandom.onchange = (event) => {
+    parameterChanged(popSize, pSRandom, event.type, event.key);
+};
+genesNum.onkeyup = genesNum.onchange = gNRandom.onchange = (event) => {
+    parameterChanged(genesNum, gNRandom, event.type, event.key);
+};
+crossover.onkeyup = crossover.onchange = coRandom.onchange = (event) => {
+    parameterChanged(crossover, coRandom, event.type, event.key);
+};
+mutation.onkeyup = mutation.onchange = mutRandom.onchange = (event) => {
+    parameterChanged(mutation, mutRandom, event.type, event.key);
+};
 webFrame.setZoomLevel(0);
 //# sourceMappingURL=renderer.js.map

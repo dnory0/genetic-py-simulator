@@ -305,6 +305,8 @@ def update_parameters(command: dict):
     """
     global g_pop_size
     global g_genes_num
+    global g_crossover_rate
+    global g_mutation_rate
     if command.get('pop_size'):
         # population size
         g_pop_size = final_value(1, command.get('pop_size'), command.get('random_pop_size'))
@@ -313,20 +315,24 @@ def update_parameters(command: dict):
         g_genes_num = final_value(1, command.get('genes_num'), command.get('random_genes_num'))
     if command.get('crossover_rate'):
         # crossover rate change, it should not be 0
-        global g_crossover_rate
-        g_crossover_rate = final_value(.001, command.get('crossover_rate'), command.get('random_crossover'))
+        g_crossover_rate = round(final_value(.001, command.get('crossover_rate'), command.get('random_crossover_rate')), 3)
     if type(command.get('mutation_rate')) is not type(None):
         # mutation rate change, can be 0
-        global g_mutation_rate
-        g_mutation_rate = final_value(.0, command.get('mutation_rate'), command.get('random_mutation'))
-    # to_json({
-    #     "pop": g_pop_size,
-    #     "genes": g_genes_num
-    # })
+        g_mutation_rate = round(final_value(.0, command.get('mutation_rate'), command.get('random_mutation_rate')), 3)
     if type(command.get('sleep')) is not type(None):
         # sleep in seconds
         global g_sleep
         g_sleep = command.get('sleep') or 0.05
+    # to_json({
+    #     "pop": g_pop_size,
+    #     "rnPop": command.get('random_pop_size'),
+    #     "genes": g_genes_num,
+    #     "rnGenes": command.get('random_genes_num'),
+    #     "crossover": g_crossover_rate,
+    #     "rnCO": command.get('random_crossover_rate'),
+    #     "mutation": g_mutation_rate,
+    #     "rnMut": command.get('random_mutation_rate')
+    # })
 
 
 def init_ga(command: dict):
