@@ -269,6 +269,7 @@ class GAThread(threading.Thread):
                 # Now release the lock
                 self.pause_cond.release()
                 self.paused = False
+            self.join()
 
 
 def to_json(word: dict):
@@ -373,7 +374,6 @@ while True:
     elif cmd.get('exit'):
         if ga_thread is not None:
             ga_thread.stop()
-        ga_thread.join()
         sys.exit(0)
     else:
         update_parameters(cmd)
