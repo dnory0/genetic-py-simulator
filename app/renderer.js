@@ -17,9 +17,9 @@ let pSRandom = document.getElementById('random-pop-size');
 let genesNum = document.getElementById('genes-num');
 let gNRandom = document.getElementById('random-genes-num');
 let crossover = document.getElementById('crossover-rate');
-let coRandom = document.getElementById('random-crossover-rate');
+let coRandom = (document.getElementById('random-crossover-rate'));
 let mutation = document.getElementById('mutation-rate');
-let mutRandom = document.getElementById('random-mutation-rate');
+let mutRandom = (document.getElementById('random-mutation-rate'));
 const prime = document.querySelector('.primary-container');
 const second = document.querySelector('.secondary-container');
 const resizeReporter = () => {
@@ -111,15 +111,12 @@ stepFBtn.onclick = () => {
 };
 const parameterChanged = (numInput, checkInput, evType, key) => {
     if (evType == 'keyup')
-        if (isNaN(parseInt(key)) &&
-            key != 'Backspace')
+        if (isNaN(parseInt(key)) && key != 'Backspace')
             return;
     if ((isNaN(parseFloat(numInput.min)) ||
-        parseFloat(numInput.value) >=
-            parseFloat(numInput.min)) &&
+        parseFloat(numInput.value) >= parseFloat(numInput.min)) &&
         (isNaN(parseFloat(numInput.max)) ||
-            parseFloat(numInput.value) <=
-                parseFloat(numInput.max))) {
+            parseFloat(numInput.value) <= parseFloat(numInput.max))) {
         numInput.style.backgroundColor = '#fff';
         pyshell.stdin.write(`${JSON.stringify({
             [numInput.name]: parseFloat(numInput.value),

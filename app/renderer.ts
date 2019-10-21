@@ -98,7 +98,9 @@ let crossover = <HTMLInputElement>document.getElementById('crossover-rate');
  * by Default is set false, if set true the true crossover rate is going to be
  * randomized between 0.001 and crossover passed to GA.
  */
-let coRandom = <HTMLInputElement>document.getElementById('random-crossover-rate');
+let coRandom = <HTMLInputElement>(
+  document.getElementById('random-crossover-rate')
+);
 /**
  * mutation rate, range of values is [0,1].
  */
@@ -107,7 +109,9 @@ let mutation = <HTMLInputElement>document.getElementById('mutation-rate');
  * by Default is set false, if set true the true mutation rate is going to be
  * randomized between 0 and mutation passed to GA.
  */
-let mutRandom = <HTMLInputElement>document.getElementById('random-mutation-rate');
+let mutRandom = <HTMLInputElement>(
+  document.getElementById('random-mutation-rate')
+);
 
 /******************************* Views Containers ********************************/
 
@@ -286,30 +290,26 @@ stepFBtn.onclick = () => {
  * @param evType      keyup | change event passed when user try to change value on one of parameters
  * @param key         keyboard key pressed on keyup event, if event type is change key is ignored
  */
-const parameterChanged = (numInput: HTMLInputElement, checkInput: HTMLInputElement, evType: string, key?: string) => {
+const parameterChanged = (
+  numInput: HTMLInputElement,
+  checkInput: HTMLInputElement,
+  evType: string,
+  key?: string
+) => {
   // prevent parameterChanged from being triggered twice if user used arrow keys,
   // also ignore other keyboard keys except backspace.
-  if (evType == 'keyup')
-    if (
-      isNaN(parseInt(key)) &&
-      key != 'Backspace'
-    )
-      return;
+  if (evType == 'keyup') if (isNaN(parseInt(key)) && key != 'Backspace') return;
 
   if (
     (isNaN(parseFloat(numInput.min)) ||
-      parseFloat(numInput.value) >=
-        parseFloat(numInput.min)) &&
+      parseFloat(numInput.value) >= parseFloat(numInput.min)) &&
     (isNaN(parseFloat(numInput.max)) ||
-      parseFloat(numInput.value) <=
-        parseFloat(numInput.max))
+      parseFloat(numInput.value) <= parseFloat(numInput.max))
   ) {
     numInput.style.backgroundColor = '#fff';
     pyshell.stdin.write(
       `${JSON.stringify({
-        [numInput.name]: parseFloat(
-          numInput.value
-        ),
+        [numInput.name]: parseFloat(numInput.value),
         [checkInput.name]: checkInput.checked
       })}\n`,
       (error: Error) => {
@@ -320,19 +320,19 @@ const parameterChanged = (numInput: HTMLInputElement, checkInput: HTMLInputEleme
 };
 
 popSize.onkeyup = popSize.onchange = pSRandom.onchange = (event: Event) => {
-  parameterChanged(popSize, pSRandom, event.type, (<KeyboardEvent>event).key)
+  parameterChanged(popSize, pSRandom, event.type, (<KeyboardEvent>event).key);
 };
 
 genesNum.onkeyup = genesNum.onchange = gNRandom.onchange = (event: Event) => {
-  parameterChanged(genesNum, gNRandom, event.type, (<KeyboardEvent>event).key)
+  parameterChanged(genesNum, gNRandom, event.type, (<KeyboardEvent>event).key);
 };
 
 crossover.onkeyup = crossover.onchange = coRandom.onchange = (event: Event) => {
-  parameterChanged(crossover, coRandom, event.type, (<KeyboardEvent>event).key)
+  parameterChanged(crossover, coRandom, event.type, (<KeyboardEvent>event).key);
 };
 
 mutation.onkeyup = mutation.onchange = mutRandom.onchange = (event: Event) => {
-  parameterChanged(mutation, mutRandom, event.type, (<KeyboardEvent>event).key)
+  parameterChanged(mutation, mutRandom, event.type, (<KeyboardEvent>event).key);
 };
 
 // document.addEventListener('DOMContentLoaded', function() {});
