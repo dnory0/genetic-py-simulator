@@ -22,4 +22,4 @@ npm start # starts the app
 
 ## Licence
 
-This project is under MIT Licence.
+This project is under the [MIT Licence](http://www.opensource.org/licenses/MIT).
