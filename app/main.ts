@@ -78,17 +78,21 @@ const createWindow = (
 
   targetWindow.once('ready-to-show', targetWindow.show);
 
-  targetWindow.on('close', () => {
+  targetWindow.once('closed', () => {
+    /**
+     * free targetWindow
+     */
+    targetWindow = null;
+
+    /**
+     * force views to be closed, to free memory
+     */
+    primaryView.destroy();
+    secondaryView.destroy();
     /**
      * exit the GA and kill spawned process, usually called on exit or reload app.
      */
     pyshell.stdin.write(`${JSON.stringify({ exit: true })}\n`);
-  });
-
-  targetWindow.once('closed', () => {
-    targetWindow = null;
-    primaryView.destroy();
-    secondaryView.destroy();
   });
   return targetWindow;
 };
@@ -318,9 +322,11 @@ app.once('ready', () => {
          */
         pyshell.stdin.write(`${JSON.stringify({ exit: true })}\n`);
         createPyshell();
-        mainWindow.webContents.reload();
-        primaryView.webContents.reload();
-        secondaryView.webContents.reload();
+        process.nextTick(() => {
+          mainWindow.webContents.reload();
+          primaryView.webContents.reload();
+          secondaryView.webContents.reload();
+        });
       }
     })
   );

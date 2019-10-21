@@ -186,7 +186,7 @@ pyshell.stdout.on('data', (response: Buffer) => {
     .toString()
     .split('\n')
     .forEach((args: string) => {
-      console.log(args);
+      // console.log(args);
       // sometimes args == ''(not sure why), those cases need to be ignored
       if (args) treatResponse(JSON.parse(args));
     });

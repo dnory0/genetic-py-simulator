@@ -261,12 +261,14 @@ class GAThread(threading.Thread):
             self.__stop_now = True
             # resume if paused to break out of running loop
             if self.paused:
+                to_json({
+                    "hi": True
+                })
                 # Notify so thread will wake after lock released
                 self.pause_cond.notify()
                 # Now release the lock
                 self.pause_cond.release()
                 self.paused = False
-            self.join()
 
 
 def to_json(word: dict):
@@ -371,6 +373,7 @@ while True:
     elif cmd.get('exit'):
         if ga_thread is not None:
             ga_thread.stop()
+        ga_thread.join()
         sys.exit(0)
     else:
         update_parameters(cmd)

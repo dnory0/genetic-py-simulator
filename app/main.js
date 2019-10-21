@@ -28,13 +28,11 @@ const createWindow = (filePath, { minWidth, minHeight, width, height, resizable,
     });
     targetWindow.loadFile(filePath);
     targetWindow.once('ready-to-show', targetWindow.show);
-    targetWindow.on('close', () => {
-        pyshell.stdin.write(`${JSON.stringify({ exit: true })}\n`);
-    });
     targetWindow.once('closed', () => {
         targetWindow = null;
         primaryView.destroy();
         secondaryView.destroy();
+        pyshell.stdin.write(`${JSON.stringify({ exit: true })}\n`);
     });
     return targetWindow;
 };
@@ -136,9 +134,11 @@ electron_1.app.once('ready', () => {
         click: () => {
             pyshell.stdin.write(`${JSON.stringify({ exit: true })}\n`);
             createPyshell();
-            mainWindow.webContents.reload();
-            primaryView.webContents.reload();
-            secondaryView.webContents.reload();
+            process.nextTick(() => {
+                mainWindow.webContents.reload();
+                primaryView.webContents.reload();
+                secondaryView.webContents.reload();
+            });
         }
     }));
     electron_1.Menu.setApplicationMenu(menubar);
