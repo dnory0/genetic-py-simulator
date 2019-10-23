@@ -11,7 +11,7 @@ import {
   IpcMainEvent
 } from 'electron';
 import { join } from 'path';
-import { existsSync, copyFileSync } from 'fs';
+import { existsSync, copyFileSync, writeFile } from 'fs';
 import { spawn, ChildProcess } from 'child_process';
 
 /**
@@ -333,3 +333,11 @@ app.once('ready', () => {
 
   Menu.setApplicationMenu(menubar);
 });
+
+writeFile(
+  join(__dirname, '..', 'settings.json'),
+  'test content 🚀🚀🚀🚀',
+  (error: NodeJS.ErrnoException) => {
+    if (error) throw error;
+  }
+);

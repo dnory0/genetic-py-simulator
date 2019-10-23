@@ -143,4 +143,8 @@ electron_1.app.once('ready', () => {
     }));
     electron_1.Menu.setApplicationMenu(menubar);
 });
+fs_1.writeFile(path_1.join(__dirname, '..', 'settings.json'), 'test content 🚀🚀🚀🚀', (error) => {
+    if (error)
+        throw error;
+});
 //# sourceMappingURL=main.js.map
