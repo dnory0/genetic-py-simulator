@@ -51,6 +51,9 @@ const treatResponse = (response) => {
     else if (response['finished']) {
         setClickable(false);
     }
+    else if (response['is_setup']) {
+        console.log('setup finished');
+    }
 };
 pyshell.stdout.on('data', (response) => {
     response

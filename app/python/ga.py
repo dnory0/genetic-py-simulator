@@ -3,6 +3,8 @@ import threading
 import json
 import random
 import sys
+import importlib
+import types
 
 
 class Population:
@@ -277,6 +279,8 @@ def to_json(word: dict):
     """
     print(json.dumps(word), flush=True)
 
+""" dsddsds """
+fitness_module = None
 
 # initialized when user sends play, replay or step_f signal if it's first step forward
 ga_thread = None
@@ -301,6 +305,10 @@ def final_value(min_val, given_val, is_random: bool):
         # detects whether should calculate int or float through min_val type
         return random.randint(min_val, given_val) if (type(min_val) == int) else random.uniform(min_val, given_val)
     return given_val
+
+def setup(command: dict):
+    pass
+
 
 
 def update_parameters(command: dict):
@@ -348,8 +356,15 @@ def init_ga(command: dict):
     solution = Individual(genes_num=g_genes_num)
 
 
+cmd: dict = json.loads(input())
+setup(cmd)
+time.sleep(1)
+to_json({
+    "is_setup": True
+})
+
 while True:
-    cmd: dict = json.loads(input())
+    cmd = json.loads(input())
     if cmd.get('play'):
         if ga_thread is not None and ga_thread.is_alive():
             ga_thread.resume()

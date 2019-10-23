@@ -178,6 +178,8 @@ const treatResponse = (response: object) => {
     setClickable();
   } else if (response['finished']) {
     setClickable(false);
+  } else if (response['is_setup']) {
+    console.log('setup finished');
   }
 };
 
