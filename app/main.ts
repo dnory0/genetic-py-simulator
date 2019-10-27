@@ -3,16 +3,10 @@ import {
   BrowserWindow,
   BrowserWindowConstructorOptions,
   Menu,
-  MenuItem,
-  BrowserView,
-  BrowserViewConstructorOptions,
-  Rectangle,
-  ipcMain,
-  IpcMainEvent
+  MenuItem
 } from 'electron';
 import { join } from 'path';
-import { existsSync, copyFileSync, writeFile } from 'fs';
-import { spawn, ChildProcess } from 'child_process';
+import { writeFile, mkdir } from 'fs';
 
 /**
  * set to true if app on development, false in production.
@@ -26,18 +20,9 @@ const isDev = app.getAppPath().indexOf('.asar') === -1;
  */
 let mainWindow: BrowserWindow;
 /**
- * primary Chart View (as progress Chart)
- */
-let primaryView: BrowserView;
-/**
- * most secondary Chart View (working on making it either most fittest/current fittest)
- */
-let secondaryView: BrowserView;
-
-/**
  * declared and initialized globally
  */
-let pyshell: ChildProcess;
+// let pyshell: ChildProcess;
 /**
  * @param filePath  string path to an HTML file relative to the root of your application
  * @param options   constructor options for the browser window returned
@@ -69,7 +54,8 @@ const createWindow = (
     frame,
     show: false,
     webPreferences: {
-      nodeIntegration,
+      webviewTag: true,
+      nodeIntegration: false,
       preload
     }
   });
@@ -83,155 +69,15 @@ const createWindow = (
      * free targetWindow
      */
     targetWindow = null;
-
-    /**
-     * force views to be closed, to free memory
-     */
-    primaryView.destroy();
-    secondaryView.destroy();
     /**
      * exit the GA and kill spawned process, usually called on exit or reload app.
      */
-    pyshell.stdin.write(`${JSON.stringify({ exit: true })}\n`);
+    // pyshell.stdin.write(`${JSON.stringify({ exit: true })}\n`);
   });
   return targetWindow;
 };
 
-/**
- * resizes browser view
- * @param targetView browser view to resize
- * @param bounds by default x & y are set to 0, width & height are set to mainWindow width & hight
- */
-const resizeView = (
-  targetView: BrowserView,
-  {
-    /**
-     * x of target view according to parent window
-     */
-    x = 0,
-    /**
-     * y of target view according to parent window
-     */
-    y = 0,
-    /**
-     * width of target view
-     */
-    width = mainWindow.getBounds().width,
-    /**
-     * height of target view
-     */
-    height = mainWindow.getBounds().height
-  } = {}
-) => {
-  targetView.setBounds({
-    x,
-    y,
-    width,
-    height
-  } as Rectangle);
-};
-
-/**
- * @param parentWindow  parent window of the returned view
- * @param filePath      string path to an HTML file relative to the root of your application
- * @param options       constructor options for the browser view returned
- */
-const createView = (
-  parentWindow: BrowserWindow,
-  filePath: string,
-  {
-    webPreferences: { preload, nodeIntegration }
-  }: BrowserViewConstructorOptions = {}
-) => {
-  /**
-   * view created with default preload and nodeIntegration
-   */
-  let targetView = new BrowserView({
-    webPreferences: {
-      preload,
-      nodeIntegration
-    }
-  });
-
-  // load file
-  targetView.webContents.loadFile(filePath);
-
-  // add to parent window
-  parentWindow.addBrowserView(targetView);
-
-  return targetView;
-};
-
-/**
- * initialize pyshell depending on the mode (development/production) and
- * platform (win32/linux)
- */
-const createPyshell = () => {
-  // if in development
-  if (isDev) {
-    // works with the script version
-    pyshell = spawn(`${process.platform == 'win32' ? 'python' : 'python3'}`, [
-      join(__dirname, 'python', 'ga.py')
-    ]);
-  } else {
-    /**
-     * path of executable/script to copy
-     */
-    let copyFrom: string;
-    /**
-     * temp directory which the executable/script is going to be copied to
-     */
-    let copyTo: string;
-    /**
-     * set to true if executable is available
-     */
-    let execExist = existsSync(
-      join(
-        __dirname,
-        'python',
-        'dist',
-        process.platform == 'win32'
-          ? join('win', 'ga.exe')
-          : join('linux', 'ga')
-      )
-    );
-
-    if (execExist) {
-      copyFrom = join(
-        __dirname,
-        'python',
-        'dist',
-        process.platform == 'win32'
-          ? join('win', 'ga.exe')
-          : join('linux', 'ga')
-      );
-      copyTo = join(
-        app.getPath('temp'),
-        process.platform == 'win32' ? 'ga.exe' : 'ga'
-      );
-    } else {
-      copyFrom = join(__dirname, 'python', 'ga.py');
-      copyTo = join(app.getPath('temp'), 'ga.py');
-    }
-    // works with the executable version
-    copyFileSync(copyFrom, copyTo);
-    pyshell = spawn(
-      execExist
-        ? copyTo
-        : `${process.platform == 'win32' ? 'python' : 'python3'}`,
-      execExist ? [] : [copyTo]
-    );
-  }
-  module.exports = pyshell;
-};
-
 app.once('ready', () => {
-  ipcMain.once('views-ready', (_event: IpcMainEvent) => {
-    mainWindow.webContents.send('views-ready');
-  });
-  /****************************** Pyshell part *****************************
-   *************************************************************************/
-  createPyshell();
   /****************************** Main Window ******************************
    *************************************************************************/
   mainWindow = createWindow(join('app', 'index.html'), {
@@ -253,91 +99,72 @@ app.once('ready', () => {
     mainWindow.setAutoHideMenuBar(false);
   });
 
-  /***************************** Browser Views *****************************
-   *************************************************************************/
-
-  /***************************** Primary View *****************************/
-  primaryView = createView(
-    mainWindow,
-    join('app', 'primary-chart', 'primary-chart.html'),
-    {
-      webPreferences: {
-        preload: join(__dirname, 'preload.js'),
-        nodeIntegration: false
-      }
-    }
-  );
-
-  // primaryView.webContents.toggleDevTools();
-
-  /****************************** Secondary View ******************************/
-
-  secondaryView = createView(
-    mainWindow,
-    join('app', 'secondary-chart', 'secondary-chart.html'),
-    {
-      webPreferences: {
-        preload: join(__dirname, 'preload.js'),
-        nodeIntegration: false
-      }
-    }
-  );
-
-  // secondaryView.webContents.toggleDevTools();
-
-  // if user resize window views must resize accordingly
-  ipcMain.on(
-    'resize',
-    (
-      _event: IpcMainEvent,
-      args: {
-        primary: Rectangle;
-        secondary: Rectangle;
-        zoom: number;
-      }
-    ) => {
-      resizeView(primaryView, args.primary);
-      resizeView(secondaryView, args.secondary);
-      primaryView.webContents.send('zoom', {
-        zoom: args.zoom
-      });
-      secondaryView.webContents.send('zoom', {
-        zoom: args.zoom
-      });
-      // console.log(args.zoom);
-    }
-  );
-
   const menubar = require('./menubar') as Menu;
+
   menubar.items[process.platform == 'darwin' ? 3 : 2].submenu.insert(
     0,
     new MenuItem({
       label: 'Reload',
       accelerator: 'CmdOrCtrl+R',
       click: () => {
-        /**
-         * stops the GA if user attemps reload while GA running
-         * recreating pyshell to avoid error of calling released function
-         * on renderer (error by far only appear on windows)
-         */
-        pyshell.stdin.write(`${JSON.stringify({ exit: true })}\n`);
-        createPyshell();
+        mainWindow.webContents.send('reload');
         process.nextTick(() => {
           mainWindow.webContents.reload();
-          primaryView.webContents.reload();
-          secondaryView.webContents.reload();
         });
       }
+    })
+  );
+
+  menubar.items[process.platform == 'darwin' ? 3 : 2].submenu.insert(
+    3,
+    new MenuItem({
+      label: 'Reset Zoom',
+      accelerator: 'CmdOrCtrl+num0',
+      click: () => mainWindow.webContents.send('zoom', '')
+    })
+  );
+
+  menubar.items[process.platform == 'darwin' ? 3 : 2].submenu.insert(
+    4,
+    new MenuItem({
+      label: 'Zoom In',
+      accelerator: 'CmdOrCtrl+numadd',
+      click: () => mainWindow.webContents.send('zoom', 'in')
+    })
+  );
+
+  menubar.items[process.platform == 'darwin' ? 3 : 2].submenu.insert(
+    5,
+    new MenuItem({
+      label: 'Zoom Out',
+      accelerator: 'CmdOrCtrl+numsub',
+      click: () => mainWindow.webContents.send('zoom', 'out')
+    })
+  );
+
+  menubar.items[process.platform == 'darwin' ? 3 : 2].submenu.insert(
+    6,
+    new MenuItem({
+      type: 'separator'
     })
   );
 
   Menu.setApplicationMenu(menubar);
 });
 
-writeFile(
-  join(__dirname, '..', 'settings.json'),
-  'test content 🚀🚀🚀🚀',
-  (error: NodeJS.ErrnoException) => {
-    if (error) throw error;
-  }
-);
+// writeFile(
+//   join(__dirname, '..', 'settings.json'),
+//   'test content 🚀🚀🚀🚀',
+//   (error: NodeJS.ErrnoException) => {
+//     if (error) throw error;
+//   }
+// );
+
+// mkdir(
+//   isDev
+//     ? join(__dirname, '..', 'libs')
+//     : join(__dirname, '..', '..', '..', 'libs'),
+//   (error: NodeJS.ErrnoException) => {
+//     if (error && error.errno != -17) throw error;
+//   }
+// );

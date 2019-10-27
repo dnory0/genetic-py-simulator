@@ -1,95 +1,23 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const highcharts_1 = require("highcharts");
 const electron_1 = require("electron");
-const pyshell = require('electron').remote.require('./main');
-window.createChart = (containerId, options) => {
-    return highcharts_1.chart(containerId, {
-        title: {
-            text: options.title.text,
-            style: {
-                padding: '80px'
-            }
-        },
-        xAxis: {
-            title: {
-                text: options.xAxis.title.text,
-                align: 'high'
-            }
-        },
-        yAxis: {
-            title: {
-                text: options.yAxis.title.text,
-                align: 'high',
-                rotation: 0,
-                y: -20,
-                x: -5,
-                offset: -35
-            }
-        },
-        series: options.series,
-        plotOptions: {
-            series: {
-                animation: false,
-                states: {
-                    hover: {
-                        halo: {
-                            opacity: 0
-                        }
-                    }
-                }
-            }
-        },
-        legend: {
-            enabled: false
-        },
-        credits: {
-            enabled: false
-        }
-    });
-};
-window.webFrame = electron_1.webFrame;
-window.ipcRenderer = electron_1.ipcRenderer;
-window.enableChartHover = (enable, chart) => {
-    chart.options.tooltip.enabled = enable;
-    chart.update({
-        plotOptions: {
-            series: {
-                marker: {
-                    enabled: enable,
-                    radius: enable ? 2 : null
-                },
-                states: {
-                    hover: {
-                        halo: {
-                            opacity: enable ? 0.5 : 0
-                        }
-                    }
-                }
-            }
-        }
-    });
-};
-window.clearChart = (chart, categories = false) => {
-    if (categories)
-        chart.xAxis[0].setCategories([]);
-    chart.series[0].setData([], true);
-};
-window.pyshell = pyshell;
-window.mostFittest = { fitness: -1 };
-window.play = () => {
+window['ipcRenderer'] = electron_1.ipcRenderer;
+window['webFrame'] = electron_1.webFrame;
+const pyshell = require('./create-pyshell')(electron_1.remote.app);
+window['pyshell'] = pyshell;
+window['play'] = () => {
     pyshell.stdin.write(`${JSON.stringify({ play: true })}\n`);
 };
-window.pause = () => {
+window['pause'] = () => {
     pyshell.stdin.write(`${JSON.stringify({ pause: true })}\n`);
 };
-window.stop = () => {
+window['stop'] = () => {
     pyshell.stdin.write(`${JSON.stringify({ stop: true })}\n`);
 };
-window.replay = () => {
+window['replay'] = () => {
     pyshell.stdin.write(`${JSON.stringify({ replay: true })}\n`);
 };
-window.stepForward = () => {
+window['stepForward'] = () => {
     pyshell.stdin.write(`${JSON.stringify({ step_f: true })}\n`);
 };
 //# sourceMappingURL=preload.js.map

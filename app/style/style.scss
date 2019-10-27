@@ -16,49 +16,20 @@ body {
   margin: 0;
   padding: 0;
   overflow: hidden;
+  height: 100%;
 }
 
-.main {
-  padding: 0;
-  margin: 0;
-  overflow: hidden;
-  height: 100vh;
-  // background-color: #e8e8e8;
+#main {
+  pointer-events: none;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.2s;
 
-  // .charts-container {
-  //   height: calc(100% - 100px);
-  //   // background-color: #f36868;
-
-  //   #progress-chart {
-  //     padding: 0;
-  //     position: relative;
-  //     height: 60%;
-  //   }
-
-  //   #genes-charts-container {
-  //     // display: none;
-  //     height: 40%;
-  //     padding: 0;
-  //     margin: 0;
-
-  //     > div {
-  //       position: relative;
-  //       height: 100%;
-  //       width: 50%;
-  //       padding: 0;
-  //       margin: 0;
-  //     }
-  //   }
-  // }
   .primary-container {
     background-color: #fff;
     height: calc(50% + 13px);
-    padding: 0 4px;
-
-    .border-container {
-      border-bottom: 1px solid #a37e7e;
-      height: 100%;
-    }
+    border-bottom: 1px solid #8d7272;
+    box-sizing: border-box;
   }
 
   .middle-container {
@@ -67,10 +38,13 @@ body {
 
     .controls-container {
       flex: 1;
-      width: 50vw;
+      width: 50%;
       text-align: center;
+      border-right: 1px solid #8d7272;
 
       .state-controls-container {
+        // pointer-events: none;
+        // opacity: 0.6;
         margin-top: 4px;
         width: fit-content;
         position: absolute;
@@ -119,6 +93,8 @@ body {
         overflow-y: auto;
 
         .parameters {
+          // pointer-events: none;
+          // opacity: 0.6;
           height: 200px;
 
           .parameter {
@@ -167,7 +143,6 @@ body {
                   position: absolute;
                   top: 0;
                   left: 0;
-                  z-index: 2;
                 }
 
                 input[type='checkbox'] + label {
@@ -179,7 +154,6 @@ body {
                   position: absolute;
                   top: 0;
                   left: 0;
-                  z-index: 1;
                   opacity: 0.5;
                 }
 
@@ -236,26 +210,19 @@ body {
 
     .secondary-container {
       flex: 1;
-      padding: 4px 0;
-
-      .border-container {
-        border-left: 1px solid #a37e7e;
-        height: 100%;
-      }
+      height: 100%;
+      overflow-y: hidden;
     }
   }
 
   .bottom-bar-container {
+    border-top: 1px solid #8d7272;
     height: 24px;
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
     padding: 0 4px;
-
-    .border-container {
-      border-top: 1px solid #a37e7e;
-      height: 100%;
-    }
+    box-sizing: border-box;
   }
 }

@@ -1,6 +1,5 @@
-import { Options, Chart, SeriesLineOptions } from 'highcharts';
-import { ChildProcess } from 'child_process';
-import { IpcRenderer, WebFrame, IpcRendererEvent } from 'electron';
+import { Chart, SeriesLineOptions } from 'highcharts';
+import { IpcRendererEvent, IpcRenderer } from 'electron';
 
 /****************************** passed by preload ******************************
  *******************************************************************************/
@@ -9,46 +8,23 @@ import { IpcRenderer, WebFrame, IpcRendererEvent } from 'electron';
  * allows sending resizing information to main process to resize primary &
  * secondary view
  */
-const ipcRenderer: IpcRenderer = (<any>window).ipcRenderer;
-
-/**
- * needed to extract the value of the current frame zoom level, default is 0,
- * and each zoom in/out is addition/minus of 0.5 respectively.
- */
-const webFrame: WebFrame = (<any>window).webFrame;
-
-/**
- * python process that executes GA
- */
-let pyshell: ChildProcess = (<any>window).pyshell;
-
-/**
- * initialize a chart and pass it options
- * @param containerId id of html div tag that is going to contain chart
- * @param options chart options, see Highcharts.Options
- *
- * @returns set up chart
- */
-const createChart: (containerId: string, options: Options) => Chart = (<any>(
-  window
-)).createChart;
+const ipcRenderer: IpcRenderer = window['ipcRenderer'];
 
 /**
  * enables or disable the hover settings for the passed chart
  * @param enable decides if to disable hover settings or enable them.
  * @param chart chart to apply hover settings on
  */
-const enableChartHover: (enable: boolean, chart: Highcharts.Chart) => void = (<
-  any
->window).enableChartHover;
+const enableChartHover: (enable: boolean, chart: Highcharts.Chart) => void =
+  window['enableChartHover'];
 
 /**
  * clears chart data and xAxis if needed and redraw instantly
  * @param chart chart to clear its data and xAxis
  * @param categories whether to clear categories, default is false
  */
-const clearChart: (chart: Chart, categories?: boolean) => void = (<any>window)
-  .clearChart;
+const clearChart: (chart: Chart, categories?: boolean) => void =
+  window['clearChart'];
 
 /**
  * figure out what response stands for and act uppon it
@@ -72,7 +48,7 @@ const treatResponse = (response: object) => {
     clearChart(primaryChart);
     // disable points on hover on chart
     enableChartHover(false, primaryChart);
-  } else if (response['paused'] || response['finished'])
+  } else if (response['paused'] || response['finished'] || response['stopped'])
     enableChartHover(true, primaryChart);
   else if (response['resumed']) enableChartHover(false, primaryChart);
 };
@@ -80,7 +56,7 @@ const treatResponse = (response: object) => {
 /**
  * updated every generation, receives the generation with its fittest fitness
  */
-let primaryChart = createChart('primary-chart', {
+let primaryChart = window['createChart']('primary-chart', {
   chart: {
     type: 'line'
   },
@@ -105,26 +81,18 @@ let primaryChart = createChart('primary-chart', {
   ] as SeriesLineOptions[]
 });
 
-pyshell.stdout.on('data', (response: Buffer) => {
-  response
+/**
+ * an array of for every generation fittest genes
+ */
+// window['fittestHistory'] = [];
+
+ipcRenderer.on('data', (_event: IpcRendererEvent, data: Buffer) => {
+  data
     .toString()
     .split('\n')
-    .forEach((args: string) => {
+    .forEach(args => {
       // console.log(args);
       // sometimes args == ''(not sure why), those cases need to be ignored
       if (args) treatResponse(JSON.parse(args));
     });
 });
-
-/**
- * receives zoom signal to update window/view size to maintain same size as
- * the main window
- */
-ipcRenderer.on('zoom', (_event: IpcRendererEvent, args: { zoom: number }) => {
-  webFrame.setZoomLevel(args.zoom);
-});
-
-/**
- * reset zoom level on first load or reload
- */
-webFrame.setZoomLevel(0);

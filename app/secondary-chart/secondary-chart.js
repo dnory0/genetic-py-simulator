@@ -1,13 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const ipcRenderer = window.ipcRenderer;
-const webFrame = window.webFrame;
-let pyshell = window.pyshell;
-let mostFittest = window.mostFittest;
-const createChart = (window).createChart;
-const enableChartHover = window.enableChartHover;
-const clearChart = window
-    .clearChart;
+const ipcRenderer = window['ipcRenderer'];
+let mostFittest = { fitness: -1, individuals: null };
+const enableChartHover = window['enableChartHover'];
+const clearChart = window['clearChart'];
 const treatResponse = (response) => {
     if (response['generation'] !== undefined &&
         response['fitness'] !== undefined &&
@@ -36,12 +32,12 @@ const treatResponse = (response) => {
         secondaryChart.xAxis[0].setCategories([...Array(response['genesNum']).keys()].map(v => `${++v}`));
         enableChartHover(false, secondaryChart);
     }
-    else if (response['paused'] || response['finished'])
+    else if (response['paused'] || response['finished'] || response['stopped'])
         enableChartHover(true, secondaryChart);
     else if (response['resumed'])
         enableChartHover(false, secondaryChart);
 };
-let secondaryChart = createChart('secondary-chart', {
+let secondaryChart = window['createChart']('secondary-chart', {
     chart: {
         type: 'line'
     },
@@ -64,7 +60,7 @@ let secondaryChart = createChart('secondary-chart', {
         }
     ]
 });
-pyshell.stdout.on('data', (response) => {
+ipcRenderer.on('data', (_event, response) => {
     response
         .toString()
         .split('\n')
@@ -73,9 +69,4 @@ pyshell.stdout.on('data', (response) => {
             treatResponse(JSON.parse(args));
     });
 });
-ipcRenderer.send('views-ready');
-ipcRenderer.on('zoom', (_event, args) => {
-    webFrame.setZoomLevel(args.zoom);
-});
-webFrame.setZoomLevel(0);
 //# sourceMappingURL=secondary-chart.js.map

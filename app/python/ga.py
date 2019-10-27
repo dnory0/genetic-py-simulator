@@ -156,21 +156,27 @@ class GAThread(threading.Thread):
         # check before entering evolution loop if pause event
         #  was fired before hitting start
         self.__pause_check()
-        while not self.__stop_now:
+        while True:
             Evolve.evolve_population(pop)
+            # if g_delay is 0 than just ignore it
+            if g_delay:
+                time.sleep(g_delay)
+
+            # pause check, moved down to avoid another iteration if stop event
+            # was triggered after a pause event
+            self.__pause_check()
+
+            # stopped event, seperating finished naturally (if there is valid
+            # solution) from being forcefully stopped
+            if self.__stop_now:
+                to_json({"stopped": True})
+                return
+
             to_json({
                 "fitness": pop.fittest().fitness(),
                 "generation": pop.generation,
                 "genes": pop.fittest().genes
             })
-
-            # if g_sleep is 0 than just ignore it
-            if g_sleep:
-                time.sleep(g_sleep)
-
-            # pause check, moved down to avoid another iteration if stop event
-            # was triggered after a pause event
-            self.__pause_check()
 
         # finished event
         to_json({"finished": True})
@@ -263,9 +269,6 @@ class GAThread(threading.Thread):
             self.__stop_now = True
             # resume if paused to break out of running loop
             if self.paused:
-                to_json({
-                    "hi": True
-                })
                 # Notify so thread will wake after lock released
                 self.pause_cond.notify()
                 # Now release the lock
@@ -289,13 +292,13 @@ solution = None
 # global settings, changed every time user passes them
 g_crossover_rate = .5
 g_mutation_rate = .06
-g_sleep = 0
+g_delay = 0
 
 # initialized every time GA is initialized,
 # if user passes them after GA started it will do nothing
 g_pop_size = int(sys.argv[1]) if len(sys.argv) > 1 else random.randint(1, 500)
 g_genes_num = int(sys.argv[2]) if len(sys.argv) > 2 else random.randint(1, 200)
-g_sleep = int(sys.argv[3]) if len(sys.argv) > 3 else g_sleep
+g_delay = int(sys.argv[3]) if len(sys.argv) > 3 else g_delay
 
 def final_value(min_val, given_val, is_random: bool):
     """ called when a signal is received, if random flag set to True it will return
@@ -318,6 +321,7 @@ def update_parameters(command: dict):
     global g_genes_num
     global g_crossover_rate
     global g_mutation_rate
+    global g_delay
     if command.get('pop_size'):
         # population size
         g_pop_size = final_value(1, command.get('pop_size'), command.get('random_pop_size'))
@@ -330,10 +334,9 @@ def update_parameters(command: dict):
     if type(command.get('mutation_rate')) is not type(None):
         # mutation rate change, can be 0
         g_mutation_rate = round(final_value(.0, command.get('mutation_rate'), command.get('random_mutation_rate')), 3)
-    if type(command.get('sleep')) is not type(None):
+    if type(command.get('delay_rate')) is not type(None):
         # sleep in seconds
-        global g_sleep
-        g_sleep = command.get('sleep') or 0.05
+        g_delay = round(final_value(.0, command.get('delay_rate'), command.get('random_delay_rate')), 2)
     # to_json({
     #     "pop": g_pop_size,
     #     "rnPop": command.get('random_pop_size'),
@@ -343,6 +346,8 @@ def update_parameters(command: dict):
     #     "rnCO": command.get('random_crossover_rate'),
     #     "mutation": g_mutation_rate,
     #     "rnMut": command.get('random_mutation_rate')
+    #     "delay": g_delay_rate,
+    #     "rnDelay": command.get('random_mutation_rate')
     # })
 
 
@@ -356,12 +361,12 @@ def init_ga(command: dict):
     solution = Individual(genes_num=g_genes_num)
 
 
-cmd: dict = json.loads(input())
-setup(cmd)
-time.sleep(1)
-to_json({
-    "is_setup": True
-})
+# cmd: dict = json.loads(input())
+# setup(cmd)
+# time.sleep(1)
+# to_json({
+#     "is_setup": True
+# })
 
 while True:
     cmd = json.loads(input())

@@ -1,48 +1,56 @@
-// import * as Highcharts from 'highcharts';
 import { ChildProcess } from 'child_process';
-import { WebFrame, IpcRenderer } from 'electron';
+import { IpcRenderer, WebviewTag, IpcRendererEvent, WebFrame } from 'electron';
 
 /***************************** passed by preload *****************************
  *****************************************************************************/
 /**
  * python process that executes GA
  */
-let pyshell: ChildProcess = (<any>window).pyshell;
+let pyshell: ChildProcess = window['pyshell'];
+/**
+ * used to listen to zoom channel for wain process to send zoom in/out/reset.
+ */
+let ipcRenderer: IpcRenderer = window['ipcRenderer'];
+/**
+ * used to resize window
+ */
+let webFrame: WebFrame = window['webFrame'];
+
+/***************************** Views Declaration *****************************
+ *****************************************************************************/
+/**
+ * webview hosting primary chart
+ */
+const primary: WebviewTag = <any>document.getElementById('primary-chart');
 
 /**
- * needed to extract the value of the current frame zoom level, default is 0,
- * and each zoom in/out is addition/minus of 0.5 respectively.
+ * webview hosting secondary chart
  */
-const webFrame: WebFrame = (<any>window).webFrame;
+const secondary: WebviewTag = <any>document.getElementById('secondary-chart');
 
-/**
- * allows sending resizing information to main process to resize primary &
- * secondary view
- */
-const ipcRenderer: IpcRenderer = (<any>window).ipcRenderer;
 /************************** GA States Changers part **************************/
 /**
- * send play to GA, python side is responsible for whether to start GA for first time are just resume
+ * send play to GA, python side is responsible for whether to start GA for first time or just resume
  *
  * disables hover settings for charts
  */
-const play: () => void = (<any>window).play;
+const play: () => void = window['play'];
 /**
  * send pause to GA, enables hover settings for charts
  */
-const pause: () => void = (<any>window).pause;
+const pause: () => void = window['pause'];
 /**
  * send stop to GA, enables hover settings for charts
  */
-const stop: () => void = (<any>window).stop;
+const stop: () => void = window['stop'];
 /**
  * stops current GA and launches new one, disables hover settings for charts in case enabled
  */
-const replay: () => void = (<any>window).replay;
+const replay: () => void = window['replay'];
 /**
  * send step forward to GA, pyshell pauses GA if needed, enables tooltip for charts in case disabled
  */
-const stepForward: () => void = (<any>window).stepForward;
+const stepForward: () => void = window['stepForward'];
 
 /************************************ GUI ************************************
  *****************************************************************************/
@@ -112,54 +120,16 @@ let mutation = <HTMLInputElement>document.getElementById('mutation-rate');
 let mutRandom = <HTMLInputElement>(
   document.getElementById('random-mutation-rate')
 );
-
-/******************************* Views Containers ********************************/
-
 /**
- * the holder of the space occupied by primary chart view
+ * delay rate, range of [0,1]
  */
-const prime = <HTMLDivElement>document.querySelector('.primary-container');
-
+let delay = <HTMLInputElement>document.getElementById('delay-rate');
 /**
- * the holder of the space occupied by secondary chart view
+ * by Default set to false
  */
-const second = <HTMLDivElement>document.querySelector('.secondary-container');
-
-/**
- * sends resize signal to main process, with primary & secondary position info, zoom
- * level of the window.
- */
-const resizeReporter = () => {
-  ipcRenderer.send('resize', {
-    primary: {
-      x: Math.floor(prime.getBoundingClientRect().left),
-      y: Math.floor(prime.getBoundingClientRect().top),
-      width: Math.floor(prime.offsetWidth * webFrame.getZoomFactor()),
-      height: Math.floor(prime.offsetHeight * webFrame.getZoomFactor())
-    },
-    secondary: {
-      x: Math.floor(
-        second.getBoundingClientRect().left * webFrame.getZoomFactor() + 2
-      ),
-      y: Math.floor(
-        second.getBoundingClientRect().top * webFrame.getZoomFactor() + 2
-      ),
-      width: Math.floor(
-        second.getBoundingClientRect().width * webFrame.getZoomFactor() - 2
-      ),
-      height: Math.floor(
-        second.getBoundingClientRect().height * webFrame.getZoomFactor() - 2
-      )
-    },
-    zoom: webFrame.getZoomLevel()
-  });
-};
-
-window.onresize = () => {
-  setTimeout(resizeReporter, 40);
-};
-
-ipcRenderer.once('views-ready', resizeReporter);
+let delayRandom = <HTMLInputElement>(
+  document.getElementById('random-delay-rate')
+);
 
 /****************************** Python Part ******************************/
 
@@ -178,21 +148,13 @@ const treatResponse = (response: object) => {
     setClickable();
   } else if (response['finished']) {
     setClickable(false);
+    blinkPlayBtn();
+  } else if (response['stopped']) {
+    setClickable(false);
   } else if (response['is_setup']) {
     console.log('setup finished');
   }
 };
-
-pyshell.stdout.on('data', (response: Buffer) => {
-  response
-    .toString()
-    .split('\n')
-    .forEach((args: string) => {
-      // console.log(args);
-      // sometimes args == ''(not sure why), those cases need to be ignored
-      if (args) treatResponse(JSON.parse(args));
-    });
-});
 
 /************************ GUI & Buttons Configuration ************************
  *****************************************************************************/
@@ -213,7 +175,10 @@ const switchBtn = () => {
 };
 
 /**
- * Set buttons (except play/pause button) clickable or not. Default is true.
+ * Set buttons clickable or not. Default is true.
+ *
+ * Note: doesn't effect play/pause and step forward button, which means
+ * that they are always enabled
  */
 const setClickable = (clickable = true) => {
   Array.from(document.querySelector('.state-controls').children).forEach(
@@ -234,28 +199,34 @@ const setClickable = (clickable = true) => {
  * clicks the playBtn, pressing playBtn will restart the GA, to avoid that
  * the playBtn is disabled for .4s and than enabled
  */
-// const blinkPlayBtn = () => {
-//   playBtn.classList.add('disabled-btn');
-//   playBtn.disabled = true;
-//   setTimeout(() => {
-//     playBtn.classList.remove('disabled-btn');
-//     playBtn.disabled = false;
-//   }, 400);
-// };
+const blinkPlayBtn = () => {
+  playBtn.classList.add('disabled-btn');
+  playBtn.disabled = true;
+  setTimeout(() => {
+    playBtn.classList.remove('disabled-btn');
+    playBtn.disabled = false;
+  }, 400);
+};
 
+/**
+ * adjust primary & secondary webviws to body's zoom
+ */
+let zoomViews = () => {};
+
+/*********************** Buttons Click Event Handling ***********************/
 /**
  * play and pause the pyshell when clicked with switching
  * the button image, if pyshell = undefined/null it initialize
  * a pyshell to start running and enable disabled buttons.
  */
 playBtn.onclick = () => {
+  if (isRunning) {
+    pause();
+  } else {
+    play();
+  }
   // isRunning switched
   isRunning = !isRunning;
-  if (isRunning) {
-    play();
-  } else {
-    pause();
-  }
   switchBtn();
 };
 
@@ -281,6 +252,51 @@ stepFBtn.onclick = () => {
   isRunning = false;
   // switch to paused state
   switchBtn();
+};
+
+/********************************* Views Setup *********************************/
+/**
+ * unlock controls and parameters adjusting for user, also set pyshell communication.
+ * triggered after both webviews finish loading.
+ */
+let setReady = () => {
+  setTimeout(() => {
+    // console.log(primary.isLoading());
+    // console.log(secondary.isLoading());
+    if (!(primary.isLoading() || secondary.isLoading())) {
+      pyshell.stdout.on('data', (response: Buffer) => {
+        secondary.send('data', response);
+        primary.send('data', response);
+        response
+          .toString()
+          .split('\n')
+          .forEach((args: string) => {
+            // console.log(args);
+            // sometimes args == ''(not sure why), those cases need to be ignored
+            if (args) treatResponse(JSON.parse(args));
+          });
+      });
+      /**
+       * function is implemented after both webviews are fully loaded,
+       */
+      zoomViews = () => {
+        primary.setZoomFactor(webFrame.getZoomFactor());
+        secondary.setZoomFactor(webFrame.getZoomFactor());
+      };
+
+      zoomViews();
+      document.getElementById('loading-bg').style.opacity = '0';
+      document.getElementById('main').style.opacity = '1';
+      document.getElementById('main').style.pointerEvents = 'inherit';
+      setTimeout(() => {
+        document.body.removeChild(document.getElementById('loading-bg'));
+      }, 0.2);
+      // primary.getWebContents().openDevTools();
+      // secondary.getWebContents().openDevTools();
+    }
+    // hopefully free some memory space
+    setReady = undefined;
+  }, 0);
 };
 
 /**************************** Inputs Event handling ****************************/
@@ -321,25 +337,76 @@ const parameterChanged = (
   } else numInput.style.backgroundColor = '#ff5a5a';
 };
 
-popSize.onkeyup = popSize.onchange = pSRandom.onchange = (event: Event) => {
-  parameterChanged(popSize, pSRandom, event.type, (<KeyboardEvent>event).key);
-};
+document.addEventListener('DOMContentLoaded', function() {
+  /**
+   * whichever did finsh loading last is going to unlock controls for user,
+   */
+  primary.addEventListener('did-finish-load', setReady);
+  secondary.addEventListener('did-finish-load', setReady);
 
-genesNum.onkeyup = genesNum.onchange = gNRandom.onchange = (event: Event) => {
-  parameterChanged(genesNum, gNRandom, event.type, (<KeyboardEvent>event).key);
-};
+  /**
+   * listen to parameters inputs change & keyup events
+   */
+  popSize.onkeyup = popSize.onchange = pSRandom.onchange = (event: Event) => {
+    parameterChanged(popSize, pSRandom, event.type, (<KeyboardEvent>event).key);
+  };
+  genesNum.onkeyup = genesNum.onchange = gNRandom.onchange = (event: Event) => {
+    parameterChanged(
+      genesNum,
+      gNRandom,
+      event.type,
+      (<KeyboardEvent>event).key
+    );
+  };
 
-crossover.onkeyup = crossover.onchange = coRandom.onchange = (event: Event) => {
-  parameterChanged(crossover, coRandom, event.type, (<KeyboardEvent>event).key);
-};
+  crossover.onkeyup = crossover.onchange = coRandom.onchange = (
+    event: Event
+  ) => {
+    parameterChanged(
+      crossover,
+      coRandom,
+      event.type,
+      (<KeyboardEvent>event).key
+    );
+  };
 
-mutation.onkeyup = mutation.onchange = mutRandom.onchange = (event: Event) => {
-  parameterChanged(mutation, mutRandom, event.type, (<KeyboardEvent>event).key);
-};
+  mutation.onkeyup = mutation.onchange = mutRandom.onchange = (
+    event: Event
+  ) => {
+    parameterChanged(
+      mutation,
+      mutRandom,
+      event.type,
+      (<KeyboardEvent>event).key
+    );
+  };
 
-// document.addEventListener('DOMContentLoaded', function() {});
+  delay.onkeyup = delay.onchange = delayRandom.onchange = (event: Event) => {
+    parameterChanged(
+      delay,
+      delayRandom,
+      event.type,
+      (<KeyboardEvent>event).key
+    );
+  };
 
-/**
- * reset zoom level on first load or reload
- */
-webFrame.setZoomLevel(0);
+  ipcRenderer.on('zoom', (_event: IpcRendererEvent, type: string) => {
+    if (type == 'in') {
+      if (webFrame.getZoomFactor() < 2)
+        webFrame.setZoomFactor(webFrame.getZoomFactor() + 0.1);
+    } else if (type == 'out') {
+      if (webFrame.getZoomFactor() > 0.6)
+        webFrame.setZoomFactor(webFrame.getZoomFactor() - 0.1);
+    } else {
+      webFrame.setZoomFactor(1);
+    }
+    zoomViews();
+  });
+
+  /**
+   * terminate pyshell process with its threads on close or reload
+   */
+  window.addEventListener('beforeunload', () => {
+    pyshell.stdin.write(`${JSON.stringify({ exit: true })}\n`);
+  });
+});

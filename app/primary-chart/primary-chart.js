@@ -1,12 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const ipcRenderer = window.ipcRenderer;
-const webFrame = window.webFrame;
-let pyshell = window.pyshell;
-const createChart = (window).createChart;
-const enableChartHover = window.enableChartHover;
-const clearChart = window
-    .clearChart;
+const ipcRenderer = window['ipcRenderer'];
+const enableChartHover = window['enableChartHover'];
+const clearChart = window['clearChart'];
 const treatResponse = (response) => {
     if (response['generation'] !== undefined &&
         response['fitness'] !== undefined &&
@@ -17,12 +13,12 @@ const treatResponse = (response) => {
         clearChart(primaryChart);
         enableChartHover(false, primaryChart);
     }
-    else if (response['paused'] || response['finished'])
+    else if (response['paused'] || response['finished'] || response['stopped'])
         enableChartHover(true, primaryChart);
     else if (response['resumed'])
         enableChartHover(false, primaryChart);
 };
-let primaryChart = createChart('primary-chart', {
+let primaryChart = window['createChart']('primary-chart', {
     chart: {
         type: 'line'
     },
@@ -46,17 +42,13 @@ let primaryChart = createChart('primary-chart', {
         }
     ]
 });
-pyshell.stdout.on('data', (response) => {
-    response
+ipcRenderer.on('data', (_event, data) => {
+    data
         .toString()
         .split('\n')
-        .forEach((args) => {
+        .forEach(args => {
         if (args)
             treatResponse(JSON.parse(args));
     });
 });
-ipcRenderer.on('zoom', (_event, args) => {
-    webFrame.setZoomLevel(args.zoom);
-});
-webFrame.setZoomLevel(0);
 //# sourceMappingURL=primary-chart.js.map

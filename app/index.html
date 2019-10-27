@@ -8,9 +8,27 @@
   </head>
 
   <body>
-    <div class="main">
+    <div
+      id="loading-bg"
+      style="height: 100%; text-align: center; position: absolute; transition: opacity 0.2s; height: 100%; width: 100%;"
+    >
+      <img
+        src="img/loading-bg.gif"
+        alt="Loading..."
+        style="height: 40vh; margin: auto; margin-top: 30vh;"
+      />
+    </div>
+    <div id="main">
       <div class="primary-container">
-        <div class="border-container"></div>
+        <webview
+          id="primary-chart"
+          src="primary-chart/primary-chart.html"
+          autosize="on"
+          style="width: 100%; height: 100%;"
+          allowtransparency
+          nodeintegration
+          preload="chart-preload"
+        ></webview>
       </div>
       <div class="middle-container">
         <div class="controls-container">
@@ -58,7 +76,11 @@
                 />
                 <div class="checkbox_wrapper">
                   <div class="hover_wrapper" title="random">
-                    <input type="checkbox" name="random_pop_size" id="random-pop-size" />
+                    <input
+                      type="checkbox"
+                      name="random_pop_size"
+                      id="random-pop-size"
+                    />
                     <label for="random-pop-size"></label>
                   </div>
                 </div>
@@ -74,7 +96,11 @@
                 />
                 <div class="checkbox_wrapper">
                   <div class="hover_wrapper" title="random">
-                    <input type="checkbox" name="random_genes_num" id="random-genes-num" />
+                    <input
+                      type="checkbox"
+                      name="random_genes_num"
+                      id="random-genes-num"
+                    />
                     <label for="random-genes-num"></label>
                   </div>
                 </div>
@@ -91,7 +117,11 @@
                 />
                 <div class="checkbox_wrapper">
                   <div class="hover_wrapper" title="random">
-                    <input type="checkbox" name="random_crossover_rate" id="random-crossover-rate" />
+                    <input
+                      type="checkbox"
+                      name="random_crossover_rate"
+                      id="random-crossover-rate"
+                    />
                     <label for="random-crossover-rate"></label>
                   </div>
                 </div>
@@ -108,7 +138,11 @@
                 />
                 <div class="checkbox_wrapper">
                   <div class="hover_wrapper" title="random">
-                    <input type="checkbox" name="random_mutation_rate" id="random-mutation-rate" />
+                    <input
+                      type="checkbox"
+                      name="random_mutation_rate"
+                      id="random-mutation-rate"
+                    />
                     <label for="random-mutation-rate"></label>
                   </div>
                 </div>
@@ -125,7 +159,11 @@
                 />
                 <div class="checkbox_wrapper">
                   <div class="hover_wrapper" title="random">
-                    <input type="checkbox" name="random_delay_rate" id="random-delay-rate" />
+                    <input
+                      type="checkbox"
+                      name="random_delay_rate"
+                      id="random-delay-rate"
+                    />
                     <label for="random-delay-rate"></label>
                   </div>
                 </div>
@@ -134,12 +172,18 @@
           </div>
         </div>
         <div class="secondary-container">
-          <div class="border-container"></div>
+          <webview
+            id="secondary-chart"
+            src="secondary-chart/secondary-chart.html"
+            autosize="on"
+            style="width: 100%; height: 100%;"
+            allowtransparency
+            nodeintegration
+            preload="chart-preload"
+          ></webview>
         </div>
       </div>
-      <div class="bottom-bar-container">
-        <div class="border-container"></div>
-      </div>
+      <div class="bottom-bar-container"></div>
     </div>
     <script>
       let exports = {};

@@ -1,66 +1,42 @@
-import { Options, Chart, SeriesLineOptions } from 'highcharts';
-import { ChildProcess } from 'child_process';
-import { IpcRenderer, IpcRendererEvent, WebFrame } from 'electron';
+import { Chart, SeriesLineOptions } from 'highcharts';
+import { IpcRenderer, IpcRendererEvent } from 'electron';
 
 /****************************** passed by preload ******************************
  *******************************************************************************/
 
 /**
- * allows sending resizing information to main process to resize primary &
- * secondary view
+ * allows communication between this webview & renderer process
  */
-const ipcRenderer: IpcRenderer = (<any>window).ipcRenderer;
-
-/**
- * needed to extract the value of the current frame zoom level, default is 0,
- * and each zoom in/out is addition/minus of 0.5 respectively.
- */
-const webFrame: WebFrame = (<any>window).webFrame;
-
-/**
- * python process that executes GA
- */
-let pyshell: ChildProcess = (<any>window).pyshell;
+const ipcRenderer: IpcRenderer = window['ipcRenderer'];
 
 /**
  * an object that holds most fittest fitness with an array of their genes
  */
 let mostFittest: {
   fitness: number;
-  individuals?: [
+  individuals: [
     {
       generation: number;
       genes: any[];
     }
   ];
-} = (<any>window).mostFittest;
-/**
- * initialize a chart and pass it options
- * @param containerId id of html div tag that is going to contain chart
- * @param options chart options, see Highcharts.Options
- *
- * @returns set up chart
- */
-const createChart: (containerId: string, options: Options) => Chart = (<any>(
-  window
-)).createChart;
+} = { fitness: -1, individuals: null };
 
 /**
  * enables or disable the hover settings for the passed chart
  * @param enable decides if to disable hover settings or enable them.
  * @param chart chart to apply hover settings on
  */
-const enableChartHover: (enable: boolean, chart: Highcharts.Chart) => void = (<
-  any
->window).enableChartHover;
+const enableChartHover: (enable: boolean, chart: Highcharts.Chart) => void =
+  window['enableChartHover'];
 
 /**
  * clears chart data and xAxis if needed and redraw instantly
  * @param chart chart to clear its data and xAxis
  * @param categories whether to clear categories, default is false
  */
-const clearChart: (chart: Chart, categories?: boolean) => void = (<any>window)
-  .clearChart;
+const clearChart: (chart: Chart, categories?: boolean) => void =
+  window['clearChart'];
 
 /**
  * figure out what response stands for and act uppon it
@@ -106,18 +82,18 @@ const treatResponse = (response: object) => {
     );
     // disable points on hover on chart
     enableChartHover(false, secondaryChart);
-  } else if (response['paused'] || response['finished'])
+  } else if (response['paused'] || response['finished'] || response['stopped'])
     enableChartHover(true, secondaryChart);
   else if (response['resumed']) enableChartHover(false, secondaryChart);
 };
 
 /**
- * updated every time a new most fittest appear, receives most fittest genes
+ * updated every time a new most fittest appear, receives most fittest genes.
  *
  * most fittest is a new fittest which its fitness value is better than every
  * fittest in the previous generations
  */
-let secondaryChart = createChart('secondary-chart', {
+let secondaryChart = window['createChart']('secondary-chart', {
   chart: {
     type: 'line'
   },
@@ -141,7 +117,7 @@ let secondaryChart = createChart('secondary-chart', {
   ] as SeriesLineOptions[]
 });
 
-pyshell.stdout.on('data', (response: Buffer) => {
+ipcRenderer.on('data', (_event: IpcRendererEvent, response: Buffer) => {
   response
     .toString()
     .split('\n')
@@ -151,23 +127,3 @@ pyshell.stdout.on('data', (response: Buffer) => {
       if (args) treatResponse(JSON.parse(args));
     });
 });
-
-/**
- * since secondary process is loaded after primary process it is safe to say that
- * all processes are fully loaded, and send main process that all views are ready
- * to resize.
- */
-ipcRenderer.send('views-ready');
-
-/**
- * receives zoom signal to update window/view size to maintain same size as
- * the main window
- */
-ipcRenderer.on('zoom', (_event: IpcRendererEvent, args: { zoom: number }) => {
-  webFrame.setZoomLevel(args.zoom);
-});
-
-/**
- * reset zoom level on first load or reload
- */
-webFrame.setZoomLevel(0);
