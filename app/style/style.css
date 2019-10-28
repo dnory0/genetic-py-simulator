@@ -55,15 +55,18 @@ body {
 }
 
 #main .middle-container .controls-container .state-controls-container {
-  margin-top: 4px;
-  width: -webkit-fit-content;
-  width: -moz-fit-content;
-  width: fit-content;
-  position: absolute;
-  left: calc(25% - 79px);
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  margin: 4px;
+  position: -webkit-sticky;
+  position: sticky;
 }
 
-#main .middle-container .controls-container .state-controls-container button {
+#main .middle-container .controls-container .state-controls-container .state-controls > button {
   padding: 5px 4px 5px 5px;
   border: none;
   border-radius: 4px;
@@ -72,30 +75,54 @@ body {
   background-color: white;
 }
 
-#main .middle-container .controls-container .state-controls-container button:hover:not(.disabled-btn) {
+#main .middle-container .controls-container .state-controls-container .state-controls > button:hover:not(.disabled-btn) {
   background-color: #c4c4c4;
 }
 
-#main .middle-container .controls-container .state-controls-container button img {
+#main .middle-container .controls-container .state-controls-container .state-controls > button img {
   width: 18px;
   float: left;
 }
 
-#main .middle-container .controls-container .state-controls-container button.disabled-btn {
+#main .middle-container .controls-container .state-controls-container .state-controls > button.disabled-btn {
   opacity: 0.6;
 }
 
-#main .middle-container .controls-container .state-controls-container button#play-btn img {
+#main .middle-container .controls-container .state-controls-container .state-controls > button#play-btn img {
   display: none;
 }
 
-#main .middle-container .controls-container .state-controls-container button#play-btn img.default {
+#main .middle-container .controls-container .state-controls-container .state-controls > button#play-btn img.default {
   display: block;
 }
 
-#main .middle-container .controls-container .controls-background {
-  height: 29px;
-  margin: 4px 0;
+#main .middle-container .controls-container .separator {
+  background-color: #8d7272;
+  width: 1px;
+  margin: 3px 6px;
+}
+
+#main .middle-container .controls-container .ga-settings {
+  position: relative;
+  right: 0;
+}
+
+#main .middle-container .controls-container .ga-settings button {
+  padding: 5px 4px 5px 5px;
+  border: none;
+  border-radius: 4px;
+  width: 28px;
+  height: 28px;
+  background-color: white;
+}
+
+#main .middle-container .controls-container .ga-settings button:hover:not(.disabled-btn) {
+  background-color: #c4c4c4;
+}
+
+#main .middle-container .controls-container .ga-settings button img {
+  width: 18px;
+  float: left;
 }
 
 #main .middle-container .controls-container .parameters-container {
