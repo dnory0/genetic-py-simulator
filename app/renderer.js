@@ -97,33 +97,31 @@ stepFBtn.onclick = () => {
     switchBtn();
 };
 let setReady = () => {
-    setTimeout(() => {
-        if (!(primary.isLoading() || secondary.isLoading())) {
-            pyshell.stdout.on('data', (response) => {
-                secondary.send('data', response);
-                primary.send('data', response);
-                response
-                    .toString()
-                    .split('\n')
-                    .forEach((args) => {
-                    if (args)
-                        treatResponse(JSON.parse(args));
-                });
-            });
-            zoomViews = () => {
-                primary.setZoomFactor(webFrame.getZoomFactor());
-                secondary.setZoomFactor(webFrame.getZoomFactor());
-            };
-            zoomViews();
-            document.getElementById('loading-bg').style.opacity = '0';
-            document.getElementById('main').style.opacity = '1';
-            document.getElementById('main').style.pointerEvents = 'inherit';
-            setTimeout(() => {
-                document.body.removeChild(document.getElementById('loading-bg'));
-            }, 0.2);
-        }
-        setReady = undefined;
-    }, 0);
+    setReady = () => { };
+    pyshell.stdout.on('data', (response) => {
+        primary.send('data', response);
+        secondary.send('data', response);
+        response
+            .toString()
+            .split('\n')
+            .forEach((args) => {
+            if (args)
+                treatResponse(JSON.parse(args));
+        });
+    });
+    zoomViews = () => {
+        primary.setZoomFactor(webFrame.getZoomFactor());
+        secondary.setZoomFactor(webFrame.getZoomFactor());
+    };
+    zoomViews();
+    if (document.getElementById('loading-bg')) {
+        document.getElementById('loading-bg').style.opacity = '0';
+        setTimeout(() => {
+            document.body.removeChild(document.getElementById('loading-bg'));
+        }, 0.2);
+    }
+    document.getElementById('main').style.opacity = '1';
+    document.getElementById('main').style.pointerEvents = 'inherit';
 };
 const parameterChanged = (numInput, checkInput, evType, key) => {
     if (evType == 'keyup')
@@ -146,8 +144,8 @@ const parameterChanged = (numInput, checkInput, evType, key) => {
         numInput.style.backgroundColor = '#ff5a5a';
 };
 document.addEventListener('DOMContentLoaded', function () {
-    primary.addEventListener('did-finish-load', setReady);
-    secondary.addEventListener('did-finish-load', setReady);
+    primary.addEventListener('dom-ready', () => setReady());
+    secondary.addEventListener('dom-ready', () => setReady());
     popSize.onkeyup = popSize.onchange = pSRandom.onchange = (event) => {
         parameterChanged(popSize, pSRandom, event.type, event.key);
     };

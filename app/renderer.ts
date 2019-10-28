@@ -260,43 +260,43 @@ stepFBtn.onclick = () => {
  * triggered after both webviews finish loading.
  */
 let setReady = () => {
-  setTimeout(() => {
-    // console.log(primary.isLoading());
-    // console.log(secondary.isLoading());
-    if (!(primary.isLoading() || secondary.isLoading())) {
-      pyshell.stdout.on('data', (response: Buffer) => {
-        secondary.send('data', response);
-        primary.send('data', response);
-        response
-          .toString()
-          .split('\n')
-          .forEach((args: string) => {
-            // console.log(args);
-            // sometimes args == ''(not sure why), those cases need to be ignored
-            if (args) treatResponse(JSON.parse(args));
-          });
+  /**
+   * hopefully free some memory space.
+   *
+   * Note: setting setReady to undefined/null might result in error when
+   * second view calling setReady finishs loading
+   */
+  setReady = () => {};
+  // open communication
+  pyshell.stdout.on('data', (response: Buffer) => {
+    primary.send('data', response);
+    secondary.send('data', response);
+    response
+      .toString()
+      .split('\n')
+      .forEach((args: string) => {
+        // console.log(args);
+        // sometimes args == ''(not sure why), those cases need to be ignored
+        if (args) treatResponse(JSON.parse(args));
       });
-      /**
-       * function is implemented after both webviews are fully loaded,
-       */
-      zoomViews = () => {
-        primary.setZoomFactor(webFrame.getZoomFactor());
-        secondary.setZoomFactor(webFrame.getZoomFactor());
-      };
+  });
+  /**
+   * function is implemented after both webviews are fully loaded,
+   */
+  zoomViews = () => {
+    primary.setZoomFactor(webFrame.getZoomFactor());
+    secondary.setZoomFactor(webFrame.getZoomFactor());
+  };
 
-      zoomViews();
-      document.getElementById('loading-bg').style.opacity = '0';
-      document.getElementById('main').style.opacity = '1';
-      document.getElementById('main').style.pointerEvents = 'inherit';
-      setTimeout(() => {
-        document.body.removeChild(document.getElementById('loading-bg'));
-      }, 0.2);
-      // primary.getWebContents().openDevTools();
-      // secondary.getWebContents().openDevTools();
-    }
-    // hopefully free some memory space
-    setReady = undefined;
-  }, 0);
+  zoomViews();
+  if (document.getElementById('loading-bg')) {
+    document.getElementById('loading-bg').style.opacity = '0';
+    setTimeout(() => {
+      document.body.removeChild(document.getElementById('loading-bg'));
+    }, 0.2);
+  }
+  document.getElementById('main').style.opacity = '1';
+  document.getElementById('main').style.pointerEvents = 'inherit';
 };
 
 /**************************** Inputs Event handling ****************************/
@@ -341,8 +341,8 @@ document.addEventListener('DOMContentLoaded', function() {
   /**
    * whichever did finsh loading last is going to unlock controls for user,
    */
-  primary.addEventListener('did-finish-load', setReady);
-  secondary.addEventListener('did-finish-load', setReady);
+  primary.addEventListener('dom-ready', () => setReady());
+  secondary.addEventListener('dom-ready', () => setReady());
 
   /**
    * listen to parameters inputs change & keyup events
