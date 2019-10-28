@@ -7,14 +7,17 @@ import { IpcRenderer, WebviewTag, IpcRendererEvent, WebFrame } from 'electron';
  * python process that executes GA
  */
 let pyshell: ChildProcess = window['pyshell'];
+delete window['pyshell'];
 /**
  * used to listen to zoom channel for wain process to send zoom in/out/reset.
  */
 let ipcRenderer: IpcRenderer = window['ipcRenderer'];
+delete window['ipcRenderer'];
 /**
  * used to resize window
  */
 let webFrame: WebFrame = window['webFrame'];
+delete window['webFrame'];
 
 /***************************** Views Declaration *****************************
  *****************************************************************************/
@@ -389,6 +392,15 @@ document.addEventListener('DOMContentLoaded', function() {
       (<KeyboardEvent>event).key
     );
   };
+
+  if (window['isDev']) {
+    delete window['isDev'];
+    ipcRenderer.on('devTools', (_event: IpcRendererEvent, webView: string) => {
+      if (webView == 'primary') primary.getWebContents().toggleDevTools();
+      else if (webView == 'secondary')
+        secondary.getWebContents().toggleDevTools();
+    });
+  }
 
   ipcRenderer.on('zoom', (_event: IpcRendererEvent, type: string) => {
     if (type == 'in') {

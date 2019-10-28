@@ -8,6 +8,7 @@ import { IpcRenderer, IpcRendererEvent } from 'electron';
  * allows communication between this webview & renderer process
  */
 const ipcRenderer: IpcRenderer = window['ipcRenderer'];
+delete window['ipcRenderer'];
 
 /**
  * an object that holds most fittest fitness with an array of their genes

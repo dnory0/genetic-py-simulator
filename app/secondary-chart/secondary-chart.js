@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const ipcRenderer = window['ipcRenderer'];
+delete window['ipcRenderer'];
 let mostFittest = { fitness: -1, individuals: null };
 const enableChartHover = window['enableChartHover'];
 const clearChart = window['clearChart'];

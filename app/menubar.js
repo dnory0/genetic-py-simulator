@@ -1,42 +1,11 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const electron_1 = require("electron");
-let template;
-(() => {
-    const isMac = process.platform == 'darwin';
-    template = [
-        ...(isMac
-            ? [
-                {
-                    label: '&Genetic Py',
-                    submenu: [
-                        { role: 'about' },
-                        { type: 'separator' },
-                        { role: 'services' },
-                        { type: 'separator' },
-                        { role: 'hide' },
-                        { role: 'hideothers' },
-                        { role: 'unhide' },
-                        { type: 'separator' },
-                        { role: 'quit' }
-                    ]
-                }
-            ]
-            : []),
+module.exports = (isDev, targetWindow) => {
+    const menu = electron_1.Menu.buildFromTemplate([
         {
             label: '&File',
-            submenu: [
-                isMac ? { role: 'close' } : { role: 'quit' }
-            ]
+            submenu: [{ role: 'quit' }]
         },
         {
             label: '&Edit',
@@ -46,65 +15,52 @@ let template;
                 { type: 'separator' },
                 { role: 'cut' },
                 { role: 'copy' },
-                { role: 'paste' },
-                ...(isMac
-                    ? [
-                        { role: 'pasteAndMatchStyle' },
-                        { role: 'delete' },
-                        { role: 'selectAll' },
-                        { type: 'separator' },
-                        {
-                            label: '&Speech',
-                            submenu: [
-                                { role: 'startspeaking' },
-                                { role: 'stopspeaking' }
-                            ]
-                        }
-                    ]
-                    : [
-                        { role: 'delete' },
-                        { type: 'separator' },
-                        { role: 'selectAll' }
-                    ])
+                { role: 'paste' }
             ]
         },
         {
             label: '&View',
             submenu: [
-                { role: 'toggledevtools' },
+                {
+                    role: 'reload'
+                },
+                { type: 'separator' },
+                {
+                    label: 'Zoom In',
+                    accelerator: 'CmdOrCtrl+numadd',
+                    click: () => targetWindow.webContents.send('zoom', 'in')
+                },
+                {
+                    label: 'Zoom Out',
+                    accelerator: 'CmdOrCtrl+numsub',
+                    click: () => targetWindow.webContents.send('zoom', 'out')
+                },
+                {
+                    label: 'Reset Zoom',
+                    accelerator: 'CmdOrCtrl+num0',
+                    click: () => targetWindow.webContents.send('zoom', '')
+                },
                 { type: 'separator' },
                 { role: 'togglefullscreen' }
             ]
-        },
-        {
-            label: '&Window',
-            submenu: [
-                { role: 'minimize' },
-                { role: 'zoom' },
-                ...(isMac
-                    ? [
-                        { type: 'separator' },
-                        { role: 'front' },
-                        { type: 'separator' },
-                        { role: 'window' }
-                    ]
-                    : [{ role: 'close' }])
-            ]
-        },
-        {
-            label: '&help',
-            role: 'help',
-            submenu: [
-                {
-                    label: '&Learn More',
-                    click: () => __awaiter(void 0, void 0, void 0, function* () {
-                        const { shell } = require('electron');
-                        yield shell.openExternal('https://electronjs.org');
-                    })
-                }
-            ]
         }
-    ];
-})();
-module.exports = electron_1.Menu.buildFromTemplate(template);
+    ]);
+    if (isDev) {
+        menu.items[2].submenu.insert(2, new electron_1.MenuItem({
+            label: 'Main Developer Tools',
+            accelerator: 'CmdOrCtrl+Shift+I',
+            click: () => targetWindow.webContents.toggleDevTools()
+        }));
+        menu.items[2].submenu.insert(3, new electron_1.MenuItem({
+            label: 'Primary Developer Tools',
+            click: () => targetWindow.webContents.send('devTools', 'primary')
+        }));
+        menu.items[2].submenu.insert(4, new electron_1.MenuItem({
+            label: 'Secondary Developer Tools',
+            click: () => targetWindow.webContents.send('devTools', 'secondary')
+        }));
+        menu.items[2].submenu.insert(5, new electron_1.MenuItem({ type: 'separator' }));
+    }
+    return menu;
+};
 //# sourceMappingURL=menubar.js.map

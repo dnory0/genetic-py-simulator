@@ -1,8 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 let pyshell = window['pyshell'];
+delete window['pyshell'];
 let ipcRenderer = window['ipcRenderer'];
+delete window['ipcRenderer'];
 let webFrame = window['webFrame'];
+delete window['webFrame'];
 const primary = document.getElementById('primary-chart');
 const secondary = document.getElementById('secondary-chart');
 const play = window['play'];
@@ -161,6 +164,15 @@ document.addEventListener('DOMContentLoaded', function () {
     delay.onkeyup = delay.onchange = delayRandom.onchange = (event) => {
         parameterChanged(delay, delayRandom, event.type, event.key);
     };
+    if (window['isDev']) {
+        delete window['isDev'];
+        ipcRenderer.on('devTools', (_event, webView) => {
+            if (webView == 'primary')
+                primary.getWebContents().toggleDevTools();
+            else if (webView == 'secondary')
+                secondary.getWebContents().toggleDevTools();
+        });
+    }
     ipcRenderer.on('zoom', (_event, type) => {
         if (type == 'in') {
             if (webFrame.getZoomFactor() < 2)

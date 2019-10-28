@@ -1,33 +1,15 @@
-import { MenuItemConstructorOptions, Menu } from 'electron';
+import {
+  MenuItemConstructorOptions,
+  Menu,
+  BrowserWindow,
+  MenuItem
+} from 'electron';
 
-let template: MenuItemConstructorOptions[];
-
-(() => {
-  const isMac = process.platform == 'darwin';
-  template = [
-    ...(isMac
-      ? ([
-          {
-            label: '&Genetic Py',
-            submenu: [
-              { role: 'about' },
-              { type: 'separator' },
-              { role: 'services' },
-              { type: 'separator' },
-              { role: 'hide' },
-              { role: 'hideothers' },
-              { role: 'unhide' },
-              { type: 'separator' },
-              { role: 'quit' }
-            ]
-          }
-        ] as MenuItemConstructorOptions[])
-      : []),
+module.exports = (isDev: boolean, targetWindow: BrowserWindow) => {
+  const menu = Menu.buildFromTemplate([
     {
       label: '&File',
-      submenu: [
-        isMac ? { role: 'close' } : { role: 'quit' }
-      ] as MenuItemConstructorOptions[]
+      submenu: [{ role: 'quit' }] as MenuItemConstructorOptions[]
     },
     {
       label: '&Edit',
@@ -37,65 +19,60 @@ let template: MenuItemConstructorOptions[];
         { type: 'separator' },
         { role: 'cut' },
         { role: 'copy' },
-        { role: 'paste' },
-        ...(isMac
-          ? [
-              { role: 'pasteAndMatchStyle' },
-              { role: 'delete' },
-              { role: 'selectAll' },
-              { type: 'separator' },
-              {
-                label: '&Speech',
-                submenu: [
-                  { role: 'startspeaking' },
-                  { role: 'stopspeaking' }
-                ] as MenuItemConstructorOptions
-              }
-            ]
-          : ([
-              { role: 'delete' },
-              { type: 'separator' },
-              { role: 'selectAll' }
-            ] as MenuItemConstructorOptions[]))
+        { role: 'paste' }
       ] as MenuItemConstructorOptions[]
     },
     {
       label: '&View',
       submenu: [
-        { role: 'toggledevtools' },
+        {
+          role: 'reload'
+        },
+        { type: 'separator' },
+        {
+          label: 'Zoom In',
+          accelerator: 'CmdOrCtrl+numadd',
+          click: () => targetWindow.webContents.send('zoom', 'in')
+        },
+        {
+          label: 'Zoom Out',
+          accelerator: 'CmdOrCtrl+numsub',
+          click: () => targetWindow.webContents.send('zoom', 'out')
+        },
+        {
+          label: 'Reset Zoom',
+          accelerator: 'CmdOrCtrl+num0',
+          click: () => targetWindow.webContents.send('zoom', '')
+        },
         { type: 'separator' },
         { role: 'togglefullscreen' }
       ] as MenuItemConstructorOptions[]
-    },
-    {
-      label: '&Window',
-      submenu: [
-        { role: 'minimize' },
-        { role: 'zoom' },
-        ...(isMac
-          ? [
-              { type: 'separator' },
-              { role: 'front' },
-              { type: 'separator' },
-              { role: 'window' }
-            ]
-          : ([{ role: 'close' }] as MenuItemConstructorOptions[]))
-      ] as MenuItemConstructorOptions[]
-    },
-    {
-      label: '&help',
-      role: 'help',
-      submenu: [
-        {
-          label: '&Learn More',
-          click: async () => {
-            const { shell } = require('electron');
-            await shell.openExternal('https://electronjs.org');
-          }
-        }
-      ] as MenuItemConstructorOptions[]
     }
-  ];
-})();
-
-module.exports = Menu.buildFromTemplate(template);
+  ]);
+  if (isDev) {
+    menu.items[2].submenu.insert(
+      2,
+      new MenuItem({
+        label: 'Main Developer Tools',
+        accelerator: 'CmdOrCtrl+Shift+I',
+        click: () => targetWindow.webContents.toggleDevTools()
+      })
+    );
+    menu.items[2].submenu.insert(
+      3,
+      new MenuItem({
+        label: 'Primary Developer Tools',
+        click: () => targetWindow.webContents.send('devTools', 'primary')
+      })
+    );
+    menu.items[2].submenu.insert(
+      4,
+      new MenuItem({
+        label: 'Secondary Developer Tools',
+        click: () => targetWindow.webContents.send('devTools', 'secondary')
+      })
+    );
+    menu.items[2].submenu.insert(5, new MenuItem({ type: 'separator' }));
+  }
+  return menu;
+};

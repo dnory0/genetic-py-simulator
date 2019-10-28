@@ -9,6 +9,7 @@ import { IpcRendererEvent, IpcRenderer } from 'electron';
  * secondary view
  */
 const ipcRenderer: IpcRenderer = window['ipcRenderer'];
+delete window['ipcRenderer'];
 
 /**
  * enables or disable the hover settings for the passed chart
