@@ -34,40 +34,20 @@
         <div class="controls-container">
           <div class="state-controls-container">
             <div class="state-controls">
-              <button
-                title="Play/Pause"
-                id="play-btn"
-                class="disabled-btn"
-                disabled
-              >
+              <button title="Play/Pause" id="play-btn" disabled>
                 <img class="default play" src="img/play-btn.png" />
                 <img class="pause" src="img/pause-btn.png" />
               </button>
-              <button title="Stop" class="disabled-btn" id="stop-btn" disabled>
+              <button title="Stop" id="stop-btn" disabled>
                 <img src="img/stop-btn.png" />
               </button>
-              <button
-                title="Relaunch the Algorithm"
-                class="disabled-btn"
-                id="to-start-btn"
-                disabled
-              >
+              <button title="Relaunch the Algorithm" id="to-start-btn" disabled>
                 <img src="img/to-start-btn.png" />
               </button>
-              <button
-                title="Previous Generation"
-                class="disabled-btn"
-                id="step-back-btn"
-                disabled
-              >
+              <button title="Previous Generation" id="step-back-btn" disabled>
                 <img src="img/step-back-btn.png" />
               </button>
-              <button
-                title="Next Generation"
-                id="step-forward-btn"
-                class="disabled-btn"
-                disabled
-              >
+              <button title="Next Generation" id="step-forward-btn" disabled>
                 <img src="img/step-forward-btn.png" />
               </button>
             </div>
@@ -89,16 +69,16 @@
                 name="pop_size"
                 disabled
               />
-              <div class="checkbox_wrapper">
-                <div class="hover_wrapper" title="random">
-                  <input
-                    type="checkbox"
-                    name="random_pop_size"
-                    id="random-pop-size"
-                    disabled
-                  />
-                  <label for="random-pop-size"></label>
-                </div>
+              <div class="checkbox-wrapper">
+                <input
+                  type="checkbox"
+                  name="random_pop_size"
+                  id="random-pop-size"
+                  disabled
+                />
+                <label for="random-pop-size">
+                  <img src="img/random.png" />
+                </label>
               </div>
             </div>
             <div class="parameter">
@@ -111,16 +91,16 @@
                 name="genes_num"
                 disabled
               />
-              <div class="checkbox_wrapper">
-                <div class="hover_wrapper" title="random">
-                  <input
-                    type="checkbox"
-                    name="random_genes_num"
-                    id="random-genes-num"
-                    disabled
-                  />
-                  <label for="random-genes-num"></label>
-                </div>
+              <div class="checkbox-wrapper">
+                <input
+                  type="checkbox"
+                  name="random_genes_num"
+                  id="random-genes-num"
+                  disabled
+                />
+                <label for="random-genes-num">
+                  <img src="img/random.png" />
+                </label>
               </div>
             </div>
             <div class="parameter">
@@ -134,16 +114,16 @@
                 name="crossover_rate"
                 disabled
               />
-              <div class="checkbox_wrapper">
-                <div class="hover_wrapper" title="random">
-                  <input
-                    type="checkbox"
-                    name="random_crossover_rate"
-                    id="random-crossover-rate"
-                    disabled
-                  />
-                  <label for="random-crossover-rate"></label>
-                </div>
+              <div class="checkbox-wrapper">
+                <input
+                  type="checkbox"
+                  name="random_crossover_rate"
+                  id="random-crossover-rate"
+                  disabled
+                />
+                <label for="random-crossover-rate">
+                  <img src="img/random.png"
+                /></label>
               </div>
             </div>
             <div class="parameter">
@@ -157,16 +137,16 @@
                 name="mutation_rate"
                 disabled
               />
-              <div class="checkbox_wrapper">
-                <div class="hover_wrapper" title="random">
-                  <input
-                    type="checkbox"
-                    name="random_mutation_rate"
-                    id="random-mutation-rate"
-                    disabled
-                  />
-                  <label for="random-mutation-rate"></label>
-                </div>
+              <div class="checkbox-wrapper">
+                <input
+                  type="checkbox"
+                  name="random_mutation_rate"
+                  id="random-mutation-rate"
+                  disabled
+                />
+                <label for="random-mutation-rate">
+                  <img src="img/random.png"
+                /></label>
               </div>
             </div>
             <div class="parameter">
@@ -180,16 +160,16 @@
                 name="delay_rate"
                 disabled
               />
-              <div class="checkbox_wrapper">
-                <div class="hover_wrapper" title="random">
-                  <input
-                    type="checkbox"
-                    name="random_delay_rate"
-                    id="random-delay-rate"
-                    disabled
-                  />
-                  <label for="random-delay-rate"></label>
-                </div>
+              <div class="checkbox-wrapper">
+                <input
+                  type="checkbox"
+                  name="random_delay_rate"
+                  id="random-delay-rate"
+                  disabled
+                />
+                <label for="random-delay-rate">
+                  <img src="img/random.png" />
+                </label>
               </div>
             </div>
           </div>
@@ -206,7 +186,7 @@
           ></webview>
         </div>
       </div>
-      <div class="bottom-bar-container"></div>
+      <div class="bottom-container"></div>
     </div>
     <script>
       let exports = {};

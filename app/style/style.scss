@@ -58,7 +58,7 @@ body {
           height: 28px;
           background-color: white;
 
-          &:hover:not(.disabled-btn) {
+          &:hover:not(:disabled) {
             background-color: #c4c4c4;
           }
 
@@ -67,7 +67,7 @@ body {
             float: left;
           }
 
-          &.disabled-btn {
+          &:disabled {
             opacity: 0.6;
           }
 
@@ -104,7 +104,7 @@ body {
           height: 28px;
           background-color: white;
 
-          &:hover:not(.disabled-btn) {
+          &:hover:not(:disabled) {
             background-color: #c4c4c4;
           }
 
@@ -120,13 +120,14 @@ body {
         height: -webkit-fill-available;
 
         .parameter {
+          margin: 5px 0;
           display: flex;
 
           p {
             font-size: 13px;
+            padding: 9px 5px;
             float: left;
             margin: 0;
-            padding: 10px 5px;
             font-family: sans-serif;
             text-align: left;
             min-width: 100px;
@@ -134,60 +135,68 @@ body {
           }
 
           input[type='number'] {
-            margin: 7px 5px 7px 2px;
-            height: 17px;
-            font-size: 16px;
+            padding-top: 2px;
+            padding-left: 2px;
+            height: 19px;
+            font-size: 17px;
             flex: 2;
+            margin: 6px;
+            border: 1px solid rgb(123, 123, 123);
+            border-radius: 2px;
             min-width: 100px;
-          }
 
-          .checkbox_wrapper {
-            position: relative;
-            min-width: 40px;
-            height: 40px;
-            flex: 0.5;
+            &:focus {
+              box-shadow: 0 0 0 1px #df9a00, 0 0 0 4px rgba(223, 165, 0, 0.3);
+            }
 
-            .hover_wrapper {
-              width: 32px;
-              height: 32px;
-              border-radius: 4px;
-              margin: 3px 3px 5px 5px;
-
-              &:hover {
-                background-color: #c4c4c4;
-              }
-              input[type='checkbox'] {
-                margin: 3px 3px 5px 5px;
-                opacity: 0;
-                border-radius: 4px;
-                height: 32px;
-                width: 32px;
-                position: absolute;
-                top: 0;
-                left: 0;
-              }
-
-              input[type='checkbox'] + label {
-                background: url('../img/random.png') no-repeat;
-                margin: 7px;
-                height: 26px;
-                width: 26px;
-                display: inline-block;
-                position: absolute;
-                top: 0;
-                left: 0;
-                opacity: 0.5;
-              }
-
-              input[type='checkbox']:checked + label {
-                opacity: 1;
-              }
+            &::-webkit-inner-spin-button {
+              -webkit-appearance: none;
             }
           }
 
-          // &::-webkit-inner-spin-button {
-          //   -webkit-appearance: none;
-          // }
+          .checkbox-wrapper {
+            position: relative;
+            min-width: 40px;
+            flex: 0.5;
+
+            input[type='checkbox'] {
+              margin: 4px 3px 3px 5px;
+              opacity: 0;
+              border-radius: 4px;
+              height: 28px;
+              width: 28px;
+              position: absolute;
+              top: 0;
+              left: 0;
+              border-radius: 4px;
+
+              & + label {
+                margin: 4px 3px 3px 5px;
+                height: 28px;
+                width: 28px;
+                padding: 5px 0;
+                box-sizing: border-box;
+                position: absolute;
+                left: 0;
+                border-radius: 4px;
+
+                > img {
+                  opacity: 0.6;
+                }
+              }
+
+              &:not(:disabled) + label:hover {
+                background-color: #c4c4c4;
+              }
+
+              &:checked + label > img {
+                opacity: 1;
+              }
+            }
+
+            // }
+          }
+
           // }
           // input[type='range'] {
           //   -webkit-appearance: none;
@@ -236,14 +245,14 @@ body {
     }
   }
 
-  .bottom-bar-container {
+  .bottom-container {
     border-top: 1px solid #8d7272;
     height: 24px;
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    padding: 0 4px;
+    padding: 0 6px;
     box-sizing: border-box;
   }
 }

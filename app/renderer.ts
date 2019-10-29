@@ -308,8 +308,8 @@ let setReady = () => {
  * highlight the input in red to indicate invalide value.
  * @param numInput    input of type number that has changed or its random flag changed
  * @param checkInput  input of type checkbox flag attached to numInput to specify whether it is random or not
- * @param evType      keyup | change event passed when user try to change value on one of parameters
- * @param key         keyboard key pressed on keyup event, if event type is change key is ignored
+ * @param evType      keonkeyup | change event passed when user try to change value on one of parameters
+ * @param key         keyboard key pressed on keonkeyup event, if event type is change key is ignored
  */
 const parameterChanged = (
   numInput: HTMLInputElement,
@@ -319,7 +319,7 @@ const parameterChanged = (
 ) => {
   // prevent parameterChanged from being triggered twice if user used arrow keys,
   // also ignore other keyboard keys except backspace.
-  if (evType == 'keyup') if (isNaN(parseInt(key)) && key != 'Backspace') return;
+  // if (evType == 'keonkeyup') if (isNaN(parseInt(key))) return;
 
   if (
     (isNaN(parseFloat(numInput.min)) ||
@@ -348,7 +348,7 @@ document.addEventListener('DOMContentLoaded', function() {
   secondary.addEventListener('dom-ready', () => setReady());
 
   /**
-   * listen to parameters inputs change & keyup events
+   * listen to parameters inputs change & keonkeyup events
    */
   popSize.onkeyup = popSize.onchange = pSRandom.onchange = (event: Event) => {
     parameterChanged(popSize, pSRandom, event.type, (<KeyboardEvent>event).key);
