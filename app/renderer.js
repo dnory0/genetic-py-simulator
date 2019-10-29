@@ -127,40 +127,39 @@ let setReady = () => {
     document.getElementById('main').style.pointerEvents = 'inherit';
 };
 const parameterChanged = (numInput, checkInput, evType, key) => {
-    if (evType == 'keyup' && ['ArrowUp', 'ArrowDown'].includes(key))
-        return;
-    if ((isNaN(parseFloat(numInput.min)) ||
-        parseFloat(numInput.value) >= parseFloat(numInput.min)) &&
-        (isNaN(parseFloat(numInput.max)) ||
-            parseFloat(numInput.value) <= parseFloat(numInput.max))) {
-        numInput.style.backgroundColor = '#fff';
-        pyshell.stdin.write(`${JSON.stringify({
-            [numInput.name]: parseFloat(numInput.value),
-            [checkInput.name]: checkInput.checked
-        })}\n`, (error) => {
-            if (error)
-                throw error;
-        });
-    }
-    else
-        numInput.style.backgroundColor = '#ff5a5a';
+    setTimeout(() => {
+        if (evType == 'keypress' && isNaN(parseFloat(key)))
+            return;
+        if ((isNaN(parseFloat(numInput.min)) ||
+            parseFloat(numInput.value) >= parseFloat(numInput.min)) &&
+            (isNaN(parseFloat(numInput.max)) ||
+                parseFloat(numInput.value) <= parseFloat(numInput.max))) {
+            numInput.style.backgroundColor = '#fff';
+            pyshell.stdin.write(`${JSON.stringify({
+                [numInput.name]: parseFloat(numInput.value),
+                [checkInput.name]: checkInput.checked
+            })}\n`);
+        }
+        else
+            numInput.style.backgroundColor = '#ff5a5a';
+    }, 0);
 };
 document.addEventListener('DOMContentLoaded', function () {
     primary.addEventListener('dom-ready', () => setReady());
     secondary.addEventListener('dom-ready', () => setReady());
-    popSize.onkeyup = popSize.onchange = pSRandom.onchange = (event) => {
+    popSize.onkeypress = popSize.onchange = pSRandom.onchange = (event) => {
         parameterChanged(popSize, pSRandom, event.type, event.key);
     };
-    genesNum.onkeyup = genesNum.onchange = gNRandom.onchange = (event) => {
+    genesNum.onkeypress = genesNum.onchange = gNRandom.onchange = (event) => {
         parameterChanged(genesNum, gNRandom, event.type, event.key);
     };
-    crossover.onkeyup = crossover.onchange = coRandom.onchange = (event) => {
+    crossover.onkeypress = crossover.onchange = coRandom.onchange = (event) => {
         parameterChanged(crossover, coRandom, event.type, event.key);
     };
-    mutation.onkeyup = mutation.onchange = mutRandom.onchange = (event) => {
+    mutation.onkeypress = mutation.onchange = mutRandom.onchange = (event) => {
         parameterChanged(mutation, mutRandom, event.type, event.key);
     };
-    delay.onkeyup = delay.onchange = delayRandom.onchange = (event) => {
+    delay.onkeypress = delay.onchange = delayRandom.onchange = (event) => {
         parameterChanged(delay, delayRandom, event.type, event.key);
     };
     if (window['isDev']) {

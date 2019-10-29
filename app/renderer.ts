@@ -306,10 +306,10 @@ let setReady = () => {
 /**
  * checks if the changed input has a valid value, if true pass it to pyshell, else
  * highlight the input in red to indicate invalide value.
- * @param numInput    input of type number that has changed or its random flag changed
- * @param checkInput  input of type checkbox flag attached to numInput to specify whether it is random or not
- * @param evType      onkeyup | change event passed when user try to change value on one of parameters
- * @param key         keyboard key pressed on onkeyup event, if event type is change key is ignored
+ * @param numInput    input of type number
+ * @param checkInput  input of type checkbox
+ * @param evType      keypress | change event
+ * @param key         keyboard key pressed
  */
 const parameterChanged = (
   numInput: HTMLInputElement,
@@ -317,26 +317,26 @@ const parameterChanged = (
   evType: string,
   key?: string
 ) => {
-  // prevent parameterChanged from being triggered twice if user used arrow keys,
-  if (evType == 'keyup' && ['ArrowUp', 'ArrowDown'].includes(key)) return;
+  setTimeout(() => {
+    // console.log(parseFloat(numInput.value));
+    // prevent parameterChanged from being triggered twice if user used arrow keys,
+    if (evType == 'keypress' && isNaN(parseFloat(key))) return;
 
-  if (
-    (isNaN(parseFloat(numInput.min)) ||
-      parseFloat(numInput.value) >= parseFloat(numInput.min)) &&
-    (isNaN(parseFloat(numInput.max)) ||
-      parseFloat(numInput.value) <= parseFloat(numInput.max))
-  ) {
-    numInput.style.backgroundColor = '#fff';
-    pyshell.stdin.write(
-      `${JSON.stringify({
-        [numInput.name]: parseFloat(numInput.value),
-        [checkInput.name]: checkInput.checked
-      })}\n`,
-      (error: Error) => {
-        if (error) throw error;
-      }
-    );
-  } else numInput.style.backgroundColor = '#ff5a5a';
+    if (
+      (isNaN(parseFloat(numInput.min)) ||
+        parseFloat(numInput.value) >= parseFloat(numInput.min)) &&
+      (isNaN(parseFloat(numInput.max)) ||
+        parseFloat(numInput.value) <= parseFloat(numInput.max))
+    ) {
+      numInput.style.backgroundColor = '#fff';
+      pyshell.stdin.write(
+        `${JSON.stringify({
+          [numInput.name]: parseFloat(numInput.value),
+          [checkInput.name]: checkInput.checked
+        })}\n`
+      );
+    } else numInput.style.backgroundColor = '#ff5a5a';
+  }, 0);
 };
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -349,10 +349,14 @@ document.addEventListener('DOMContentLoaded', function() {
   /**
    * listen to parameters inputs change & keonkeyup events
    */
-  popSize.onkeyup = popSize.onchange = pSRandom.onchange = (event: Event) => {
+  popSize.onkeypress = popSize.onchange = pSRandom.onchange = (
+    event: Event
+  ) => {
     parameterChanged(popSize, pSRandom, event.type, (<KeyboardEvent>event).key);
   };
-  genesNum.onkeyup = genesNum.onchange = gNRandom.onchange = (event: Event) => {
+  genesNum.onkeypress = genesNum.onchange = gNRandom.onchange = (
+    event: Event
+  ) => {
     parameterChanged(
       genesNum,
       gNRandom,
@@ -361,7 +365,7 @@ document.addEventListener('DOMContentLoaded', function() {
     );
   };
 
-  crossover.onkeyup = crossover.onchange = coRandom.onchange = (
+  crossover.onkeypress = crossover.onchange = coRandom.onchange = (
     event: Event
   ) => {
     parameterChanged(
@@ -372,7 +376,7 @@ document.addEventListener('DOMContentLoaded', function() {
     );
   };
 
-  mutation.onkeyup = mutation.onchange = mutRandom.onchange = (
+  mutation.onkeypress = mutation.onchange = mutRandom.onchange = (
     event: Event
   ) => {
     parameterChanged(
@@ -383,7 +387,7 @@ document.addEventListener('DOMContentLoaded', function() {
     );
   };
 
-  delay.onkeyup = delay.onchange = delayRandom.onchange = (event: Event) => {
+  delay.onkeypress = delay.onchange = delayRandom.onchange = (event: Event) => {
     parameterChanged(
       delay,
       delayRandom,
