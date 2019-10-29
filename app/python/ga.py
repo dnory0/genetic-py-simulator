@@ -158,9 +158,9 @@ class GAThread(threading.Thread):
         self.__pause_check()
         while True:
             Evolve.evolve_population(pop)
-            # if g_delay is 0 than just ignore it
-            if g_delay:
-                time.sleep(g_delay)
+            # if g_delay_rate is 0 than just ignore it
+            if g_delay_rate:
+                time.sleep(g_delay_rate)
 
             # pause check, moved down to avoid another iteration if stop event
             # was triggered after a pause event
@@ -292,13 +292,13 @@ solution = None
 # global settings, changed every time user passes them
 g_crossover_rate = .5
 g_mutation_rate = .06
-g_delay = 0
+g_delay_rate = 0
 
 # initialized every time GA is initialized,
 # if user passes them after GA started it will do nothing
 g_pop_size = int(sys.argv[1]) if len(sys.argv) > 1 else random.randint(1, 500)
 g_genes_num = int(sys.argv[2]) if len(sys.argv) > 2 else random.randint(1, 200)
-g_delay = int(sys.argv[3]) if len(sys.argv) > 3 else g_delay
+g_delay_rate = int(sys.argv[3]) if len(sys.argv) > 3 else g_delay_rate
 
 def final_value(min_val, given_val, is_random: bool):
     """ called when a signal is received, if random flag set to True it will return
@@ -321,7 +321,7 @@ def update_parameters(command: dict):
     global g_genes_num
     global g_crossover_rate
     global g_mutation_rate
-    global g_delay
+    global g_delay_rate
     if command.get('pop_size'):
         # population size
         g_pop_size = final_value(1, command.get('pop_size'), command.get('random_pop_size'))
@@ -336,19 +336,19 @@ def update_parameters(command: dict):
         g_mutation_rate = round(final_value(.0, command.get('mutation_rate'), command.get('random_mutation_rate')), 3)
     if type(command.get('delay_rate')) is not type(None):
         # sleep in seconds
-        g_delay = round(final_value(.0, command.get('delay_rate'), command.get('random_delay_rate')), 2)
-    # to_json({
-    #     "pop": g_pop_size,
-    #     "rnPop": command.get('random_pop_size'),
-    #     "genes": g_genes_num,
-    #     "rnGenes": command.get('random_genes_num'),
-    #     "crossover": g_crossover_rate,
-    #     "rnCO": command.get('random_crossover_rate'),
-    #     "mutation": g_mutation_rate,
-    #     "rnMut": command.get('random_mutation_rate')
-    #     "delay": g_delay_rate,
-    #     "rnDelay": command.get('random_mutation_rate')
-    # })
+        g_delay_rate = round(final_value(.0, command.get('delay_rate'), command.get('random_delay_rate')), 2)
+    to_json({
+        "pop": g_pop_size,
+        "rnPop": command.get('random_pop_size'),
+        "genes": g_genes_num,
+        "rnGenes": command.get('random_genes_num'),
+        "crossover": g_crossover_rate,
+        "rnCO": command.get('random_crossover_rate'),
+        "mutation": g_mutation_rate,
+        "rnMut": command.get('random_mutation_rate'),
+        "delay": g_delay_rate,
+        "rnDelay": command.get('random_mutation_rate')
+    })
 
 
 def init_ga(command: dict):

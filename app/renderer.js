@@ -127,6 +127,8 @@ let setReady = () => {
     document.getElementById('main').style.pointerEvents = 'inherit';
 };
 const parameterChanged = (numInput, checkInput, evType, key) => {
+    if (evType == 'keyup' && ['ArrowUp', 'ArrowDown'].includes(key))
+        return;
     if ((isNaN(parseFloat(numInput.min)) ||
         parseFloat(numInput.value) >= parseFloat(numInput.min)) &&
         (isNaN(parseFloat(numInput.max)) ||
