@@ -29,7 +29,9 @@
           nodeintegration
           preload="chart-preload"
         ></webview>
+        <div class="resize-cover for-primary"></div>
       </div>
+      <div class="slider hor"></div>
       <div class="middle-container">
         <div class="controls-container">
           <div class="state-controls-container">
@@ -106,7 +108,7 @@
             <div class="parameter">
               <p>Crossover rate:</p>
               <div class="input-wrapper">
-                <input type="range" min="0.001" max="1" step="0.001" />
+                <input type="range" min="0.001" max="1" step="0.001" disabled />
                 <input
                   type="number"
                   min="0.001"
@@ -114,6 +116,7 @@
                   step="0.001"
                   id="crossover-rate"
                   name="crossover_rate"
+                  disabled
                 />
               </div>
               <div class="checkbox-wrapper">
@@ -130,9 +133,8 @@
             </div>
             <div class="parameter">
               <p>Mutation rate:</p>
-
               <div class="input-wrapper">
-                <input type="range" min="0" max="1" step="0.001" />
+                <input type="range" min="0" max="1" step="0.001" disabled />
                 <input
                   type="number"
                   min="0"
@@ -140,6 +142,7 @@
                   step="0.001"
                   id="mutation-rate"
                   name="mutation_rate"
+                  disabled
                 />
               </div>
               <div class="checkbox-wrapper">
@@ -156,9 +159,8 @@
             </div>
             <div class="parameter">
               <p>delay rate:</p>
-
               <div class="input-wrapper">
-                <input type="range" min="0" max="5" step="0.05" />
+                <input type="range" min="0" max="5" step="0.05" disabled />
                 <input
                   type="number"
                   min="0"
@@ -166,6 +168,7 @@
                   step="0.05"
                   id="delay-rate"
                   name="delay_rate"
+                  disabled
                 />
               </div>
               <div class="checkbox-wrapper">
@@ -173,6 +176,7 @@
                   type="checkbox"
                   name="random_delay_rate"
                   id="random-delay-rate"
+                  disabled
                 />
                 <label for="random-delay-rate">
                   <img src="img/random.png" />
@@ -181,6 +185,7 @@
             </div>
           </div>
         </div>
+        <div class="slider ver"></div>
         <div class="secondary-container">
           <webview
             id="secondary-chart"
@@ -191,6 +196,7 @@
             nodeintegration
             preload="chart-preload"
           ></webview>
+          <div class="resize-cover for-secondary"></div>
         </div>
       </div>
       <div class="bottom-container"></div>

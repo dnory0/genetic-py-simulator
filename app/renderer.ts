@@ -418,6 +418,60 @@ document.addEventListener('DOMContentLoaded', function() {
     zoomViews();
   });
 
+  let sliders = document.getElementsByClassName('slider');
+
+  Array.from(sliders).forEach((slider: HTMLDivElement) => {
+    // console.log(slider);
+    const prevSib = <HTMLDivElement>slider.previousElementSibling;
+    if (slider.classList.contains('ver')) {
+      slider.onmousedown = e => {
+        (<HTMLDivElement>(
+          slider.nextElementSibling.querySelector('.resize-cover')
+        )).style.display = 'block';
+        (<HTMLDivElement>(
+          document.querySelector('.primary-container').lastElementChild
+        )).style.display = 'block';
+        let dragY = e.clientX;
+        console.log(prevSib);
+        window.onmousemove = e => {
+          prevSib.style.width = prevSib.offsetWidth + e.clientX - dragY + 'px';
+          dragY = e.clientX;
+        };
+        window.onmouseup = () => {
+          window.onmousemove = window.onmouseup = null;
+          (<HTMLDivElement>(
+            slider.nextElementSibling.querySelector('.resize-cover')
+          )).style.display = 'none';
+          (<HTMLDivElement>(
+            document.querySelector('.primary-container').lastElementChild
+          )).style.display = 'none';
+        };
+      };
+    } else if (slider.classList.contains('hor')) {
+      slider.onmousedown = e => {
+        (<HTMLDivElement>prevSib.querySelector('.resize-cover')).style.display =
+          'block';
+        (<HTMLDivElement>(
+          document.querySelector('.secondary-container').lastElementChild
+        )).style.display = 'block';
+        let dragX = e.clientY;
+        document.onmousemove = e => {
+          prevSib.style.height =
+            prevSib.offsetHeight + e.clientY - dragX + 'px';
+          dragX = e.clientY;
+        };
+        document.onmouseup = () => {
+          document.onmousemove = document.onmouseup = null;
+          (<HTMLDivElement>(
+            prevSib.querySelector('.resize-cover')
+          )).style.display = 'none';
+          (<HTMLDivElement>(
+            document.querySelector('.secondary-container').lastElementChild
+          )).style.display = 'none';
+        };
+      };
+    }
+  });
   /**
    * terminate pyshell process with its threads on close or reload
    */

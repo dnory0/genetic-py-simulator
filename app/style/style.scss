@@ -24,25 +24,34 @@ body {
   height: 100%;
   opacity: 0;
   transition: opacity 0.2s;
+  display: flex;
+  flex-direction: column;
 
   .primary-container {
+    position: relative;
+    min-height: 200px;
     background-color: #fff;
     height: calc(50% + 13px);
-    border-bottom: 1px solid #8d7272;
-    box-sizing: border-box;
+    margin-bottom: -4px;
+    overflow: hidden;
   }
 
   .middle-container {
+    min-height: 180px;
     display: flex;
     height: calc(50% - 37px);
+    margin-top: -4px;
+    overflow: hidden;
+    flex: 1;
 
     .controls-container {
-      flex: 1;
-      width: 50%;
-      text-align: center;
-      border-right: 1px solid #8d7272;
+      min-width: 299px;
       display: flex;
       flex-flow: column;
+      width: 50%;
+      text-align: center;
+      margin-right: -4px;
+      overflow: hidden;
 
       .state-controls-container {
         display: flex;
@@ -116,6 +125,7 @@ body {
       }
 
       .parameters-container {
+        flex: 1;
         overflow-y: auto;
         height: -webkit-fill-available;
 
@@ -164,14 +174,20 @@ body {
               -webkit-appearance: none;
               flex: 1;
               height: 13px;
-              cursor: pointer;
               padding: 12px 0;
               margin-left: -4px;
+
+              &:not(:disabled) {
+                cursor: pointer;
+              }
+
+              &:disabled {
+                opacity: 0.6;
+              }
 
               &::-webkit-slider-runnable-track {
                 width: 100%;
                 height: 5px;
-                cursor: pointer;
                 background: #555555;
                 border-radius: 3px;
                 transition: background 0.15s;
@@ -183,17 +199,16 @@ body {
                 width: 14px;
                 border-radius: 7px;
                 background: #272727;
-                cursor: pointer;
                 -webkit-appearance: none;
                 margin-top: -5px;
                 transition: background 0.15s;
               }
 
-              &:hover::-webkit-slider-thumb {
+              &:not(:disabled):hover::-webkit-slider-thumb {
                 background: #6b6b6b;
               }
 
-              &:hover::-webkit-slider-runnable-track {
+              &:not(:disabled):hover::-webkit-slider-runnable-track {
                 background: #272727;
               }
             }
@@ -255,20 +270,63 @@ body {
     }
 
     .secondary-container {
+      position: relative;
+      margin-left: -4px;
       flex: 1;
       height: 100%;
       overflow-y: hidden;
+      min-width: 280px;
     }
   }
 
   .bottom-container {
     border-top: 1px solid #8d7272;
     height: 24px;
-    position: absolute;
+    min-height: 24px;
     bottom: 0;
     left: 0;
     right: 0;
     padding: 0 6px;
     box-sizing: border-box;
+  }
+
+  .slider {
+    background-clip: content-box;
+    background-color: #8d7272;
+    position: relative;
+
+    &.hor {
+      cursor: row-resize;
+      padding: 4px 0;
+      height: 1px;
+      min-height: 1px;
+    }
+
+    &.ver {
+      cursor: col-resize;
+      padding: 0 4px;
+      width: 1px;
+      min-width: 1px;
+      height: 100%;
+    }
+  }
+
+  .resize-cover {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    &.for-primary {
+      height: inherit;
+      width: 100%;
+      min-height: 180px;
+    }
+
+    &.for-secondary {
+      height: inherit;
+      width: 100%;
+      min-width: 280px;
+    }
   }
 }

@@ -185,6 +185,45 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         zoomViews();
     });
+    let sliders = document.getElementsByClassName('slider');
+    Array.from(sliders).forEach((slider) => {
+        const prevSib = slider.previousElementSibling;
+        if (slider.classList.contains('ver')) {
+            slider.onmousedown = e => {
+                (slider.nextElementSibling.querySelector('.resize-cover')).style.display = 'block';
+                (document.querySelector('.primary-container').lastElementChild).style.display = 'block';
+                let dragY = e.clientX;
+                console.log(prevSib);
+                window.onmousemove = e => {
+                    prevSib.style.width = prevSib.offsetWidth + e.clientX - dragY + 'px';
+                    dragY = e.clientX;
+                };
+                window.onmouseup = () => {
+                    window.onmousemove = window.onmouseup = null;
+                    (slider.nextElementSibling.querySelector('.resize-cover')).style.display = 'none';
+                    (document.querySelector('.primary-container').lastElementChild).style.display = 'none';
+                };
+            };
+        }
+        else if (slider.classList.contains('hor')) {
+            slider.onmousedown = e => {
+                prevSib.querySelector('.resize-cover').style.display =
+                    'block';
+                (document.querySelector('.secondary-container').lastElementChild).style.display = 'block';
+                let dragX = e.clientY;
+                document.onmousemove = e => {
+                    prevSib.style.height =
+                        prevSib.offsetHeight + e.clientY - dragX + 'px';
+                    dragX = e.clientY;
+                };
+                document.onmouseup = () => {
+                    document.onmousemove = document.onmouseup = null;
+                    (prevSib.querySelector('.resize-cover')).style.display = 'none';
+                    (document.querySelector('.secondary-container').lastElementChild).style.display = 'none';
+                };
+            };
+        }
+    });
     window.addEventListener('beforeunload', () => {
         pyshell.stdin.write(`${JSON.stringify({ exit: true })}\n`);
     });
