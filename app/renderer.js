@@ -8,11 +8,6 @@ let webFrame = window['webFrame'];
 delete window['webFrame'];
 const primary = document.getElementById('primary-chart');
 const secondary = document.getElementById('secondary-chart');
-const play = window['play'];
-const pause = window['pause'];
-const stop = window['stop'];
-const replay = window['replay'];
-const stepForward = window['stepForward'];
 let playBtn = document.getElementById('play-btn');
 let stopBtn = document.getElementById('stop-btn');
 let toStartBtn = document.getElementById('to-start-btn');
@@ -74,28 +69,26 @@ const blinkPlayBtn = () => {
 };
 let zoomViews = () => { };
 playBtn.onclick = () => {
-    if (isRunning) {
-        pause();
-    }
-    else {
-        play();
-    }
+    if (isRunning)
+        window['pause']();
+    else
+        window['play']();
     isRunning = !isRunning;
     switchBtn();
 };
 stopBtn.onclick = () => {
     setClickable(false);
-    stop();
+    window['stop']();
     isRunning = false;
     switchBtn();
 };
 toStartBtn.onclick = () => {
-    replay();
+    window['replay']();
     isRunning = true;
     switchBtn();
 };
 stepFBtn.onclick = () => {
-    stepForward();
+    window['stepForward']();
     isRunning = false;
     switchBtn();
 };
@@ -193,7 +186,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 (slider.nextElementSibling.querySelector('.resize-cover')).style.display = 'block';
                 (document.querySelector('.primary-container').lastElementChild).style.display = 'block';
                 let dragY = e.clientX;
-                console.log(prevSib);
                 window.onmousemove = e => {
                     prevSib.style.width = prevSib.offsetWidth + e.clientX - dragY + 'px';
                     dragY = e.clientX;
@@ -224,8 +216,6 @@ document.addEventListener('DOMContentLoaded', function () {
             };
         }
     });
-    window.addEventListener('beforeunload', () => {
-        pyshell.stdin.write(`exit\n`);
-    });
+    window.addEventListener('beforeunload', window['exit']);
 });
 //# sourceMappingURL=renderer.js.map

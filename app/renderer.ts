@@ -31,30 +31,6 @@ const primary: WebviewTag = <any>document.getElementById('primary-chart');
  */
 const secondary: WebviewTag = <any>document.getElementById('secondary-chart');
 
-/************************** GA States Changers part **************************/
-/**
- * send play to GA, python side is responsible for whether to start GA for first time or just resume
- *
- * disables hover settings for charts
- */
-const play: () => void = window['play'];
-/**
- * send pause to GA, enables hover settings for charts
- */
-const pause: () => void = window['pause'];
-/**
- * send stop to GA, enables hover settings for charts
- */
-const stop: () => void = window['stop'];
-/**
- * stops current GA and launches new one, disables hover settings for charts in case enabled
- */
-const replay: () => void = window['replay'];
-/**
- * send step forward to GA, pyshell pauses GA if needed, enables tooltip for charts in case disabled
- */
-const stepForward: () => void = window['stepForward'];
-
 /************************************ GUI ************************************
  *****************************************************************************/
 
@@ -223,11 +199,8 @@ let zoomViews = () => {};
  * a pyshell to start running and enable disabled buttons.
  */
 playBtn.onclick = () => {
-  if (isRunning) {
-    pause();
-  } else {
-    play();
-  }
+  if (isRunning) window['pause']();
+  else window['play']();
   // isRunning switched
   isRunning = !isRunning;
   switchBtn();
@@ -235,7 +208,7 @@ playBtn.onclick = () => {
 
 stopBtn.onclick = () => {
   setClickable(false);
-  stop();
+  window['stop']();
   // doesn't effect if pyshell is paused
   isRunning = false;
   // switch play/pause button to play state if needed
@@ -243,14 +216,14 @@ stopBtn.onclick = () => {
 };
 
 toStartBtn.onclick = () => {
-  replay();
+  window['replay']();
   // in case pyshell was paused before
   isRunning = true;
   switchBtn();
 };
 
 stepFBtn.onclick = () => {
-  stepForward();
+  window['stepForward']();
   // pyshell paused when going next step
   isRunning = false;
   // switch to paused state
@@ -432,7 +405,6 @@ document.addEventListener('DOMContentLoaded', function() {
           document.querySelector('.primary-container').lastElementChild
         )).style.display = 'block';
         let dragY = e.clientX;
-        console.log(prevSib);
         window.onmousemove = e => {
           prevSib.style.width = prevSib.offsetWidth + e.clientX - dragY + 'px';
           dragY = e.clientX;
@@ -475,7 +447,5 @@ document.addEventListener('DOMContentLoaded', function() {
   /**
    * terminate pyshell process with its threads on close or reload
    */
-  window.addEventListener('beforeunload', () => {
-    pyshell.stdin.write(`exit\n`);
-  });
+  window.addEventListener('beforeunload', window['exit']);
 });
