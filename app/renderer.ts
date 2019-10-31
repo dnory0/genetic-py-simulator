@@ -406,8 +406,14 @@ document.addEventListener('DOMContentLoaded', function() {
         )).style.display = 'block';
         let dragY = e.clientX;
         window.onmousemove = e => {
-          prevSib.style.width = prevSib.offsetWidth + e.clientX - dragY + 'px';
-          dragY = e.clientX;
+          if (
+            e.clientX <= document.body.offsetWidth - 280 &&
+            e.clientX >= 299
+          ) {
+            prevSib.style.width =
+              prevSib.offsetWidth + e.clientX - dragY + 'px';
+            dragY = e.clientX;
+          }
         };
         window.onmouseup = () => {
           window.onmousemove = window.onmouseup = null;
@@ -428,9 +434,14 @@ document.addEventListener('DOMContentLoaded', function() {
         )).style.display = 'block';
         let dragX = e.clientY;
         document.onmousemove = e => {
-          prevSib.style.height =
-            prevSib.offsetHeight + e.clientY - dragX + 'px';
-          dragX = e.clientY;
+          if (
+            e.clientY <= document.body.offsetHeight - 217 &&
+            e.clientY >= 200
+          ) {
+            prevSib.style.height =
+              prevSib.offsetHeight + e.clientY - dragX + 'px';
+            dragX = e.clientY;
+          }
         };
         document.onmouseup = () => {
           document.onmousemove = document.onmouseup = null;
