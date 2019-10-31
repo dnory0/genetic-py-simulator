@@ -160,7 +160,6 @@ body {
       -ms-flex: 1;
           flex: 1;
   overflow-y: auto;
-  height: -webkit-fill-available;
 }
 
 #main .middle-container .controls-container .parameters-container .parameter {
@@ -322,7 +321,7 @@ body {
       -ms-flex: 1;
           flex: 1;
   height: 100%;
-  overflow-y: hidden;
+  overflow: hidden;
   min-width: 280px;
 }
 

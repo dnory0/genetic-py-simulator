@@ -127,7 +127,6 @@ body {
       .parameters-container {
         flex: 1;
         overflow-y: auto;
-        height: -webkit-fill-available;
 
         .parameter {
           margin: 5px 0;
@@ -274,7 +273,7 @@ body {
       margin-left: -4px;
       flex: 1;
       height: 100%;
-      overflow-y: hidden;
+      overflow: hidden;
       min-width: 280px;
     }
   }

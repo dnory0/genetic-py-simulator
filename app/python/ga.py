@@ -337,18 +337,18 @@ def update_parameters(command: dict):
     if type(command.get('delay_rate')) is not type(None):
         # sleep in seconds
         g_delay_rate = round(final_value(.0, command.get('delay_rate'), command.get('random_delay_rate')), 2)
-    to_json({
-        "pop": g_pop_size,
-        "rnPop": command.get('random_pop_size'),
-        "genes": g_genes_num,
-        "rnGenes": command.get('random_genes_num'),
-        "crossover": g_crossover_rate,
-        "rnCO": command.get('random_crossover_rate'),
-        "mutation": g_mutation_rate,
-        "rnMut": command.get('random_mutation_rate'),
-        "delay": g_delay_rate,
-        "rnDelay": command.get('random_mutation_rate')
-    })
+    # to_json({
+    #     "pop": g_pop_size,
+    #     "rnPop": command.get('random_pop_size'),
+    #     "genes": g_genes_num,
+    #     "rnGenes": command.get('random_genes_num'),
+    #     "crossover": g_crossover_rate,
+    #     "rnCO": command.get('random_crossover_rate'),
+    #     "mutation": g_mutation_rate,
+    #     "rnMut": command.get('random_mutation_rate'),
+    #     "delay": g_delay_rate,
+    #     "rnDelay": command.get('random_delay_rate')
+    # })
 
 
 def init_ga(command: dict):
@@ -369,31 +369,31 @@ def init_ga(command: dict):
 # })
 
 while True:
-    cmd = json.loads(input())
-    if cmd.get('play'):
+    cmd = input()
+    if cmd == 'play':
         if ga_thread is not None and ga_thread.is_alive():
             ga_thread.resume()
         else:
             init_ga(cmd)
             ga_thread.start()
-    elif cmd.get('pause'):
+    elif cmd == 'pause':
         if ga_thread is not None and ga_thread.is_alive():
             ga_thread.pause()
-    elif cmd.get('stop'):
+    elif cmd == 'stop':
         if ga_thread is not None:
             ga_thread.stop()
-    elif cmd.get('replay'):
+    elif cmd == 'replay':
         if ga_thread is not None:
             ga_thread.stop()
         init_ga(cmd)
         ga_thread.start()
-    elif cmd.get('step_f'):
+    elif cmd == 'step_f':
         if ga_thread is None or not ga_thread.is_alive():
             init_ga(cmd)
         ga_thread.step_forward()
-    elif cmd.get('exit'):
+    elif cmd == 'exit':
         if ga_thread is not None:
             ga_thread.stop()
         sys.exit(0)
     else:
-        update_parameters(cmd)
+        update_parameters(json.loads(cmd))

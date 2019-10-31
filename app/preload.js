@@ -7,18 +7,21 @@ window['isDev'] = electron_1.remote.app.getAppPath().indexOf('.asar') === -1;
 const pyshell = require('./create-pyshell')(electron_1.remote.app);
 window['pyshell'] = pyshell;
 window['play'] = () => {
-    pyshell.stdin.write(`${JSON.stringify({ play: true })}\n`);
+    pyshell.stdin.write(`play\n`);
 };
 window['pause'] = () => {
-    pyshell.stdin.write(`${JSON.stringify({ pause: true })}\n`);
+    pyshell.stdin.write(`pause\n`);
 };
 window['stop'] = () => {
-    pyshell.stdin.write(`${JSON.stringify({ stop: true })}\n`);
+    pyshell.stdin.write(`stop\n`);
 };
 window['replay'] = () => {
-    pyshell.stdin.write(`${JSON.stringify({ replay: true })}\n`);
+    pyshell.stdin.write(`replay\n`);
 };
 window['stepForward'] = () => {
-    pyshell.stdin.write(`${JSON.stringify({ step_f: true })}\n`);
+    pyshell.stdin.write(`step_f\n`);
+};
+window['exit'] = () => {
+    pyshell.stdin.write(`exit\n`);
 };
 //# sourceMappingURL=preload.js.map

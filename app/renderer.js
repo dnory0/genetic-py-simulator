@@ -225,7 +225,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
     window.addEventListener('beforeunload', () => {
-        pyshell.stdin.write(`${JSON.stringify({ exit: true })}\n`);
+        pyshell.stdin.write(`exit\n`);
     });
 });
 //# sourceMappingURL=renderer.js.map

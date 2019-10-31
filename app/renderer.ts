@@ -476,6 +476,6 @@ document.addEventListener('DOMContentLoaded', function() {
    * terminate pyshell process with its threads on close or reload
    */
   window.addEventListener('beforeunload', () => {
-    pyshell.stdin.write(`${JSON.stringify({ exit: true })}\n`);
+    pyshell.stdin.write(`exit\n`);
   });
 });

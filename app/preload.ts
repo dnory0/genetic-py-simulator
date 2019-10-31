@@ -28,33 +28,40 @@ window['pyshell'] = pyshell;
  * send play to GA, python side is responsible for whether to start GA for first time are just resume
  */
 window['play'] = () => {
-  pyshell.stdin.write(`${JSON.stringify({ play: true })}\n`);
+  pyshell.stdin.write(`play\n`);
 };
 
 /**
  * send pause to GA
  */
 window['pause'] = () => {
-  pyshell.stdin.write(`${JSON.stringify({ pause: true })}\n`);
+  pyshell.stdin.write(`pause\n`);
 };
 
 /**
  * send stop to GA
  */
 window['stop'] = () => {
-  pyshell.stdin.write(`${JSON.stringify({ stop: true })}\n`);
+  pyshell.stdin.write(`stop\n`);
 };
 
 /**
  * stops current GA and launches new one
  */
 window['replay'] = () => {
-  pyshell.stdin.write(`${JSON.stringify({ replay: true })}\n`);
+  pyshell.stdin.write(`replay\n`);
 };
 
 /**
  * send step forward to GA, pyshell pauses GA if needed
  */
 window['stepForward'] = () => {
-  pyshell.stdin.write(`${JSON.stringify({ step_f: true })}\n`);
+  pyshell.stdin.write(`step_f\n`);
+};
+
+/**
+ * stops ga and free memory
+ */
+window['exit'] = () => {
+  pyshell.stdin.write(`exit\n`);
 };
