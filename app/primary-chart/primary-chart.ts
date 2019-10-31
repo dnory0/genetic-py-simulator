@@ -81,6 +81,7 @@ let primaryChart = window['createChart']('primary-chart', {
     }
   ] as SeriesLineOptions[]
 });
+delete window['createChart'];
 
 /**
  * an array of for every generation fittest genes

@@ -61,6 +61,7 @@ let secondaryChart = window['createChart']('secondary-chart', {
         }
     ]
 });
+delete window['createChart'];
 ipcRenderer.on('data', (_event, response) => {
     response
         .toString()

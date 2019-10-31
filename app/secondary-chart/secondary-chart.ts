@@ -117,6 +117,7 @@ let secondaryChart = window['createChart']('secondary-chart', {
     }
   ] as SeriesLineOptions[]
 });
+delete window['createChart'];
 
 ipcRenderer.on('data', (_event: IpcRendererEvent, response: Buffer) => {
   response

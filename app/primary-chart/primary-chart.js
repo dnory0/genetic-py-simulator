@@ -43,6 +43,7 @@ let primaryChart = window['createChart']('primary-chart', {
         }
     ]
 });
+delete window['createChart'];
 ipcRenderer.on('data', (_event, data) => {
     data
         .toString()
