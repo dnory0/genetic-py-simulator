@@ -119,27 +119,27 @@ let setReady = () => {
     document.getElementById('main').style.opacity = '1';
     document.getElementById('main').style.pointerEvents = 'inherit';
 };
-const parameterChanged = (numInput, checkInput, evType, key) => {
-    setTimeout(() => {
-        if (evType == 'keypress' && isNaN(parseFloat(key)))
-            return;
-        if ((isNaN(parseFloat(numInput.min)) ||
-            parseFloat(numInput.value) >= parseFloat(numInput.min)) &&
-            (isNaN(parseFloat(numInput.max)) ||
-                parseFloat(numInput.value) <= parseFloat(numInput.max))) {
-            numInput.style.backgroundColor = '#fff';
-            pyshell.stdin.write(`${JSON.stringify({
-                [numInput.name]: parseFloat(numInput.value),
-                [checkInput.name]: checkInput.checked
-            })}\n`);
-        }
-        else
-            numInput.style.backgroundColor = '#ff5a5a';
-    }, 0);
-};
 document.addEventListener('DOMContentLoaded', function () {
     primary.addEventListener('dom-ready', () => setReady());
     secondary.addEventListener('dom-ready', () => setReady());
+    const parameterChanged = (numInput, checkInput, evType, key) => {
+        setTimeout(() => {
+            if (evType == 'keypress' && isNaN(parseFloat(key)))
+                return;
+            if ((isNaN(parseFloat(numInput.min)) ||
+                parseFloat(numInput.value) >= parseFloat(numInput.min)) &&
+                (isNaN(parseFloat(numInput.max)) ||
+                    parseFloat(numInput.value) <= parseFloat(numInput.max))) {
+                numInput.style.backgroundColor = '#fff';
+                pyshell.stdin.write(`${JSON.stringify({
+                    [numInput.name]: parseFloat(numInput.value),
+                    [checkInput.name]: checkInput.checked
+                })}\n`);
+            }
+            else
+                numInput.style.backgroundColor = '#ff5a5a';
+        }, 0);
+    };
     popSize.onkeypress = popSize.onchange = pSRandom.onchange = (event) => {
         parameterChanged(popSize, pSRandom, event.type, event.key);
     };

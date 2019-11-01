@@ -275,43 +275,6 @@ let setReady = () => {
   document.getElementById('main').style.pointerEvents = 'inherit';
 };
 
-/**************************** Inputs Event handling ****************************/
-/**
- * checks if the changed input has a valid value, if true pass it to pyshell, else
- * highlight the input in red to indicate invalide value.
- * @param numInput    input of type number
- * @param checkInput  input of type checkbox
- * @param evType      keypress | change event
- * @param key         keyboard key pressed
- */
-const parameterChanged = (
-  numInput: HTMLInputElement,
-  checkInput: HTMLInputElement,
-  evType: string,
-  key?: string
-) => {
-  setTimeout(() => {
-    // console.log(parseFloat(numInput.value));
-    // prevent parameterChanged from being triggered twice if user used arrow keys,
-    if (evType == 'keypress' && isNaN(parseFloat(key))) return;
-
-    if (
-      (isNaN(parseFloat(numInput.min)) ||
-        parseFloat(numInput.value) >= parseFloat(numInput.min)) &&
-      (isNaN(parseFloat(numInput.max)) ||
-        parseFloat(numInput.value) <= parseFloat(numInput.max))
-    ) {
-      numInput.style.backgroundColor = '#fff';
-      pyshell.stdin.write(
-        `${JSON.stringify({
-          [numInput.name]: parseFloat(numInput.value),
-          [checkInput.name]: checkInput.checked
-        })}\n`
-      );
-    } else numInput.style.backgroundColor = '#ff5a5a';
-  }, 0);
-};
-
 document.addEventListener('DOMContentLoaded', function() {
   /**
    * whichever did finsh loading last is going to unlock controls for user,
@@ -319,6 +282,41 @@ document.addEventListener('DOMContentLoaded', function() {
   primary.addEventListener('dom-ready', () => setReady());
   secondary.addEventListener('dom-ready', () => setReady());
 
+  /**************************** Inputs Event handling ****************************/
+  /**
+   * checks if the changed input has a valid value, if true pass it to pyshell, else
+   * highlight the input in red to indicate invalide value.
+   * @param numInput    input of type number
+   * @param checkInput  input of type checkbox
+   * @param evType      keypress | change event
+   * @param key         keyboard key pressed
+   */
+  const parameterChanged = (
+    numInput: HTMLInputElement,
+    checkInput: HTMLInputElement,
+    evType: string,
+    key?: string
+  ) => {
+    setTimeout(() => {
+      // prevent parameterChanged from being triggered twice if user used arrow keys,
+      if (evType == 'keypress' && isNaN(parseFloat(key))) return;
+
+      if (
+        (isNaN(parseFloat(numInput.min)) ||
+          parseFloat(numInput.value) >= parseFloat(numInput.min)) &&
+        (isNaN(parseFloat(numInput.max)) ||
+          parseFloat(numInput.value) <= parseFloat(numInput.max))
+      ) {
+        numInput.style.backgroundColor = '#fff';
+        pyshell.stdin.write(
+          `${JSON.stringify({
+            [numInput.name]: parseFloat(numInput.value),
+            [checkInput.name]: checkInput.checked
+          })}\n`
+        );
+      } else numInput.style.backgroundColor = '#ff5a5a';
+    }, 0);
+  };
   /**
    * listen to parameters inputs change & keonkeyup events
    */
