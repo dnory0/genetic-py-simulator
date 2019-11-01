@@ -101,6 +101,7 @@ let setReady = () => {
             .toString()
             .split('\n')
             .forEach((args) => {
+            console.log(args);
             if (args)
                 treatResponse(JSON.parse(args));
         });
@@ -119,7 +120,8 @@ let setReady = () => {
     document.getElementById('main').style.opacity = '1';
     document.getElementById('main').style.pointerEvents = 'inherit';
 };
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function loaded() {
+    document.removeEventListener('DOMContentLoaded', loaded);
     primary.addEventListener('dom-ready', () => setReady());
     secondary.addEventListener('dom-ready', () => setReady());
     const parameterChanged = (numInput, checkInput, evType, key) => {
@@ -166,7 +168,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     ipcRenderer.on('zoom', (_event, type) => {
         if (type == 'in') {
-            if (webFrame.getZoomFactor() < 2)
+            if (webFrame.getZoomFactor() < 1.8)
                 webFrame.setZoomFactor(webFrame.getZoomFactor() + 0.1);
         }
         else if (type == 'out') {
@@ -176,6 +178,15 @@ document.addEventListener('DOMContentLoaded', function () {
         else {
             webFrame.setZoomFactor(1);
         }
+        Array.from(document.getElementsByClassName('slider')).forEach((slider) => {
+            let scale;
+            if (slider.classList.contains('hor')) {
+                scale = 'scaleY';
+            }
+            else
+                scale = 'scaleX';
+            slider.style['transform'] = `${scale}(${webFrame.getZoomFactor() < 1.5 ? 1 : 2 / webFrame.getZoomFactor()})`;
+        });
         zoomViews();
     });
     Array.from(document.getElementsByClassName('slider')).forEach((slider) => {

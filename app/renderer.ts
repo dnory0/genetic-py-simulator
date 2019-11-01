@@ -251,7 +251,7 @@ let setReady = () => {
       .toString()
       .split('\n')
       .forEach((args: string) => {
-        // console.log(args);
+        console.log(args);
         // sometimes args == ''(not sure why), those cases need to be ignored
         if (args) treatResponse(JSON.parse(args));
       });
@@ -274,8 +274,8 @@ let setReady = () => {
   document.getElementById('main').style.opacity = '1';
   document.getElementById('main').style.pointerEvents = 'inherit';
 };
-
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function loaded() {
+  document.removeEventListener('DOMContentLoaded', loaded);
   /**
    * whichever did finsh loading last is going to unlock controls for user,
    */
@@ -378,7 +378,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   ipcRenderer.on('zoom', (_event: IpcRendererEvent, type: string) => {
     if (type == 'in') {
-      if (webFrame.getZoomFactor() < 2)
+      if (webFrame.getZoomFactor() < 1.8)
         webFrame.setZoomFactor(webFrame.getZoomFactor() + 0.1);
     } else if (type == 'out') {
       if (webFrame.getZoomFactor() > 0.6)
@@ -386,6 +386,17 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
       webFrame.setZoomFactor(1);
     }
+    Array.from(document.getElementsByClassName('slider')).forEach(
+      (slider: HTMLDivElement) => {
+        let scale: string;
+        if (slider.classList.contains('hor')) {
+          scale = 'scaleY';
+        } else scale = 'scaleX';
+        slider.style['transform'] = `${scale}(${
+          webFrame.getZoomFactor() < 1.5 ? 1 : 2 / webFrame.getZoomFactor()
+        })`;
+      }
+    );
     zoomViews();
   });
 

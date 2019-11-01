@@ -39,7 +39,7 @@ body {
 
 #main .primary-container {
   position: relative;
-  min-height: 200px;
+  min-height: 140px;
   background-color: #fff;
   height: calc(50% + 13px);
   margin-bottom: -4px;
@@ -60,7 +60,7 @@ body {
 }
 
 #main .middle-container .controls-container {
-  min-width: 299px;
+  min-width: 388px;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -322,7 +322,7 @@ body {
           flex: 1;
   height: 100%;
   overflow: hidden;
-  min-width: 280px;
+  min-width: 140px;
 }
 
 #main .bottom-container {
@@ -360,7 +360,7 @@ body {
 }
 
 #main .resize-cover {
-  display: block !important;
+  display: none;
   position: absolute;
   top: 0;
   left: 0;
@@ -369,12 +369,12 @@ body {
 #main .resize-cover.for-primary {
   height: 100%;
   width: 100%;
-  min-height: 180px;
+  min-height: 140px;
 }
 
 #main .resize-cover.for-secondary {
   height: 100%;
   width: 100%;
-  min-width: 280px;
+  min-width: 140px;
 }
 /*# sourceMappingURL=style.css.map */

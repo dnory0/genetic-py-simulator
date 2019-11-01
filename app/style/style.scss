@@ -29,7 +29,7 @@ body {
 
   .primary-container {
     position: relative;
-    min-height: 200px;
+    min-height: 140px;
     background-color: #fff;
     height: calc(50% + 13px);
     margin-bottom: -4px;
@@ -45,7 +45,7 @@ body {
     flex: 1;
 
     .controls-container {
-      min-width: 299px;
+      min-width: 388px;
       display: flex;
       flex-flow: column;
       width: 50%;
@@ -274,7 +274,7 @@ body {
       flex: 1;
       height: 100%;
       overflow: hidden;
-      min-width: 280px;
+      min-width: 140px;
     }
   }
 
@@ -312,7 +312,7 @@ body {
   }
 
   .resize-cover {
-    display: block !important;
+    display: none;
     position: absolute;
     top: 0;
     left: 0;
@@ -320,13 +320,13 @@ body {
     &.for-primary {
       height: 100%;
       width: 100%;
-      min-height: 180px;
+      min-height: 140px;
     }
 
     &.for-secondary {
       height: 100%;
       width: 100%;
-      min-width: 280px;
+      min-width: 140px;
     }
   }
 }
