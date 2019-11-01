@@ -178,86 +178,70 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         zoomViews();
     });
-    let sliders = document.getElementsByClassName('slider');
-    Array.from(sliders).forEach((slider) => {
-        const prevSib = slider.previousElementSibling;
-        const nextSib = slider.nextElementSibling;
-        const prevDisp = prevSib.style.display;
-        const nextDisp = nextSib.style.display;
+    Array.from(document.getElementsByClassName('slider')).forEach((slider) => {
+        const prevSib = slider.previousElementSibling, nextSib = slider.nextElementSibling, prevDisp = prevSib.style.display, nextDisp = nextSib.style.display;
+        let prevRes, minPrevRes, minNextRes, client, winRes;
         if (slider.classList.contains('ver')) {
-            slider.onmousedown = () => {
-                document
-                    .querySelectorAll('.resize-cover')
-                    .forEach((ele) => (ele.style.display = 'block'));
-                window.onmousemove = (e) => {
-                    if (e.clientX >= 299 &&
-                        e.clientX <= document.body.offsetWidth - 280) {
-                        prevSib.style.width = e.clientX + 'px';
-                    }
-                    else if (e.clientX < 100) {
-                        prevSib.style.display = 'none';
-                    }
-                    else if (e.clientX >= 100) {
-                        if (prevSib.style.display == 'none') {
-                            prevSib.style.display = prevDisp;
-                        }
-                    }
-                    if (document.body.offsetWidth - e.clientX < 100) {
-                        nextSib.style.display = 'none';
-                        prevSib.style.flex = '1';
-                    }
-                    else if (document.body.offsetWidth - e.clientX >= 100) {
-                        if (nextSib.style.display == 'none') {
-                            nextSib.style.display = nextDisp;
-                            prevSib.style.flex = 'unset';
-                        }
-                    }
-                };
-                window.onmouseup = () => {
-                    window.onmousemove = window.onmouseup = null;
-                    document
-                        .querySelectorAll('.resize-cover')
-                        .forEach((ele) => (ele.style.display = 'none'));
-                };
-            };
+            prevRes = 'width';
+            minPrevRes = window.getComputedStyle(prevSib).minWidth.slice(0, -2);
+            minNextRes = window.getComputedStyle(nextSib).minWidth.slice(0, -2);
+            client = 'clientX';
+            winRes = 'innerWidth';
         }
         else if (slider.classList.contains('hor')) {
-            slider.onmousedown = () => {
-                document
-                    .querySelectorAll('.resize-cover')
-                    .forEach((ele) => (ele.style.display = 'block'));
-                window.onmousemove = (e) => {
-                    if (e.clientY >= 200 &&
-                        e.clientY <= document.body.offsetHeight - 180) {
-                        prevSib.style.height = e.clientY + 'px';
-                    }
-                    else if (e.clientY < 100) {
+            prevRes = 'height';
+            minPrevRes = window.getComputedStyle(prevSib).minHeight.slice(0, -2);
+            minNextRes = window.getComputedStyle(nextSib).minHeight.slice(0, -2);
+            client = 'clientY';
+            winRes = 'innerHeight';
+        }
+        slider.onmousedown = () => {
+            document
+                .querySelectorAll('.resize-cover')
+                .forEach((ele) => (ele.style.display = 'block'));
+            window.onmousemove = (e) => {
+                if (e[client] >= minPrevRes &&
+                    e[client] <= window[winRes] - minNextRes)
+                    prevSib.style[prevRes] = e[client] + 'px';
+                else if (e[client] < minPrevRes) {
+                    if (e[client] < 100) {
+                        slider.style.padding = '0 4px 4px 0';
+                        slider.style.margin = '-1px';
                         prevSib.style.display = 'none';
                     }
-                    else if (e.clientY >= 100) {
+                    else if (e[client] >= 100)
                         if (prevSib.style.display == 'none') {
+                            slider.style.padding = '';
+                            slider.style.margin = '';
                             prevSib.style.display = prevDisp;
                         }
+                }
+                else {
+                    if (window[winRes] - e[client] < 100) {
+                        if (nextSib.style.display != 'none') {
+                            slider.style.margin = '-1px';
+                            slider.style.padding = '4px 0 0 4px';
+                            nextSib.style.display = 'none';
+                            prevSib.style.flex = '1';
+                        }
                     }
-                    if (document.body.offsetHeight - e.clientY < 100) {
-                        nextSib.style.display = 'none';
-                        prevSib.style.flex = '1';
-                    }
-                    else if (document.body.offsetHeight - e.clientY >= 100) {
+                    else if (window[winRes] - e[client] >= 100) {
                         if (nextSib.style.display == 'none') {
+                            slider.style.padding = '';
+                            slider.style.margin = '';
                             nextSib.style.display = nextDisp;
                             prevSib.style.flex = 'unset';
                         }
                     }
-                };
-                window.onmouseup = () => {
-                    window.onmousemove = window.onmouseup = null;
-                    document
-                        .querySelectorAll('.resize-cover')
-                        .forEach((ele) => (ele.style.display = 'none'));
-                };
+                }
             };
-        }
+            window.onmouseup = () => {
+                window.onmousemove = window.onmouseup = null;
+                document
+                    .querySelectorAll('.resize-cover')
+                    .forEach((ele) => (ele.style.display = 'none'));
+            };
+        };
     });
     window.addEventListener('beforeunload', window['exit']);
 });

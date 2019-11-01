@@ -37,7 +37,7 @@ body {
   }
 
   .middle-container {
-    min-height: 180px;
+    min-height: 140px;
     display: flex;
     height: calc(50% - 37px);
     margin-top: -4px;
@@ -312,19 +312,19 @@ body {
   }
 
   .resize-cover {
-    display: none;
+    display: block !important;
     position: absolute;
     top: 0;
     left: 0;
 
     &.for-primary {
-      height: inherit;
+      height: 100%;
       width: 100%;
       min-height: 180px;
     }
 
     &.for-secondary {
-      height: inherit;
+      height: 100%;
       width: 100%;
       min-width: 280px;
     }

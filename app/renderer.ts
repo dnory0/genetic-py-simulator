@@ -391,14 +391,30 @@ document.addEventListener('DOMContentLoaded', function() {
     zoomViews();
   });
 
-  let sliders = document.getElementsByClassName('slider');
-
-  Array.from(sliders).forEach((slider: HTMLDivElement) => {
-    const prevSib = <HTMLDivElement>slider.previousElementSibling;
-    const nextSib = <HTMLDivElement>slider.nextElementSibling;
-    const prevDisp = prevSib.style.display;
-    const nextDisp = nextSib.style.display;
-    if (slider.classList.contains('ver')) {
+  Array.from(document.getElementsByClassName('slider')).forEach(
+    (slider: HTMLDivElement) => {
+      const prevSib = <HTMLDivElement>slider.previousElementSibling,
+        nextSib = <HTMLDivElement>slider.nextElementSibling,
+        prevDisp = prevSib.style.display,
+        nextDisp = nextSib.style.display;
+      let prevRes: string,
+        minPrevRes: any,
+        minNextRes: any,
+        client: string,
+        winRes: string;
+      if (slider.classList.contains('ver')) {
+        prevRes = 'width';
+        minPrevRes = window.getComputedStyle(prevSib).minWidth.slice(0, -2);
+        minNextRes = window.getComputedStyle(nextSib).minWidth.slice(0, -2);
+        client = 'clientX';
+        winRes = 'innerWidth';
+      } else if (slider.classList.contains('hor')) {
+        prevRes = 'height';
+        minPrevRes = window.getComputedStyle(prevSib).minHeight.slice(0, -2);
+        minNextRes = window.getComputedStyle(nextSib).minHeight.slice(0, -2);
+        client = 'clientY';
+        winRes = 'innerHeight';
+      }
       slider.onmousedown = () => {
         document
           .querySelectorAll('.resize-cover')
@@ -406,66 +422,39 @@ document.addEventListener('DOMContentLoaded', function() {
         window.onmousemove = (e: MouseEvent) => {
           // does only the resize and no hiding and showing
           if (
-            e.clientX >= 299 &&
-            e.clientX <= document.body.offsetWidth - 280
-          ) {
-            prevSib.style.width = e.clientX + 'px';
-          }
+            e[client] >= minPrevRes &&
+            e[client] <= window[winRes] - minNextRes
+          )
+            prevSib.style[prevRes] = e[client] + 'px';
           // hider and shower of the previous div
-          else if (e.clientX < 100) {
-            prevSib.style.display = 'none';
-          } else if (e.clientX >= 100) {
-            if (prevSib.style.display == 'none') {
-              prevSib.style.display = prevDisp;
-            }
+          else if (e[client] < minPrevRes) {
+            if (e[client] < 100) {
+              slider.style.padding = '0 4px 4px 0';
+              slider.style.margin = '-1px';
+              prevSib.style.display = 'none';
+            } else if (e[client] >= 100)
+              if (prevSib.style.display == 'none') {
+                slider.style.padding = '';
+                slider.style.margin = '';
+                prevSib.style.display = prevDisp;
+              }
           }
           // hider and shower of the next div
-          if (document.body.offsetWidth - e.clientX < 100) {
-            nextSib.style.display = 'none';
-            prevSib.style.flex = '1';
-          } else if (document.body.offsetWidth - e.clientX >= 100) {
-            if (nextSib.style.display == 'none') {
-              nextSib.style.display = nextDisp;
-              prevSib.style.flex = 'unset';
-            }
-          }
-        };
-        window.onmouseup = () => {
-          window.onmousemove = window.onmouseup = null;
-          document
-            .querySelectorAll('.resize-cover')
-            .forEach((ele: HTMLDivElement) => (ele.style.display = 'none'));
-        };
-      };
-    } else if (slider.classList.contains('hor')) {
-      slider.onmousedown = () => {
-        document
-          .querySelectorAll('.resize-cover')
-          .forEach((ele: HTMLDivElement) => (ele.style.display = 'block'));
-        window.onmousemove = (e: MouseEvent) => {
-          // does only the resize and no hiding and showing
-          if (
-            e.clientY >= 200 &&
-            e.clientY <= document.body.offsetHeight - 180
-          ) {
-            prevSib.style.height = e.clientY + 'px';
-          }
-          // hider and shower of the previous div
-          else if (e.clientY < 100) {
-            prevSib.style.display = 'none';
-          } else if (e.clientY >= 100) {
-            if (prevSib.style.display == 'none') {
-              prevSib.style.display = prevDisp;
-            }
-          }
-          // hider and shower of the next div
-          if (document.body.offsetHeight - e.clientY < 100) {
-            nextSib.style.display = 'none';
-            prevSib.style.flex = '1';
-          } else if (document.body.offsetHeight - e.clientY >= 100) {
-            if (nextSib.style.display == 'none') {
-              nextSib.style.display = nextDisp;
-              prevSib.style.flex = 'unset';
+          else {
+            if (window[winRes] - e[client] < 100) {
+              if (nextSib.style.display != 'none') {
+                slider.style.margin = '-1px';
+                slider.style.padding = '4px 0 0 4px';
+                nextSib.style.display = 'none';
+                prevSib.style.flex = '1';
+              }
+            } else if (window[winRes] - e[client] >= 100) {
+              if (nextSib.style.display == 'none') {
+                slider.style.padding = '';
+                slider.style.margin = '';
+                nextSib.style.display = nextDisp;
+                prevSib.style.flex = 'unset';
+              }
             }
           }
         };
@@ -477,7 +466,7 @@ document.addEventListener('DOMContentLoaded', function() {
         };
       };
     }
-  });
+  );
   /**
    * terminate pyshell process with its threads on close or reload
    */

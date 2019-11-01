@@ -47,7 +47,7 @@ body {
 }
 
 #main .middle-container {
-  min-height: 180px;
+  min-height: 140px;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -360,20 +360,20 @@ body {
 }
 
 #main .resize-cover {
-  display: none;
+  display: block !important;
   position: absolute;
   top: 0;
   left: 0;
 }
 
 #main .resize-cover.for-primary {
-  height: inherit;
+  height: 100%;
   width: 100%;
   min-height: 180px;
 }
 
 #main .resize-cover.for-secondary {
-  height: inherit;
+  height: 100%;
   width: 100%;
   min-width: 280px;
 }
