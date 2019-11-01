@@ -394,63 +394,86 @@ document.addEventListener('DOMContentLoaded', function() {
   let sliders = document.getElementsByClassName('slider');
 
   Array.from(sliders).forEach((slider: HTMLDivElement) => {
-    // console.log(slider);
     const prevSib = <HTMLDivElement>slider.previousElementSibling;
+    const nextSib = <HTMLDivElement>slider.nextElementSibling;
+    const prevDisp = prevSib.style.display;
+    const nextDisp = nextSib.style.display;
     if (slider.classList.contains('ver')) {
-      slider.onmousedown = e => {
-        (<HTMLDivElement>(
-          slider.nextElementSibling.querySelector('.resize-cover')
-        )).style.display = 'block';
-        (<HTMLDivElement>(
-          document.querySelector('.primary-container').lastElementChild
-        )).style.display = 'block';
-        let dragY = e.clientX;
-        window.onmousemove = e => {
+      slider.onmousedown = () => {
+        document
+          .querySelectorAll('.resize-cover')
+          .forEach((ele: HTMLDivElement) => (ele.style.display = 'block'));
+        window.onmousemove = (e: MouseEvent) => {
+          // does only the resize and no hiding and showing
           if (
-            e.clientX <= document.body.offsetWidth - 280 &&
-            e.clientX >= 299
+            e.clientX >= 299 &&
+            e.clientX <= document.body.offsetWidth - 280
           ) {
-            prevSib.style.width =
-              prevSib.offsetWidth + e.clientX - dragY + 'px';
-            dragY = e.clientX;
+            prevSib.style.width = e.clientX + 'px';
+          }
+          // hider and shower of the previous div
+          else if (e.clientX < 100) {
+            prevSib.style.display = 'none';
+          } else if (e.clientX >= 100) {
+            if (prevSib.style.display == 'none') {
+              prevSib.style.display = prevDisp;
+            }
+          }
+          // hider and shower of the next div
+          if (document.body.offsetWidth - e.clientX < 100) {
+            nextSib.style.display = 'none';
+            prevSib.style.flex = '1';
+          } else if (document.body.offsetWidth - e.clientX >= 100) {
+            if (nextSib.style.display == 'none') {
+              nextSib.style.display = nextDisp;
+              prevSib.style.flex = 'unset';
+            }
           }
         };
         window.onmouseup = () => {
           window.onmousemove = window.onmouseup = null;
-          (<HTMLDivElement>(
-            slider.nextElementSibling.querySelector('.resize-cover')
-          )).style.display = 'none';
-          (<HTMLDivElement>(
-            document.querySelector('.primary-container').lastElementChild
-          )).style.display = 'none';
+          document
+            .querySelectorAll('.resize-cover')
+            .forEach((ele: HTMLDivElement) => (ele.style.display = 'none'));
         };
       };
     } else if (slider.classList.contains('hor')) {
-      slider.onmousedown = e => {
-        (<HTMLDivElement>prevSib.querySelector('.resize-cover')).style.display =
-          'block';
-        (<HTMLDivElement>(
-          document.querySelector('.secondary-container').lastElementChild
-        )).style.display = 'block';
-        let dragX = e.clientY;
-        document.onmousemove = e => {
+      slider.onmousedown = () => {
+        document
+          .querySelectorAll('.resize-cover')
+          .forEach((ele: HTMLDivElement) => (ele.style.display = 'block'));
+        window.onmousemove = (e: MouseEvent) => {
+          // does only the resize and no hiding and showing
           if (
-            e.clientY <= document.body.offsetHeight - 217 &&
-            e.clientY >= 200
+            e.clientY >= 200 &&
+            e.clientY <= document.body.offsetHeight - 180
           ) {
-            prevSib.style.height =
-              prevSib.offsetHeight + e.clientY - dragX + 'px';
-            dragX = e.clientY;
+            prevSib.style.height = e.clientY + 'px';
+          }
+          // hider and shower of the previous div
+          else if (e.clientY < 100) {
+            prevSib.style.display = 'none';
+          } else if (e.clientY >= 100) {
+            if (prevSib.style.display == 'none') {
+              prevSib.style.display = prevDisp;
+            }
+          }
+          // hider and shower of the next div
+          if (document.body.offsetHeight - e.clientY < 100) {
+            nextSib.style.display = 'none';
+            prevSib.style.flex = '1';
+          } else if (document.body.offsetHeight - e.clientY >= 100) {
+            if (nextSib.style.display == 'none') {
+              nextSib.style.display = nextDisp;
+              prevSib.style.flex = 'unset';
+            }
           }
         };
-        document.onmouseup = () => {
-          document.onmousemove = document.onmouseup = null;
-          (<HTMLDivElement>(
-            prevSib.querySelector('.resize-cover')
-          )).style.display = 'none';
-          (<HTMLDivElement>(
-            document.querySelector('.secondary-container').lastElementChild
-          )).style.display = 'none';
+        window.onmouseup = () => {
+          window.onmousemove = window.onmouseup = null;
+          document
+            .querySelectorAll('.resize-cover')
+            .forEach((ele: HTMLDivElement) => (ele.style.display = 'none'));
         };
       };
     }

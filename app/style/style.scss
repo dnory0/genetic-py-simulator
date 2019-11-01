@@ -279,7 +279,7 @@ body {
   }
 
   .bottom-container {
-    border-top: 1px solid #8d7272;
+    border-top: 1px solid #cebbbb;
     height: 24px;
     min-height: 24px;
     bottom: 0;
@@ -293,16 +293,17 @@ body {
     background-clip: content-box;
     background-color: #cebbbb;
     position: relative;
+    z-index: 1;
 
     &.hor {
-      cursor: row-resize;
+      cursor: ns-resize;
       padding: 4px 0;
       height: 1px;
       min-height: 1px;
     }
 
     &.ver {
-      cursor: col-resize;
+      cursor: ew-resize;
       padding: 0 4px;
       width: 1px;
       min-width: 1px;

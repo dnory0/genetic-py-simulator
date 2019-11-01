@@ -181,44 +181,80 @@ document.addEventListener('DOMContentLoaded', function () {
     let sliders = document.getElementsByClassName('slider');
     Array.from(sliders).forEach((slider) => {
         const prevSib = slider.previousElementSibling;
+        const nextSib = slider.nextElementSibling;
+        const prevDisp = prevSib.style.display;
+        const nextDisp = nextSib.style.display;
         if (slider.classList.contains('ver')) {
-            slider.onmousedown = e => {
-                (slider.nextElementSibling.querySelector('.resize-cover')).style.display = 'block';
-                (document.querySelector('.primary-container').lastElementChild).style.display = 'block';
-                let dragY = e.clientX;
-                window.onmousemove = e => {
-                    if (e.clientX <= document.body.offsetWidth - 280 &&
-                        e.clientX >= 299) {
-                        prevSib.style.width =
-                            prevSib.offsetWidth + e.clientX - dragY + 'px';
-                        dragY = e.clientX;
+            slider.onmousedown = () => {
+                document
+                    .querySelectorAll('.resize-cover')
+                    .forEach((ele) => (ele.style.display = 'block'));
+                window.onmousemove = (e) => {
+                    if (e.clientX >= 299 &&
+                        e.clientX <= document.body.offsetWidth - 280) {
+                        prevSib.style.width = e.clientX + 'px';
+                    }
+                    else if (e.clientX < 100) {
+                        prevSib.style.display = 'none';
+                    }
+                    else if (e.clientX >= 100) {
+                        if (prevSib.style.display == 'none') {
+                            prevSib.style.display = prevDisp;
+                        }
+                    }
+                    if (document.body.offsetWidth - e.clientX < 100) {
+                        nextSib.style.display = 'none';
+                        prevSib.style.flex = '1';
+                    }
+                    else if (document.body.offsetWidth - e.clientX >= 100) {
+                        if (nextSib.style.display == 'none') {
+                            nextSib.style.display = nextDisp;
+                            prevSib.style.flex = 'unset';
+                        }
                     }
                 };
                 window.onmouseup = () => {
                     window.onmousemove = window.onmouseup = null;
-                    (slider.nextElementSibling.querySelector('.resize-cover')).style.display = 'none';
-                    (document.querySelector('.primary-container').lastElementChild).style.display = 'none';
+                    document
+                        .querySelectorAll('.resize-cover')
+                        .forEach((ele) => (ele.style.display = 'none'));
                 };
             };
         }
         else if (slider.classList.contains('hor')) {
-            slider.onmousedown = e => {
-                prevSib.querySelector('.resize-cover').style.display =
-                    'block';
-                (document.querySelector('.secondary-container').lastElementChild).style.display = 'block';
-                let dragX = e.clientY;
-                document.onmousemove = e => {
-                    if (e.clientY <= document.body.offsetHeight - 217 &&
-                        e.clientY >= 200) {
-                        prevSib.style.height =
-                            prevSib.offsetHeight + e.clientY - dragX + 'px';
-                        dragX = e.clientY;
+            slider.onmousedown = () => {
+                document
+                    .querySelectorAll('.resize-cover')
+                    .forEach((ele) => (ele.style.display = 'block'));
+                window.onmousemove = (e) => {
+                    if (e.clientY >= 200 &&
+                        e.clientY <= document.body.offsetHeight - 180) {
+                        prevSib.style.height = e.clientY + 'px';
+                    }
+                    else if (e.clientY < 100) {
+                        prevSib.style.display = 'none';
+                    }
+                    else if (e.clientY >= 100) {
+                        if (prevSib.style.display == 'none') {
+                            prevSib.style.display = prevDisp;
+                        }
+                    }
+                    if (document.body.offsetHeight - e.clientY < 100) {
+                        nextSib.style.display = 'none';
+                        prevSib.style.flex = '1';
+                    }
+                    else if (document.body.offsetHeight - e.clientY >= 100) {
+                        if (nextSib.style.display == 'none') {
+                            nextSib.style.display = nextDisp;
+                            prevSib.style.flex = 'unset';
+                        }
                     }
                 };
-                document.onmouseup = () => {
-                    document.onmousemove = document.onmouseup = null;
-                    (prevSib.querySelector('.resize-cover')).style.display = 'none';
-                    (document.querySelector('.secondary-container').lastElementChild).style.display = 'none';
+                window.onmouseup = () => {
+                    window.onmousemove = window.onmouseup = null;
+                    document
+                        .querySelectorAll('.resize-cover')
+                        .forEach((ele) => (ele.style.display = 'none'));
                 };
             };
         }
