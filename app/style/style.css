@@ -266,8 +266,8 @@ body {
 
 #main .middle-container .controls-container .parameters-container .parameter .input-wrapper input[type='number'] {
   margin-right: 0;
-  min-width: 72px;
-  max-width: 72px;
+  min-width: 46px;
+  max-width: 46px;
 }
 
 #main .middle-container .controls-container .parameters-container .parameter .checkbox-wrapper {
