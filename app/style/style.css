@@ -337,21 +337,21 @@ body {
           box-sizing: border-box;
 }
 
-#main .slider {
+#main .border {
   background-clip: content-box;
   background-color: #cebbbb;
   position: relative;
   z-index: 1;
 }
 
-#main .slider.hor {
+#main .border.hor {
   cursor: ns-resize;
   padding: 4px 0;
   height: 1px;
   min-height: 1px;
 }
 
-#main .slider.ver {
+#main .border.ver {
   cursor: ew-resize;
   padding: 0 4px;
   width: 1px;

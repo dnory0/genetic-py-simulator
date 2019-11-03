@@ -251,7 +251,7 @@ let setReady = () => {
       .toString()
       .split('\n')
       .forEach((args: string) => {
-        console.log(args);
+        // console.log(args);
         // sometimes args == ''(not sure why), those cases need to be ignored
         if (args) treatResponse(JSON.parse(args));
       });
@@ -298,7 +298,6 @@ document.addEventListener('DOMContentLoaded', function loaded() {
     key?: string
   ) => {
     setTimeout(() => {
-      // prevent parameterChanged from being triggered twice if user used arrow keys,
       if (evType == 'keypress' && isNaN(parseFloat(key))) return;
 
       if (
@@ -386,13 +385,13 @@ document.addEventListener('DOMContentLoaded', function loaded() {
     } else {
       webFrame.setZoomFactor(1);
     }
-    Array.from(document.getElementsByClassName('slider')).forEach(
-      (slider: HTMLDivElement) => {
+    Array.from(document.getElementsByClassName('border')).forEach(
+      (border: HTMLDivElement) => {
         let scale: string;
-        if (slider.classList.contains('hor')) {
+        if (border.classList.contains('hor')) {
           scale = 'scaleY';
         } else scale = 'scaleX';
-        slider.style['transform'] = `${scale}(${
+        border.style['transform'] = `${scale}(${
           webFrame.getZoomFactor() < 1.5 ? 1 : 2 / webFrame.getZoomFactor()
         })`;
       }
@@ -400,10 +399,10 @@ document.addEventListener('DOMContentLoaded', function loaded() {
     zoomViews();
   });
 
-  Array.from(document.getElementsByClassName('slider')).forEach(
-    (slider: HTMLDivElement) => {
-      const prevSib = <HTMLDivElement>slider.previousElementSibling,
-        nextSib = <HTMLDivElement>slider.nextElementSibling,
+  Array.from(document.getElementsByClassName('border')).forEach(
+    (border: HTMLDivElement) => {
+      const prevSib = <HTMLDivElement>border.previousElementSibling,
+        nextSib = <HTMLDivElement>border.nextElementSibling,
         prevDisp = prevSib.style.display,
         nextDisp = nextSib.style.display;
       let prevRes: string,
@@ -411,20 +410,20 @@ document.addEventListener('DOMContentLoaded', function loaded() {
         minNextRes: any,
         client: string,
         winRes: string;
-      if (slider.classList.contains('ver')) {
+      if (border.classList.contains('ver')) {
         prevRes = 'width';
         minPrevRes = window.getComputedStyle(prevSib).minWidth.slice(0, -2);
         minNextRes = window.getComputedStyle(nextSib).minWidth.slice(0, -2);
         client = 'clientX';
         winRes = 'innerWidth';
-      } else if (slider.classList.contains('hor')) {
+      } else if (border.classList.contains('hor')) {
         prevRes = 'height';
         minPrevRes = window.getComputedStyle(prevSib).minHeight.slice(0, -2);
         minNextRes = window.getComputedStyle(nextSib).minHeight.slice(0, -2);
         client = 'clientY';
         winRes = 'innerHeight';
       }
-      slider.onmousedown = () => {
+      border.onmousedown = () => {
         document
           .querySelectorAll('.resize-cover')
           .forEach((ele: HTMLDivElement) => (ele.style.display = 'block'));
@@ -438,13 +437,13 @@ document.addEventListener('DOMContentLoaded', function loaded() {
           // hider and shower of the previous div
           else if (e[client] < minPrevRes) {
             if (e[client] < 100) {
-              slider.style.padding = '0 4px 4px 0';
-              slider.style.margin = '-1px';
+              border.style.padding = '0 4px 4px 0';
+              border.style.margin = '-1px';
               prevSib.style.display = 'none';
             } else if (e[client] >= 100)
               if (prevSib.style.display == 'none') {
-                slider.style.padding = '';
-                slider.style.margin = '';
+                border.style.padding = '';
+                border.style.margin = '';
                 prevSib.style.display = prevDisp;
               }
           }
@@ -452,15 +451,15 @@ document.addEventListener('DOMContentLoaded', function loaded() {
           else {
             if (window[winRes] - e[client] < 100) {
               if (nextSib.style.display != 'none') {
-                slider.style.margin = '-1px';
-                slider.style.padding = '4px 0 0 4px';
+                border.style.margin = '-1px';
+                border.style.padding = '4px 0 0 4px';
                 nextSib.style.display = 'none';
                 prevSib.style.flex = '1';
               }
             } else if (window[winRes] - e[client] >= 100) {
               if (nextSib.style.display == 'none') {
-                slider.style.padding = '';
-                slider.style.margin = '';
+                border.style.padding = '';
+                border.style.margin = '';
                 nextSib.style.display = nextDisp;
                 prevSib.style.flex = 'unset';
               }
