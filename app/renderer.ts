@@ -288,19 +288,63 @@ document.addEventListener('DOMContentLoaded', function loaded() {
    * highlight the input in red to indicate invalide value.
    * @param numInput    input of type number
    * @param checkInput  input of type checkbox
-   * @param evType      keypress | change event
-   * @param key         keyboard key pressed
+   * @param mustBeInt   must be integer flag, if triggered value should not contain dot '.'
+   * @param event       keyboard key pressed
    */
   const parameterChanged = (
     numInput: HTMLInputElement,
     checkInput: HTMLInputElement,
-    evType: string,
-    key?: string
+    mustBeInt: boolean,
+    event: Event
   ) => {
     setTimeout(() => {
-      if (evType == 'keypress' && isNaN(parseFloat(key))) return;
-
       if (
+        isNaN(<any>numInput.value) ||
+        [
+          'Control',
+          'Shift',
+          'Alt',
+          'CapsLock',
+          'AltGraph',
+          'Tab',
+          'Enter',
+          'ArrowLeft',
+          'ArrowRight',
+          'Home',
+          'End'
+        ].includes((<KeyboardEvent>event).key)
+      )
+        return;
+
+      /**
+       * if mustBeInt than:
+       *    - if parsing int is not NaN && the fractional part is equal to zero, than it's
+       *      safe to delete it with its period.
+       */
+      if (
+        mustBeInt &&
+        !isNaN(parseInt(numInput.value)) &&
+        parseInt(numInput.value) == <any>numInput.value
+      ) {
+        // this removes the last period
+        numInput.value = `${parseInt(numInput.value) + 1}`;
+        numInput.value = `${parseInt(numInput.value) - 1}`;
+      }
+
+      /**
+       * if mustBeInt is true than:
+       *    - last entered key must not be a period '.'.
+       *    - the numInput itself shoold not have the period too.
+       *    Note: those two conditions above are necessary since input type number behavior is
+       *      a little unexpected and if input ends with period it is not going to show it when
+       *      trying to access input value so in that case we need to compte on event.key to
+       *      not be a period.
+       * else these conditions are not necessary.
+       * all inputs type number needs to be greater than or equal to mox and less than or equal
+       * to the min.
+       */
+      if (
+        ((mustBeInt && !numInput.value.includes('.')) || !mustBeInt) &&
         (isNaN(parseFloat(numInput.min)) ||
           parseFloat(numInput.value) >= parseFloat(numInput.min)) &&
         (isNaN(parseFloat(numInput.max)) ||
@@ -313,57 +357,29 @@ document.addEventListener('DOMContentLoaded', function loaded() {
             [checkInput.name]: checkInput.checked
           })}\n`
         );
-      } else numInput.style.backgroundColor = '#ff5a5a';
+      } else numInput.style.backgroundColor = '#ff4343b8';
     }, 0);
   };
   /**
    * listen to parameters inputs change & keonkeyup events
    */
-  popSize.onkeypress = popSize.onchange = pSRandom.onchange = (
-    event: Event
-  ) => {
-    parameterChanged(popSize, pSRandom, event.type, (<KeyboardEvent>event).key);
+  popSize.onkeyup = pSRandom.onchange = (event: Event) => {
+    parameterChanged(popSize, pSRandom, true, event);
   };
-  genesNum.onkeypress = genesNum.onchange = gNRandom.onchange = (
-    event: Event
-  ) => {
-    parameterChanged(
-      genesNum,
-      gNRandom,
-      event.type,
-      (<KeyboardEvent>event).key
-    );
+  genesNum.onkeyup = gNRandom.onchange = (event: Event) => {
+    parameterChanged(genesNum, gNRandom, true, event);
   };
 
-  crossover.onkeypress = crossover.onchange = coRandom.onchange = (
-    event: Event
-  ) => {
-    parameterChanged(
-      crossover,
-      coRandom,
-      event.type,
-      (<KeyboardEvent>event).key
-    );
+  crossover.onkeyup = coRandom.onchange = (event: Event) => {
+    parameterChanged(crossover, coRandom, false, event);
   };
 
-  mutation.onkeypress = mutation.onchange = mutRandom.onchange = (
-    event: Event
-  ) => {
-    parameterChanged(
-      mutation,
-      mutRandom,
-      event.type,
-      (<KeyboardEvent>event).key
-    );
+  mutation.onkeyup = mutRandom.onchange = (event: Event) => {
+    parameterChanged(mutation, mutRandom, false, event);
   };
 
-  delay.onkeypress = delay.onchange = delayRandom.onchange = (event: Event) => {
-    parameterChanged(
-      delay,
-      delayRandom,
-      event.type,
-      (<KeyboardEvent>event).key
-    );
+  delay.onkeyup = delayRandom.onchange = (event: Event) => {
+    parameterChanged(delay, delayRandom, false, event);
   };
 
   if (window['isDev']) {

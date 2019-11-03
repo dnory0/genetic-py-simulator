@@ -123,12 +123,32 @@ document.addEventListener('DOMContentLoaded', function loaded() {
     document.removeEventListener('DOMContentLoaded', loaded);
     primary.addEventListener('dom-ready', () => setReady());
     secondary.addEventListener('dom-ready', () => setReady());
-    const parameterChanged = (numInput, checkInput, evType, key) => {
+    const parameterChanged = (numInput, checkInput, mustBeInt, event) => {
         setTimeout(() => {
-            if (evType == 'keypress' && isNaN(parseFloat(key)))
+            if (isNaN(numInput.value) ||
+                [
+                    'Control',
+                    'Shift',
+                    'Alt',
+                    'CapsLock',
+                    'AltGraph',
+                    'Tab',
+                    'Enter',
+                    'ArrowLeft',
+                    'ArrowRight',
+                    'Home',
+                    'End'
+                ].includes(event.key))
                 return;
-            if ((isNaN(parseFloat(numInput.min)) ||
-                parseFloat(numInput.value) >= parseFloat(numInput.min)) &&
+            if (mustBeInt &&
+                !isNaN(parseInt(numInput.value)) &&
+                parseInt(numInput.value) == numInput.value) {
+                numInput.value = `${parseInt(numInput.value) + 1}`;
+                numInput.value = `${parseInt(numInput.value) - 1}`;
+            }
+            if (((mustBeInt && !numInput.value.includes('.')) || !mustBeInt) &&
+                (isNaN(parseFloat(numInput.min)) ||
+                    parseFloat(numInput.value) >= parseFloat(numInput.min)) &&
                 (isNaN(parseFloat(numInput.max)) ||
                     parseFloat(numInput.value) <= parseFloat(numInput.max))) {
                 numInput.style.backgroundColor = '#fff';
@@ -138,23 +158,23 @@ document.addEventListener('DOMContentLoaded', function loaded() {
                 })}\n`);
             }
             else
-                numInput.style.backgroundColor = '#ff5a5a';
+                numInput.style.backgroundColor = '#ff4343b8';
         }, 0);
     };
-    popSize.onkeypress = popSize.onchange = pSRandom.onchange = (event) => {
-        parameterChanged(popSize, pSRandom, event.type, event.key);
+    popSize.onkeyup = pSRandom.onchange = (event) => {
+        parameterChanged(popSize, pSRandom, true, event);
     };
-    genesNum.onkeypress = genesNum.onchange = gNRandom.onchange = (event) => {
-        parameterChanged(genesNum, gNRandom, event.type, event.key);
+    genesNum.onkeyup = gNRandom.onchange = (event) => {
+        parameterChanged(genesNum, gNRandom, true, event);
     };
-    crossover.onkeypress = crossover.onchange = coRandom.onchange = (event) => {
-        parameterChanged(crossover, coRandom, event.type, event.key);
+    crossover.onkeyup = coRandom.onchange = (event) => {
+        parameterChanged(crossover, coRandom, false, event);
     };
-    mutation.onkeypress = mutation.onchange = mutRandom.onchange = (event) => {
-        parameterChanged(mutation, mutRandom, event.type, event.key);
+    mutation.onkeyup = mutRandom.onchange = (event) => {
+        parameterChanged(mutation, mutRandom, false, event);
     };
-    delay.onkeypress = delay.onchange = delayRandom.onchange = (event) => {
-        parameterChanged(delay, delayRandom, event.type, event.key);
+    delay.onkeyup = delayRandom.onchange = (event) => {
+        parameterChanged(delay, delayRandom, false, event);
     };
     if (window['isDev']) {
         delete window['isDev'];
