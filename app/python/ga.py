@@ -337,18 +337,18 @@ def update_parameters(command: dict):
     if type(command.get('delay_rate')) is not type(None):
         # sleep in seconds
         g_delay_rate = round(final_value(.0, command.get('delay_rate'), command.get('random_delay_rate')), 2)
-    to_json({
-        "pop": g_pop_size,
-        "rnPop": command.get('random_pop_size'),
-        "genes": g_genes_num,
-        "rnGenes": command.get('random_genes_num'),
-        "crossover": g_crossover_rate,
-        "rnCO": command.get('random_crossover_rate'),
-        "mutation": g_mutation_rate,
-        "rnMut": command.get('random_mutation_rate'),
-        "delay": g_delay_rate,
-        "rnDelay": command.get('random_delay_rate')
-    })
+    # to_json({
+    #     "pop": g_pop_size,
+    #     "rnPop": command.get('random_pop_size'),
+    #     "genes": g_genes_num,
+    #     "rnGenes": command.get('random_genes_num'),
+    #     "crossover": g_crossover_rate,
+    #     "rnCO": command.get('random_crossover_rate'),
+    #     "mutation": g_mutation_rate,
+    #     "rnMut": command.get('random_mutation_rate'),
+    #     "delay": g_delay_rate,
+    #     "rnDelay": command.get('random_delay_rate')
+    # })
 
 
 def init_ga(command: dict):

@@ -1,4 +1,9 @@
-import { app, BrowserWindow, BrowserWindowConstructorOptions } from 'electron';
+import {
+  app,
+  BrowserWindow,
+  BrowserWindowConstructorOptions,
+  globalShortcut
+} from 'electron';
 import { join } from 'path';
 
 /**
@@ -95,6 +100,11 @@ app.once('ready', () => {
    */
   app.applicationMenu = require('./menubar')(isDev, mainWindow);
   delete require.cache[require.resolve('./menubar')];
+
+  /**
+   * add global shortcuts
+   */
+  globalShortcut.register('CmdOrCtrl+W', app.quit);
 });
 
 // writeFile(

@@ -9,7 +9,9 @@ module.exports = (isDev: boolean, targetWindow: BrowserWindow) => {
   const menu = Menu.buildFromTemplate([
     {
       label: '&File',
-      submenu: [{ role: 'quit' }] as MenuItemConstructorOptions[]
+      submenu: [
+        { role: 'quit', accelerator: 'CmdOrCtrl+Q' }
+      ] as MenuItemConstructorOptions[]
     },
     {
       label: '&Edit',

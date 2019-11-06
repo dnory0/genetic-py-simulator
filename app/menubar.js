@@ -5,7 +5,9 @@ module.exports = (isDev, targetWindow) => {
     const menu = electron_1.Menu.buildFromTemplate([
         {
             label: '&File',
-            submenu: [{ role: 'quit' }]
+            submenu: [
+                { role: 'quit', accelerator: 'CmdOrCtrl+Q' }
+            ]
         },
         {
             label: '&Edit',
