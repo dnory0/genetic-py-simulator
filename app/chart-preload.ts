@@ -1,6 +1,13 @@
-import { ipcRenderer } from 'electron';
+import { ipcRenderer, remote } from 'electron';
 import { Chart } from 'highcharts';
 
+/**
+ * set to true if app on development, false in production.
+ *
+ * NOTE: app needs to be packed on asar (by default) to detect production mode
+ * if you don't set asar to false on electron-builder.json you're good to go
+ */
+const isDev = remote.app.getAppPath().indexOf('.asar') === -1;
 /**
  * allows communication between this webview & renderer process
  */
@@ -20,24 +27,37 @@ window['createChart'] = require('./create-chart');
  * @param chart chart to apply hover settings on
  */
 window['enableChartHover'] = (enable: boolean, chart: Chart) => {
-  chart.options.tooltip.enabled = enable;
-  chart.update({
-    plotOptions: {
-      series: {
-        marker: {
-          enabled: enable,
-          radius: enable ? 2 : null
-        },
-        states: {
-          hover: {
-            halo: {
-              opacity: enable ? 0.5 : 0
+  chart.update(
+    {
+      tooltip: {
+        enabled: enable
+      },
+      navigator: {
+        enabled: enable
+      },
+      xAxis: {
+        crosshair: enable
+      },
+      plotOptions: {
+        series: {
+          marker: {
+            enabled: enable,
+            radius: enable ? 2 : null
+          },
+          states: {
+            hover: {
+              halo: {
+                opacity: enable ? 0.5 : 0
+              }
             }
           }
         }
       }
-    }
-  });
+    },
+    true,
+    false,
+    false
+  );
 };
 
 /**
@@ -49,3 +69,15 @@ window['clearChart'] = (chart: Chart, categories: boolean = false) => {
   if (categories) chart.xAxis[0].setCategories([]);
   chart.series[0].setData([], true);
 };
+
+if (isDev)
+  window.addEventListener(
+    'keyup',
+    (event: KeyboardEvent) => {
+      if (event.code == 'Backquote')
+        if (event.ctrlKey)
+          if (event.shiftKey) ipcRenderer.sendToHost('devTools', 'secondary');
+          else ipcRenderer.sendToHost('devTools', 'primary');
+    },
+    true
+  );

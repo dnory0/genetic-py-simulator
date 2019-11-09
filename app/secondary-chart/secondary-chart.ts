@@ -99,16 +99,16 @@ let secondaryChart = window['createChart']('secondary-chart', {
     type: 'line'
   },
   title: {
-    text: 'Best Fittest'
+    text: 'Best Fittest Genes'
   },
   xAxis: {
     title: {
-      text: 'Genes'
+      text: 'Position'
     }
   },
   yAxis: {
     title: {
-      text: 'Gene value'
+      text: 'Gene'
     }
   },
   series: [

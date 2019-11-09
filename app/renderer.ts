@@ -1,5 +1,11 @@
 import { ChildProcess } from 'child_process';
-import { IpcRenderer, WebviewTag, IpcRendererEvent, WebFrame } from 'electron';
+import {
+  IpcRenderer,
+  WebviewTag,
+  IpcRendererEvent,
+  WebFrame,
+  IpcMessageEvent
+} from 'electron';
 
 /***************************** passed by preload *****************************
  *****************************************************************************/
@@ -382,15 +388,6 @@ document.addEventListener('DOMContentLoaded', function loaded() {
     parameterChanged(delay, delayRandom, false, event);
   };
 
-  if (window['isDev']) {
-    delete window['isDev'];
-    ipcRenderer.on('devTools', (_event: IpcRendererEvent, webView: string) => {
-      if (webView == 'primary') primary.getWebContents().toggleDevTools();
-      else if (webView == 'secondary')
-        secondary.getWebContents().toggleDevTools();
-    });
-  }
-
   ipcRenderer.on('zoom', (_event: IpcRendererEvent, type: string) => {
     if (type == 'in') {
       if (webFrame.getZoomFactor() < 1.8)
@@ -401,19 +398,52 @@ document.addEventListener('DOMContentLoaded', function loaded() {
     } else {
       webFrame.setZoomFactor(1);
     }
-    Array.from(document.getElementsByClassName('border')).forEach(
-      (border: HTMLDivElement) => {
+    Array.from(document.getElementsByClassName('border'))
+      .concat(Array.from(document.getElementsByClassName('separator')))
+      .forEach((border: HTMLDivElement) => {
         let scale: string;
-        if (border.classList.contains('hor')) {
-          scale = 'scaleY';
-        } else scale = 'scaleX';
-        border.style['transform'] = `${scale}(${
-          webFrame.getZoomFactor() < 1.5 ? 1 : 2 / webFrame.getZoomFactor()
-        })`;
-      }
-    );
+        if (border.classList.contains('hor')) scale = 'scaleY';
+        else scale = 'scaleX';
+        border.style['transform'] = `${scale}(${(webFrame.getZoomFactor() < 1.5
+          ? 1
+          : 2) / webFrame.getZoomFactor()})`;
+      });
     zoomViews();
   });
+
+  if (window['isDev']) {
+    delete window['isDev'];
+    // devTools listeners for primary & secondary webview
+    /**
+     * toggles devTools for intended webview
+     * @param webView primary | secondary view
+     */
+    const devToolsToggler = (webView: string) => {
+      if (webView == 'primary') primary.getWebContents().toggleDevTools();
+      else if (webView == 'secondary')
+        secondary.getWebContents().toggleDevTools();
+    };
+    // listens for main process' menubar
+    ipcRenderer.on('devTools', (_event: IpcRendererEvent, webView: string) =>
+      devToolsToggler(webView)
+    );
+    // listens for renderer process
+    window.addEventListener(
+      'keyup',
+      (event: KeyboardEvent) => {
+        if (event.code == 'Backquote')
+          if (event.ctrlKey)
+            devToolsToggler(event.shiftKey ? 'secondary' : 'primary');
+      },
+      true
+    );
+    primary.addEventListener('ipc-message', (event: IpcMessageEvent) => {
+      if (event.channel == 'devTools') devToolsToggler(<any>event.args);
+    });
+    secondary.addEventListener('ipc-message', (event: IpcMessageEvent) => {
+      if (event.channel == 'devTools') devToolsToggler(<any>event.args);
+    });
+  }
 
   Array.from(document.getElementsByClassName('border')).forEach(
     (border: HTMLDivElement) => {

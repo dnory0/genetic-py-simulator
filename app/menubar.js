@@ -2,11 +2,15 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const electron_1 = require("electron");
 module.exports = (isDev, targetWindow) => {
+    const zoomin = () => targetWindow.webContents.send('zoom', 'in');
+    const zoomout = () => targetWindow.webContents.send('zoom', 'out');
+    const zoomreset = () => targetWindow.webContents.send('zoom', '');
     const menu = electron_1.Menu.buildFromTemplate([
         {
             label: '&File',
             submenu: [
-                { role: 'quit', accelerator: 'CmdOrCtrl+Q' }
+                { role: 'quit', accelerator: 'CmdOrCtrl+Q' },
+                { role: 'close', visible: false }
             ]
         },
         {
@@ -30,17 +34,17 @@ module.exports = (isDev, targetWindow) => {
                 {
                     label: 'Zoom In',
                     accelerator: 'CmdOrCtrl+numadd',
-                    click: () => targetWindow.webContents.send('zoom', 'in')
+                    click: zoomin
                 },
                 {
                     label: 'Zoom Out',
                     accelerator: 'CmdOrCtrl+numsub',
-                    click: () => targetWindow.webContents.send('zoom', 'out')
+                    click: zoomout
                 },
                 {
                     label: 'Reset Zoom',
                     accelerator: 'CmdOrCtrl+num0',
-                    click: () => targetWindow.webContents.send('zoom', '')
+                    click: zoomreset
                 },
                 { type: 'separator' },
                 { role: 'togglefullscreen' }
@@ -54,15 +58,18 @@ module.exports = (isDev, targetWindow) => {
             click: () => targetWindow.webContents.toggleDevTools()
         }));
         menu.items[2].submenu.insert(3, new electron_1.MenuItem({
-            label: 'Primary Developer Tools',
+            label: 'Primary Developer Tools [Ctrl+²]',
             click: () => targetWindow.webContents.send('devTools', 'primary')
         }));
         menu.items[2].submenu.insert(4, new electron_1.MenuItem({
-            label: 'Secondary Developer Tools',
+            label: 'Secondary Developer Tools [Ctrl+Shift+²]',
             click: () => targetWindow.webContents.send('devTools', 'secondary')
         }));
         menu.items[2].submenu.insert(5, new electron_1.MenuItem({ type: 'separator' }));
     }
+    electron_1.globalShortcut.register('CmdOrCtrl+=', zoomin);
+    electron_1.globalShortcut.register('CmdOrCtrl+6', zoomout);
+    electron_1.globalShortcut.register('CmdOrCtrl+0', zoomreset);
     return menu;
 };
 //# sourceMappingURL=menubar.js.map

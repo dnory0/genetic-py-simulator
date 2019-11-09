@@ -81,9 +81,10 @@ body {
   -webkit-box-pack: center;
       -ms-flex-pack: center;
           justify-content: center;
-  margin: 4px;
+  padding: 4px 4px 3px;
   position: -webkit-sticky;
   position: sticky;
+  border-bottom: 1px solid #cebbbb;
 }
 
 #main .middle-container .controls-container .state-controls-container .state-controls > button {
@@ -117,7 +118,7 @@ body {
 }
 
 #main .middle-container .controls-container .separator {
-  background-color: #8d7272;
+  background-color: #cebbbb;
   width: 1px;
   margin: 3px 6px;
 }
@@ -323,6 +324,7 @@ body {
   height: 100%;
   overflow: hidden;
   min-width: 140px;
+  margin-top: 1px;
 }
 
 #main .bottom-container {

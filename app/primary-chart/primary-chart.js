@@ -33,7 +33,7 @@ let primaryChart = window['createChart']('primary-chart', {
     },
     yAxis: {
         title: {
-            text: 'Fitness value'
+            text: 'Fitness'
         }
     },
     series: [

@@ -49,6 +49,5 @@ electron_1.app.once('ready', () => {
     });
     electron_1.app.applicationMenu = require('./menubar')(isDev, mainWindow);
     delete require.cache[require.resolve('./menubar')];
-    electron_1.globalShortcut.register('CmdOrCtrl+W', electron_1.app.quit);
 });
 //# sourceMappingURL=main.js.map

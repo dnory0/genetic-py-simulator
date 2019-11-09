@@ -176,15 +176,6 @@ document.addEventListener('DOMContentLoaded', function loaded() {
     delay.onkeyup = delayRandom.onchange = (event) => {
         parameterChanged(delay, delayRandom, false, event);
     };
-    if (window['isDev']) {
-        delete window['isDev'];
-        ipcRenderer.on('devTools', (_event, webView) => {
-            if (webView == 'primary')
-                primary.getWebContents().toggleDevTools();
-            else if (webView == 'secondary')
-                secondary.getWebContents().toggleDevTools();
-        });
-    }
     ipcRenderer.on('zoom', (_event, type) => {
         if (type == 'in') {
             if (webFrame.getZoomFactor() < 1.8)
@@ -197,17 +188,43 @@ document.addEventListener('DOMContentLoaded', function loaded() {
         else {
             webFrame.setZoomFactor(1);
         }
-        Array.from(document.getElementsByClassName('border')).forEach((border) => {
+        Array.from(document.getElementsByClassName('border'))
+            .concat(Array.from(document.getElementsByClassName('separator')))
+            .forEach((border) => {
             let scale;
-            if (border.classList.contains('hor')) {
+            if (border.classList.contains('hor'))
                 scale = 'scaleY';
-            }
             else
                 scale = 'scaleX';
-            border.style['transform'] = `${scale}(${webFrame.getZoomFactor() < 1.5 ? 1 : 2 / webFrame.getZoomFactor()})`;
+            border.style['transform'] = `${scale}(${(webFrame.getZoomFactor() < 1.5
+                ? 1
+                : 2) / webFrame.getZoomFactor()})`;
         });
         zoomViews();
     });
+    if (window['isDev']) {
+        delete window['isDev'];
+        const devToolsToggler = (webView) => {
+            if (webView == 'primary')
+                primary.getWebContents().toggleDevTools();
+            else if (webView == 'secondary')
+                secondary.getWebContents().toggleDevTools();
+        };
+        ipcRenderer.on('devTools', (_event, webView) => devToolsToggler(webView));
+        window.addEventListener('keyup', (event) => {
+            if (event.code == 'Backquote')
+                if (event.ctrlKey)
+                    devToolsToggler(event.shiftKey ? 'secondary' : 'primary');
+        }, true);
+        primary.addEventListener('ipc-message', (event) => {
+            if (event.channel == 'devTools')
+                devToolsToggler(event.args);
+        });
+        secondary.addEventListener('ipc-message', (event) => {
+            if (event.channel == 'devTools')
+                devToolsToggler(event.args);
+        });
+    }
     Array.from(document.getElementsByClassName('border')).forEach((border) => {
         const prevSib = border.previousElementSibling, nextSib = border.nextElementSibling, prevDisp = prevSib.style.display, nextDisp = nextSib.style.display;
         let prevRes, minPrevRes, minNextRes, client, winRes;

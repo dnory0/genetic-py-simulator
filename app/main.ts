@@ -100,11 +100,6 @@ app.once('ready', () => {
    */
   app.applicationMenu = require('./menubar')(isDev, mainWindow);
   delete require.cache[require.resolve('./menubar')];
-
-  /**
-   * add global shortcuts
-   */
-  globalShortcut.register('CmdOrCtrl+W', app.quit);
 });
 
 // writeFile(

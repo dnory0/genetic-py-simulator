@@ -16,7 +16,7 @@ delete window['ipcRenderer'];
  * @param enable decides if to disable hover settings or enable them.
  * @param chart chart to apply hover settings on
  */
-const enableChartHover: (enable: boolean, chart: Highcharts.Chart) => void =
+const enableChartHover: (enable: boolean, chart: Chart) => void =
   window['enableChartHover'];
 
 /**
@@ -71,7 +71,7 @@ let primaryChart = window['createChart']('primary-chart', {
   },
   yAxis: {
     title: {
-      text: 'Fitness value'
+      text: 'Fitness'
     }
   },
   series: [
