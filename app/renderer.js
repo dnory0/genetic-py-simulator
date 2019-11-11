@@ -123,6 +123,34 @@ document.addEventListener('DOMContentLoaded', function loaded() {
     document.removeEventListener('DOMContentLoaded', loaded);
     primary.addEventListener('dom-ready', () => setReady());
     secondary.addEventListener('dom-ready', () => setReady());
+    const sendParameter = (numInput, checkInput) => {
+        numInput.style.backgroundColor = '#fff';
+        pyshell.stdin.write(`${JSON.stringify({
+            [numInput.name]: parseFloat(numInput.value),
+            [checkInput.name]: checkInput.checked
+        })}\n`);
+    };
+    const rangeChange = (rangeInput, numberInput, checkbox) => {
+        setTimeout(() => {
+            numberInput.value = rangeInput.value;
+            sendParameter(numberInput, checkbox);
+        }, 0);
+    };
+    const numberChange = (rangeInput, numberInput) => {
+        setTimeout(() => {
+            rangeInput.value = numberInput.value;
+        }, 0);
+    };
+    Array.from(document.getElementsByClassName('input-wrapper')).forEach((wrapper) => {
+        const first = wrapper.firstElementChild;
+        const last = wrapper.lastElementChild;
+        const checkbox = (wrapper.nextElementSibling.firstElementChild);
+        first.onmousedown = () => {
+            first.onmousemove = () => rangeChange(first, last, checkbox);
+            rangeChange(first, last, checkbox);
+            first.onmouseup = () => (first.onmouseup = first.onmousemove = null);
+        };
+    });
     const parameterChanged = (numInput, checkInput, mustBeInt, event) => {
         setTimeout(() => {
             if (isNaN(numInput.value) ||
@@ -151,11 +179,9 @@ document.addEventListener('DOMContentLoaded', function loaded() {
                     parseFloat(numInput.value) >= parseFloat(numInput.min)) &&
                 (isNaN(parseFloat(numInput.max)) ||
                     parseFloat(numInput.value) <= parseFloat(numInput.max))) {
-                numInput.style.backgroundColor = '#fff';
-                pyshell.stdin.write(`${JSON.stringify({
-                    [numInput.name]: parseFloat(numInput.value),
-                    [checkInput.name]: checkInput.checked
-                })}\n`);
+                sendParameter(numInput, checkInput);
+                if (!mustBeInt)
+                    numberChange(numInput.previousElementSibling, numInput);
             }
             else
                 numInput.style.backgroundColor = '#ff4343b8';

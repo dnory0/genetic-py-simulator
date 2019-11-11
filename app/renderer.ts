@@ -288,6 +288,71 @@ document.addEventListener('DOMContentLoaded', function loaded() {
   primary.addEventListener('dom-ready', () => setReady());
   secondary.addEventListener('dom-ready', () => setReady());
 
+  /**************************** Ranges change handling ****************************/
+
+  /**
+   * sends pyshel the input value & the accompanying checkbox value, also changes
+   * number input background to white if needed, note that this method should only
+   * be called when number input has valide value, else it might stop the GA.
+   */
+  const sendParameter = (
+    numInput: HTMLInputElement,
+    checkInput: HTMLInputElement
+  ) => {
+    numInput.style.backgroundColor = '#fff';
+    pyshell.stdin.write(
+      `${JSON.stringify({
+        [numInput.name]: parseFloat(numInput.value),
+        [checkInput.name]: checkInput.checked
+      })}\n`
+    );
+  };
+
+  /**
+   * called when range inputs change value, to update accompanying number input & pass
+   * the new value to GA.
+   */
+  const rangeChange = (
+    rangeInput: HTMLInputElement,
+    numberInput: HTMLInputElement,
+    checkbox: HTMLInputElement
+  ) => {
+    setTimeout(() => {
+      numberInput.value = rangeInput.value;
+      sendParameter(numberInput, checkbox);
+    }, 0);
+  };
+
+  /**
+   * called when number input change, consequently its either crossover, mutation or delay input
+   * to update the accompanying range input with its value.
+   */
+  const numberChange = (
+    rangeInput: HTMLInputElement,
+    numberInput: HTMLInputElement
+  ) => {
+    setTimeout(() => {
+      rangeInput.value = numberInput.value;
+    }, 0);
+  };
+
+  Array.from(document.getElementsByClassName('input-wrapper')).forEach(
+    (wrapper: HTMLDivElement) => {
+      const first = <HTMLInputElement>wrapper.firstElementChild;
+      const last = <HTMLInputElement>wrapper.lastElementChild;
+      const checkbox = <HTMLInputElement>(
+        wrapper.nextElementSibling.firstElementChild
+      );
+      first.onmousedown = () => {
+        first.onmousemove = () => rangeChange(first, last, checkbox);
+        // user could just click without move after click
+        rangeChange(first, last, checkbox);
+        // clean events on mouse up
+        first.onmouseup = () => (first.onmouseup = first.onmousemove = null);
+      };
+    }
+  );
+
   /**************************** Inputs Event handling ****************************/
   /**
    * checks if the changed input has a valid value, if true pass it to pyshell, else
@@ -356,13 +421,13 @@ document.addEventListener('DOMContentLoaded', function loaded() {
         (isNaN(parseFloat(numInput.max)) ||
           parseFloat(numInput.value) <= parseFloat(numInput.max))
       ) {
-        numInput.style.backgroundColor = '#fff';
-        pyshell.stdin.write(
-          `${JSON.stringify({
-            [numInput.name]: parseFloat(numInput.value),
-            [checkInput.name]: checkInput.checked
-          })}\n`
-        );
+        sendParameter(numInput, checkInput);
+        // should be called only on number inputs with range inputs beside them
+        if (!mustBeInt)
+          numberChange(
+            <HTMLInputElement>numInput.previousElementSibling,
+            numInput
+          );
       } else numInput.style.backgroundColor = '#ff4343b8';
     }, 0);
   };
