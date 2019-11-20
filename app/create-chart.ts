@@ -63,7 +63,6 @@ module.exports = (containerId: string, options: Options) => {
           type: 'all'
         }
       ],
-      allButtonsEnabled: false,
       buttonPosition: {
         align: 'right',
         x: -30,
