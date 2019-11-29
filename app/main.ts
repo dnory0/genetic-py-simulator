@@ -1,9 +1,4 @@
-import {
-  app,
-  BrowserWindow,
-  BrowserWindowConstructorOptions,
-  globalShortcut
-} from 'electron';
+import { app, BrowserWindow, BrowserWindowConstructorOptions } from 'electron';
 import { join } from 'path';
 
 /**
@@ -72,6 +67,8 @@ const createWindow = (
 };
 
 app.once('ready', () => {
+  if (isDev) (<any>process.env['ELECTRON_DISABLE_SECURITY_WARNINGS']) = true;
+
   // creates main window
   mainWindow = createWindow(join('app', 'index.html'), {
     minWidth: 580,

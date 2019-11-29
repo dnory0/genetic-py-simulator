@@ -263,7 +263,7 @@ let setReady = () => {
       });
   });
   /**
-   * function is implemented after both webviews are fully loaded,
+   * function is implemented after both webviews are fully loaded.
    */
   zoomViews = () => {
     primary.setZoomFactor(webFrame.getZoomFactor());
@@ -510,6 +510,47 @@ document.addEventListener('DOMContentLoaded', function loaded() {
     });
   }
 
+  // add scroller auto appear & hide event handlers
+  Array.from(document.getElementsByClassName('scrollbar-activator')).forEach(
+    (scrollActivator: HTMLDivElement) => {
+      let parentContainer: HTMLDivElement;
+      let scrollbarContainer: HTMLDivElement;
+      let paramsContainer: HTMLDivElement;
+      const outOfScrollbar = () => {
+        parentContainer.classList.remove('scrollbar-hover');
+        scrollActivator.classList.remove('scrollbar-activator-hover');
+        scrollActivator.onmouseleave = scrollbarContainer.onmousemove = scrollbarContainer.onmouseup = null;
+      };
+
+      if (scrollActivator.classList.contains('parameters-scrollbar')) {
+        parentContainer = <HTMLDivElement>(
+          scrollActivator.parentElement.parentElement
+        );
+        scrollbarContainer = <HTMLDivElement>scrollActivator.parentElement;
+        paramsContainer = <HTMLDivElement>scrollActivator.nextElementSibling;
+      }
+
+      scrollActivator.onmouseenter = () => {
+        // for future if I add other scrollers with other setting it might be in the else filed
+        if (scrollActivator.classList.contains('parameters-scrollbar')) {
+          // test if scrollbar appeared or not
+          if (paramsContainer.clientHeight <= scrollbarContainer.clientHeight)
+            return;
+        }
+        parentContainer.classList.add('scrollbar-hover');
+        scrollActivator.classList.add('scrollbar-activator-hover');
+
+        scrollbarContainer.onmousemove = (ev: MouseEvent) => {
+          if (scrollbarContainer.clientWidth - 10 < ev.clientX) return;
+          outOfScrollbar();
+        };
+
+        scrollbarContainer.onmouseleave = scrollbarContainer.onmouseup = outOfScrollbar;
+      };
+    }
+  );
+
+  // add resizing borders event handlers
   Array.from(document.getElementsByClassName('border')).forEach(
     (border: HTMLDivElement) => {
       const prevSib = <HTMLDivElement>border.previousElementSibling,

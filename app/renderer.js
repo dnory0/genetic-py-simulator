@@ -251,6 +251,35 @@ document.addEventListener('DOMContentLoaded', function loaded() {
                 devToolsToggler(event.args);
         });
     }
+    Array.from(document.getElementsByClassName('scrollbar-activator')).forEach((scrollActivator) => {
+        let parentContainer;
+        let scrollbarContainer;
+        let paramsContainer;
+        const outOfScrollbar = () => {
+            parentContainer.classList.remove('scrollbar-hover');
+            scrollActivator.classList.remove('scrollbar-activator-hover');
+            scrollActivator.onmouseleave = scrollbarContainer.onmousemove = scrollbarContainer.onmouseup = null;
+        };
+        if (scrollActivator.classList.contains('parameters-scrollbar')) {
+            parentContainer = (scrollActivator.parentElement.parentElement);
+            scrollbarContainer = scrollActivator.parentElement;
+            paramsContainer = scrollActivator.nextElementSibling;
+        }
+        scrollActivator.onmouseenter = () => {
+            if (scrollActivator.classList.contains('parameters-scrollbar')) {
+                if (paramsContainer.clientHeight <= scrollbarContainer.clientHeight)
+                    return;
+            }
+            parentContainer.classList.add('scrollbar-hover');
+            scrollActivator.classList.add('scrollbar-activator-hover');
+            scrollbarContainer.onmousemove = (ev) => {
+                if (scrollbarContainer.clientWidth - 10 < ev.clientX)
+                    return;
+                outOfScrollbar();
+            };
+            scrollbarContainer.onmouseleave = scrollbarContainer.onmouseup = outOfScrollbar;
+        };
+    });
     Array.from(document.getElementsByClassName('border')).forEach((border) => {
         const prevSib = border.previousElementSibling, nextSib = border.nextElementSibling, prevDisp = prevSib.style.display, nextDisp = nextSib.style.display;
         let prevRes, minPrevRes, minNextRes, client, winRes;

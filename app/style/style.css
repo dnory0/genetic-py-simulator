@@ -1,6 +1,68 @@
 /* width */
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 2px;
+  -webkit-transition: width 2s linear;
+  transition: width 2s linear;
+}
+
+.scrollbar-activator {
+  position: relative;
+  width: 16px;
+  margin-right: -2px;
+  float: right;
+}
+
+.scrollbar-activator.parameters-scrollbar {
+  height: 203px;
+}
+
+.scrollbar-activator.scrollbar-activator-hover {
+  display: none;
+}
+
+.scrollbar-hover ::-webkit-scrollbar {
+  width: 16px;
+}
+
+.border {
+  background-clip: content-box;
+  background-color: #cebbbb;
+  position: relative;
+  z-index: 1;
+}
+
+.border.hor {
+  cursor: ns-resize;
+  padding: 4px 0;
+  height: 1px;
+  min-height: 1px;
+}
+
+.border.ver {
+  cursor: ew-resize;
+  padding: 0 4px;
+  width: 1px;
+  min-width: 1px;
+  height: 100%;
+}
+
+.resize-cover {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.resize-cover.for-primary {
+  height: 100%;
+  width: 100%;
+  min-height: 140px;
+}
+
+.resize-cover.for-secondary {
+  height: 100%;
+  width: 100%;
+  min-width: 140px;
 }
 
 /* Track */
@@ -61,7 +123,7 @@ body {
   position: relative;
   min-height: 140px;
   background-color: #fff;
-  height: calc(50% + 13px);
+  height: calc(70% + 13px);
   margin-bottom: -4px;
   overflow: hidden;
 }
@@ -71,7 +133,7 @@ body {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  height: calc(50% - 37px);
+  height: calc(30% - 37px);
   margin-top: -4px;
   overflow: hidden;
   -webkit-box-flex: 1;
@@ -88,7 +150,7 @@ body {
   -webkit-box-direction: normal;
       -ms-flex-flow: column;
           flex-flow: column;
-  width: 50%;
+  width: 35%;
   text-align: center;
   margin-right: -4px;
   overflow: hidden;
@@ -176,11 +238,17 @@ body {
   float: left;
 }
 
-#main .middle-container .controls-container .parameters-container {
+#main .middle-container .controls-container .parameters-scrollbar-container {
   -webkit-box-flex: 1;
       -ms-flex: 1;
           flex: 1;
+  height: 100%;
   overflow-y: auto;
+  overflow-x: hidden;
+}
+
+#main .middle-container .controls-container .parameters-container {
+  margin-top: -5px;
 }
 
 #main .middle-container .controls-container .parameters-container .parameter {
@@ -188,6 +256,10 @@ body {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+}
+
+#main .middle-container .controls-container .parameters-container .parameter:last-child {
+  margin-bottom: 0;
 }
 
 #main .middle-container .controls-container .parameters-container .parameter p {
@@ -357,46 +429,5 @@ body {
   padding: 0 6px;
   -webkit-box-sizing: border-box;
           box-sizing: border-box;
-}
-
-#main .border {
-  background-clip: content-box;
-  background-color: #cebbbb;
-  position: relative;
-  z-index: 1;
-}
-
-#main .border.hor {
-  cursor: ns-resize;
-  padding: 4px 0;
-  height: 1px;
-  min-height: 1px;
-}
-
-#main .border.ver {
-  cursor: ew-resize;
-  padding: 0 4px;
-  width: 1px;
-  min-width: 1px;
-  height: 100%;
-}
-
-#main .resize-cover {
-  display: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
-#main .resize-cover.for-primary {
-  height: 100%;
-  width: 100%;
-  min-height: 140px;
-}
-
-#main .resize-cover.for-secondary {
-  height: 100%;
-  width: 100%;
-  min-width: 140px;
 }
 /*# sourceMappingURL=style.css.map */

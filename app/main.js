@@ -30,6 +30,8 @@ const createWindow = (filePath, { minWidth, minHeight, width, height, resizable,
     return targetWindow;
 };
 electron_1.app.once('ready', () => {
+    if (isDev)
+        process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true;
     mainWindow = createWindow(path_1.join('app', 'index.html'), {
         minWidth: 580,
         minHeight: 430,
