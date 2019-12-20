@@ -40,22 +40,22 @@ module.exports = (containerId: string, options: Options) => {
       buttons: [
         {
           text: '10',
-          count: 10,
+          count: 9,
           type: 'millisecond'
         },
         {
           text: '50',
-          count: 50,
+          count: 49,
           type: 'millisecond'
         },
         {
           text: '100',
-          count: 100,
+          count: 99,
           type: 'millisecond'
         },
         {
           text: '200',
-          count: 200,
+          count: 199,
           type: 'millisecond'
         },
         {
