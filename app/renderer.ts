@@ -198,47 +198,32 @@ const blinkPlayBtn = () => {
  */
 let zoomViews = () => {};
 
-/*********************** Buttons Click Event Handling ***********************/
 /**
- * play and pause the pyshell when clicked with switching
- * the button image, if pyshell = undefined/null it initialize
- * a pyshell to start running and enable disabled buttons.
+ * sends signal to GA, isRunning is set depending on goingToRun passed, in the end
+ * it updates play/pause button.
+ *
+ * @param signal play | pause | stop | replay | step_f
+ * @param goingToRun set to true on play and replay signal, set to false otherwise.
  */
-playBtn.onclick = () => {
-  if (isRunning) window['pause']();
-  else window['play']();
-  // isRunning switched
-  isRunning = !isRunning;
+const ctrlClicked = (signal: string, goingToRun: boolean) => {
+  window['sendSig'](signal);
+  isRunning = goingToRun;
   switchBtn();
 };
 
-stopBtn.onclick = () => {
-  setClickable(false);
-  window['stop']();
-  // doesn't effect if pyshell is paused
-  isRunning = false;
-  // switch play/pause button to play state if needed
-  switchBtn();
-};
+/*********************** Buttons Click Event Handling ***********************/
 
-toStartBtn.onclick = () => {
-  window['replay']();
-  // in case pyshell was paused before
-  isRunning = true;
-  switchBtn();
-};
+playBtn.onclick = () => ctrlClicked(isRunning ? 'pause' : 'play', !isRunning);
 
-stepFBtn.onclick = () => {
-  window['stepForward']();
-  // pyshell paused when going next step
-  isRunning = false;
-  // switch to paused state
-  switchBtn();
-};
+stopBtn.onclick = () => ctrlClicked('stop', false);
+
+toStartBtn.onclick = () => ctrlClicked('replay', true);
+
+stepFBtn.onclick = () => ctrlClicked('step_f', false);
 
 /********************************* Views Setup *********************************/
 /**
- * unlock controls and parameters adjusting for user, also set pyshell communication.
+ * unlock controls and parameters adjusting for user, also set pyshell communication
  * triggered after both webviews finish loading.
  */
 let setReady = () => {
@@ -255,12 +240,8 @@ let setReady = () => {
     secondary.send('data', response);
     response
       .toString()
-      .split('\n')
-      .forEach((args: string) => {
-        // console.log(args);
-        // sometimes args == ''(not sure why), those cases need to be ignored
-        if (args) treatResponse(JSON.parse(args));
-      });
+      .split(/(?<=\n)/)
+      .forEach((args: string) => treatResponse(JSON.parse(args)));
   });
   /**
    * function is implemented after both webviews are fully loaded.
@@ -324,8 +305,8 @@ document.addEventListener('DOMContentLoaded', function loaded() {
   };
 
   /**
-   * called when number input change, consequently its either crossover, mutation or delay input
-   * to update the accompanying range input with its value.
+   * called when number input change, consequently its either crossover, mutation or
+   * delay input to update the accompanying range input with its value.
    */
   const numberChange = (
     rangeInput: HTMLInputElement,
@@ -630,5 +611,5 @@ document.addEventListener('DOMContentLoaded', function loaded() {
   /**
    * terminate pyshell process with its threads on close or reload
    */
-  window.addEventListener('beforeunload', window['exit']);
+  window.addEventListener('beforeunload', () => window['sendSig']('exit'));
 });

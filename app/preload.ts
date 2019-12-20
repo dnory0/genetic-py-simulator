@@ -20,48 +20,15 @@ window['webFrame'] = webFrame;
 window['isDev'] = remote.app.getAppPath().indexOf('.asar') === -1;
 
 /*************************** Python part ***************************/
+/**
+ * python process responsible for executing genetic algorithm.
+ */
 const pyshell: ChildProcess = require('./create-pyshell')(remote.app);
 window['pyshell'] = pyshell;
 
 /************************* states controller part *************************/
 /**
- * send play to GA, python side is responsible for whether to start GA for first time are just resume
+ * send signal to GA
+ * @param signal play | pause | stop | replay | step_f | exit
  */
-window['play'] = () => {
-  pyshell.stdin.write(`play\n`);
-};
-
-/**
- * send pause to GA
- */
-window['pause'] = () => {
-  pyshell.stdin.write(`pause\n`);
-};
-
-/**
- * send stop to GA
- */
-window['stop'] = () => {
-  pyshell.stdin.write(`stop\n`);
-};
-
-/**
- * stops current GA and launches new one
- */
-window['replay'] = () => {
-  pyshell.stdin.write(`replay\n`);
-};
-
-/**
- * send step forward to GA, pyshell pauses GA if needed
- */
-window['stepForward'] = () => {
-  pyshell.stdin.write(`step_f\n`);
-};
-
-/**
- * stops ga and free memory
- */
-window['exit'] = () => {
-  pyshell.stdin.write(`exit\n`);
-};
+window['sendSig'] = (signal: string) => pyshell.stdin.write(`${signal}\n`);

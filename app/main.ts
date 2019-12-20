@@ -75,7 +75,6 @@ app.once('ready', () => {
     minHeight: 430,
     webPreferences: {
       preload: join(__dirname, 'preload.js'),
-      nodeIntegration: false,
       webviewTag: true
     }
   });

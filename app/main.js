@@ -37,7 +37,6 @@ electron_1.app.once('ready', () => {
         minHeight: 430,
         webPreferences: {
             preload: path_1.join(__dirname, 'preload.js'),
-            nodeIntegration: false,
             webviewTag: true
         }
     });

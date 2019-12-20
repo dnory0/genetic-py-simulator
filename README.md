@@ -16,7 +16,7 @@ A Simulator that solves optimization problems using Genetic Algorithms & Quantum
 ```sh
 git clone https://github.com/dnory0/genetic-py.git # downloads a copy of the app
 cd genetic-py
-npm install # install dependencies
+npm install # installs dependencies
 npm start # starts the app
 ```
 

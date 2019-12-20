@@ -91,10 +91,6 @@ delete window['createChart'];
 ipcRenderer.on('data', (_event: IpcRendererEvent, data: Buffer) => {
   data
     .toString()
-    .split('\n')
-    .forEach(args => {
-      // console.log(args);
-      // sometimes args == ''(not sure why), those cases need to be ignored
-      if (args) treatResponse(JSON.parse(args));
-    });
+    .split(/(?<=\n)/)
+    .forEach((args: string) => treatResponse(JSON.parse(args)));
 });

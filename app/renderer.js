@@ -68,30 +68,15 @@ const blinkPlayBtn = () => {
     }, 400);
 };
 let zoomViews = () => { };
-playBtn.onclick = () => {
-    if (isRunning)
-        window['pause']();
-    else
-        window['play']();
-    isRunning = !isRunning;
+const ctrlClicked = (signal, goingToRun) => {
+    window['sendSig'](signal);
+    isRunning = goingToRun;
     switchBtn();
 };
-stopBtn.onclick = () => {
-    setClickable(false);
-    window['stop']();
-    isRunning = false;
-    switchBtn();
-};
-toStartBtn.onclick = () => {
-    window['replay']();
-    isRunning = true;
-    switchBtn();
-};
-stepFBtn.onclick = () => {
-    window['stepForward']();
-    isRunning = false;
-    switchBtn();
-};
+playBtn.onclick = () => ctrlClicked(isRunning ? 'pause' : 'play', !isRunning);
+stopBtn.onclick = () => ctrlClicked('stop', false);
+toStartBtn.onclick = () => ctrlClicked('replay', true);
+stepFBtn.onclick = () => ctrlClicked('step_f', false);
 let setReady = () => {
     setReady = () => { };
     pyshell.stdout.on('data', (response) => {
@@ -99,11 +84,8 @@ let setReady = () => {
         secondary.send('data', response);
         response
             .toString()
-            .split('\n')
-            .forEach((args) => {
-            if (args)
-                treatResponse(JSON.parse(args));
-        });
+            .split(/(?<=\n)/)
+            .forEach((args) => treatResponse(JSON.parse(args)));
     });
     zoomViews = () => {
         primary.setZoomFactor(webFrame.getZoomFactor());
@@ -345,6 +327,6 @@ document.addEventListener('DOMContentLoaded', function loaded() {
             };
         };
     });
-    window.addEventListener('beforeunload', window['exit']);
+    window.addEventListener('beforeunload', () => window['sendSig']('exit'));
 });
 //# sourceMappingURL=renderer.js.map

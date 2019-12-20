@@ -65,10 +65,7 @@ delete window['createChart'];
 ipcRenderer.on('data', (_event, response) => {
     response
         .toString()
-        .split('\n')
-        .forEach((args) => {
-        if (args)
-            treatResponse(JSON.parse(args));
-    });
+        .split(/(?<=\n)/)
+        .forEach((args) => treatResponse(JSON.parse(args)));
 });
 //# sourceMappingURL=secondary-chart.js.map
