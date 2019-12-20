@@ -32,7 +32,7 @@ const createWindow = (
     maximizable,
     parent,
     frame,
-    webPreferences: { preload, nodeIntegration, webviewTag }
+    webPreferences: { preload, webviewTag }
   }: BrowserWindowConstructorOptions = {}
 ): BrowserWindow => {
   let targetWindow = new BrowserWindow({
@@ -48,7 +48,6 @@ const createWindow = (
     show: false,
     webPreferences: {
       preload,
-      nodeIntegration,
       webviewTag
     }
   });
