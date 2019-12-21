@@ -1,106 +1,7 @@
-/* width */
-::-webkit-scrollbar {
-  width: 2px;
-  transition: width 2s linear;
-}
-
-.scrollbar-activator {
-  position: relative;
-  width: 16px;
-  margin-right: -2px;
-  float: right;
-
-  &.parameters-scrollbar {
-    height: 203px;
-  }
-
-  &.scrollbar-activator-hover {
-    display: none;
-  }
-}
-
-.scrollbar-hover {
-  ::-webkit-scrollbar {
-    width: 16px;
-  }
-}
-
-.border {
-  background-clip: content-box;
-  background-color: #cebbbb;
-  position: relative;
-  z-index: 1;
-
-  &.hor {
-    cursor: ns-resize;
-    padding: 4px 0;
-    height: 1px;
-    min-height: 1px;
-  }
-
-  &.ver {
-    cursor: ew-resize;
-    padding: 0 4px;
-    width: 1px;
-    min-width: 1px;
-    height: 100%;
-  }
-}
-
-.resize-cover {
-  display: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-
-  &.for-primary {
-    height: 100%;
-    width: 100%;
-    min-height: 140px;
-  }
-
-  &.for-secondary {
-    height: 100%;
-    width: 100%;
-    min-width: 140px;
-  }
-}
-
-/* Track */
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-/* Handle */
-::-webkit-scrollbar-thumb {
-  background: #888;
-}
-
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-  background: #555;
-}
-
-textarea,
-input,
-div,
-button {
-  outline: none !important;
-  margin: 0;
-}
-
-* {
-  user-select: none;
-  -webkit-user-drag: none;
-}
-
-html,
-body {
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  height: 100%;
-}
+@import 'basics.scss';
+@import 'border.scss';
+@import 'scrollbar.scss';
+@import 'resize-cover.scss';
 
 #main {
   pointer-events: none;
@@ -174,12 +75,6 @@ body {
             }
           }
         }
-      }
-
-      .separator {
-        background-color: #cebbbb;
-        width: 1px;
-        margin: 3px 6px;
       }
 
       .ga-settings {

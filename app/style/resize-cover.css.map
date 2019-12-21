@@ -1,0 +1,9 @@
+{
+    "version": 3,
+    "mappings": "AAAA,AAAA,aAAa,CAAC;EACZ,OAAO,EAAE,IAAI;EACb,QAAQ,EAAE,QAAQ;EAClB,GAAG,EAAE,CAAC;EACN,IAAI,EAAE,CAAC;CAaR;;AAjBD,AAME,aANW,AAMV,YAAY,CAAC;EACZ,MAAM,EAAE,IAAI;EACZ,KAAK,EAAE,IAAI;EACX,UAAU,EAAE,KAAK;CAClB;;AAVH,AAYE,aAZW,AAYV,cAAc,CAAC;EACd,MAAM,EAAE,IAAI;EACZ,KAAK,EAAE,IAAI;EACX,SAAS,EAAE,KAAK;CACjB",
+    "sources": [
+        "resize-cover.scss"
+    ],
+    "names": [],
+    "file": "resize-cover.css"
+}

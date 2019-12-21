@@ -261,6 +261,7 @@ let setReady = () => {
   document.getElementById('main').style.opacity = '1';
   document.getElementById('main').style.pointerEvents = 'inherit';
 };
+
 document.addEventListener('DOMContentLoaded', function loaded() {
   document.removeEventListener('DOMContentLoaded', loaded);
   /**

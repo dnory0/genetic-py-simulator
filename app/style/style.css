@@ -1,4 +1,58 @@
-/* width */
+textarea,
+input,
+div,
+button {
+  outline: none !important;
+  margin: 0;
+}
+
+* {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  -webkit-user-drag: none;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  height: 100%;
+}
+
+/* Borders used between 2 resizable DIVs */
+.border {
+  background-clip: content-box;
+  background-color: #cebbbb;
+  position: relative;
+  z-index: 1;
+}
+
+.border.hor {
+  cursor: ns-resize;
+  padding: 4px 0;
+  height: 1px;
+  min-height: 1px;
+}
+
+.border.ver {
+  cursor: ew-resize;
+  padding: 0 4px;
+  width: 1px;
+  min-width: 1px;
+  height: 100%;
+}
+
+/* Border between content that need to be devided sementically */
+.separator {
+  background-color: #cebbbb;
+  width: 1px;
+  margin: 3px 6px;
+}
+
+/* Default width */
 ::-webkit-scrollbar {
   width: 2px;
   -webkit-transition: width 2s linear;
@@ -24,26 +78,19 @@
   width: 16px;
 }
 
-.border {
-  background-clip: content-box;
-  background-color: #cebbbb;
-  position: relative;
-  z-index: 1;
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
 }
 
-.border.hor {
-  cursor: ns-resize;
-  padding: 4px 0;
-  height: 1px;
-  min-height: 1px;
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
 }
 
-.border.ver {
-  cursor: ew-resize;
-  padding: 0 4px;
-  width: 1px;
-  min-width: 1px;
-  height: 100%;
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
 
 .resize-cover {
@@ -63,45 +110,6 @@
   height: 100%;
   width: 100%;
   min-width: 140px;
-}
-
-/* Track */
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-/* Handle */
-::-webkit-scrollbar-thumb {
-  background: #888;
-}
-
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-  background: #555;
-}
-
-textarea,
-input,
-div,
-button {
-  outline: none !important;
-  margin: 0;
-}
-
-* {
-  -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
-  -webkit-user-drag: none;
-}
-
-html,
-body {
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  height: 100%;
 }
 
 #main {
@@ -197,12 +205,6 @@ body {
 
 #main .middle-container .controls-container .state-controls-container .state-controls > button#play-btn img.default {
   display: block;
-}
-
-#main .middle-container .controls-container .separator {
-  background-color: #cebbbb;
-  width: 1px;
-  margin: 3px 6px;
 }
 
 #main .middle-container .controls-container .ga-settings {

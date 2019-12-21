@@ -1,0 +1,24 @@
+textarea,
+input,
+div,
+button {
+  outline: none !important;
+  margin: 0;
+}
+
+* {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  -webkit-user-drag: none;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  height: 100%;
+}
+/*# sourceMappingURL=basics.css.map */

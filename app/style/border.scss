@@ -1,0 +1,29 @@
+/* Borders used between 2 resizable DIVs */
+.border {
+  background-clip: content-box;
+  background-color: #cebbbb;
+  position: relative;
+  z-index: 1;
+
+  &.hor {
+    cursor: ns-resize;
+    padding: 4px 0;
+    height: 1px;
+    min-height: 1px;
+  }
+
+  &.ver {
+    cursor: ew-resize;
+    padding: 0 4px;
+    width: 1px;
+    min-width: 1px;
+    height: 100%;
+  }
+}
+
+/* Border between content that need to be devided sementically */
+.separator {
+  background-color: #cebbbb;
+  width: 1px;
+  margin: 3px 6px;
+}

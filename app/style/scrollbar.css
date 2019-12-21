@@ -1,0 +1,41 @@
+/* Default width */
+::-webkit-scrollbar {
+  width: 2px;
+  -webkit-transition: width 2s linear;
+  transition: width 2s linear;
+}
+
+.scrollbar-activator {
+  position: relative;
+  width: 16px;
+  margin-right: -2px;
+  float: right;
+}
+
+.scrollbar-activator.parameters-scrollbar {
+  height: 203px;
+}
+
+.scrollbar-activator.scrollbar-activator-hover {
+  display: none;
+}
+
+.scrollbar-hover ::-webkit-scrollbar {
+  width: 16px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+/*# sourceMappingURL=scrollbar.css.map */

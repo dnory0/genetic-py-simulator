@@ -1,0 +1,19 @@
+.resize-cover {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.resize-cover.for-primary {
+  height: 100%;
+  width: 100%;
+  min-height: 140px;
+}
+
+.resize-cover.for-secondary {
+  height: 100%;
+  width: 100%;
+  min-width: 140px;
+}
+/*# sourceMappingURL=resize-cover.css.map */
