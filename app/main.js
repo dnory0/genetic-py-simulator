@@ -35,7 +35,7 @@ electron_1.app.once('ready', () => {
         minWidth: 580,
         minHeight: 430,
         webPreferences: {
-            preload: path_1.join(__dirname, 'preload.js'),
+            preload: path_1.join(__dirname, 'preloads', 'preload.js'),
             webviewTag: true
         }
     });
@@ -47,7 +47,6 @@ electron_1.app.once('ready', () => {
         mainWindow.setMenuBarVisibility(true);
         mainWindow.setAutoHideMenuBar(false);
     });
-    electron_1.app.applicationMenu = require('./menubar')(isDev, mainWindow);
-    delete require.cache[require.resolve('./menubar')];
+    electron_1.app.applicationMenu = require('./modules/menubar')(isDev, mainWindow);
 });
 //# sourceMappingURL=main.js.map

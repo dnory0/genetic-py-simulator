@@ -1,41 +1,45 @@
-/* Default width */
-::-webkit-scrollbar {
-  width: 2px;
-  -webkit-transition: width 2s linear;
-  transition: width 2s linear;
-}
-
-.scrollbar-activator {
+.scrollbar-container {
   position: relative;
-  width: 16px;
-  margin-right: -2px;
+  width: 24px;
   float: right;
+  height: 100%;
+  overflow-x: hidden;
 }
 
-.scrollbar-activator.parameters-scrollbar {
-  height: 203px;
+.scrollbar-container .transition-scrollbar-container {
+  -webkit-transition: margin-right 0.08s ease-in-out;
+  transition: margin-right 0.08s ease-in-out;
+  overflow-x: hidden;
+  overflow-y: auto;
+  height: 100%;
+  margin-right: -12px;
+  /* Track */
+  /* Handle */
+  /* Handle on hover */
 }
 
-.scrollbar-activator.scrollbar-activator-hover {
-  display: none;
+.scrollbar-container .transition-scrollbar-container::-webkit-scrollbar {
+  width: 15px;
 }
 
-.scrollbar-hover ::-webkit-scrollbar {
-  width: 16px;
-}
-
-/* Track */
-::-webkit-scrollbar-track {
+.scrollbar-container .transition-scrollbar-container::-webkit-scrollbar-track {
   background: #f1f1f1;
 }
 
-/* Handle */
-::-webkit-scrollbar-thumb {
-  background: #888;
+.scrollbar-container .transition-scrollbar-container::-webkit-scrollbar-thumb {
+  background: #aaa;
 }
 
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-  background: #555;
+.scrollbar-container .transition-scrollbar-container::-webkit-scrollbar-thumb:hover {
+  background: #777;
+}
+
+.scrollbar-container .transition-scrollbar-container .scrollbar {
+  width: 0px;
+  height: 203px;
+}
+
+.scrolling-content::-webkit-scrollbar {
+  display: none;
 }
 /*# sourceMappingURL=scrollbar.css.map */

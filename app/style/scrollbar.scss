@@ -1,41 +1,45 @@
-/* Default width */
-::-webkit-scrollbar {
-  width: 2px;
-  transition: width 2s linear;
+.scrollbar-container {
+  position: relative;
+  width: 24px;
+  float: right;
+  height: 100%;
+  overflow-x: hidden;
+
+  .transition-scrollbar-container {
+    transition: margin-right 0.08s ease-in-out;
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: 100%;
+    margin-right: -12px;
+
+    &::-webkit-scrollbar {
+      width: 15px;
+    }
+
+    /* Track */
+    &::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    /* Handle */
+    &::-webkit-scrollbar-thumb {
+      background: #aaa;
+    }
+
+    /* Handle on hover */
+    &::-webkit-scrollbar-thumb:hover {
+      background: #777;
+    }
+
+    .scrollbar {
+      width: 0px;
+      height: 203px;
+    }
+  }
 }
 
-.scrollbar-activator {
-  position: relative;
-  width: 16px;
-  margin-right: -2px;
-  float: right;
-
-  &.parameters-scrollbar {
-    height: 203px;
-  }
-
-  &.scrollbar-activator-hover {
+.scrolling-content {
+  &::-webkit-scrollbar {
     display: none;
   }
-}
-
-.scrollbar-hover {
-  ::-webkit-scrollbar {
-    width: 16px;
-  }
-}
-
-/* Track */
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-/* Handle */
-::-webkit-scrollbar-thumb {
-  background: #888;
-}
-
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-  background: #555;
 }

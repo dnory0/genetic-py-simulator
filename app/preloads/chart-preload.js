@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const electron_1 = require("electron");
 const isDev = electron_1.remote.app.getAppPath().indexOf('.asar') === -1;
 window['ipcRenderer'] = electron_1.ipcRenderer;
-window['createChart'] = require('./create-chart');
+window['createChart'] = require('../modules/create-chart');
 window['enableChartHover'] = (enable, chart) => {
     chart.update({
         tooltip: {

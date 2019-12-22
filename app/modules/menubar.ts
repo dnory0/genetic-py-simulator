@@ -7,6 +7,7 @@ import {
 } from 'electron';
 
 module.exports = (isDev: boolean, targetWindow: BrowserWindow) => {
+  delete require.cache[require.resolve('./menubar')];
   /**
    * zooms in on the renderer process
    */

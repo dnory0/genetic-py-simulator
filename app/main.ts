@@ -73,7 +73,7 @@ app.once('ready', () => {
     minWidth: 580,
     minHeight: 430,
     webPreferences: {
-      preload: join(__dirname, 'preload.js'),
+      preload: join(__dirname, 'preloads', 'preload.js'),
       webviewTag: true
     }
   });
@@ -93,8 +93,7 @@ app.once('ready', () => {
   /**
    * sets menu and free module after it's done
    */
-  app.applicationMenu = require('./menubar')(isDev, mainWindow);
-  delete require.cache[require.resolve('./menubar')];
+  app.applicationMenu = require('./modules/menubar')(isDev, mainWindow);
 });
 
 // writeFile(

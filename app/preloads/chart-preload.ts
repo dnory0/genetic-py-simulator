@@ -20,7 +20,7 @@ window['ipcRenderer'] = ipcRenderer;
  *
  * @returns set up chart
  */
-window['createChart'] = require('./create-chart');
+window['createChart'] = require('../modules/create-chart');
 /**
  * enables or disable the hover settings for the passed chart
  * @param enable decides if to disable hover settings or enable them.

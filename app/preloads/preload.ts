@@ -14,16 +14,25 @@ window['webFrame'] = webFrame;
 /**
  * set to true if app on development, false in production.
  *
- * NOTE: app needs to be packed on asar (by default) to detect production mode
- * if you don't set asar to false on electron-builder.json you're good to go
+ * NOTE: app needs to be packed on asar (by default) to detect production mode.
+ * if you don't set asar to false on electron-builder file it should work correctly.
  */
 window['isDev'] = remote.app.getAppPath().indexOf('.asar') === -1;
+/*************************** Modules part ***************************/
+/**
+ * add scroller auto maximizing & minimizing
+ */
+window['scrollbar'] = require('../modules/scrollbar');
+/**
+ * add resizabality parts of the UI
+ */
+window['border'] = require('../modules/border');
 
 /*************************** Python part ***************************/
 /**
  * python process responsible for executing genetic algorithm.
  */
-const pyshell: ChildProcess = require('./create-pyshell')(remote.app);
+const pyshell: ChildProcess = require('../modules/create-pyshell')(remote.app);
 window['pyshell'] = pyshell;
 
 /************************* states controller part *************************/
