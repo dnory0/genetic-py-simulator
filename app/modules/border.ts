@@ -1,4 +1,5 @@
 module.exports = function(borders: HTMLCollectionOf<HTMLDivElement>) {
+  delete require.cache[require.resolve('./border')];
   Array.from(borders).forEach((border: HTMLDivElement) => {
     const prevSib = <HTMLDivElement>border.previousElementSibling,
       nextSib = <HTMLDivElement>border.nextElementSibling,

@@ -1,5 +1,5 @@
 module.exports = function (scrollConts) {
-    require.cache['./scrollbar'];
+    delete require.cache[require.resolve('./scrollbar')];
     Array.from(scrollConts).forEach((scrollCont) => {
         let fChild = scrollCont.firstElementChild;
         let nextSib = scrollCont.nextElementSibling;

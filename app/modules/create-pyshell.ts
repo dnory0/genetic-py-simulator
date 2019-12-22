@@ -8,6 +8,7 @@ import { App } from 'electron';
  * platform (win32/linux)
  */
 module.exports = (app: App) => {
+  delete require.cache[require.resolve('./create-pyshell')];
   /**
    * set to true if app on development, false in production.
    *

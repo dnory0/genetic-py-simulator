@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const highstock_1 = require("highcharts/highstock");
 module.exports = (containerId, options) => {
-    delete require.cache[require.resolve('./create-pyshell')];
+    delete require.cache[require.resolve('./create-chart')];
     return highstock_1.stockChart(containerId, {
         title: {
             text: options.title.text,

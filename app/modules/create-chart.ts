@@ -6,7 +6,7 @@ import {
 } from 'highcharts/highstock';
 
 module.exports = (containerId: string, options: Options) => {
-  delete require.cache[require.resolve('./create-pyshell')];
+  delete require.cache[require.resolve('./create-chart')];
   return stockChart(containerId, {
     title: {
       text: options.title.text,

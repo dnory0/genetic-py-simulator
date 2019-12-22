@@ -1,4 +1,5 @@
 module.exports = function (borders) {
+    delete require.cache[require.resolve('./border')];
     Array.from(borders).forEach((border) => {
         const prevSib = border.previousElementSibling, nextSib = border.nextElementSibling, prevDisp = prevSib.style.display, nextDisp = nextSib.style.display;
         let prevRes, minPrevRes, minNextRes, client, winRes;

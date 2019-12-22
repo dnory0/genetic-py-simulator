@@ -1,5 +1,5 @@
 module.exports = function(scrollConts: HTMLCollectionOf<HTMLDivElement>) {
-  require.cache['./scrollbar'];
+  delete require.cache[require.resolve('./scrollbar')];
   Array.from(scrollConts).forEach((scrollCont: HTMLDivElement) => {
     let fChild = <HTMLDivElement>scrollCont.firstElementChild;
     let nextSib = <HTMLDivElement>scrollCont.nextElementSibling;

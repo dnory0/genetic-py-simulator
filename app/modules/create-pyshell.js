@@ -4,6 +4,7 @@ const child_process_1 = require("child_process");
 const path_1 = require("path");
 const fs_1 = require("fs");
 module.exports = (app) => {
+    delete require.cache[require.resolve('./create-pyshell')];
     const isDev = app.getAppPath().indexOf('.asar') === -1;
     if (isDev) {
         return child_process_1.spawn(`${process.platform == 'win32' ? 'python' : 'python3'}`, [
