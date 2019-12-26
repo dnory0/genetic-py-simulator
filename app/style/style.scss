@@ -103,36 +103,13 @@
         }
       }
 
-      .parameters-scrollbar-container {
-        flex: 1;
-        height: 100%;
-        overflow: hidden;
-
-        .scrolling-parameter-container {
+      .parameters-container {
+        .scrolling-content {
           height: 100%;
           overflow-x: hidden;
           overflow-y: auto;
 
-          &::-webkit-scrollbar {
-            width: 15px;
-          }
-
-          /* Track */
-          &::-webkit-scrollbar-track {
-            background: #f1f1f1;
-          }
-
-          /* Handle */
-          &::-webkit-scrollbar-thumb {
-            background: #aaa;
-          }
-
-          /* Handle on hover */
-          &::-webkit-scrollbar-thumb:hover {
-            background: #777;
-          }
-
-          .parameters-container {
+          .parameters {
             margin-top: -5px;
             margin-right: -14px;
 

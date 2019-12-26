@@ -1,12 +1,12 @@
-.scrollbar-container {
+.scrollbar {
   position: relative;
-  width: 24px;
+  width: 28px;
   float: right;
   height: 100%;
   overflow-x: hidden;
 }
 
-.scrollbar-container .transition-scrollbar-container {
+.scrollbar .transitioned-scrollbar {
   -webkit-transition: margin-right 0.08s ease-in-out;
   transition: margin-right 0.08s ease-in-out;
   overflow-x: hidden;
@@ -18,25 +18,24 @@
   /* Handle on hover */
 }
 
-.scrollbar-container .transition-scrollbar-container::-webkit-scrollbar {
+.scrollbar .transitioned-scrollbar::-webkit-scrollbar {
   width: 15px;
 }
 
-.scrollbar-container .transition-scrollbar-container::-webkit-scrollbar-track {
+.scrollbar .transitioned-scrollbar::-webkit-scrollbar-track {
   background: #f1f1f1;
 }
 
-.scrollbar-container .transition-scrollbar-container::-webkit-scrollbar-thumb {
+.scrollbar .transitioned-scrollbar::-webkit-scrollbar-thumb {
   background: #aaa;
 }
 
-.scrollbar-container .transition-scrollbar-container::-webkit-scrollbar-thumb:hover {
+.scrollbar .transitioned-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #777;
 }
 
-.scrollbar-container .transition-scrollbar-container .scrollbar {
+.scrollbar .transitioned-scrollbar .scrollbar-content {
   width: 0px;
-  height: 203px;
 }
 
 .scrolling-content::-webkit-scrollbar {

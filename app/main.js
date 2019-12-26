@@ -47,6 +47,6 @@ electron_1.app.once('ready', () => {
         mainWindow.setMenuBarVisibility(true);
         mainWindow.setAutoHideMenuBar(false);
     });
-    electron_1.app.applicationMenu = require('./modules/menubar')(isDev, mainWindow);
+    electron_1.app.applicationMenu = require(path_1.join(__dirname, 'modules', 'menubar.js'))(isDev, mainWindow);
 });
 //# sourceMappingURL=main.js.map

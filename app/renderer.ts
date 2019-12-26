@@ -148,15 +148,12 @@ const treatResponse = (response: object) => {
  * switch the play/pause button image depending on isRunning state.
  */
 const switchBtn = () => {
-  if (isRunning) {
-    // show playing state
-    (<HTMLImageElement>playBtn.querySelector('.play')).style.display = 'none';
-    (<HTMLImageElement>playBtn.querySelector('.pause')).style.display = 'block';
-  } else {
-    // show start/paused state
-    (<HTMLImageElement>playBtn.querySelector('.play')).style.display = 'block';
-    (<HTMLImageElement>playBtn.querySelector('.pause')).style.display = 'none';
-  }
+  (<HTMLImageElement>playBtn.querySelector('.play')).style.display = isRunning
+    ? 'none'
+    : 'block';
+  (<HTMLImageElement>playBtn.querySelector('.pause')).style.display = isRunning
+    ? 'block'
+    : 'none';
 };
 
 /**
@@ -467,8 +464,7 @@ document.addEventListener('DOMContentLoaded', function loaded() {
      */
     const devToolsToggler = (webView: string) => {
       if (webView == 'primary') primary.getWebContents().toggleDevTools();
-      else if (webView == 'secondary')
-        secondary.getWebContents().toggleDevTools();
+      else secondary.getWebContents().toggleDevTools();
     };
     // listens for main process' menubar
     ipcRenderer.on('devTools', (_event: IpcRendererEvent, webView: string) =>
@@ -478,9 +474,8 @@ document.addEventListener('DOMContentLoaded', function loaded() {
     window.addEventListener(
       'keyup',
       (event: KeyboardEvent) => {
-        if (event.code == 'Backquote')
-          if (event.ctrlKey)
-            devToolsToggler(event.shiftKey ? 'secondary' : 'primary');
+        if (event.code == 'Backquote' && event.ctrlKey)
+          devToolsToggler(event.shiftKey ? 'secondary' : 'primary');
       },
       true
     );
@@ -493,11 +488,11 @@ document.addEventListener('DOMContentLoaded', function loaded() {
   }
 
   // add scroller auto maximizing & minimizing
-  window['scrollbar'](document.getElementsByClassName('scrollbar-container'));
+  window['scrollbar']();
   delete window['scrollbar'];
 
   // add resizabality parts of the UI
-  window['border'](document.getElementsByClassName('border'));
+  window['border']();
   delete window['border'];
 
   /**

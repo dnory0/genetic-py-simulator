@@ -39,14 +39,12 @@ const treatResponse = (response) => {
     }
 };
 const switchBtn = () => {
-    if (isRunning) {
-        playBtn.querySelector('.play').style.display = 'none';
-        playBtn.querySelector('.pause').style.display = 'block';
-    }
-    else {
-        playBtn.querySelector('.play').style.display = 'block';
-        playBtn.querySelector('.pause').style.display = 'none';
-    }
+    playBtn.querySelector('.play').style.display = isRunning
+        ? 'none'
+        : 'block';
+    playBtn.querySelector('.pause').style.display = isRunning
+        ? 'block'
+        : 'none';
 };
 const setClickable = (clickable = true) => {
     Array.from(document.querySelector('.state-controls').children).forEach((element, index) => {
@@ -215,14 +213,13 @@ document.addEventListener('DOMContentLoaded', function loaded() {
         const devToolsToggler = (webView) => {
             if (webView == 'primary')
                 primary.getWebContents().toggleDevTools();
-            else if (webView == 'secondary')
+            else
                 secondary.getWebContents().toggleDevTools();
         };
         ipcRenderer.on('devTools', (_event, webView) => devToolsToggler(webView));
         window.addEventListener('keyup', (event) => {
-            if (event.code == 'Backquote')
-                if (event.ctrlKey)
-                    devToolsToggler(event.shiftKey ? 'secondary' : 'primary');
+            if (event.code == 'Backquote' && event.ctrlKey)
+                devToolsToggler(event.shiftKey ? 'secondary' : 'primary');
         }, true);
         primary.addEventListener('ipc-message', (event) => {
             if (event.channel == 'devTools')
@@ -233,9 +230,9 @@ document.addEventListener('DOMContentLoaded', function loaded() {
                 devToolsToggler(event.args);
         });
     }
-    window['scrollbar'](document.getElementsByClassName('scrollbar-container'));
+    window['scrollbar']();
     delete window['scrollbar'];
-    window['border'](document.getElementsByClassName('border'));
+    window['border']();
     delete window['border'];
     window.addEventListener('beforeunload', () => window['sendSig']('exit'));
 });

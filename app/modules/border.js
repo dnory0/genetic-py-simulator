@@ -1,6 +1,6 @@
-module.exports = function (borders) {
+module.exports = function () {
     delete require.cache[require.resolve('./border')];
-    Array.from(borders).forEach((border) => {
+    Array.from(document.getElementsByClassName('border')).forEach((border) => {
         const prevSib = border.previousElementSibling, nextSib = border.nextElementSibling, prevDisp = prevSib.style.display, nextDisp = nextSib.style.display;
         let prevRes, minPrevRes, minNextRes, client, winRes;
         if (border.classList.contains('ver')) {
@@ -22,7 +22,8 @@ module.exports = function (borders) {
                 .querySelectorAll('.resize-cover')
                 .forEach((ele) => (ele.style.display = 'block'));
             window.onmousemove = (e) => {
-                if (e[client] >= minPrevRes && e[client] <= window[winRes] - minNextRes)
+                if (e[client] >= minPrevRes &&
+                    e[client] <= window[winRes] - minNextRes)
                     prevSib.style[prevRes] = e[client] + 'px';
                 else if (e[client] < minPrevRes) {
                     if (e[client] < 100) {

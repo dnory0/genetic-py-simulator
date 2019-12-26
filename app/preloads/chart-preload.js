@@ -1,9 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const electron_1 = require("electron");
+const path_1 = require("path");
 const isDev = electron_1.remote.app.getAppPath().indexOf('.asar') === -1;
 window['ipcRenderer'] = electron_1.ipcRenderer;
-window['createChart'] = require('../modules/create-chart');
+window['createChart'] = require(path_1.join(__dirname, '..', 'modules', 'create-chart'));
 window['enableChartHover'] = (enable, chart) => {
     chart.update({
         tooltip: {

@@ -1,11 +1,11 @@
-.scrollbar-container {
+.scrollbar {
   position: relative;
-  width: 24px;
+  width: 28px;
   float: right;
   height: 100%;
   overflow-x: hidden;
 
-  .transition-scrollbar-container {
+  .transitioned-scrollbar {
     transition: margin-right 0.08s ease-in-out;
     overflow-x: hidden;
     overflow-y: auto;
@@ -31,9 +31,8 @@
       background: #777;
     }
 
-    .scrollbar {
+    .scrollbar-content {
       width: 0px;
-      height: 203px;
     }
   }
 }

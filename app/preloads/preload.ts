@@ -1,5 +1,9 @@
 import { ChildProcess } from 'child_process';
 import { ipcRenderer, webFrame, remote } from 'electron';
+import { setFlagsFromString } from 'v8';
+import { join } from 'path';
+
+setFlagsFromString('--no-lazy');
 
 /************************ Charts & Python Configuration ************************
  ******************************************************************************/
@@ -22,17 +26,22 @@ window['isDev'] = remote.app.getAppPath().indexOf('.asar') === -1;
 /**
  * add scroller auto maximizing & minimizing
  */
-window['scrollbar'] = require('../modules/scrollbar');
+window['scrollbar'] = require(join(__dirname, '..', 'modules', 'scrollbar.js'));
 /**
  * add resizabality parts of the UI
  */
-window['border'] = require('../modules/border');
+window['border'] = require(join(__dirname, '..', 'modules', 'border.js'));
 
 /*************************** Python part ***************************/
 /**
  * python process responsible for executing genetic algorithm.
  */
-const pyshell: ChildProcess = require('../modules/create-pyshell')(remote.app);
+const pyshell: ChildProcess = require(join(
+  __dirname,
+  '..',
+  'modules',
+  'create-pyshell.js'
+))(remote.app);
 window['pyshell'] = pyshell;
 
 /************************* states controller part *************************/

@@ -1,6 +1,7 @@
 import * as child_process from 'child_process';
 import * as fs from 'fs';
-const readline = require('readline');
+import * as readline from 'readline';
+import { join } from 'path';
 require('colors');
 
 let command = 'npm install';
@@ -18,7 +19,7 @@ const askUser = (question: string) => {
   });
 };
 const wipeDeps = () => {
-  const file = fs.readFileSync('package.json');
+  const file = fs.readFileSync(join(__dirname, '..', 'package.json'));
   const content = JSON.parse(file.toString());
   const deps = Object.keys(content.dependencies);
   const devDeps = Object.keys(content.devDependencies);
@@ -36,7 +37,6 @@ const wipeDeps = () => {
     cwd: __dirname,
     stdio: 'inherit'
   });
-  // console.log(command);
 };
 
 if (require.main == module)

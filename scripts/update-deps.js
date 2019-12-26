@@ -2,7 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const child_process = require("child_process");
 const fs = require("fs");
-const readline = require('readline');
+const readline = require("readline");
+const path_1 = require("path");
 require('colors');
 let command = 'npm install';
 const askUser = (question) => {
@@ -18,7 +19,7 @@ const askUser = (question) => {
     });
 };
 const wipeDeps = () => {
-    const file = fs.readFileSync('package.json');
+    const file = fs.readFileSync(path_1.join(__dirname, '..', 'package.json'));
     const content = JSON.parse(file.toString());
     const deps = Object.keys(content.dependencies);
     const devDeps = Object.keys(content.devDependencies);

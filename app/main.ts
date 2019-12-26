@@ -93,7 +93,10 @@ app.once('ready', () => {
   /**
    * sets menu and free module after it's done
    */
-  app.applicationMenu = require('./modules/menubar')(isDev, mainWindow);
+  app.applicationMenu = require(join(__dirname, 'modules', 'menubar.js'))(
+    isDev,
+    mainWindow
+  );
 });
 
 // writeFile(

@@ -1,5 +1,6 @@
 import { ipcRenderer, remote } from 'electron';
 import { Chart } from 'highcharts';
+import { join } from 'path';
 
 /**
  * set to true if app on development, false in production.
@@ -20,7 +21,12 @@ window['ipcRenderer'] = ipcRenderer;
  *
  * @returns set up chart
  */
-window['createChart'] = require('../modules/create-chart');
+window['createChart'] = require(join(
+  __dirname,
+  '..',
+  'modules',
+  'create-chart'
+));
 /**
  * enables or disable the hover settings for the passed chart
  * @param enable decides if to disable hover settings or enable them.
