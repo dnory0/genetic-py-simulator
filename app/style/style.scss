@@ -11,13 +11,13 @@
   display: flex;
   flex-direction: column;
 
-  .primary-container {
+  .prime-container {
     position: relative;
     min-height: 140px;
-    background-color: #fff;
+    // background-color: #fff;
     height: calc(70% + 13px);
     margin-bottom: -4px;
-    overflow: hidden;
+    // overflow: hidden;
   }
 
   .middle-container {
@@ -255,14 +255,14 @@
       }
     }
 
-    .secondary-container {
+    .side-container {
       position: relative;
       margin-left: -4px;
       flex: 1;
       height: 100%;
       overflow: hidden;
       min-width: 140px;
-      margin-top: 1px;
+      // margin-top: 1px;
     }
   }
 

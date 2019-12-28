@@ -2,17 +2,15 @@
   display: none;
   position: absolute;
   top: 0;
-  left: 0;
+  // left: 0;
+  height: 100%;
+  width: 100%;
 
-  &.for-primary {
-    height: 100%;
-    width: 100%;
+  &.for-prime {
     min-height: 140px;
   }
 
-  &.for-secondary {
-    height: 100%;
-    width: 100%;
+  &.for-side {
     min-width: 140px;
   }
 }

@@ -1,9 +1,9 @@
 import { ChildProcess } from 'child_process';
 import { ipcRenderer, webFrame, remote } from 'electron';
-import { setFlagsFromString } from 'v8';
+// import { setFlagsFromString } from 'v8';
 import { join } from 'path';
 
-setFlagsFromString('--no-lazy');
+// setFlagsFromString('--no-lazy');
 
 /************************ Charts & Python Configuration ************************
  ******************************************************************************/
@@ -24,11 +24,19 @@ window['webFrame'] = webFrame;
 window['isDev'] = remote.app.getAppPath().indexOf('.asar') === -1;
 /*************************** Modules part ***************************/
 /**
- * add scroller auto maximizing & minimizing
+ * opens pyshell communication and returns webviews zoom factor resetter.
+ */
+window['ready'] = require(join(__dirname, '..', 'modules', 'ready.js'));
+/**
+ * removes loading background and shows the app interface.
+ */
+window['loaded'] = require(join(__dirname, '..', 'modules', 'loaded.js'));
+/**
+ * add scroller auto stretching & shrinking
  */
 window['scrollbar'] = require(join(__dirname, '..', 'modules', 'scrollbar.js'));
 /**
- * add resizabality parts of the UI
+ * add resizabality for webviews and other parts of the UI
  */
 window['border'] = require(join(__dirname, '..', 'modules', 'border.js'));
 

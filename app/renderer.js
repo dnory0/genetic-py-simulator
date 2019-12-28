@@ -6,8 +6,8 @@ let ipcRenderer = window['ipcRenderer'];
 delete window['ipcRenderer'];
 let webFrame = window['webFrame'];
 delete window['webFrame'];
-const primary = document.getElementById('primary-chart');
-const secondary = document.getElementById('secondary-chart');
+const prime = document.getElementById('prime-chart');
+const side = document.getElementById('side-chart');
 let playBtn = document.getElementById('play-btn');
 let stopBtn = document.getElementById('stop-btn');
 let toStartBtn = document.getElementById('to-start-btn');
@@ -75,34 +75,18 @@ playBtn.onclick = () => ctrlClicked(isRunning ? 'pause' : 'play', !isRunning);
 stopBtn.onclick = () => ctrlClicked('stop', false);
 toStartBtn.onclick = () => ctrlClicked('replay', true);
 stepFBtn.onclick = () => ctrlClicked('step_f', false);
-let setReady = () => {
-    setReady = () => { };
-    pyshell.stdout.on('data', (response) => {
-        primary.send('data', response);
-        secondary.send('data', response);
-        response
-            .toString()
-            .split(/(?<=\n)/)
-            .forEach((args) => treatResponse(JSON.parse(args)));
-    });
-    zoomViews = () => {
-        primary.setZoomFactor(webFrame.getZoomFactor());
-        secondary.setZoomFactor(webFrame.getZoomFactor());
-    };
+let ready = () => {
+    ready = () => { };
+    zoomViews = window['ready'](pyshell, prime, side, treatResponse, webFrame);
     zoomViews();
-    if (document.getElementById('loading-bg')) {
-        document.getElementById('loading-bg').style.opacity = '0';
-        setTimeout(() => {
-            document.body.removeChild(document.getElementById('loading-bg'));
-        }, 0.2);
-    }
-    document.getElementById('main').style.opacity = '1';
-    document.getElementById('main').style.pointerEvents = 'inherit';
+    window['loaded']();
+    delete window['ready'];
+    delete window['loaded'];
 };
 document.addEventListener('DOMContentLoaded', function loaded() {
     document.removeEventListener('DOMContentLoaded', loaded);
-    primary.addEventListener('dom-ready', () => setReady());
-    secondary.addEventListener('dom-ready', () => setReady());
+    prime.addEventListener('dom-ready', () => ready());
+    side.addEventListener('dom-ready', () => ready());
     const sendParameter = (numInput, checkInput) => {
         numInput.style.backgroundColor = '#fff';
         pyshell.stdin.write(`${JSON.stringify({
@@ -211,21 +195,21 @@ document.addEventListener('DOMContentLoaded', function loaded() {
     if (window['isDev']) {
         delete window['isDev'];
         const devToolsToggler = (webView) => {
-            if (webView == 'primary')
-                primary.getWebContents().toggleDevTools();
+            if (webView == 'prime')
+                prime.getWebContents().toggleDevTools();
             else
-                secondary.getWebContents().toggleDevTools();
+                side.getWebContents().toggleDevTools();
         };
         ipcRenderer.on('devTools', (_event, webView) => devToolsToggler(webView));
         window.addEventListener('keyup', (event) => {
             if (event.code == 'Backquote' && event.ctrlKey)
-                devToolsToggler(event.shiftKey ? 'secondary' : 'primary');
+                devToolsToggler(event.shiftKey ? 'side' : 'prime');
         }, true);
-        primary.addEventListener('ipc-message', (event) => {
+        prime.addEventListener('ipc-message', (event) => {
             if (event.channel == 'devTools')
                 devToolsToggler(event.args);
         });
-        secondary.addEventListener('ipc-message', (event) => {
+        side.addEventListener('ipc-message', (event) => {
             if (event.channel == 'devTools')
                 devToolsToggler(event.args);
         });

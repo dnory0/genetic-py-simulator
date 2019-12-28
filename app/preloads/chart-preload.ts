@@ -82,8 +82,8 @@ if (isDev)
     (event: KeyboardEvent) => {
       if (event.code == 'Backquote')
         if (event.ctrlKey)
-          if (event.shiftKey) ipcRenderer.sendToHost('devTools', 'secondary');
-          else ipcRenderer.sendToHost('devTools', 'primary');
+          if (event.shiftKey) ipcRenderer.sendToHost('devTools', 'side');
+          else ipcRenderer.sendToHost('devTools', 'prime');
     },
     true
   );

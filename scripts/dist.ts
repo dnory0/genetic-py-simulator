@@ -14,7 +14,7 @@ exec(
     //   .filter(
     //     file =>
     //       !file.match(
-    //         /preload|renderer|launch|primary-chart|secondary-chart|^$/
+    //         /preload|renderer|launch|prime-chart|side-chart|^$/
     //       )
     //   );
     // files.forEach(file => exec(`rm ${file}c`).stderr.pipe(process.stderr));

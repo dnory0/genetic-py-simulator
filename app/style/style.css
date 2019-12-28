@@ -54,7 +54,7 @@ body {
 
 .scrollbar {
   position: relative;
-  width: 24px;
+  width: 28px;
   float: right;
   height: 100%;
   overflow-x: hidden;
@@ -90,7 +90,6 @@ body {
 
 .scrollbar .transitioned-scrollbar .scrollbar-content {
   width: 0px;
-  height: 203px;
 }
 
 .scrolling-content::-webkit-scrollbar {
@@ -101,18 +100,15 @@ body {
   display: none;
   position: absolute;
   top: 0;
-  left: 0;
-}
-
-.resize-cover.for-primary {
   height: 100%;
   width: 100%;
+}
+
+.resize-cover.for-prime {
   min-height: 140px;
 }
 
-.resize-cover.for-secondary {
-  height: 100%;
-  width: 100%;
+.resize-cover.for-side {
   min-width: 140px;
 }
 
@@ -131,13 +127,11 @@ body {
           flex-direction: column;
 }
 
-#main .primary-container {
+#main .prime-container {
   position: relative;
   min-height: 140px;
-  background-color: #fff;
   height: calc(70% + 13px);
   margin-bottom: -4px;
-  overflow: hidden;
 }
 
 #main .middle-container {
@@ -411,7 +405,7 @@ body {
   opacity: 1;
 }
 
-#main .middle-container .secondary-container {
+#main .middle-container .side-container {
   position: relative;
   margin-left: -4px;
   -webkit-box-flex: 1;
@@ -420,7 +414,6 @@ body {
   height: 100%;
   overflow: hidden;
   min-width: 140px;
-  margin-top: 1px;
 }
 
 #main .bottom-container {

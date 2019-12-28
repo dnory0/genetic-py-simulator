@@ -28,14 +28,14 @@ delete window['webFrame'];
 /***************************** Views Declaration *****************************
  *****************************************************************************/
 /**
- * webview hosting primary chart
+ * webview hosting prime chart
  */
-const primary: WebviewTag = <any>document.getElementById('primary-chart');
+const prime: WebviewTag = <any>document.getElementById('prime-chart');
 
 /**
- * webview hosting secondary chart
+ * webview hosting side chart
  */
-const secondary: WebviewTag = <any>document.getElementById('secondary-chart');
+const side: WebviewTag = <any>document.getElementById('side-chart');
 
 /************************************ GUI ************************************
  *****************************************************************************/
@@ -191,7 +191,7 @@ const blinkPlayBtn = () => {
 };
 
 /**
- * adjust primary & secondary webviws to body's zoom
+ * adjust prime & side webviws to body's zoom
  */
 let zoomViews = () => {};
 
@@ -223,40 +223,19 @@ stepFBtn.onclick = () => ctrlClicked('step_f', false);
  * unlock controls and parameters adjusting for user, also set pyshell communication
  * triggered after both webviews finish loading.
  */
-let setReady = () => {
+let ready = () => {
   /**
    * hopefully free some memory space.
    *
-   * Note: setting setReady to undefined/null might result in error when
-   * second view calling setReady finishs loading
+   * Note: setting ready to undefined/null might result in error when
+   * second view finishs loading
    */
-  setReady = () => {};
-  // open communication
-  pyshell.stdout.on('data', (response: Buffer) => {
-    primary.send('data', response);
-    secondary.send('data', response);
-    response
-      .toString()
-      .split(/(?<=\n)/)
-      .forEach((args: string) => treatResponse(JSON.parse(args)));
-  });
-  /**
-   * function is implemented after both webviews are fully loaded.
-   */
-  zoomViews = () => {
-    primary.setZoomFactor(webFrame.getZoomFactor());
-    secondary.setZoomFactor(webFrame.getZoomFactor());
-  };
-
+  ready = () => {};
+  zoomViews = window['ready'](pyshell, prime, side, treatResponse, webFrame);
   zoomViews();
-  if (document.getElementById('loading-bg')) {
-    document.getElementById('loading-bg').style.opacity = '0';
-    setTimeout(() => {
-      document.body.removeChild(document.getElementById('loading-bg'));
-    }, 0.2);
-  }
-  document.getElementById('main').style.opacity = '1';
-  document.getElementById('main').style.pointerEvents = 'inherit';
+  window['loaded']();
+  delete window['ready'];
+  delete window['loaded'];
 };
 
 document.addEventListener('DOMContentLoaded', function loaded() {
@@ -264,8 +243,8 @@ document.addEventListener('DOMContentLoaded', function loaded() {
   /**
    * whichever did finsh loading last is going to unlock controls for user,
    */
-  primary.addEventListener('dom-ready', () => setReady());
-  secondary.addEventListener('dom-ready', () => setReady());
+  prime.addEventListener('dom-ready', () => ready());
+  side.addEventListener('dom-ready', () => ready());
 
   /**************************** Ranges change handling ****************************/
 
@@ -457,14 +436,14 @@ document.addEventListener('DOMContentLoaded', function loaded() {
 
   if (window['isDev']) {
     delete window['isDev'];
-    // devTools listeners for primary & secondary webview
+    // devTools listeners for prime & side webview
     /**
      * toggles devTools for intended webview
-     * @param webView primary | secondary view
+     * @param webView prime | side view
      */
     const devToolsToggler = (webView: string) => {
-      if (webView == 'primary') primary.getWebContents().toggleDevTools();
-      else secondary.getWebContents().toggleDevTools();
+      if (webView == 'prime') prime.getWebContents().toggleDevTools();
+      else side.getWebContents().toggleDevTools();
     };
     // listens for main process' menubar
     ipcRenderer.on('devTools', (_event: IpcRendererEvent, webView: string) =>
@@ -475,14 +454,14 @@ document.addEventListener('DOMContentLoaded', function loaded() {
       'keyup',
       (event: KeyboardEvent) => {
         if (event.code == 'Backquote' && event.ctrlKey)
-          devToolsToggler(event.shiftKey ? 'secondary' : 'primary');
+          devToolsToggler(event.shiftKey ? 'side' : 'prime');
       },
       true
     );
-    primary.addEventListener('ipc-message', (event: IpcMessageEvent) => {
+    prime.addEventListener('ipc-message', (event: IpcMessageEvent) => {
       if (event.channel == 'devTools') devToolsToggler(<any>event.args);
     });
-    secondary.addEventListener('ipc-message', (event: IpcMessageEvent) => {
+    side.addEventListener('ipc-message', (event: IpcMessageEvent) => {
       if (event.channel == 'devTools') devToolsToggler(<any>event.args);
     });
   }

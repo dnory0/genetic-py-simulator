@@ -50,7 +50,7 @@ const treatResponse = (response: object) => {
     response['genes'] !== undefined
   ) {
     // mostFittest processing work is done here instead of being in preload file
-    // is to avoid race conditions because secondaryChart latest data is taken of it.
+    // is to avoid race conditions because sideChart latest data is taken of it.
     // probably needs to moved on another file that imports reload file (when every
     // view and window has its own preload)
     if (mostFittest['fitness'] < response['fitness']) {
@@ -67,25 +67,21 @@ const treatResponse = (response: object) => {
         genes: response['genes']
       });
     }
-    secondaryChart.series[0].setData(
-      mostFittest.individuals[0].genes,
-      true,
-      false
-    );
+    sideChart.series[0].setData(mostFittest.individuals[0].genes, true, false);
   } else if (response['started'] && response['genesNum'] !== undefined) {
-    clearChart(secondaryChart);
+    clearChart(sideChart);
     // clean mostFittest object before start recieving data
     mostFittest['fitness'] = -1;
     mostFittest['individuals'] = null;
     // setting up xAxis for fittest and current chart
-    secondaryChart.xAxis[0].setCategories(
+    sideChart.xAxis[0].setCategories(
       [...Array(response['genesNum']).keys()].map(v => `${++v}`)
     );
     // disable points on hover on chart
-    enableChartHover(false, secondaryChart);
+    enableChartHover(false, sideChart);
   } else if (response['paused'] || response['finished'] || response['stopped'])
-    enableChartHover(true, secondaryChart);
-  else if (response['resumed']) enableChartHover(false, secondaryChart);
+    enableChartHover(true, sideChart);
+  else if (response['resumed']) enableChartHover(false, sideChart);
 };
 
 /**
@@ -94,7 +90,7 @@ const treatResponse = (response: object) => {
  * most fittest is a new fittest which its fitness value is better than every
  * fittest in the previous generations
  */
-let secondaryChart = window['createChart']('secondary-chart', {
+let sideChart = window['createChart']('side-chart', {
   chart: {
     type: 'line'
   },

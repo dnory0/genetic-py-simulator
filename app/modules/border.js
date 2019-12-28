@@ -1,19 +1,20 @@
 module.exports = function () {
     delete require.cache[require.resolve('./border')];
+    const pxSlicer = (element, minRes) => window.getComputedStyle(element)[minRes].slice(0, -2);
     Array.from(document.getElementsByClassName('border')).forEach((border) => {
-        const prevSib = border.previousElementSibling, nextSib = border.nextElementSibling, prevDisp = prevSib.style.display, nextDisp = nextSib.style.display;
-        let prevRes, minPrevRes, minNextRes, client, winRes;
+        var prevSib = border.previousElementSibling, nextSib = border.nextElementSibling, prevDisp = prevSib.style.display, nextDisp = nextSib.style.display;
+        var prevRes, minPrevRes, minNextRes, client, winRes;
         if (border.classList.contains('ver')) {
             prevRes = 'width';
-            minPrevRes = window.getComputedStyle(prevSib).minWidth.slice(0, -2);
-            minNextRes = window.getComputedStyle(nextSib).minWidth.slice(0, -2);
+            minPrevRes = pxSlicer(prevSib, 'minWidth');
+            minNextRes = pxSlicer(nextSib, 'minWidth');
             client = 'clientX';
             winRes = 'innerWidth';
         }
         else if (border.classList.contains('hor')) {
             prevRes = 'height';
-            minPrevRes = window.getComputedStyle(prevSib).minHeight.slice(0, -2);
-            minNextRes = window.getComputedStyle(nextSib).minHeight.slice(0, -2);
+            minPrevRes = pxSlicer(prevSib, 'minHeight');
+            minNextRes = pxSlicer(nextSib, 'minHeight');
             client = 'clientY';
             winRes = 'innerHeight';
         }

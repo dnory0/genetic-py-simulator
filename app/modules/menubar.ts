@@ -81,15 +81,15 @@ module.exports = (isDev: boolean, targetWindow: BrowserWindow) => {
     menu.items[2].submenu.insert(
       3,
       new MenuItem({
-        label: 'Primary Developer Tools [Ctrl+²]',
-        click: () => targetWindow.webContents.send('devTools', 'primary')
+        label: 'prime Developer Tools [Ctrl+²]',
+        click: () => targetWindow.webContents.send('devTools', 'prime')
       })
     );
     menu.items[2].submenu.insert(
       4,
       new MenuItem({
-        label: 'Secondary Developer Tools [Ctrl+Shift+²]',
-        click: () => targetWindow.webContents.send('devTools', 'secondary')
+        label: 'side Developer Tools [Ctrl+Shift+²]',
+        click: () => targetWindow.webContents.send('devTools', 'side')
       })
     );
     menu.items[2].submenu.insert(5, new MenuItem({ type: 'separator' }));

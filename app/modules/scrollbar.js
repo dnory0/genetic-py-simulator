@@ -1,9 +1,9 @@
 module.exports = function () {
     delete require.cache[require.resolve('./scrollbar')];
     Array.from(document.getElementsByClassName('scrollbar')).forEach((scrollbar) => {
-        let scrollingContent = scrollbar.nextElementSibling;
-        let transitionedScrollbar = document.createElement('div');
-        let scrollbarContent = document.createElement('div');
+        var scrollingContent = scrollbar.nextElementSibling;
+        var transitionedScrollbar = document.createElement('div');
+        var scrollbarContent = document.createElement('div');
         scrollbar.parentElement.style.height = '100%';
         transitionedScrollbar.classList.add('transitioned-scrollbar');
         scrollbar.appendChild(transitionedScrollbar);

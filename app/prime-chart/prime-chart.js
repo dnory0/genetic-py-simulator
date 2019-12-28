@@ -5,21 +5,19 @@ delete window['ipcRenderer'];
 const enableChartHover = window['enableChartHover'];
 const clearChart = window['clearChart'];
 const treatResponse = (response) => {
-    if (response['generation'] !== undefined &&
-        response['fitness'] !== undefined &&
-        response['genes'] !== undefined) {
-        primaryChart.series[0].addPoint(parseInt(response['fitness']), true, false, false);
+    if (response['fitness'] !== undefined) {
+        primeChart.series[0].addPoint(parseInt(response['fitness']), true, false, false);
     }
-    else if (response['started'] && response['genesNum'] !== undefined) {
-        clearChart(primaryChart);
-        enableChartHover(false, primaryChart);
+    else if (response['started']) {
+        clearChart(primeChart);
+        enableChartHover(false, primeChart);
     }
     else if (response['paused'] || response['finished'] || response['stopped'])
-        enableChartHover(true, primaryChart);
+        enableChartHover(true, primeChart);
     else if (response['resumed'])
-        enableChartHover(false, primaryChart);
+        enableChartHover(false, primeChart);
 };
-let primaryChart = window['createChart']('primary-chart', {
+let primeChart = window['createChart']('prime-chart', {
     chart: {
         type: 'line'
     },
@@ -50,4 +48,4 @@ ipcRenderer.on('data', (_event, data) => {
         .split(/(?<=\n)/)
         .forEach((args) => treatResponse(JSON.parse(args)));
 });
-//# sourceMappingURL=primary-chart.js.map
+//# sourceMappingURL=prime-chart.js.map

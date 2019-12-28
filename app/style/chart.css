@@ -25,8 +25,8 @@ body {
   height: 100vh;
 }
 
-.charts-container #primary-chart,
-.charts-container #secondary-chart {
+.charts-container #prime-chart,
+.charts-container #side-chart {
   padding: 0;
   position: relative;
   width: 100%;

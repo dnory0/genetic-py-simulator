@@ -5,8 +5,8 @@ import { IpcRendererEvent, IpcRenderer } from 'electron';
  *******************************************************************************/
 
 /**
- * allows sending resizing information to main process to resize primary &
- * secondary view
+ * allows sending resizing information to main process to resize prime &
+ * side view
  */
 const ipcRenderer: IpcRenderer = window['ipcRenderer'];
 delete window['ipcRenderer'];
@@ -32,32 +32,28 @@ const clearChart: (chart: Chart, categories?: boolean) => void =
  * @param response response of pyshell
  */
 const treatResponse = (response: object) => {
-  if (
-    response['generation'] !== undefined &&
-    response['fitness'] !== undefined &&
-    response['genes'] !== undefined
-  ) {
-    // every point is added to primaryChart
-    primaryChart.series[0].addPoint(
+  if (response['fitness'] !== undefined) {
+    // every point is added to primeChart
+    primeChart.series[0].addPoint(
       parseInt(response['fitness']),
       true,
       false,
       false
     );
-  } else if (response['started'] && response['genesNum'] !== undefined) {
+  } else if (response['started']) {
     // clear past results
-    clearChart(primaryChart);
+    clearChart(primeChart);
     // disable points on hover on chart
-    enableChartHover(false, primaryChart);
+    enableChartHover(false, primeChart);
   } else if (response['paused'] || response['finished'] || response['stopped'])
-    enableChartHover(true, primaryChart);
-  else if (response['resumed']) enableChartHover(false, primaryChart);
+    enableChartHover(true, primeChart);
+  else if (response['resumed']) enableChartHover(false, primeChart);
 };
 
 /**
  * updated every generation, receives the generation with its fittest fitness
  */
-let primaryChart = window['createChart']('primary-chart', {
+let primeChart = window['createChart']('prime-chart', {
   chart: {
     type: 'line'
   },

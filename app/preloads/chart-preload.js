@@ -43,8 +43,8 @@ if (isDev)
         if (event.code == 'Backquote')
             if (event.ctrlKey)
                 if (event.shiftKey)
-                    electron_1.ipcRenderer.sendToHost('devTools', 'secondary');
+                    electron_1.ipcRenderer.sendToHost('devTools', 'side');
                 else
-                    electron_1.ipcRenderer.sendToHost('devTools', 'primary');
+                    electron_1.ipcRenderer.sendToHost('devTools', 'prime');
     }, true);
 //# sourceMappingURL=chart-preload.js.map
