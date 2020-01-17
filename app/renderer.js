@@ -194,25 +194,8 @@ document.addEventListener('DOMContentLoaded', function loaded() {
     });
     if (window['isDev']) {
         delete window['isDev'];
-        const devToolsToggler = (webView) => {
-            if (webView == 'prime')
-                prime.getWebContents().toggleDevTools();
-            else
-                side.getWebContents().toggleDevTools();
-        };
-        ipcRenderer.on('devTools', (_event, webView) => devToolsToggler(webView));
-        window.addEventListener('keyup', (event) => {
-            if (event.code == 'Backquote' && event.ctrlKey)
-                devToolsToggler(event.shiftKey ? 'side' : 'prime');
-        }, true);
-        prime.addEventListener('ipc-message', (event) => {
-            if (event.channel == 'devTools')
-                devToolsToggler(event.args);
-        });
-        side.addEventListener('ipc-message', (event) => {
-            if (event.channel == 'devTools')
-                devToolsToggler(event.args);
-        });
+        window['k-shorts'](prime, side, ipcRenderer);
+        delete window['k-shorts'];
     }
     window['scrollbar']();
     delete window['scrollbar'];

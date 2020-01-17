@@ -39,7 +39,11 @@ window['scrollbar'] = require(join(__dirname, '..', 'modules', 'scrollbar.js'));
  * add resizabality for webviews and other parts of the UI
  */
 window['border'] = require(join(__dirname, '..', 'modules', 'border.js'));
-
+/**
+ * some keyboard shortcuts can't be implemented in the main process so they
+ * are implemented in the renderer process
+ */
+window['k-shorts'] = require(join(__dirname, '..', 'modules', 'k-shorts.js'));
 /*************************** Python part ***************************/
 /**
  * python process responsible for executing genetic algorithm.

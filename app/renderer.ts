@@ -436,34 +436,8 @@ document.addEventListener('DOMContentLoaded', function loaded() {
 
   if (window['isDev']) {
     delete window['isDev'];
-    // devTools listeners for prime & side webview
-    /**
-     * toggles devTools for intended webview
-     * @param webView prime | side view
-     */
-    const devToolsToggler = (webView: string) => {
-      if (webView == 'prime') prime.getWebContents().toggleDevTools();
-      else side.getWebContents().toggleDevTools();
-    };
-    // listens for main process' menubar
-    ipcRenderer.on('devTools', (_event: IpcRendererEvent, webView: string) =>
-      devToolsToggler(webView)
-    );
-    // listens for renderer process
-    window.addEventListener(
-      'keyup',
-      (event: KeyboardEvent) => {
-        if (event.code == 'Backquote' && event.ctrlKey)
-          devToolsToggler(event.shiftKey ? 'side' : 'prime');
-      },
-      true
-    );
-    prime.addEventListener('ipc-message', (event: IpcMessageEvent) => {
-      if (event.channel == 'devTools') devToolsToggler(<any>event.args);
-    });
-    side.addEventListener('ipc-message', (event: IpcMessageEvent) => {
-      if (event.channel == 'devTools') devToolsToggler(<any>event.args);
-    });
+    window['k-shorts'](prime, side, ipcRenderer);
+    delete window['k-shorts'];
   }
 
   // add scroller auto maximizing & minimizing

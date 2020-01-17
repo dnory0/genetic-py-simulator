@@ -1,5 +1,5 @@
 module.exports = function() {
-  // free module from memory if possible
+  // free module from memory if possible after it finishes
   delete require.cache[require.resolve('./border')];
 
   /**

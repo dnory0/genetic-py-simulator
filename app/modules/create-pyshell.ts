@@ -6,8 +6,9 @@ import { App } from 'electron';
 /**
  * initialize pyshell depending on the mode (development/production) and
  * platform (win32/linux)
+ * @param app used to get paths
  */
-module.exports = (app: App) => {
+function createPyshell(app: App) {
   delete require.cache[require.resolve('./create-pyshell')];
   /**
    * set to true if app on development, false in production.
@@ -71,4 +72,6 @@ module.exports = (app: App) => {
       execExist ? [] : [copyTo]
     );
   }
-};
+}
+
+module.exports = createPyshell;

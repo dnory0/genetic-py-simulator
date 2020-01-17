@@ -1,5 +1,8 @@
-module.exports = function() {
-  // free module from memory if possible
+/**
+ * scrollbar fn adds a scrollbar to every ```<div class="scrollbar"></div>```
+ */
+function scrollbar() {
+  // free module from memory if possible after it finishes
   delete require.cache[require.resolve('./scrollbar')];
 
   Array.from(document.getElementsByClassName('scrollbar')).forEach(
@@ -45,4 +48,6 @@ module.exports = function() {
           ev.type == 'mouseover' ? '0' : '-12px');
     }
   );
-};
+}
+
+module.exports = scrollbar;

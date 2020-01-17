@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const child_process_1 = require("child_process");
 const path_1 = require("path");
 const fs_1 = require("fs");
-module.exports = (app) => {
+function createPyshell(app) {
     delete require.cache[require.resolve('./create-pyshell')];
     const isDev = app.getAppPath().indexOf('.asar') === -1;
     if (isDev) {
@@ -32,5 +32,6 @@ module.exports = (app) => {
             ? copyTo
             : `${process.platform == 'win32' ? 'python' : 'python3'}`, execExist ? [] : [copyTo]);
     }
-};
+}
+module.exports = createPyshell;
 //# sourceMappingURL=create-pyshell.js.map

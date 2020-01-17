@@ -1,4 +1,4 @@
-module.exports = function () {
+function scrollbar() {
     delete require.cache[require.resolve('./scrollbar')];
     Array.from(document.getElementsByClassName('scrollbar')).forEach((scrollbar) => {
         var scrollingContent = scrollbar.nextElementSibling;
@@ -23,5 +23,6 @@ module.exports = function () {
         scrollbar.onmouseover = scrollbar.onmouseleave = (ev) => (transitionedScrollbar.style.marginRight =
             ev.type == 'mouseover' ? '0' : '-12px');
     });
-};
+}
+module.exports = scrollbar;
 //# sourceMappingURL=scrollbar.js.map
