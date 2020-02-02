@@ -197,8 +197,6 @@ document.addEventListener('DOMContentLoaded', function loaded() {
         window['k-shorts'](prime, side, ipcRenderer);
         delete window['k-shorts'];
     }
-    window['scrollbar']();
-    delete window['scrollbar'];
     window['border']();
     delete window['border'];
     window.addEventListener('beforeunload', () => window['sendSig']('exit'));

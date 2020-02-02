@@ -1,44 +1,22 @@
-.scrollbar {
-  position: relative;
-  width: 28px;
-  float: right;
-  height: 100%;
-  overflow-x: hidden;
-}
-
-.scrollbar .transitioned-scrollbar {
-  -webkit-transition: margin-right 0.08s ease-in-out;
-  transition: margin-right 0.08s ease-in-out;
-  overflow-x: hidden;
-  overflow-y: auto;
-  height: 100%;
-  margin-right: -12px;
+.parameters-container {
   /* Track */
   /* Handle */
   /* Handle on hover */
 }
 
-.scrollbar .transitioned-scrollbar::-webkit-scrollbar {
-  width: 15px;
+.parameters-container::-webkit-scrollbar {
+  width: 12px;
 }
 
-.scrollbar .transitioned-scrollbar::-webkit-scrollbar-track {
+.parameters-container::-webkit-scrollbar-track {
   background: #f1f1f1;
 }
 
-.scrollbar .transitioned-scrollbar::-webkit-scrollbar-thumb {
+.parameters-container::-webkit-scrollbar-thumb {
   background: #aaa;
 }
 
-.scrollbar .transitioned-scrollbar::-webkit-scrollbar-thumb:hover {
+.parameters-container::-webkit-scrollbar-thumb:hover {
   background: #777;
-}
-
-.scrollbar .transitioned-scrollbar .scrollbar-content {
-  width: 0px;
-}
-
-.scrolling-content::-webkit-scrollbar {
-  display: none;
 }
 /*# sourceMappingURL=scrollbar.css.map */

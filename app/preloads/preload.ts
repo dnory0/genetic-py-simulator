@@ -32,10 +32,6 @@ window['ready'] = require(join(__dirname, '..', 'modules', 'ready.js'));
  */
 window['loaded'] = require(join(__dirname, '..', 'modules', 'loaded.js'));
 /**
- * add scroller auto stretching & shrinking
- */
-window['scrollbar'] = require(join(__dirname, '..', 'modules', 'scrollbar.js'));
-/**
  * add resizabality for webviews and other parts of the UI
  */
 window['border'] = require(join(__dirname, '..', 'modules', 'border.js'));

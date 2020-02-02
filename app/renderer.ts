@@ -440,10 +440,6 @@ document.addEventListener('DOMContentLoaded', function loaded() {
     delete window['k-shorts'];
   }
 
-  // add scroller auto maximizing & minimizing
-  window['scrollbar']();
-  delete window['scrollbar'];
-
   // add resizabality parts of the UI
   window['border']();
   delete window['border'];

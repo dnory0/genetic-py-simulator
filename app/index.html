@@ -60,121 +60,118 @@
               </button>
             </div>
           </div>
-          <div class="parameters-container scrollbar-container">
-            <div class="scrollbar"></div>
-            <div class="scrolling-content">
-              <div class="parameters">
-                <div class="parameter">
-                  <p>Population size:</p>
+          <div class="parameters-container">
+            <div class="parameters">
+              <div class="parameter">
+                <p>Population size:</p>
+                <input
+                  type="number"
+                  min="1"
+                  step="1"
+                  id="pop-size"
+                  name="pop_size"
+                />
+                <div class="checkbox-wrapper">
+                  <input
+                    type="checkbox"
+                    name="random_pop_size"
+                    id="random-pop-size"
+                  />
+                  <label for="random-pop-size">
+                    <img src="img/random.png" />
+                  </label>
+                </div>
+              </div>
+              <div class="parameter">
+                <p>Genes number:</p>
+                <input
+                  type="number"
+                  min="1"
+                  step="1"
+                  id="genes-num"
+                  name="genes_num"
+                />
+                <div class="checkbox-wrapper">
+                  <input
+                    type="checkbox"
+                    name="random_genes_num"
+                    id="random-genes-num"
+                  />
+                  <label for="random-genes-num">
+                    <img src="img/random.png" />
+                  </label>
+                </div>
+              </div>
+              <div class="parameter">
+                <p>Crossover rate:</p>
+                <div class="input-wrapper">
+                  <input type="range" min="0.001" max="1" step="0.001" />
                   <input
                     type="number"
-                    min="1"
-                    step="1"
-                    id="pop-size"
-                    name="pop_size"
+                    min="0.001"
+                    max="1"
+                    step="0.001"
+                    id="crossover-rate"
+                    name="crossover_rate"
                   />
-                  <div class="checkbox-wrapper">
-                    <input
-                      type="checkbox"
-                      name="random_pop_size"
-                      id="random-pop-size"
-                    />
-                    <label for="random-pop-size">
-                      <img src="img/random.png" />
-                    </label>
-                  </div>
                 </div>
-                <div class="parameter">
-                  <p>Genes number:</p>
+                <div class="checkbox-wrapper">
+                  <input
+                    type="checkbox"
+                    name="random_crossover_rate"
+                    id="random-crossover-rate"
+                  />
+                  <label for="random-crossover-rate">
+                    <img src="img/random.png"
+                  /></label>
+                </div>
+              </div>
+              <div class="parameter">
+                <p>Mutation rate:</p>
+                <div class="input-wrapper">
+                  <input type="range" min="0" max="1" step="0.001" />
                   <input
                     type="number"
-                    min="1"
-                    step="1"
-                    id="genes-num"
-                    name="genes_num"
+                    min="0"
+                    max="1"
+                    step="0.001"
+                    id="mutation-rate"
+                    name="mutation_rate"
                   />
-                  <div class="checkbox-wrapper">
-                    <input
-                      type="checkbox"
-                      name="random_genes_num"
-                      id="random-genes-num"
-                    />
-                    <label for="random-genes-num">
-                      <img src="img/random.png" />
-                    </label>
-                  </div>
                 </div>
-                <div class="parameter">
-                  <p>Crossover rate:</p>
-                  <div class="input-wrapper">
-                    <input type="range" min="0.001" max="1" step="0.001" />
-                    <input
-                      type="number"
-                      min="0.001"
-                      max="1"
-                      step="0.001"
-                      id="crossover-rate"
-                      name="crossover_rate"
-                    />
-                  </div>
-                  <div class="checkbox-wrapper">
-                    <input
-                      type="checkbox"
-                      name="random_crossover_rate"
-                      id="random-crossover-rate"
-                    />
-                    <label for="random-crossover-rate">
-                      <img src="img/random.png"
-                    /></label>
-                  </div>
+                <div class="checkbox-wrapper">
+                  <input
+                    type="checkbox"
+                    name="random_mutation_rate"
+                    id="random-mutation-rate"
+                  />
+                  <label for="random-mutation-rate">
+                    <img src="img/random.png"
+                  /></label>
                 </div>
-                <div class="parameter">
-                  <p>Mutation rate:</p>
-                  <div class="input-wrapper">
-                    <input type="range" min="0" max="1" step="0.001" />
-                    <input
-                      type="number"
-                      min="0"
-                      max="1"
-                      step="0.001"
-                      id="mutation-rate"
-                      name="mutation_rate"
-                    />
-                  </div>
-                  <div class="checkbox-wrapper">
-                    <input
-                      type="checkbox"
-                      name="random_mutation_rate"
-                      id="random-mutation-rate"
-                    />
-                    <label for="random-mutation-rate">
-                      <img src="img/random.png"
-                    /></label>
-                  </div>
+              </div>
+              <div class="parameter">
+                <p>delay rate:</p>
+                <div class="input-wrapper">
+                  <input type="range" min="0" max="5" step="0.05" />
+                  <input
+                    type="number"
+                    min="0"
+                    max="5"
+                    step="0.05"
+                    id="delay-rate"
+                    name="delay_rate"
+                  />
                 </div>
-                <div class="parameter">
-                  <p>delay rate:</p>
-                  <div class="input-wrapper">
-                    <input type="range" min="0" max="5" step="0.05" />
-                    <input
-                      type="number"
-                      min="0"
-                      max="5"
-                      step="0.05"
-                      id="delay-rate"
-                      name="delay_rate"
-                    />
-                  </div>
-                  <div class="checkbox-wrapper">
-                    <input
-                      type="checkbox"
-                      name="random_delay_rate"
-                      id="random-delay-rate"
-                    />
-                    <label for="random-delay-rate">
-                      <img src="img/random.png" />
-                    </label>
-                  </div>
+                <div class="checkbox-wrapper">
+                  <input
+                    type="checkbox"
+                    name="random_delay_rate"
+                    id="random-delay-rate"
+                  />
+                  <label for="random-delay-rate">
+                    <img src="img/random.png" />
+                  </label>
                 </div>
               </div>
             </div>
