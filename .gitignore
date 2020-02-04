@@ -102,3 +102,5 @@ IDEA.*
 settings.json
 import*
 lib*
+scripts/dist-python.*
+scripts/pyinstaller-install.*

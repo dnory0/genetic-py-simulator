@@ -1,14 +1,7 @@
-import { ipcRenderer, remote } from 'electron';
+import { ipcRenderer } from 'electron';
 import { Chart } from 'highcharts';
 import { join } from 'path';
 
-/**
- * set to true if app on development, false in production.
- *
- * NOTE: app needs to be packed on asar (by default) to detect production mode
- * if you don't set asar to false on electron-builder.json you're good to go
- */
-const isDev = remote.app.getAppPath().indexOf('.asar') === -1;
 /**
  * allows communication between this webview & renderer process
  */
@@ -76,7 +69,8 @@ window['clearChart'] = (chart: Chart, categories: boolean = false) => {
   chart.series[0].setData([], true);
 };
 
-if (isDev)
+ipcRenderer.once('mode', (_ev, isDev) => {
+  if (!isDev) return;
   window.addEventListener(
     'keyup',
     (event: KeyboardEvent) => {
@@ -87,3 +81,4 @@ if (isDev)
     },
     true
   );
+});

@@ -1,19 +1,12 @@
 import { ChildProcess } from 'child_process';
-import {
-  IpcRenderer,
-  WebviewTag,
-  IpcRendererEvent,
-  WebFrame,
-  IpcMessageEvent
-} from 'electron';
+import { IpcRenderer, WebviewTag, IpcRendererEvent, WebFrame } from 'electron';
 
 /***************************** passed by preload *****************************
  *****************************************************************************/
 /**
  * python process that executes GA
  */
-let pyshell: ChildProcess = window['pyshell'];
-delete window['pyshell'];
+let pyshell: ChildProcess;
 /**
  * used to listen to zoom channel for wain process to send zoom in/out/reset.
  */
@@ -219,33 +212,46 @@ toStartBtn.onclick = () => ctrlClicked('replay', true);
 stepFBtn.onclick = () => ctrlClicked('step_f', false);
 
 /********************************* Views Setup *********************************/
-/**
- * unlock controls and parameters adjusting for user, also set pyshell communication
- * triggered after both webviews finish loading.
- */
-let ready = () => {
-  /**
-   * hopefully free some memory space.
-   *
-   * Note: setting ready to undefined/null might result in error when
-   * second view finishs loading
-   */
-  ready = () => {};
-  zoomViews = window['ready'](pyshell, prime, side, treatResponse, webFrame);
-  zoomViews();
-  window['loaded']();
-  delete window['ready'];
-  delete window['loaded'];
-};
-
 document.addEventListener('DOMContentLoaded', function loaded() {
   document.removeEventListener('DOMContentLoaded', loaded);
-  /**
-   * whichever did finsh loading last is going to unlock controls for user,
-   */
-  prime.addEventListener('dom-ready', () => ready());
-  side.addEventListener('dom-ready', () => ready());
+  (() => {
+    /**
+     * unlock controls and parameters adjusting for user, also set pyshell communication
+     * triggered after both webviews finish loading.
+     */
+    let ready = () => {
+      /**
+       * hopefully free some memory space.
+       *
+       * Note: setting ready to undefined/null might result in error when
+       * second view finishs loading
+       */
+      ready = () => {
+        prime.send('mode', window['isDev']);
+        side.send('mode', window['isDev']);
+        delete window['isDev'];
+        ready;
+      };
 
+      zoomViews = window['ready'](
+        pyshell,
+        prime,
+        side,
+        treatResponse,
+        webFrame
+      );
+      zoomViews();
+      window['loaded']();
+      delete window['ready'];
+      delete window['loaded'];
+    };
+
+    /**
+     * whichever did finsh loading last is going to unlock controls for user,
+     */
+    prime.addEventListener('dom-ready', () => ready());
+    side.addEventListener('dom-ready', () => ready());
+  })();
   /**************************** Ranges change handling ****************************/
 
   /**
@@ -258,11 +264,11 @@ document.addEventListener('DOMContentLoaded', function loaded() {
     checkInput: HTMLInputElement
   ) => {
     numInput.style.backgroundColor = '#fff';
-    pyshell.stdin.write(
-      `${JSON.stringify({
+    window['sendSig'](
+      JSON.stringify({
         [numInput.name]: parseFloat(numInput.value),
         [checkInput.name]: checkInput.checked
-      })}\n`
+      })
     );
   };
 
@@ -434,12 +440,6 @@ document.addEventListener('DOMContentLoaded', function loaded() {
     zoomViews();
   });
 
-  if (window['isDev']) {
-    delete window['isDev'];
-    window['k-shorts'](prime, side, ipcRenderer);
-    delete window['k-shorts'];
-  }
-
   // add resizabality parts of the UI
   window['border']();
   delete window['border'];
@@ -448,4 +448,20 @@ document.addEventListener('DOMContentLoaded', function loaded() {
    * terminate pyshell process with its threads on close or reload
    */
   window.addEventListener('beforeunload', () => window['sendSig']('exit'));
+});
+
+// request mode
+ipcRenderer.send('mode');
+
+/**
+ * lanch once when the main process returns if the app is in development mode or not
+ */
+ipcRenderer.once('mode', (_ev, isDev: boolean) => {
+  if (isDev) {
+    window['k-shorts'](prime, side, ipcRenderer);
+    delete window['k-shorts'];
+  }
+  window['isDev'] = isDev;
+  pyshell = window['pyshell'];
+  delete window['pyshell'];
 });

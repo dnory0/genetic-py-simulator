@@ -3,11 +3,8 @@ import { join } from 'path';
 
 /**
  * set to true if app on development, false in production.
- *
- * NOTE: app needs to be packed on asar (by default) to detect production mode
- * if you don't set asar to false on electron-builder.json you're good to go
  */
-const isDev = app.getAppPath().indexOf('.asar') === -1;
+const isDev = process.argv.some(arg => ['--dev', '-D', '-d'].includes(arg));
 /**
  * main window
  */
@@ -69,7 +66,7 @@ app.once('ready', () => {
   if (isDev) (<any>process.env['ELECTRON_DISABLE_SECURITY_WARNINGS']) = true;
 
   // creates main window
-  mainWindow = createWindow(join('app', 'index.html'), {
+  mainWindow = createWindow(join(__dirname, 'index.html'), {
     minWidth: 580,
     minHeight: 430,
     webPreferences: {
@@ -97,6 +94,10 @@ app.once('ready', () => {
     isDev,
     mainWindow
   );
+
+  mainWindow.webContents.on('ipc-message', (_ev, channel) => {
+    if (channel == 'mode') mainWindow.webContents.send('mode', isDev);
+  });
 });
 
 // writeFile(

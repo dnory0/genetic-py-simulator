@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-let pyshell = window['pyshell'];
-delete window['pyshell'];
+let pyshell;
 let ipcRenderer = window['ipcRenderer'];
 delete window['ipcRenderer'];
 let webFrame = window['webFrame'];
@@ -75,24 +74,31 @@ playBtn.onclick = () => ctrlClicked(isRunning ? 'pause' : 'play', !isRunning);
 stopBtn.onclick = () => ctrlClicked('stop', false);
 toStartBtn.onclick = () => ctrlClicked('replay', true);
 stepFBtn.onclick = () => ctrlClicked('step_f', false);
-let ready = () => {
-    ready = () => { };
-    zoomViews = window['ready'](pyshell, prime, side, treatResponse, webFrame);
-    zoomViews();
-    window['loaded']();
-    delete window['ready'];
-    delete window['loaded'];
-};
 document.addEventListener('DOMContentLoaded', function loaded() {
     document.removeEventListener('DOMContentLoaded', loaded);
-    prime.addEventListener('dom-ready', () => ready());
-    side.addEventListener('dom-ready', () => ready());
+    (() => {
+        let ready = () => {
+            ready = () => {
+                prime.send('mode', window['isDev']);
+                side.send('mode', window['isDev']);
+                delete window['isDev'];
+                ready;
+            };
+            zoomViews = window['ready'](pyshell, prime, side, treatResponse, webFrame);
+            zoomViews();
+            window['loaded']();
+            delete window['ready'];
+            delete window['loaded'];
+        };
+        prime.addEventListener('dom-ready', () => ready());
+        side.addEventListener('dom-ready', () => ready());
+    })();
     const sendParameter = (numInput, checkInput) => {
         numInput.style.backgroundColor = '#fff';
-        pyshell.stdin.write(`${JSON.stringify({
+        window['sendSig'](JSON.stringify({
             [numInput.name]: parseFloat(numInput.value),
             [checkInput.name]: checkInput.checked
-        })}\n`);
+        }));
     };
     const rangeChange = (rangeInput, numberInput, checkbox) => {
         setTimeout(() => {
@@ -192,13 +198,18 @@ document.addEventListener('DOMContentLoaded', function loaded() {
         });
         zoomViews();
     });
-    if (window['isDev']) {
-        delete window['isDev'];
-        window['k-shorts'](prime, side, ipcRenderer);
-        delete window['k-shorts'];
-    }
     window['border']();
     delete window['border'];
     window.addEventListener('beforeunload', () => window['sendSig']('exit'));
+});
+ipcRenderer.send('mode');
+ipcRenderer.once('mode', (_ev, isDev) => {
+    if (isDev) {
+        window['k-shorts'](prime, side, ipcRenderer);
+        delete window['k-shorts'];
+    }
+    window['isDev'] = isDev;
+    pyshell = window['pyshell'];
+    delete window['pyshell'];
 });
 //# sourceMappingURL=renderer.js.map
