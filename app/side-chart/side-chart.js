@@ -26,12 +26,12 @@ const treatResponse = (response) => {
         }
         sideChart.series[0].setData(mostFittest.individuals[0].genes, true, false);
     }
-    else if (response['started'] && response['genesNum'] !== undefined) {
+    else if (response['started']) {
         clearChart(sideChart);
         mostFittest['fitness'] = -1;
         mostFittest['individuals'] = null;
         sideChart.xAxis[0].setCategories([...Array(response['genesNum']).keys()].map(v => `${++v}`));
-        enableChartHover(false, sideChart);
+        enableChartHover(response['first-step'], sideChart);
     }
     else if (response['paused'] || response['finished'] || response['stopped'])
         enableChartHover(true, sideChart);
@@ -64,10 +64,5 @@ let sideChart = window['createChart']('side-chart', {
     ]
 });
 delete window['createChart'];
-ipcRenderer.on('data', (_event, response) => {
-    response
-        .toString()
-        .split(/(?<=\n)/)
-        .forEach((args) => treatResponse(JSON.parse(args)));
-});
+ipcRenderer.on('data', (_event, response) => treatResponse(response));
 //# sourceMappingURL=side-chart.js.map

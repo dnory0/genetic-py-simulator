@@ -55,8 +55,8 @@ const treatResponse = (response: object) => {
   } else if (response['started']) {
     // clear past results
     clearChart(primeChart);
-    // disable points on hover on chart
-    enableChartHover(false, primeChart);
+    // disable points on hover on chart if it's not just a step forward
+    enableChartHover(response['first-step'], primeChart);
   } else if (response['paused'] || response['finished'] || response['stopped'])
     enableChartHover(true, primeChart);
   else if (response['resumed']) enableChartHover(false, primeChart);
@@ -97,12 +97,9 @@ delete window['createChart'];
  */
 // window['fittestHistory'] = [];
 
-ipcRenderer.on('data', (_event: IpcRendererEvent, data: Buffer) => {
-  data
-    .toString()
-    .split(/(?<=\n)/)
-    .forEach((args: string) => treatResponse(JSON.parse(args)));
-});
+ipcRenderer.on('data', (_event: IpcRendererEvent, data: object) =>
+  treatResponse(data)
+);
 
 ipcRenderer.on(
   'update-mode',

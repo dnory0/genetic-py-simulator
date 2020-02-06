@@ -2,12 +2,15 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 module.exports = (pyshell, prime, side, treatResponse, webFrame) => {
     pyshell.stdout.on('data', (response) => {
-        prime.send('data', response);
-        side.send('data', response);
         response
             .toString()
-            .split(/(?<=\n)/)
-            .forEach((args) => treatResponse(JSON.parse(args)));
+            .split(/(?<=\n)/g)
+            .map((data) => JSON.parse(data))
+            .forEach((data) => {
+            prime.send('data', data);
+            side.send('data', data);
+            treatResponse(data);
+        });
     });
     return () => {
         prime.setZoomFactor(webFrame.getZoomFactor());

@@ -130,7 +130,7 @@ let isRunning = false;
  * @param response response of pyshell
  */
 const treatResponse = (response: object) => {
-  if (response['started'] && response['genesNum'] !== undefined) {
+  if (response['started']) {
     // to be able to change in ga state
     setClickable();
   } else if (response['finished']) {

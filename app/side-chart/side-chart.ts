@@ -68,7 +68,7 @@ const treatResponse = (response: object) => {
       });
     }
     sideChart.series[0].setData(mostFittest.individuals[0].genes, true, false);
-  } else if (response['started'] && response['genesNum'] !== undefined) {
+  } else if (response['started']) {
     clearChart(sideChart);
     // clean mostFittest object before start recieving data
     mostFittest['fitness'] = -1;
@@ -77,8 +77,8 @@ const treatResponse = (response: object) => {
     sideChart.xAxis[0].setCategories(
       [...Array(response['genesNum']).keys()].map(v => `${++v}`)
     );
-    // disable points on hover on chart
-    enableChartHover(false, sideChart);
+    // disable points on hover on chart if it's not just a step forward
+    enableChartHover(response['first-step'], sideChart);
   } else if (response['paused'] || response['finished'] || response['stopped'])
     enableChartHover(true, sideChart);
   else if (response['resumed']) enableChartHover(false, sideChart);
@@ -117,9 +117,6 @@ let sideChart: Chart = window['createChart']('side-chart', {
 } as Options);
 delete window['createChart'];
 
-ipcRenderer.on('data', (_event: IpcRendererEvent, response: Buffer) => {
-  response
-    .toString()
-    .split(/(?<=\n)/)
-    .forEach((args: string) => treatResponse(JSON.parse(args)));
-});
+ipcRenderer.on('data', (_event: IpcRendererEvent, response: object) =>
+  treatResponse(response)
+);

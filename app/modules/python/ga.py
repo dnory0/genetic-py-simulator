@@ -133,12 +133,16 @@ class GAThread(threading.Thread):
         self.__stop_now = False
 
     def run(self):
+        # initializing the population
         pop = Population(g_pop_size, len(solution.genes))
+
         # started signal to the renderer process
         to_json({
             "started": True,
+            "first-step": self.__pause_now,
             "genesNum": pop.genes_num
         })
+        
         # first generated solutions (generation 0)
         to_json({
             "fitness": pop.fittest().fitness(),
@@ -146,18 +150,9 @@ class GAThread(threading.Thread):
             "genes": pop.fittest().genes
         })
 
-        # in case user triggered step_f signal instead of play or replay
-        # send paused to enable hover over charts
-        if self.__pause_now:
-            to_json({
-                "paused": True
-            })
-
-        # check before entering evolution loop if pause event
-        #  was fired before hitting start
-        self.__pause_check()
         while True:
             Evolve.evolve_population(pop)
+
             # if g_delay_rate is 0 than just ignore it
             if g_delay_rate:
                 time.sleep(g_delay_rate)
@@ -242,8 +237,8 @@ class GAThread(threading.Thread):
         # start it if not started yet
         if not self.start_triggered:
             self.start_triggered = True
-            threading.Thread.start(self)
             self.__pause_now = True
+            threading.Thread.start(self)
             return
         # release if paused, it will lock automatically after one generation
         # because __pause_now is set to True
@@ -252,6 +247,7 @@ class GAThread(threading.Thread):
             to_json({
                 "paused": True
             })
+
         if self.paused:
             # Notify so thread will wake after lock released
             self.pause_cond.notify()
@@ -351,7 +347,7 @@ def update_parameters(command: dict):
     # })
 
 
-def init_ga(command: dict):
+def init_ga():
     """ Initialize new GA thread with a new solution
      """
     global ga_thread
@@ -374,7 +370,7 @@ while True:
         if ga_thread is not None and ga_thread.is_alive():
             ga_thread.resume()
         else:
-            init_ga(cmd)
+            init_ga()
             ga_thread.start()
     elif cmd == 'pause':
         if ga_thread is not None and ga_thread.is_alive():
@@ -385,15 +381,22 @@ while True:
     elif cmd == 'replay':
         if ga_thread is not None:
             ga_thread.stop()
-        init_ga(cmd)
+        init_ga()
         ga_thread.start()
     elif cmd == 'step_f':
         if ga_thread is None or not ga_thread.is_alive():
-            init_ga(cmd)
+            init_ga()
         ga_thread.step_forward()
     elif cmd == 'exit':
         if ga_thread is not None:
             ga_thread.stop()
         sys.exit(0)
     else:
-        update_parameters(json.loads(cmd))
+        try:
+            load = json.loads(cmd)
+        except:
+            print("Enter a valide commande.", flush=True)
+            pass
+        else:
+            update_parameters(load)
+            

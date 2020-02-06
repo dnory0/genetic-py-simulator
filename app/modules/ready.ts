@@ -10,13 +10,17 @@ module.exports = (
 ) => {
   // open communication
   pyshell.stdout.on('data', (response: Buffer) => {
-    prime.send('data', response);
-    side.send('data', response);
     response
       .toString()
-      .split(/(?<=\n)/)
-      .forEach((args: string) => treatResponse(JSON.parse(args)));
+      .split(/(?<=\n)/g)
+      .map((data: string) => JSON.parse(data))
+      .forEach((data: object) => {
+        prime.send('data', data);
+        side.send('data', data);
+        treatResponse(data);
+      });
   });
+
   // returns webviews zoom factor resetter.
   return () => {
     prime.setZoomFactor(webFrame.getZoomFactor());

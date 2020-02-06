@@ -13,7 +13,7 @@ const treatResponse = (response) => {
     }
     else if (response['started']) {
         clearChart(primeChart);
-        enableChartHover(false, primeChart);
+        enableChartHover(response['first-step'], primeChart);
     }
     else if (response['paused'] || response['finished'] || response['stopped'])
         enableChartHover(true, primeChart);
@@ -46,12 +46,7 @@ let primeChart = window['createChart']('prime-chart', {
     ]
 });
 delete window['createChart'];
-ipcRenderer.on('data', (_event, data) => {
-    data
-        .toString()
-        .split(/(?<=\n)/)
-        .forEach((args) => treatResponse(JSON.parse(args)));
-});
+ipcRenderer.on('data', (_event, data) => treatResponse(data));
 ipcRenderer.on('update-mode', (_ev, newLR) => (liveRendering.isLive = newLR));
 ipcRenderer.on('step-forward', () => (liveRendering.stepForward = true));
 //# sourceMappingURL=prime-chart.js.map

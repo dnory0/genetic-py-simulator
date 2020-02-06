@@ -24,7 +24,7 @@ let delayRandom = (document.getElementById('random-delay-rate'));
 let lRSwitch = document.getElementById('live-rendering');
 let isRunning = false;
 const treatResponse = (response) => {
-    if (response['started'] && response['genesNum'] !== undefined) {
+    if (response['started']) {
         setClickable();
     }
     else if (response['finished']) {
