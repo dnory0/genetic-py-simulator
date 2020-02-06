@@ -14,6 +14,11 @@ button {
   -webkit-user-drag: none;
 }
 
+/* changes the default cursor to chart's navigator */
+.highcharts-navigator-mask-inside {
+  cursor: all-scroll !important;
+}
+
 html,
 body {
   padding: 0;

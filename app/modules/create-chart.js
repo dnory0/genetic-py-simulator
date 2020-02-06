@@ -4,6 +4,7 @@ const highstock_1 = require("highcharts/highstock");
 module.exports = (containerId, options) => {
     delete require.cache[require.resolve('./create-chart')];
     return highstock_1.stockChart(containerId, {
+        chart: {},
         title: {
             text: options.title.text,
             style: {
@@ -12,7 +13,8 @@ module.exports = (containerId, options) => {
         },
         subtitle: {
             text: options.yAxis.title.text,
-            align: 'left'
+            align: 'left',
+            y: 20
         },
         xAxis: {
             crosshair: false,
@@ -29,9 +31,13 @@ module.exports = (containerId, options) => {
         },
         yAxis: {
             minRange: 1,
-            opposite: false
+            maxRange: 26,
+            opposite: false,
+            tickInterval: options.yAxis.tickInterval,
+            endOnTick: false
         },
         rangeSelector: {
+            enabled: false,
             inputEnabled: false,
             buttons: [
                 {
@@ -77,8 +83,8 @@ module.exports = (containerId, options) => {
                     }
                 }
             },
-            margin: 5,
-            height: 30
+            margin: 3,
+            height: 25
         },
         scrollbar: {
             enabled: false

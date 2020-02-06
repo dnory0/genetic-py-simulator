@@ -1,4 +1,4 @@
-import { Chart, SeriesLineOptions } from 'highcharts';
+import { Chart, SeriesLineOptions, Options } from 'highcharts';
 import { IpcRenderer, IpcRendererEvent } from 'electron';
 
 /****************************** passed by preload ******************************
@@ -90,7 +90,7 @@ const treatResponse = (response: object) => {
  * most fittest is a new fittest which its fitness value is better than every
  * fittest in the previous generations
  */
-let sideChart = window['createChart']('side-chart', {
+let sideChart: Chart = window['createChart']('side-chart', {
   chart: {
     type: 'line'
   },
@@ -105,14 +105,16 @@ let sideChart = window['createChart']('side-chart', {
   yAxis: {
     title: {
       text: 'Gene'
-    }
+    },
+    tickInterval: 1,
+    endOnTick: false
   },
   series: [
     {
       data: []
     }
   ] as SeriesLineOptions[]
-});
+} as Options);
 delete window['createChart'];
 
 ipcRenderer.on('data', (_event: IpcRendererEvent, response: Buffer) => {

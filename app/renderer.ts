@@ -109,6 +109,15 @@ let delayRandom = <HTMLInputElement>(
   document.getElementById('random-delay-rate')
 );
 
+/****************************** GA Settings ******************************/
+/**
+ * checkbox that acts as a switch for enabling/disabling live rendering,
+ * if enabled chart updates every time a point (Generation) is added,
+ * if disabled chart update when the GA is paused or stopped,
+ * default is enabled
+ */
+let lRSwitch = <HTMLInputElement>document.getElementById('live-rendering');
+
 /****************************** Python Part ******************************/
 
 /**
@@ -140,7 +149,7 @@ const treatResponse = (response: object) => {
 /**
  * switch the play/pause button image depending on isRunning state.
  */
-const switchBtn = () => {
+const switchPlayBtn = () => {
   (<HTMLImageElement>playBtn.querySelector('.play')).style.display = isRunning
     ? 'none'
     : 'block';
@@ -196,9 +205,16 @@ let zoomViews = () => {};
  * @param goingToRun set to true on play and replay signal, set to false otherwise.
  */
 const ctrlClicked = (signal: string, goingToRun: boolean) => {
+  /**
+   * if user clicked step forward button when lRSwitch is not checked,
+   * chart is not going to update that, this fixes it so the live Rendering
+   * is enabled for only the this step.
+   */
+  if (signal == 'step_f' && !lRSwitch.checked) prime.send('step-forward');
+
   window['sendSig'](signal);
   isRunning = goingToRun;
-  switchBtn();
+  switchPlayBtn();
 };
 
 /*********************** Buttons Click Event Handling ***********************/
@@ -230,7 +246,8 @@ document.addEventListener('DOMContentLoaded', function loaded() {
         prime.send('mode', window['isDev']);
         side.send('mode', window['isDev']);
         delete window['isDev'];
-        ready;
+
+        lRSwitch.onchange = () => prime.send('update-mode', lRSwitch.checked);
       };
 
       zoomViews = window['ready'](
@@ -454,7 +471,7 @@ document.addEventListener('DOMContentLoaded', function loaded() {
 ipcRenderer.send('mode');
 
 /**
- * lanch once when the main process returns if the app is in development mode or not
+ * launches once when the main process returns if the app is in development mode or production mode
  */
 ipcRenderer.once('mode', (_ev, isDev: boolean) => {
   if (isDev) {

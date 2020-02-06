@@ -21,6 +21,7 @@ let mutation = document.getElementById('mutation-rate');
 let mutRandom = (document.getElementById('random-mutation-rate'));
 let delay = document.getElementById('delay-rate');
 let delayRandom = (document.getElementById('random-delay-rate'));
+let lRSwitch = document.getElementById('live-rendering');
 let isRunning = false;
 const treatResponse = (response) => {
     if (response['started'] && response['genesNum'] !== undefined) {
@@ -37,7 +38,7 @@ const treatResponse = (response) => {
         console.log('setup finished');
     }
 };
-const switchBtn = () => {
+const switchPlayBtn = () => {
     playBtn.querySelector('.play').style.display = isRunning
         ? 'none'
         : 'block';
@@ -66,9 +67,11 @@ const blinkPlayBtn = () => {
 };
 let zoomViews = () => { };
 const ctrlClicked = (signal, goingToRun) => {
+    if (signal == 'step_f' && !lRSwitch.checked)
+        prime.send('step-forward');
     window['sendSig'](signal);
     isRunning = goingToRun;
-    switchBtn();
+    switchPlayBtn();
 };
 playBtn.onclick = () => ctrlClicked(isRunning ? 'pause' : 'play', !isRunning);
 stopBtn.onclick = () => ctrlClicked('stop', false);
@@ -82,7 +85,7 @@ document.addEventListener('DOMContentLoaded', function loaded() {
                 prime.send('mode', window['isDev']);
                 side.send('mode', window['isDev']);
                 delete window['isDev'];
-                ready;
+                lRSwitch.onchange = () => prime.send('update-mode', lRSwitch.checked);
             };
             zoomViews = window['ready'](pyshell, prime, side, treatResponse, webFrame);
             zoomViews();

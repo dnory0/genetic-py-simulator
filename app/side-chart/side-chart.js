@@ -53,7 +53,9 @@ let sideChart = window['createChart']('side-chart', {
     yAxis: {
         title: {
             text: 'Gene'
-        }
+        },
+        tickInterval: 1,
+        endOnTick: false
     },
     series: [
         {

@@ -8,6 +8,9 @@ import {
 module.exports = (containerId: string, options: Options) => {
   delete require.cache[require.resolve('./create-chart')];
   return stockChart(containerId, {
+    chart: {
+      // zoomType: 'x',
+    },
     title: {
       text: options.title.text,
       style: {
@@ -16,7 +19,8 @@ module.exports = (containerId: string, options: Options) => {
     },
     subtitle: {
       text: (<YAxisOptions>options.yAxis).title.text,
-      align: 'left'
+      align: 'left',
+      y: 20
     },
     xAxis: {
       crosshair: false,
@@ -33,9 +37,13 @@ module.exports = (containerId: string, options: Options) => {
     },
     yAxis: {
       minRange: 1,
-      opposite: false
+      maxRange: 26,
+      opposite: false,
+      tickInterval: (<YAxisOptions>options.yAxis).tickInterval,
+      endOnTick: false
     },
     rangeSelector: {
+      enabled: false,
       inputEnabled: false,
       buttons: [
         {
@@ -81,8 +89,8 @@ module.exports = (containerId: string, options: Options) => {
           } as any
         }
       },
-      margin: 5,
-      height: 30
+      margin: 3,
+      height: 25
     },
     scrollbar: {
       enabled: false

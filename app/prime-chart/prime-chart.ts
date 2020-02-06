@@ -1,5 +1,16 @@
-import { Chart, SeriesLineOptions } from 'highcharts';
+import { Chart, SeriesLineOptions, Options } from 'highcharts';
 import { IpcRendererEvent, IpcRenderer } from 'electron';
+
+/**
+ * by default the chart updates whenever it has a point added to it,
+ * user can disable that from the interface switch so the chart updates
+ * when the GA is paused or stopped. however if its disabled and user
+ * pressed step forward button, the chart is not going to update that,
+ * to fix that, step forward button is set to true after the step forward
+ * is pressed, then chart adds the point, redraw, and set step forward
+ * button back to false.
+ */
+let liveRendering = { isLive: true, stepForward: false };
 
 /****************************** passed by preload ******************************
  *******************************************************************************/
@@ -36,10 +47,11 @@ const treatResponse = (response: object) => {
     // every point is added to primeChart
     primeChart.series[0].addPoint(
       parseInt(response['fitness']),
-      true,
+      liveRendering.isLive || liveRendering.stepForward,
       false,
       false
     );
+    if (liveRendering.stepForward) liveRendering.stepForward = false;
   } else if (response['started']) {
     // clear past results
     clearChart(primeChart);
@@ -53,7 +65,7 @@ const treatResponse = (response: object) => {
 /**
  * updated every generation, receives the generation with its fittest fitness
  */
-let primeChart = window['createChart']('prime-chart', {
+let primeChart: Chart = window['createChart']('prime-chart', {
   chart: {
     type: 'line'
   },
@@ -68,7 +80,8 @@ let primeChart = window['createChart']('prime-chart', {
   yAxis: {
     title: {
       text: 'Fitness'
-    }
+    },
+    tickInterval: 1
   },
   series: [
     {
@@ -76,7 +89,7 @@ let primeChart = window['createChart']('prime-chart', {
       data: []
     }
   ] as SeriesLineOptions[]
-});
+} as Options);
 delete window['createChart'];
 
 /**
@@ -90,3 +103,9 @@ ipcRenderer.on('data', (_event: IpcRendererEvent, data: Buffer) => {
     .split(/(?<=\n)/)
     .forEach((args: string) => treatResponse(JSON.parse(args)));
 });
+
+ipcRenderer.on(
+  'update-mode',
+  (_ev, newLR: boolean) => (liveRendering.isLive = newLR)
+);
+ipcRenderer.on('step-forward', () => (liveRendering.stepForward = true));

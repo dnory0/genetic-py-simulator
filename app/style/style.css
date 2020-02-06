@@ -126,7 +126,7 @@ body {
 }
 
 #main .middle-container .controls-container {
-  min-width: 388px;
+  min-width: 350px;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -183,22 +183,7 @@ body {
   display: block;
 }
 
-#main .middle-container .controls-container .ga-settings {
-  position: relative;
-  right: 0;
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-      -ms-flex-flow: column;
-          flex-flow: column;
-  -webkit-box-pack: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-}
-
-#main .middle-container .controls-container .ga-settings button {
+#main .middle-container .controls-container .state-controls-container .ga-settings button {
   padding: 5px 4px 5px 5px;
   border: none;
   border-radius: 4px;
@@ -207,11 +192,11 @@ body {
   background-color: white;
 }
 
-#main .middle-container .controls-container .ga-settings button:hover:not(:disabled) {
+#main .middle-container .controls-container .state-controls-container .ga-settings button:hover:not(:disabled) {
   background-color: #c4c4c4;
 }
 
-#main .middle-container .controls-container .ga-settings button img {
+#main .middle-container .controls-container .state-controls-container .ga-settings button img {
   width: 18px;
   float: left;
 }
@@ -345,10 +330,16 @@ body {
   -webkit-box-flex: 0.5;
       -ms-flex: 0.5;
           flex: 0.5;
+  padding: 4px 3px 3px 5px;
 }
 
-#main .middle-container .controls-container .parameters-container .parameters .parameter .checkbox-wrapper input[type='checkbox'] {
-  margin: 4px 3px 3px 5px;
+#main .middle-container .checkbox-wrapper {
+  width: 28px;
+  height: 28px;
+  position: relative;
+}
+
+#main .middle-container .checkbox-wrapper input[type='checkbox'] {
   opacity: 0;
   border-radius: 4px;
   height: 28px;
@@ -359,8 +350,7 @@ body {
   border-radius: 4px;
 }
 
-#main .middle-container .controls-container .parameters-container .parameters .parameter .checkbox-wrapper input[type='checkbox'] + label {
-  margin: 4px 3px 3px 5px;
+#main .middle-container .checkbox-wrapper input[type='checkbox'] + label {
   height: 28px;
   width: 28px;
   padding: 5px 0;
@@ -371,15 +361,15 @@ body {
   border-radius: 4px;
 }
 
-#main .middle-container .controls-container .parameters-container .parameters .parameter .checkbox-wrapper input[type='checkbox'] + label > img {
-  opacity: 0.6;
+#main .middle-container .checkbox-wrapper input[type='checkbox'] + label > img {
+  opacity: 0.5;
 }
 
-#main .middle-container .controls-container .parameters-container .parameters .parameter .checkbox-wrapper input[type='checkbox']:not(:disabled) + label:hover {
+#main .middle-container .checkbox-wrapper input[type='checkbox']:not(:disabled) + label:hover {
   background-color: #c4c4c4;
 }
 
-#main .middle-container .controls-container .parameters-container .parameters .parameter .checkbox-wrapper input[type='checkbox']:checked + label > img {
+#main .middle-container .checkbox-wrapper input[type='checkbox']:checked + label > img {
   opacity: 1;
 }
 
