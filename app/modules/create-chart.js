@@ -3,20 +3,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const highstock_1 = require("highcharts/highstock");
 module.exports = (containerId, options) => {
     delete require.cache[require.resolve('./create-chart')];
-    return highstock_1.stockChart(containerId, {
+    var chartSVG;
+    let chart = highstock_1.stockChart(containerId, {
         chart: {
             events: {
                 redraw: () => {
-                    var chartSVG = document.querySelector('.highcharts-root');
-                    var yAxisLabels = document.querySelectorAll('g.highcharts-axis-labels.highcharts-yaxis-labels > text');
+                    var yAxisLabels = document.getElementsByClassName('highcharts-yaxis-labels')[0].children;
                     if (yAxisLabels == null || !yAxisLabels.length)
                         return;
                     var matrix = chartSVG.createSVGMatrix();
-                    yAxisLabels[yAxisLabels.length - 1].x.baseVal.getItem(0).value = yAxisLabels[0].x.baseVal.getItem(0).value;
+                    var driftedLabel = (Array.from(yAxisLabels).filter((textEle) => textEle.y.baseVal.getItem(0).value < 0)[0]);
+                    driftedLabel.x.baseVal.getItem(0).value = (yAxisLabels[0]).x.baseVal.getItem(0).value;
                     var y = 9999;
                     Array.from((document.querySelectorAll('.highcharts-grid.highcharts-yaxis-grid > .highcharts-grid-line'))).forEach((path) => (y = y < path.getBBox().y ? y : path.getBBox().y));
                     matrix = matrix.translate(0, 9996 + y);
-                    yAxisLabels[yAxisLabels.length - 1].transform.baseVal
+                    driftedLabel.transform.baseVal
                         .getItem(0)
                         .setMatrix(matrix);
                 }
@@ -139,5 +140,7 @@ module.exports = (containerId, options) => {
             enabled: false
         }
     });
+    chartSVG = document.querySelector('.highcharts-root');
+    return chart;
 };
 //# sourceMappingURL=create-chart.js.map

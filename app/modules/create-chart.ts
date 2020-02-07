@@ -7,23 +7,28 @@ import {
 
 module.exports = (containerId: string, options: Options) => {
   delete require.cache[require.resolve('./create-chart')];
-  return stockChart(containerId, {
+  var chartSVG: SVGSVGElement;
+  let chart = stockChart(containerId, {
     chart: {
       // zoomType: 'x',
       events: {
         redraw: () => {
-          var chartSVG: SVGSVGElement = document.querySelector(
-            '.highcharts-root'
-          );
-          var yAxisLabels: NodeListOf<SVGTextElement> = document.querySelectorAll(
-            'g.highcharts-axis-labels.highcharts-yaxis-labels > text'
-          );
+          var yAxisLabels: HTMLCollectionOf<Element> = document.getElementsByClassName(
+            'highcharts-yaxis-labels'
+          )[0].children;
+          // usually means graph is not generated yet
           if (yAxisLabels == null || !yAxisLabels.length) return;
 
           var matrix = chartSVG.createSVGMatrix();
-          yAxisLabels[yAxisLabels.length - 1].x.baseVal.getItem(
-            0
-          ).value = yAxisLabels[0].x.baseVal.getItem(0).value;
+          var driftedLabel: SVGTextElement = <SVGTextElement>(
+            Array.from(yAxisLabels).filter(
+              (textEle: SVGTextElement) =>
+                textEle.y.baseVal.getItem(0).value < 0
+            )[0]
+          );
+          driftedLabel.x.baseVal.getItem(0).value = (<SVGTextElement>(
+            yAxisLabels[0]
+          )).x.baseVal.getItem(0).value;
           var y = 9999;
 
           Array.from(
@@ -37,7 +42,7 @@ module.exports = (containerId: string, options: Options) => {
               (y = y < path.getBBox().y ? y : path.getBBox().y)
           );
           matrix = matrix.translate(0, 9996 + y);
-          yAxisLabels[yAxisLabels.length - 1].transform.baseVal
+          (<SVGTextElement>driftedLabel).transform.baseVal
             .getItem(0)
             .setMatrix(matrix);
         }
@@ -162,4 +167,6 @@ module.exports = (containerId: string, options: Options) => {
       enabled: false
     }
   });
+  chartSVG = document.querySelector('.highcharts-root');
+  return chart;
 };
