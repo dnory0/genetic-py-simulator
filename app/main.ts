@@ -67,8 +67,8 @@ app.once('ready', () => {
 
   // creates main window
   mainWindow = createWindow(join(__dirname, 'index.html'), {
-    minWidth: 580,
-    minHeight: 430,
+    minWidth: 720,
+    minHeight: 500,
     webPreferences: {
       preload: join(__dirname, 'preloads', 'preload.js'),
       webviewTag: true

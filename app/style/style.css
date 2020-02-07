@@ -83,11 +83,11 @@ body {
 }
 
 .resize-cover.for-prime {
-  min-height: 140px;
+  min-height: 280px;
 }
 
 .resize-cover.for-side {
-  min-width: 140px;
+  min-width: 280px;
 }
 
 #main {
@@ -107,7 +107,7 @@ body {
 
 #main .prime-container {
   position: relative;
-  min-height: 140px;
+  min-height: 280px;
   height: calc(70% + 13px);
   margin-bottom: -4px;
 }
@@ -381,7 +381,7 @@ body {
           flex: 1;
   height: 100%;
   overflow: hidden;
-  min-width: 140px;
+  min-width: 280px;
 }
 
 #main .bottom-container {

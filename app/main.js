@@ -32,8 +32,8 @@ electron_1.app.once('ready', () => {
     if (isDev)
         process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true;
     mainWindow = createWindow(path_1.join(__dirname, 'index.html'), {
-        minWidth: 580,
-        minHeight: 430,
+        minWidth: 720,
+        minHeight: 500,
         webPreferences: {
             preload: path_1.join(__dirname, 'preloads', 'preload.js'),
             webviewTag: true
