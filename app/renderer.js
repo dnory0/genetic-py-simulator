@@ -31,12 +31,6 @@ const treatResponse = (response) => {
         setClickable(false);
         blinkPlayBtn();
     }
-    else if (response['stopped']) {
-        setClickable(false);
-    }
-    else if (response['is_setup']) {
-        console.log('setup finished');
-    }
 };
 const switchPlayBtn = () => {
     playBtn.querySelector('.play').style.display = isRunning
@@ -69,6 +63,8 @@ let zoomViews = () => { };
 const ctrlClicked = (signal, goingToRun) => {
     if (signal == 'step_f' && !lRSwitch.checked)
         prime.send('step-forward');
+    if (signal == 'stop')
+        setClickable(false);
     window['sendSig'](signal);
     isRunning = goingToRun;
     switchPlayBtn();

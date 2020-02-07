@@ -136,10 +136,6 @@ const treatResponse = (response: object) => {
   } else if (response['finished']) {
     setClickable(false);
     blinkPlayBtn();
-  } else if (response['stopped']) {
-    setClickable(false);
-  } else if (response['is_setup']) {
-    console.log('setup finished');
   }
 };
 
@@ -211,6 +207,11 @@ const ctrlClicked = (signal: string, goingToRun: boolean) => {
    * is enabled for only the this step.
    */
   if (signal == 'step_f' && !lRSwitch.checked) prime.send('step-forward');
+  /**
+   * in heavy GA (GA that takes considerable amount of time to generate 1 generation)
+   * buttons should be stopped on click instead of waiting GA stopped event.
+   */
+  if (signal == 'stop') setClickable(false);
 
   window['sendSig'](signal);
   isRunning = goingToRun;
