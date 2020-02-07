@@ -4,7 +4,24 @@ const highstock_1 = require("highcharts/highstock");
 module.exports = (containerId, options) => {
     delete require.cache[require.resolve('./create-chart')];
     return highstock_1.stockChart(containerId, {
-        chart: {},
+        chart: {
+            events: {
+                redraw: () => {
+                    var chartSVG = document.querySelector('.highcharts-root');
+                    var yAxisLabels = document.querySelectorAll('g.highcharts-axis-labels.highcharts-yaxis-labels > text');
+                    if (yAxisLabels == null || !yAxisLabels.length)
+                        return;
+                    var matrix = chartSVG.createSVGMatrix();
+                    yAxisLabels[yAxisLabels.length - 1].x.baseVal.getItem(0).value = yAxisLabels[0].x.baseVal.getItem(0).value;
+                    var y = 9999;
+                    Array.from((document.querySelectorAll('.highcharts-grid.highcharts-yaxis-grid > .highcharts-grid-line'))).forEach((path) => (y = y < path.getBBox().y ? y : path.getBBox().y));
+                    matrix = matrix.translate(0, 9996 + y);
+                    yAxisLabels[yAxisLabels.length - 1].transform.baseVal
+                        .getItem(0)
+                        .setMatrix(matrix);
+                }
+            }
+        },
         title: {
             text: options.title.text,
             style: {

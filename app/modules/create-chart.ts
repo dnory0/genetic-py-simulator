@@ -10,6 +10,38 @@ module.exports = (containerId: string, options: Options) => {
   return stockChart(containerId, {
     chart: {
       // zoomType: 'x',
+      events: {
+        redraw: () => {
+          var chartSVG: SVGSVGElement = document.querySelector(
+            '.highcharts-root'
+          );
+          var yAxisLabels: NodeListOf<SVGTextElement> = document.querySelectorAll(
+            'g.highcharts-axis-labels.highcharts-yaxis-labels > text'
+          );
+          if (yAxisLabels == null || !yAxisLabels.length) return;
+
+          var matrix = chartSVG.createSVGMatrix();
+          yAxisLabels[yAxisLabels.length - 1].x.baseVal.getItem(
+            0
+          ).value = yAxisLabels[0].x.baseVal.getItem(0).value;
+          var y = 9999;
+
+          Array.from(
+            <NodeListOf<SVGPathElement>>(
+              document.querySelectorAll(
+                '.highcharts-grid.highcharts-yaxis-grid > .highcharts-grid-line'
+              )
+            )
+          ).forEach(
+            (path: SVGPathElement) =>
+              (y = y < path.getBBox().y ? y : path.getBBox().y)
+          );
+          matrix = matrix.translate(0, 9996 + y);
+          yAxisLabels[yAxisLabels.length - 1].transform.baseVal
+            .getItem(0)
+            .setMatrix(matrix);
+        }
+      }
     },
     title: {
       text: options.title.text,
