@@ -92,12 +92,15 @@ dist
 .idea
 .vscode
 genetic_algorithm.py
-secondary-process.*
+side-process.*
 index.ts
 index.js.map
 index.js
 SOURCES.md
 TODO.*
+IDEA.*
 settings.json
 import*
 lib*
+scripts/dist-python.*
+scripts/pyinstaller-install.*

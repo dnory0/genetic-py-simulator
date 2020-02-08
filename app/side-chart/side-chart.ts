@@ -1,4 +1,4 @@
-import { Chart, SeriesLineOptions } from 'highcharts';
+import { Chart, SeriesLineOptions, Options } from 'highcharts';
 import { IpcRenderer, IpcRendererEvent } from 'electron';
 
 /****************************** passed by preload ******************************
@@ -44,13 +44,9 @@ const clearChart: (chart: Chart, categories?: boolean) => void =
  * @param response response of pyshell
  */
 const treatResponse = (response: object) => {
-  if (
-    response['generation'] !== undefined &&
-    response['fitness'] !== undefined &&
-    response['genes'] !== undefined
-  ) {
+  if (response['fitness'] !== undefined) {
     // mostFittest processing work is done here instead of being in preload file
-    // is to avoid race conditions because secondaryChart latest data is taken of it.
+    // is to avoid race conditions because sideChart latest data is taken of it.
     // probably needs to moved on another file that imports reload file (when every
     // view and window has its own preload)
     if (mostFittest['fitness'] < response['fitness']) {
@@ -67,25 +63,21 @@ const treatResponse = (response: object) => {
         genes: response['genes']
       });
     }
-    secondaryChart.series[0].setData(
-      mostFittest.individuals[0].genes,
-      true,
-      false
-    );
-  } else if (response['started'] && response['genesNum'] !== undefined) {
-    clearChart(secondaryChart);
+    sideChart.series[0].setData(mostFittest.individuals[0].genes, true, false);
+  } else if (response['started']) {
+    clearChart(sideChart);
     // clean mostFittest object before start recieving data
     mostFittest['fitness'] = -1;
     mostFittest['individuals'] = null;
     // setting up xAxis for fittest and current chart
-    secondaryChart.xAxis[0].setCategories(
+    sideChart.xAxis[0].setCategories(
       [...Array(response['genesNum']).keys()].map(v => `${++v}`)
     );
-    // disable points on hover on chart
-    enableChartHover(false, secondaryChart);
-  } else if (response['paused'] || response['finished'] || response['stopped'])
-    enableChartHover(true, secondaryChart);
-  else if (response['resumed']) enableChartHover(false, secondaryChart);
+    // disable points on hover on chart if it's not just a step forward
+    enableChartHover(response['first-step'], sideChart);
+  } else if (response['paused'] || response['stopped'] || response['finished'])
+    enableChartHover(true, sideChart);
+  else if (response['resumed']) enableChartHover(false, sideChart);
 };
 
 /**
@@ -94,7 +86,7 @@ const treatResponse = (response: object) => {
  * most fittest is a new fittest which its fitness value is better than every
  * fittest in the previous generations
  */
-let secondaryChart = window['createChart']('secondary-chart', {
+let sideChart: Chart = window['createChart']('side-chart', {
   chart: {
     type: 'line'
   },
@@ -109,19 +101,18 @@ let secondaryChart = window['createChart']('secondary-chart', {
   yAxis: {
     title: {
       text: 'Gene'
-    }
+    },
+    tickInterval: 1,
+    endOnTick: false
   },
   series: [
     {
       data: []
     }
   ] as SeriesLineOptions[]
-});
+} as Options);
 delete window['createChart'];
 
-ipcRenderer.on('data', (_event: IpcRendererEvent, response: Buffer) => {
-  response
-    .toString()
-    .split(/(?<=\n)/)
-    .forEach((args: string) => treatResponse(JSON.parse(args)));
-});
+ipcRenderer.on('data', (_event: IpcRendererEvent, response: object) =>
+  treatResponse(response)
+);

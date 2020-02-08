@@ -1,13 +1,7 @@
-import { ipcRenderer, remote } from 'electron';
+import { ipcRenderer } from 'electron';
 import { Chart } from 'highcharts';
+import { join } from 'path';
 
-/**
- * set to true if app on development, false in production.
- *
- * NOTE: app needs to be packed on asar (by default) to detect production mode
- * if you don't set asar to false on electron-builder.json you're good to go
- */
-const isDev = remote.app.getAppPath().indexOf('.asar') === -1;
 /**
  * allows communication between this webview & renderer process
  */
@@ -20,7 +14,12 @@ window['ipcRenderer'] = ipcRenderer;
  *
  * @returns set up chart
  */
-window['createChart'] = require('../modules/create-chart');
+window['createChart'] = require(join(
+  __dirname,
+  '..',
+  'modules',
+  'create-chart'
+));
 /**
  * enables or disable the hover settings for the passed chart
  * @param enable decides if to disable hover settings or enable them.
@@ -70,14 +69,16 @@ window['clearChart'] = (chart: Chart, categories: boolean = false) => {
   chart.series[0].setData([], true);
 };
 
-if (isDev)
+ipcRenderer.once('mode', (_ev, isDev) => {
+  if (!isDev) return;
   window.addEventListener(
     'keyup',
     (event: KeyboardEvent) => {
       if (event.code == 'Backquote')
         if (event.ctrlKey)
-          if (event.shiftKey) ipcRenderer.sendToHost('devTools', 'secondary');
-          else ipcRenderer.sendToHost('devTools', 'primary');
+          if (event.shiftKey) ipcRenderer.sendToHost('devTools', 'side');
+          else ipcRenderer.sendToHost('devTools', 'prime');
     },
     true
   );
+});

@@ -1,13 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-let pyshell = window['pyshell'];
-delete window['pyshell'];
+let pyshell;
 let ipcRenderer = window['ipcRenderer'];
 delete window['ipcRenderer'];
 let webFrame = window['webFrame'];
 delete window['webFrame'];
-const primary = document.getElementById('primary-chart');
-const secondary = document.getElementById('secondary-chart');
+const prime = document.getElementById('prime-chart');
+const side = document.getElementById('side-chart');
 let playBtn = document.getElementById('play-btn');
 let stopBtn = document.getElementById('stop-btn');
 let toStartBtn = document.getElementById('to-start-btn');
@@ -22,31 +21,24 @@ let mutation = document.getElementById('mutation-rate');
 let mutRandom = (document.getElementById('random-mutation-rate'));
 let delay = document.getElementById('delay-rate');
 let delayRandom = (document.getElementById('random-delay-rate'));
+let lRSwitch = document.getElementById('live-rendering');
 let isRunning = false;
 const treatResponse = (response) => {
-    if (response['started'] && response['genesNum'] !== undefined) {
+    if (response['started']) {
         setClickable();
     }
     else if (response['finished']) {
         setClickable(false);
         blinkPlayBtn();
     }
-    else if (response['stopped']) {
-        setClickable(false);
-    }
-    else if (response['is_setup']) {
-        console.log('setup finished');
-    }
 };
-const switchBtn = () => {
-    if (isRunning) {
-        playBtn.querySelector('.play').style.display = 'none';
-        playBtn.querySelector('.pause').style.display = 'block';
-    }
-    else {
-        playBtn.querySelector('.play').style.display = 'block';
-        playBtn.querySelector('.pause').style.display = 'none';
-    }
+const switchPlayBtn = () => {
+    playBtn.querySelector('.play').style.display = isRunning
+        ? 'none'
+        : 'block';
+    playBtn.querySelector('.pause').style.display = isRunning
+        ? 'block'
+        : 'none';
 };
 const setClickable = (clickable = true) => {
     Array.from(document.querySelector('.state-controls').children).forEach((element, index) => {
@@ -69,48 +61,43 @@ const blinkPlayBtn = () => {
 };
 let zoomViews = () => { };
 const ctrlClicked = (signal, goingToRun) => {
+    if (signal == 'step_f')
+        prime.send('step-forward');
+    if (signal == 'stop')
+        setClickable(false);
     window['sendSig'](signal);
     isRunning = goingToRun;
-    switchBtn();
+    switchPlayBtn();
 };
 playBtn.onclick = () => ctrlClicked(isRunning ? 'pause' : 'play', !isRunning);
 stopBtn.onclick = () => ctrlClicked('stop', false);
 toStartBtn.onclick = () => ctrlClicked('replay', true);
 stepFBtn.onclick = () => ctrlClicked('step_f', false);
-let setReady = () => {
-    setReady = () => { };
-    pyshell.stdout.on('data', (response) => {
-        primary.send('data', response);
-        secondary.send('data', response);
-        response
-            .toString()
-            .split(/(?<=\n)/)
-            .forEach((args) => treatResponse(JSON.parse(args)));
-    });
-    zoomViews = () => {
-        primary.setZoomFactor(webFrame.getZoomFactor());
-        secondary.setZoomFactor(webFrame.getZoomFactor());
-    };
-    zoomViews();
-    if (document.getElementById('loading-bg')) {
-        document.getElementById('loading-bg').style.opacity = '0';
-        setTimeout(() => {
-            document.body.removeChild(document.getElementById('loading-bg'));
-        }, 0.2);
-    }
-    document.getElementById('main').style.opacity = '1';
-    document.getElementById('main').style.pointerEvents = 'inherit';
-};
 document.addEventListener('DOMContentLoaded', function loaded() {
     document.removeEventListener('DOMContentLoaded', loaded);
-    primary.addEventListener('dom-ready', () => setReady());
-    secondary.addEventListener('dom-ready', () => setReady());
+    (() => {
+        let ready = () => {
+            ready = () => {
+                prime.send('mode', window['isDev']);
+                side.send('mode', window['isDev']);
+                delete window['isDev'];
+                lRSwitch.onchange = () => prime.send('update-mode', lRSwitch.checked);
+            };
+            zoomViews = window['ready'](pyshell, prime, side, treatResponse, webFrame);
+            zoomViews();
+            window['loaded']();
+            delete window['ready'];
+            delete window['loaded'];
+        };
+        prime.addEventListener('dom-ready', () => ready());
+        side.addEventListener('dom-ready', () => ready());
+    })();
     const sendParameter = (numInput, checkInput) => {
         numInput.style.backgroundColor = '#fff';
-        pyshell.stdin.write(`${JSON.stringify({
+        window['sendSig'](JSON.stringify({
             [numInput.name]: parseFloat(numInput.value),
             [checkInput.name]: checkInput.checked
-        })}\n`);
+        }));
     };
     const rangeChange = (rangeInput, numberInput, checkbox) => {
         setTimeout(() => {
@@ -210,33 +197,18 @@ document.addEventListener('DOMContentLoaded', function loaded() {
         });
         zoomViews();
     });
-    if (window['isDev']) {
-        delete window['isDev'];
-        const devToolsToggler = (webView) => {
-            if (webView == 'primary')
-                primary.getWebContents().toggleDevTools();
-            else if (webView == 'secondary')
-                secondary.getWebContents().toggleDevTools();
-        };
-        ipcRenderer.on('devTools', (_event, webView) => devToolsToggler(webView));
-        window.addEventListener('keyup', (event) => {
-            if (event.code == 'Backquote')
-                if (event.ctrlKey)
-                    devToolsToggler(event.shiftKey ? 'secondary' : 'primary');
-        }, true);
-        primary.addEventListener('ipc-message', (event) => {
-            if (event.channel == 'devTools')
-                devToolsToggler(event.args);
-        });
-        secondary.addEventListener('ipc-message', (event) => {
-            if (event.channel == 'devTools')
-                devToolsToggler(event.args);
-        });
-    }
-    window['scrollbar'](document.getElementsByClassName('scrollbar-container'));
-    delete window['scrollbar'];
-    window['border'](document.getElementsByClassName('border'));
+    window['border']();
     delete window['border'];
     window.addEventListener('beforeunload', () => window['sendSig']('exit'));
+});
+ipcRenderer.send('mode');
+ipcRenderer.once('mode', (_ev, isDev) => {
+    if (isDev) {
+        window['k-shorts'](prime, side, ipcRenderer);
+        delete window['k-shorts'];
+    }
+    window['isDev'] = isDev;
+    pyshell = window['pyshell'];
+    delete window['pyshell'];
 });
 //# sourceMappingURL=renderer.js.map

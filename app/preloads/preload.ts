@@ -1,8 +1,8 @@
 import { ChildProcess } from 'child_process';
 import { ipcRenderer, webFrame, remote } from 'electron';
+import { join } from 'path';
 
-/************************ Charts & Python Configuration ************************
- ******************************************************************************/
+const { app } = remote;
 /**
  * preloaded globally
  */
@@ -11,33 +11,48 @@ window['ipcRenderer'] = ipcRenderer;
  * used to resize webviews
  */
 window['webFrame'] = webFrame;
-/**
- * set to true if app on development, false in production.
- *
- * NOTE: app needs to be packed on asar (by default) to detect production mode.
- * if you don't set asar to false on electron-builder file it should work correctly.
- */
-window['isDev'] = remote.app.getAppPath().indexOf('.asar') === -1;
 /*************************** Modules part ***************************/
 /**
- * add scroller auto maximizing & minimizing
+ * opens pyshell communication and returns webviews zoom factor resetter.
  */
-window['scrollbar'] = require('../modules/scrollbar');
+window['ready'] = require(join(__dirname, '..', 'modules', 'ready.js'));
 /**
- * add resizabality parts of the UI
+ * removes loading background and shows the app interface.
  */
-window['border'] = require('../modules/border');
+window['loaded'] = require(join(__dirname, '..', 'modules', 'loaded.js'));
+/**
+ * add resizabality for webviews and other parts of the UI
+ */
+window['border'] = require(join(__dirname, '..', 'modules', 'border.js'));
+ipcRenderer.once('mode', (_ev, isDev: boolean) => {
+  /**
+   * some keyboard shortcuts can't be implemented in the main process so they
+   * are implemented in the renderer process
+   */
+  if (isDev)
+    window['k-shorts'] = require(join(
+      __dirname,
+      '..',
+      'modules',
+      'k-shorts.js'
+    ));
 
-/*************************** Python part ***************************/
-/**
- * python process responsible for executing genetic algorithm.
- */
-const pyshell: ChildProcess = require('../modules/create-pyshell')(remote.app);
-window['pyshell'] = pyshell;
+  /*************************** Python part ***************************/
+  /**
+   * python process responsible for executing genetic algorithm.
+   */
+  const pyshell: ChildProcess = require(join(
+    __dirname,
+    '..',
+    'modules',
+    'create-pyshell.js'
+  ))(app);
+  window['pyshell'] = pyshell;
 
-/************************* states controller part *************************/
-/**
- * send signal to GA
- * @param signal play | pause | stop | replay | step_f | exit
- */
-window['sendSig'] = (signal: string) => pyshell.stdin.write(`${signal}\n`);
+  /************************* states controller part *************************/
+  /**
+   * send signal to GA
+   * @param signal play | pause | stop | replay | step_f | exit
+   */
+  window['sendSig'] = (signal: string) => pyshell.stdin.write(`${signal}\n`);
+});

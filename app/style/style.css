@@ -52,68 +52,42 @@ body {
   margin: 3px 6px;
 }
 
-.scrollbar-container {
-  position: relative;
-  width: 24px;
-  float: right;
-  height: 100%;
-  overflow-x: hidden;
-}
-
-.scrollbar-container .transition-scrollbar-container {
-  -webkit-transition: margin-right 0.08s ease-in-out;
-  transition: margin-right 0.08s ease-in-out;
-  overflow-x: hidden;
-  overflow-y: auto;
-  height: 100%;
-  margin-right: -12px;
+.parameters-container {
   /* Track */
   /* Handle */
   /* Handle on hover */
 }
 
-.scrollbar-container .transition-scrollbar-container::-webkit-scrollbar {
-  width: 15px;
+.parameters-container::-webkit-scrollbar {
+  width: 12px;
 }
 
-.scrollbar-container .transition-scrollbar-container::-webkit-scrollbar-track {
+.parameters-container::-webkit-scrollbar-track {
   background: #f1f1f1;
 }
 
-.scrollbar-container .transition-scrollbar-container::-webkit-scrollbar-thumb {
+.parameters-container::-webkit-scrollbar-thumb {
   background: #aaa;
 }
 
-.scrollbar-container .transition-scrollbar-container::-webkit-scrollbar-thumb:hover {
+.parameters-container::-webkit-scrollbar-thumb:hover {
   background: #777;
-}
-
-.scrollbar-container .transition-scrollbar-container .scrollbar {
-  width: 0px;
-  height: 203px;
-}
-
-.scrolling-content::-webkit-scrollbar {
-  display: none;
 }
 
 .resize-cover {
   display: none;
   position: absolute;
   top: 0;
-  left: 0;
-}
-
-.resize-cover.for-primary {
   height: 100%;
   width: 100%;
-  min-height: 140px;
 }
 
-.resize-cover.for-secondary {
-  height: 100%;
-  width: 100%;
-  min-width: 140px;
+.resize-cover.for-prime {
+  min-height: 280px;
+}
+
+.resize-cover.for-side {
+  min-width: 280px;
 }
 
 #main {
@@ -131,13 +105,11 @@ body {
           flex-direction: column;
 }
 
-#main .primary-container {
+#main .prime-container {
   position: relative;
-  min-height: 140px;
-  background-color: #fff;
+  min-height: 280px;
   height: calc(70% + 13px);
   margin-bottom: -4px;
-  overflow: hidden;
 }
 
 #main .middle-container {
@@ -154,7 +126,7 @@ body {
 }
 
 #main .middle-container .controls-container {
-  min-width: 388px;
+  min-width: 350px;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -211,22 +183,7 @@ body {
   display: block;
 }
 
-#main .middle-container .controls-container .ga-settings {
-  position: relative;
-  right: 0;
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-      -ms-flex-flow: column;
-          flex-flow: column;
-  -webkit-box-pack: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-}
-
-#main .middle-container .controls-container .ga-settings button {
+#main .middle-container .controls-container .state-controls-container .ga-settings button {
   padding: 5px 4px 5px 5px;
   border: none;
   border-radius: 4px;
@@ -235,65 +192,38 @@ body {
   background-color: white;
 }
 
-#main .middle-container .controls-container .ga-settings button:hover:not(:disabled) {
+#main .middle-container .controls-container .state-controls-container .ga-settings button:hover:not(:disabled) {
   background-color: #c4c4c4;
 }
 
-#main .middle-container .controls-container .ga-settings button img {
+#main .middle-container .controls-container .state-controls-container .ga-settings button img {
   width: 18px;
   float: left;
 }
 
-#main .middle-container .controls-container .parameters-scrollbar-container {
-  -webkit-box-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
-  height: 100%;
-  overflow: hidden;
-}
-
-#main .middle-container .controls-container .parameters-scrollbar-container .scrolling-parameter-container {
+#main .middle-container .controls-container .parameters-container {
   height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
-  /* Track */
-  /* Handle */
-  /* Handle on hover */
 }
 
-#main .middle-container .controls-container .parameters-scrollbar-container .scrolling-parameter-container::-webkit-scrollbar {
-  width: 15px;
-}
-
-#main .middle-container .controls-container .parameters-scrollbar-container .scrolling-parameter-container::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-#main .middle-container .controls-container .parameters-scrollbar-container .scrolling-parameter-container::-webkit-scrollbar-thumb {
-  background: #aaa;
-}
-
-#main .middle-container .controls-container .parameters-scrollbar-container .scrolling-parameter-container::-webkit-scrollbar-thumb:hover {
-  background: #777;
-}
-
-#main .middle-container .controls-container .parameters-scrollbar-container .scrolling-parameter-container .parameters-container {
+#main .middle-container .controls-container .parameters-container .parameters {
   margin-top: -5px;
   margin-right: -14px;
 }
 
-#main .middle-container .controls-container .parameters-scrollbar-container .scrolling-parameter-container .parameters-container .parameter {
+#main .middle-container .controls-container .parameters-container .parameters .parameter {
   margin: 5px 0;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
 }
 
-#main .middle-container .controls-container .parameters-scrollbar-container .scrolling-parameter-container .parameters-container .parameter:last-child {
+#main .middle-container .controls-container .parameters-container .parameters .parameter:last-child {
   margin-bottom: 0;
 }
 
-#main .middle-container .controls-container .parameters-scrollbar-container .scrolling-parameter-container .parameters-container .parameter p {
+#main .middle-container .controls-container .parameters-container .parameters .parameter p {
   font-size: 13px;
   padding: 9px 5px;
   float: left;
@@ -306,7 +236,7 @@ body {
           flex: 1;
 }
 
-#main .middle-container .controls-container .parameters-scrollbar-container .scrolling-parameter-container .parameters-container .parameter input[type='number'] {
+#main .middle-container .controls-container .parameters-container .parameters .parameter input[type='number'] {
   padding-top: 2px;
   padding-left: 2px;
   height: 19px;
@@ -320,16 +250,16 @@ body {
   min-width: 100px;
 }
 
-#main .middle-container .controls-container .parameters-scrollbar-container .scrolling-parameter-container .parameters-container .parameter input[type='number']:focus {
+#main .middle-container .controls-container .parameters-container .parameters .parameter input[type='number']:focus {
   -webkit-box-shadow: 0 0 0 1px #df9a00, 0 0 0 4px rgba(223, 165, 0, 0.3);
           box-shadow: 0 0 0 1px #df9a00, 0 0 0 4px rgba(223, 165, 0, 0.3);
 }
 
-#main .middle-container .controls-container .parameters-scrollbar-container .scrolling-parameter-container .parameters-container .parameter input[type='number']::-webkit-inner-spin-button {
+#main .middle-container .controls-container .parameters-container .parameters .parameter input[type='number']::-webkit-inner-spin-button {
   -webkit-appearance: none;
 }
 
-#main .middle-container .controls-container .parameters-scrollbar-container .scrolling-parameter-container .parameters-container .parameter .input-wrapper {
+#main .middle-container .controls-container .parameters-container .parameters .parameter .input-wrapper {
   margin: 0 6px;
   padding: 0 0 0 4px;
   -webkit-box-flex: 2;
@@ -341,7 +271,7 @@ body {
   display: flex;
 }
 
-#main .middle-container .controls-container .parameters-scrollbar-container .scrolling-parameter-container .parameters-container .parameter .input-wrapper input[type='range'] {
+#main .middle-container .controls-container .parameters-container .parameters .parameter .input-wrapper input[type='range'] {
   -webkit-appearance: none;
   -webkit-box-flex: 1;
       -ms-flex: 1;
@@ -351,15 +281,15 @@ body {
   margin-left: -4px;
 }
 
-#main .middle-container .controls-container .parameters-scrollbar-container .scrolling-parameter-container .parameters-container .parameter .input-wrapper input[type='range']:not(:disabled) {
+#main .middle-container .controls-container .parameters-container .parameters .parameter .input-wrapper input[type='range']:not(:disabled) {
   cursor: pointer;
 }
 
-#main .middle-container .controls-container .parameters-scrollbar-container .scrolling-parameter-container .parameters-container .parameter .input-wrapper input[type='range']:disabled {
+#main .middle-container .controls-container .parameters-container .parameters .parameter .input-wrapper input[type='range']:disabled {
   opacity: 0.6;
 }
 
-#main .middle-container .controls-container .parameters-scrollbar-container .scrolling-parameter-container .parameters-container .parameter .input-wrapper input[type='range']::-webkit-slider-runnable-track {
+#main .middle-container .controls-container .parameters-container .parameters .parameter .input-wrapper input[type='range']::-webkit-slider-runnable-track {
   width: 100%;
   height: 5px;
   background: #555555;
@@ -368,7 +298,7 @@ body {
   transition: background 0.15s;
 }
 
-#main .middle-container .controls-container .parameters-scrollbar-container .scrolling-parameter-container .parameters-container .parameter .input-wrapper input[type='range']::-webkit-slider-thumb {
+#main .middle-container .controls-container .parameters-container .parameters .parameter .input-wrapper input[type='range']::-webkit-slider-thumb {
   border: 1px solid #000000;
   height: 14px;
   width: 14px;
@@ -380,30 +310,36 @@ body {
   transition: background 0.15s;
 }
 
-#main .middle-container .controls-container .parameters-scrollbar-container .scrolling-parameter-container .parameters-container .parameter .input-wrapper input[type='range']:not(:disabled):hover::-webkit-slider-thumb {
+#main .middle-container .controls-container .parameters-container .parameters .parameter .input-wrapper input[type='range']:not(:disabled):hover::-webkit-slider-thumb {
   background: #6b6b6b;
 }
 
-#main .middle-container .controls-container .parameters-scrollbar-container .scrolling-parameter-container .parameters-container .parameter .input-wrapper input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
+#main .middle-container .controls-container .parameters-container .parameters .parameter .input-wrapper input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
   background: #272727;
 }
 
-#main .middle-container .controls-container .parameters-scrollbar-container .scrolling-parameter-container .parameters-container .parameter .input-wrapper input[type='number'] {
+#main .middle-container .controls-container .parameters-container .parameters .parameter .input-wrapper input[type='number'] {
   margin-right: 0;
   min-width: 46px;
   max-width: 46px;
 }
 
-#main .middle-container .controls-container .parameters-scrollbar-container .scrolling-parameter-container .parameters-container .parameter .checkbox-wrapper {
+#main .middle-container .controls-container .parameters-container .parameters .parameter .checkbox-wrapper {
   position: relative;
   min-width: 40px;
   -webkit-box-flex: 0.5;
       -ms-flex: 0.5;
           flex: 0.5;
+  padding: 4px 3px 3px 5px;
 }
 
-#main .middle-container .controls-container .parameters-scrollbar-container .scrolling-parameter-container .parameters-container .parameter .checkbox-wrapper input[type='checkbox'] {
-  margin: 4px 3px 3px 5px;
+#main .middle-container .checkbox-wrapper {
+  width: 28px;
+  height: 28px;
+  position: relative;
+}
+
+#main .middle-container .checkbox-wrapper input[type='checkbox'] {
   opacity: 0;
   border-radius: 4px;
   height: 28px;
@@ -414,8 +350,7 @@ body {
   border-radius: 4px;
 }
 
-#main .middle-container .controls-container .parameters-scrollbar-container .scrolling-parameter-container .parameters-container .parameter .checkbox-wrapper input[type='checkbox'] + label {
-  margin: 4px 3px 3px 5px;
+#main .middle-container .checkbox-wrapper input[type='checkbox'] + label {
   height: 28px;
   width: 28px;
   padding: 5px 0;
@@ -426,19 +361,19 @@ body {
   border-radius: 4px;
 }
 
-#main .middle-container .controls-container .parameters-scrollbar-container .scrolling-parameter-container .parameters-container .parameter .checkbox-wrapper input[type='checkbox'] + label > img {
-  opacity: 0.6;
+#main .middle-container .checkbox-wrapper input[type='checkbox'] + label > img {
+  opacity: 0.5;
 }
 
-#main .middle-container .controls-container .parameters-scrollbar-container .scrolling-parameter-container .parameters-container .parameter .checkbox-wrapper input[type='checkbox']:not(:disabled) + label:hover {
+#main .middle-container .checkbox-wrapper input[type='checkbox']:not(:disabled) + label:hover {
   background-color: #c4c4c4;
 }
 
-#main .middle-container .controls-container .parameters-scrollbar-container .scrolling-parameter-container .parameters-container .parameter .checkbox-wrapper input[type='checkbox']:checked + label > img {
+#main .middle-container .checkbox-wrapper input[type='checkbox']:checked + label > img {
   opacity: 1;
 }
 
-#main .middle-container .secondary-container {
+#main .middle-container .side-container {
   position: relative;
   margin-left: -4px;
   -webkit-box-flex: 1;
@@ -446,8 +381,7 @@ body {
           flex: 1;
   height: 100%;
   overflow: hidden;
-  min-width: 140px;
-  margin-top: 1px;
+  min-width: 280px;
 }
 
 #main .bottom-container {

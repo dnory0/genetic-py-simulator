@@ -1,7 +1,7 @@
 {
   "name": "genetic-py",
   "productName": "Genetic Py",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "description": "A Simulator developed with ElectronJS for Genetic Algorithms written in Python",
   "homepage": "https://github.com/dnory0/genetic-py.git",
   "repository": {
@@ -10,19 +10,13 @@
   },
   "main": "app/main.js",
   "scripts": {
-    "pyi-l": "python3 -m pip install pyinstaller --user",
-    "pyi-w": "python -m pip install pyinstaller --user",
     "log": "git log --oneline --graph --all",
-    "clean-l": "find dist/ -name '.fuse*' | xargs -d'\n' -I{} mv {} /media/$USER/*/.Trash-1000/files/; rm dist -rf",
-    "clean-w": "rm dist -r",
-    "distpy-l": "pyinstaller --onefile --specpath app/python/spec/linux --distpath app/python/dist/linux --workpath app/python/build/linux app/python/ga.py",
-    "distpy-w": "pyinstaller --onefile --specpath app/python/spec/win --distpath app/python/dist/win --workpath app/python/build/win app/python/ga.py",
-    "cleanpy": "rm -r app/python/build app/python/spec app/python/__pycache__",
-    "updeps": "node update-deps.js",
+    "clean": "node scripts/clean.js",
+    "updeps": "node scripts/update-deps.js",
     "start": "electron .",
+    "dev": "./node_modules/.bin/electron app/main.js --dev",
     "watch": "tsc",
-    "dist-l": "electron-builder --linux --x64",
-    "dist-w": "electron-builder --win --x64"
+    "dist": "node scripts/dist.js"
   },
   "keywords": [
     "genetic",

@@ -133,12 +133,16 @@ class GAThread(threading.Thread):
         self.__stop_now = False
 
     def run(self):
+        # initializing the population
         pop = Population(g_pop_size, len(solution.genes))
+
         # started signal to the renderer process
         to_json({
             "started": True,
+            "first-step": self.__pause_now,
             "genesNum": pop.genes_num
         })
+        
         # first generated solutions (generation 0)
         to_json({
             "fitness": pop.fittest().fitness(),
@@ -146,18 +150,9 @@ class GAThread(threading.Thread):
             "genes": pop.fittest().genes
         })
 
-        # in case user triggered step_f signal instead of play or replay
-        # send paused to enable hover over charts
-        if self.__pause_now:
-            to_json({
-                "paused": True
-            })
-
-        # check before entering evolution loop if pause event
-        #  was fired before hitting start
-        self.__pause_check()
         while True:
             Evolve.evolve_population(pop)
+
             # if g_delay_rate is 0 than just ignore it
             if g_delay_rate:
                 time.sleep(g_delay_rate)
@@ -234,6 +229,10 @@ class GAThread(threading.Thread):
             to_json({
                 "resumed": True
             })
+        # user triggered pause (through play button) through GUI and self.paused is still false means
+        # GA is too slow on generating the next generation, than when the user clicked play (for resume)
+        # it just turns self.__pause_now to false to prevent GA from pausing.
+        elif self.__pause_now: self.__pause_now = False
 
     def step_forward(self):
         """
@@ -242,17 +241,19 @@ class GAThread(threading.Thread):
         # start it if not started yet
         if not self.start_triggered:
             self.start_triggered = True
-            threading.Thread.start(self)
             self.__pause_now = True
+            # fixes the blocking that happens when user clicks step_f multiple times on a heavy GA
+            self.paused = False
+            threading.Thread.start(self)
             return
         # release if paused, it will lock automatically after one generation
         # because __pause_now is set to True
-        if not self.paused:
+        elif not self.paused:
             self.__pause_now = True
             to_json({
                 "paused": True
             })
-        if self.paused:
+        elif not self.__pause_now:
             # Notify so thread will wake after lock released
             self.pause_cond.notify()
             # Now release the lock
@@ -274,6 +275,8 @@ class GAThread(threading.Thread):
                 # Now release the lock
                 self.pause_cond.release()
                 self.paused = False
+            # in case is going to pause but user pressed stop, GA should pass the pause check test to stop
+            else: self.__pause_now = False
             self.join()
 
 
@@ -351,7 +354,7 @@ def update_parameters(command: dict):
     # })
 
 
-def init_ga(command: dict):
+def init_ga():
     """ Initialize new GA thread with a new solution
      """
     global ga_thread
@@ -361,20 +364,15 @@ def init_ga(command: dict):
     solution = Individual(genes_num=g_genes_num)
 
 
-# cmd: dict = json.loads(input())
-# setup(cmd)
-# time.sleep(1)
-# to_json({
-#     "is_setup": True
-# })
-
+# possible to add condition here in near future
 while True:
+    # read a command
     cmd = input()
     if cmd == 'play':
         if ga_thread is not None and ga_thread.is_alive():
             ga_thread.resume()
         else:
-            init_ga(cmd)
+            init_ga()
             ga_thread.start()
     elif cmd == 'pause':
         if ga_thread is not None and ga_thread.is_alive():
@@ -385,15 +383,21 @@ while True:
     elif cmd == 'replay':
         if ga_thread is not None:
             ga_thread.stop()
-        init_ga(cmd)
+        init_ga()
         ga_thread.start()
     elif cmd == 'step_f':
         if ga_thread is None or not ga_thread.is_alive():
-            init_ga(cmd)
+            init_ga()
         ga_thread.step_forward()
     elif cmd == 'exit':
         if ga_thread is not None:
             ga_thread.stop()
         sys.exit(0)
     else:
-        update_parameters(json.loads(cmd))
+        try:
+            load = json.loads(cmd)
+        except:
+            pass
+        else:
+            update_parameters(load)
+

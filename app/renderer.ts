@@ -1,19 +1,12 @@
 import { ChildProcess } from 'child_process';
-import {
-  IpcRenderer,
-  WebviewTag,
-  IpcRendererEvent,
-  WebFrame,
-  IpcMessageEvent
-} from 'electron';
+import { IpcRenderer, WebviewTag, IpcRendererEvent, WebFrame } from 'electron';
 
 /***************************** passed by preload *****************************
  *****************************************************************************/
 /**
  * python process that executes GA
  */
-let pyshell: ChildProcess = window['pyshell'];
-delete window['pyshell'];
+let pyshell: ChildProcess;
 /**
  * used to listen to zoom channel for wain process to send zoom in/out/reset.
  */
@@ -28,14 +21,14 @@ delete window['webFrame'];
 /***************************** Views Declaration *****************************
  *****************************************************************************/
 /**
- * webview hosting primary chart
+ * webview hosting prime chart
  */
-const primary: WebviewTag = <any>document.getElementById('primary-chart');
+const prime: WebviewTag = <any>document.getElementById('prime-chart');
 
 /**
- * webview hosting secondary chart
+ * webview hosting side chart
  */
-const secondary: WebviewTag = <any>document.getElementById('secondary-chart');
+const side: WebviewTag = <any>document.getElementById('side-chart');
 
 /************************************ GUI ************************************
  *****************************************************************************/
@@ -116,6 +109,15 @@ let delayRandom = <HTMLInputElement>(
   document.getElementById('random-delay-rate')
 );
 
+/****************************** GA Settings ******************************/
+/**
+ * checkbox that acts as a switch for enabling/disabling live rendering,
+ * if enabled chart updates every time a point (Generation) is added,
+ * if disabled chart update when the GA is paused or stopped,
+ * default is enabled
+ */
+let lRSwitch = <HTMLInputElement>document.getElementById('live-rendering');
+
 /****************************** Python Part ******************************/
 
 /**
@@ -128,16 +130,12 @@ let isRunning = false;
  * @param response response of pyshell
  */
 const treatResponse = (response: object) => {
-  if (response['started'] && response['genesNum'] !== undefined) {
+  if (response['started']) {
     // to be able to change in ga state
     setClickable();
   } else if (response['finished']) {
     setClickable(false);
     blinkPlayBtn();
-  } else if (response['stopped']) {
-    setClickable(false);
-  } else if (response['is_setup']) {
-    console.log('setup finished');
   }
 };
 
@@ -147,16 +145,13 @@ const treatResponse = (response: object) => {
 /**
  * switch the play/pause button image depending on isRunning state.
  */
-const switchBtn = () => {
-  if (isRunning) {
-    // show playing state
-    (<HTMLImageElement>playBtn.querySelector('.play')).style.display = 'none';
-    (<HTMLImageElement>playBtn.querySelector('.pause')).style.display = 'block';
-  } else {
-    // show start/paused state
-    (<HTMLImageElement>playBtn.querySelector('.play')).style.display = 'block';
-    (<HTMLImageElement>playBtn.querySelector('.pause')).style.display = 'none';
-  }
+const switchPlayBtn = () => {
+  (<HTMLImageElement>playBtn.querySelector('.play')).style.display = isRunning
+    ? 'none'
+    : 'block';
+  (<HTMLImageElement>playBtn.querySelector('.pause')).style.display = isRunning
+    ? 'block'
+    : 'none';
 };
 
 /**
@@ -194,7 +189,7 @@ const blinkPlayBtn = () => {
 };
 
 /**
- * adjust primary & secondary webviws to body's zoom
+ * adjust prime & side webviws to body's zoom
  */
 let zoomViews = () => {};
 
@@ -206,9 +201,21 @@ let zoomViews = () => {};
  * @param goingToRun set to true on play and replay signal, set to false otherwise.
  */
 const ctrlClicked = (signal: string, goingToRun: boolean) => {
+  /**
+   * if user clicked step forward button when lRSwitch is not checked,
+   * chart is not going to update that, this fixes it so the live Rendering
+   * is enabled for only the this step.
+   */
+  if (signal == 'step_f') prime.send('step-forward');
+  /**
+   * in heavy GA (GA that takes considerable amount of time to generate 1 generation)
+   * buttons should be stopped on click instead of waiting GA stopped event.
+   */
+  if (signal == 'stop') setClickable(false);
+
   window['sendSig'](signal);
   isRunning = goingToRun;
-  switchBtn();
+  switchPlayBtn();
 };
 
 /*********************** Buttons Click Event Handling ***********************/
@@ -222,54 +229,47 @@ toStartBtn.onclick = () => ctrlClicked('replay', true);
 stepFBtn.onclick = () => ctrlClicked('step_f', false);
 
 /********************************* Views Setup *********************************/
-/**
- * unlock controls and parameters adjusting for user, also set pyshell communication
- * triggered after both webviews finish loading.
- */
-let setReady = () => {
-  /**
-   * hopefully free some memory space.
-   *
-   * Note: setting setReady to undefined/null might result in error when
-   * second view calling setReady finishs loading
-   */
-  setReady = () => {};
-  // open communication
-  pyshell.stdout.on('data', (response: Buffer) => {
-    primary.send('data', response);
-    secondary.send('data', response);
-    response
-      .toString()
-      .split(/(?<=\n)/)
-      .forEach((args: string) => treatResponse(JSON.parse(args)));
-  });
-  /**
-   * function is implemented after both webviews are fully loaded.
-   */
-  zoomViews = () => {
-    primary.setZoomFactor(webFrame.getZoomFactor());
-    secondary.setZoomFactor(webFrame.getZoomFactor());
-  };
-
-  zoomViews();
-  if (document.getElementById('loading-bg')) {
-    document.getElementById('loading-bg').style.opacity = '0';
-    setTimeout(() => {
-      document.body.removeChild(document.getElementById('loading-bg'));
-    }, 0.2);
-  }
-  document.getElementById('main').style.opacity = '1';
-  document.getElementById('main').style.pointerEvents = 'inherit';
-};
-
 document.addEventListener('DOMContentLoaded', function loaded() {
   document.removeEventListener('DOMContentLoaded', loaded);
-  /**
-   * whichever did finsh loading last is going to unlock controls for user,
-   */
-  primary.addEventListener('dom-ready', () => setReady());
-  secondary.addEventListener('dom-ready', () => setReady());
+  (() => {
+    /**
+     * unlock controls and parameters adjusting for user, also set pyshell communication
+     * triggered after both webviews finish loading.
+     */
+    let ready = () => {
+      /**
+       * hopefully free some memory space.
+       *
+       * Note: setting ready to undefined/null might result in error when
+       * second view finishs loading
+       */
+      ready = () => {
+        prime.send('mode', window['isDev']);
+        side.send('mode', window['isDev']);
+        delete window['isDev'];
 
+        lRSwitch.onchange = () => prime.send('update-mode', lRSwitch.checked);
+      };
+
+      zoomViews = window['ready'](
+        pyshell,
+        prime,
+        side,
+        treatResponse,
+        webFrame
+      );
+      zoomViews();
+      window['loaded']();
+      delete window['ready'];
+      delete window['loaded'];
+    };
+
+    /**
+     * whichever did finsh loading last is going to unlock controls for user,
+     */
+    prime.addEventListener('dom-ready', () => ready());
+    side.addEventListener('dom-ready', () => ready());
+  })();
   /**************************** Ranges change handling ****************************/
 
   /**
@@ -282,11 +282,11 @@ document.addEventListener('DOMContentLoaded', function loaded() {
     checkInput: HTMLInputElement
   ) => {
     numInput.style.backgroundColor = '#fff';
-    pyshell.stdin.write(
-      `${JSON.stringify({
+    window['sendSig'](
+      JSON.stringify({
         [numInput.name]: parseFloat(numInput.value),
         [checkInput.name]: checkInput.checked
-      })}\n`
+      })
     );
   };
 
@@ -458,50 +458,28 @@ document.addEventListener('DOMContentLoaded', function loaded() {
     zoomViews();
   });
 
-  if (window['isDev']) {
-    delete window['isDev'];
-    // devTools listeners for primary & secondary webview
-    /**
-     * toggles devTools for intended webview
-     * @param webView primary | secondary view
-     */
-    const devToolsToggler = (webView: string) => {
-      if (webView == 'primary') primary.getWebContents().toggleDevTools();
-      else if (webView == 'secondary')
-        secondary.getWebContents().toggleDevTools();
-    };
-    // listens for main process' menubar
-    ipcRenderer.on('devTools', (_event: IpcRendererEvent, webView: string) =>
-      devToolsToggler(webView)
-    );
-    // listens for renderer process
-    window.addEventListener(
-      'keyup',
-      (event: KeyboardEvent) => {
-        if (event.code == 'Backquote')
-          if (event.ctrlKey)
-            devToolsToggler(event.shiftKey ? 'secondary' : 'primary');
-      },
-      true
-    );
-    primary.addEventListener('ipc-message', (event: IpcMessageEvent) => {
-      if (event.channel == 'devTools') devToolsToggler(<any>event.args);
-    });
-    secondary.addEventListener('ipc-message', (event: IpcMessageEvent) => {
-      if (event.channel == 'devTools') devToolsToggler(<any>event.args);
-    });
-  }
-
-  // add scroller auto maximizing & minimizing
-  window['scrollbar'](document.getElementsByClassName('scrollbar-container'));
-  delete window['scrollbar'];
-
   // add resizabality parts of the UI
-  window['border'](document.getElementsByClassName('border'));
+  window['border']();
   delete window['border'];
 
   /**
    * terminate pyshell process with its threads on close or reload
    */
   window.addEventListener('beforeunload', () => window['sendSig']('exit'));
+});
+
+// request mode
+ipcRenderer.send('mode');
+
+/**
+ * launches once when the main process returns if the app is in development mode or production mode
+ */
+ipcRenderer.once('mode', (_ev, isDev: boolean) => {
+  if (isDev) {
+    window['k-shorts'](prime, side, ipcRenderer);
+    delete window['k-shorts'];
+  }
+  window['isDev'] = isDev;
+  pyshell = window['pyshell'];
+  delete window['pyshell'];
 });

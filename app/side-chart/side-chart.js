@@ -6,9 +6,7 @@ let mostFittest = { fitness: -1, individuals: null };
 const enableChartHover = window['enableChartHover'];
 const clearChart = window['clearChart'];
 const treatResponse = (response) => {
-    if (response['generation'] !== undefined &&
-        response['fitness'] !== undefined &&
-        response['genes'] !== undefined) {
+    if (response['fitness'] !== undefined) {
         if (mostFittest['fitness'] < response['fitness']) {
             mostFittest['fitness'] = response['fitness'];
             mostFittest['individuals'] = [
@@ -24,21 +22,21 @@ const treatResponse = (response) => {
                 genes: response['genes']
             });
         }
-        secondaryChart.series[0].setData(mostFittest.individuals[0].genes, true, false);
+        sideChart.series[0].setData(mostFittest.individuals[0].genes, true, false);
     }
-    else if (response['started'] && response['genesNum'] !== undefined) {
-        clearChart(secondaryChart);
+    else if (response['started']) {
+        clearChart(sideChart);
         mostFittest['fitness'] = -1;
         mostFittest['individuals'] = null;
-        secondaryChart.xAxis[0].setCategories([...Array(response['genesNum']).keys()].map(v => `${++v}`));
-        enableChartHover(false, secondaryChart);
+        sideChart.xAxis[0].setCategories([...Array(response['genesNum']).keys()].map(v => `${++v}`));
+        enableChartHover(response['first-step'], sideChart);
     }
-    else if (response['paused'] || response['finished'] || response['stopped'])
-        enableChartHover(true, secondaryChart);
+    else if (response['paused'] || response['stopped'] || response['finished'])
+        enableChartHover(true, sideChart);
     else if (response['resumed'])
-        enableChartHover(false, secondaryChart);
+        enableChartHover(false, sideChart);
 };
-let secondaryChart = window['createChart']('secondary-chart', {
+let sideChart = window['createChart']('side-chart', {
     chart: {
         type: 'line'
     },
@@ -53,7 +51,9 @@ let secondaryChart = window['createChart']('secondary-chart', {
     yAxis: {
         title: {
             text: 'Gene'
-        }
+        },
+        tickInterval: 1,
+        endOnTick: false
     },
     series: [
         {
@@ -62,10 +62,5 @@ let secondaryChart = window['createChart']('secondary-chart', {
     ]
 });
 delete window['createChart'];
-ipcRenderer.on('data', (_event, response) => {
-    response
-        .toString()
-        .split(/(?<=\n)/)
-        .forEach((args) => treatResponse(JSON.parse(args)));
-});
-//# sourceMappingURL=secondary-chart.js.map
+ipcRenderer.on('data', (_event, response) => treatResponse(response));
+//# sourceMappingURL=side-chart.js.map

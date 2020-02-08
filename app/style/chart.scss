@@ -11,6 +11,11 @@ button {
   -webkit-user-drag: none;
 }
 
+/* changes the default cursor to chart's navigator */
+.highcharts-navigator-mask-inside {
+  cursor: all-scroll !important;
+}
+
 html,
 body {
   padding: 0;
@@ -21,8 +26,8 @@ body {
 .charts-container {
   height: 100vh;
 
-  #primary-chart,
-  #secondary-chart {
+  #prime-chart,
+  #side-chart {
     padding: 0;
     position: relative;
     width: 100%;

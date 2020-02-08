@@ -1,9 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const electron_1 = require("electron");
-const isDev = electron_1.remote.app.getAppPath().indexOf('.asar') === -1;
+const path_1 = require("path");
 window['ipcRenderer'] = electron_1.ipcRenderer;
-window['createChart'] = require('../modules/create-chart');
+window['createChart'] = require(path_1.join(__dirname, '..', 'modules', 'create-chart'));
 window['enableChartHover'] = (enable, chart) => {
     chart.update({
         tooltip: {
@@ -37,13 +37,16 @@ window['clearChart'] = (chart, categories = false) => {
         chart.xAxis[0].setCategories([]);
     chart.series[0].setData([], true);
 };
-if (isDev)
+electron_1.ipcRenderer.once('mode', (_ev, isDev) => {
+    if (!isDev)
+        return;
     window.addEventListener('keyup', (event) => {
         if (event.code == 'Backquote')
             if (event.ctrlKey)
                 if (event.shiftKey)
-                    electron_1.ipcRenderer.sendToHost('devTools', 'secondary');
+                    electron_1.ipcRenderer.sendToHost('devTools', 'side');
                 else
-                    electron_1.ipcRenderer.sendToHost('devTools', 'primary');
+                    electron_1.ipcRenderer.sendToHost('devTools', 'prime');
     }, true);
+});
 //# sourceMappingURL=chart-preload.js.map

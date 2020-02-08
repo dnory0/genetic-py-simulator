@@ -59,12 +59,12 @@ module.exports = (isDev, targetWindow) => {
             click: () => targetWindow.webContents.toggleDevTools()
         }));
         menu.items[2].submenu.insert(3, new electron_1.MenuItem({
-            label: 'Primary Developer Tools [Ctrl+²]',
-            click: () => targetWindow.webContents.send('devTools', 'primary')
+            label: 'prime Developer Tools [Ctrl+²]',
+            click: () => targetWindow.webContents.send('devTools', 'prime')
         }));
         menu.items[2].submenu.insert(4, new electron_1.MenuItem({
-            label: 'Secondary Developer Tools [Ctrl+Shift+²]',
-            click: () => targetWindow.webContents.send('devTools', 'secondary')
+            label: 'side Developer Tools [Ctrl+Shift+²]',
+            click: () => targetWindow.webContents.send('devTools', 'side')
         }));
         menu.items[2].submenu.insert(5, new electron_1.MenuItem({ type: 'separator' }));
     }

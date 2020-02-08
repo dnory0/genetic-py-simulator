@@ -19,17 +19,17 @@
       />
     </div>
     <div id="main">
-      <div class="primary-container">
+      <div class="prime-container">
         <webview
-          id="primary-chart"
-          src="primary-chart/primary-chart.html"
+          id="prime-chart"
+          src="prime-chart/prime-chart.html"
           autosize="on"
-          style="width: 100%; height: 100%;"
+          style="height: 100%;"
           allowtransparency
           nodeintegration
           preload="preloads/chart-preload"
         ></webview>
-        <div class="resize-cover for-primary"></div>
+        <div class="resize-cover for-prime"></div>
       </div>
       <div class="border hor"></div>
       <div class="middle-container">
@@ -54,148 +54,155 @@
               </button>
             </div>
             <div class="separator"></div>
+            <div class="chart-settings">
+              <div class="checkbox-wrapper">
+                <input
+                  type="checkbox"
+                  name="live-rendering"
+                  id="live-rendering"
+                  checked
+                />
+                <label title="Live Rendering" for="live-rendering">
+                  <img src="img/live-rendering.png" />
+                </label>
+              </div>
+            </div>
+            <div class="separator"></div>
             <div class="ga-settings">
               <button title="Settings" id="settings-btn">
                 <img src="img/settings.png" />
               </button>
             </div>
           </div>
-          <div class="parameters-scrollbar-container">
-            <div class="scrollbar-container">
-              <div class="transition-scrollbar-container">
-                <div class="scrollbar"></div>
+          <div class="parameters-container">
+            <div class="parameters">
+              <div class="parameter">
+                <p>Population size:</p>
+                <input
+                  type="number"
+                  min="1"
+                  step="1"
+                  id="pop-size"
+                  name="pop_size"
+                />
+                <div class="checkbox-wrapper">
+                  <input
+                    type="checkbox"
+                    name="random_pop_size"
+                    id="random-pop-size"
+                  />
+                  <label for="random-pop-size">
+                    <img src="img/random.png" />
+                  </label>
+                </div>
               </div>
-            </div>
-            <div class="scrolling-parameter-container scrolling-content">
-              <div class="parameters-container">
-                <div class="parameter">
-                  <p>Population size:</p>
+              <div class="parameter">
+                <p>Genes number:</p>
+                <input
+                  type="number"
+                  min="1"
+                  step="1"
+                  id="genes-num"
+                  name="genes_num"
+                />
+                <div class="checkbox-wrapper">
+                  <input
+                    type="checkbox"
+                    name="random_genes_num"
+                    id="random-genes-num"
+                  />
+                  <label for="random-genes-num">
+                    <img src="img/random.png" />
+                  </label>
+                </div>
+              </div>
+              <div class="parameter">
+                <p>Crossover rate:</p>
+                <div class="input-wrapper">
+                  <input type="range" min="0.001" max="1" step="0.001" />
                   <input
                     type="number"
-                    min="1"
-                    step="1"
-                    id="pop-size"
-                    name="pop_size"
+                    min="0.001"
+                    max="1"
+                    step="0.001"
+                    id="crossover-rate"
+                    name="crossover_rate"
                   />
-                  <div class="checkbox-wrapper">
-                    <input
-                      type="checkbox"
-                      name="random_pop_size"
-                      id="random-pop-size"
-                    />
-                    <label for="random-pop-size">
-                      <img src="img/random.png" />
-                    </label>
-                  </div>
                 </div>
-                <div class="parameter">
-                  <p>Genes number:</p>
+                <div class="checkbox-wrapper">
+                  <input
+                    type="checkbox"
+                    name="random_crossover_rate"
+                    id="random-crossover-rate"
+                  />
+                  <label for="random-crossover-rate">
+                    <img src="img/random.png"
+                  /></label>
+                </div>
+              </div>
+              <div class="parameter">
+                <p>Mutation rate:</p>
+                <div class="input-wrapper">
+                  <input type="range" min="0" max="1" step="0.001" />
                   <input
                     type="number"
-                    min="1"
-                    step="1"
-                    id="genes-num"
-                    name="genes_num"
+                    min="0"
+                    max="1"
+                    step="0.001"
+                    id="mutation-rate"
+                    name="mutation_rate"
                   />
-                  <div class="checkbox-wrapper">
-                    <input
-                      type="checkbox"
-                      name="random_genes_num"
-                      id="random-genes-num"
-                    />
-                    <label for="random-genes-num">
-                      <img src="img/random.png" />
-                    </label>
-                  </div>
                 </div>
-                <div class="parameter">
-                  <p>Crossover rate:</p>
-                  <div class="input-wrapper">
-                    <input type="range" min="0.001" max="1" step="0.001" />
-                    <input
-                      type="number"
-                      min="0.001"
-                      max="1"
-                      step="0.001"
-                      id="crossover-rate"
-                      name="crossover_rate"
-                    />
-                  </div>
-                  <div class="checkbox-wrapper">
-                    <input
-                      type="checkbox"
-                      name="random_crossover_rate"
-                      id="random-crossover-rate"
-                    />
-                    <label for="random-crossover-rate">
-                      <img src="img/random.png"
-                    /></label>
-                  </div>
+                <div class="checkbox-wrapper">
+                  <input
+                    type="checkbox"
+                    name="random_mutation_rate"
+                    id="random-mutation-rate"
+                  />
+                  <label for="random-mutation-rate">
+                    <img src="img/random.png"
+                  /></label>
                 </div>
-                <div class="parameter">
-                  <p>Mutation rate:</p>
-                  <div class="input-wrapper">
-                    <input type="range" min="0" max="1" step="0.001" />
-                    <input
-                      type="number"
-                      min="0"
-                      max="1"
-                      step="0.001"
-                      id="mutation-rate"
-                      name="mutation_rate"
-                    />
-                  </div>
-                  <div class="checkbox-wrapper">
-                    <input
-                      type="checkbox"
-                      name="random_mutation_rate"
-                      id="random-mutation-rate"
-                    />
-                    <label for="random-mutation-rate">
-                      <img src="img/random.png"
-                    /></label>
-                  </div>
+              </div>
+              <div class="parameter">
+                <p>delay rate:</p>
+                <div class="input-wrapper">
+                  <input type="range" min="0" max="5" step="0.05" />
+                  <input
+                    type="number"
+                    min="0"
+                    max="5"
+                    step="0.05"
+                    id="delay-rate"
+                    name="delay_rate"
+                  />
                 </div>
-                <div class="parameter">
-                  <p>delay rate:</p>
-                  <div class="input-wrapper">
-                    <input type="range" min="0" max="5" step="0.05" />
-                    <input
-                      type="number"
-                      min="0"
-                      max="5"
-                      step="0.05"
-                      id="delay-rate"
-                      name="delay_rate"
-                    />
-                  </div>
-                  <div class="checkbox-wrapper">
-                    <input
-                      type="checkbox"
-                      name="random_delay_rate"
-                      id="random-delay-rate"
-                    />
-                    <label for="random-delay-rate">
-                      <img src="img/random.png" />
-                    </label>
-                  </div>
+                <div class="checkbox-wrapper">
+                  <input
+                    type="checkbox"
+                    name="random_delay_rate"
+                    id="random-delay-rate"
+                  />
+                  <label for="random-delay-rate">
+                    <img src="img/random.png" />
+                  </label>
                 </div>
               </div>
             </div>
           </div>
         </div>
         <div class="border ver"></div>
-        <div class="secondary-container">
+        <div class="side-container">
           <webview
-            id="secondary-chart"
-            src="secondary-chart/secondary-chart.html"
+            id="side-chart"
+            src="side-chart/side-chart.html"
             autosize="on"
-            style="width: 100%; height: 100%;"
+            style="height: 100%;"
             allowtransparency
             nodeintegration
             preload="preloads/chart-preload"
           ></webview>
-          <div class="resize-cover for-secondary"></div>
+          <div class="resize-cover for-side"></div>
         </div>
       </div>
       <div class="bottom-container"></div>
