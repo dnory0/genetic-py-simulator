@@ -15,7 +15,7 @@ const treatResponse = (response) => {
         clearChart(primeChart);
         enableChartHover(response['first-step'], primeChart);
     }
-    else if (response['paused'] || response['finished'] || response['stopped'])
+    else if (response['paused'] || response['stopped'] || response['finished'])
         enableChartHover(true, primeChart);
     else if (response['resumed'])
         enableChartHover(false, primeChart);

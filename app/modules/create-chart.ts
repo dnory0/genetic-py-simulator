@@ -80,42 +80,7 @@ module.exports = (containerId: string, options: Options) => {
       endOnTick: false
     },
     rangeSelector: {
-      enabled: false,
-      inputEnabled: false,
-      buttons: [
-        {
-          text: '10',
-          count: 9,
-          type: 'millisecond'
-        },
-        {
-          text: '50',
-          count: 49,
-          type: 'millisecond'
-        },
-        {
-          text: '100',
-          count: 99,
-          type: 'millisecond'
-        },
-        {
-          text: '200',
-          count: 199,
-          type: 'millisecond'
-        },
-        {
-          text: 'all',
-          type: 'all'
-        }
-      ],
-      buttonPosition: {
-        align: 'right',
-        x: -30,
-        y: -30
-      },
-      labelStyle: {
-        fontSize: '0px'
-      }
+      enabled: false
     },
     series: options.series,
     navigator: {

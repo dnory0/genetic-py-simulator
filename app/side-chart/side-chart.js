@@ -6,9 +6,7 @@ let mostFittest = { fitness: -1, individuals: null };
 const enableChartHover = window['enableChartHover'];
 const clearChart = window['clearChart'];
 const treatResponse = (response) => {
-    if (response['generation'] !== undefined &&
-        response['fitness'] !== undefined &&
-        response['genes'] !== undefined) {
+    if (response['fitness'] !== undefined) {
         if (mostFittest['fitness'] < response['fitness']) {
             mostFittest['fitness'] = response['fitness'];
             mostFittest['individuals'] = [
@@ -33,7 +31,7 @@ const treatResponse = (response) => {
         sideChart.xAxis[0].setCategories([...Array(response['genesNum']).keys()].map(v => `${++v}`));
         enableChartHover(response['first-step'], sideChart);
     }
-    else if (response['paused'] || response['finished'] || response['stopped'])
+    else if (response['paused'] || response['stopped'] || response['finished'])
         enableChartHover(true, sideChart);
     else if (response['resumed'])
         enableChartHover(false, sideChart);

@@ -44,11 +44,7 @@ const clearChart: (chart: Chart, categories?: boolean) => void =
  * @param response response of pyshell
  */
 const treatResponse = (response: object) => {
-  if (
-    response['generation'] !== undefined &&
-    response['fitness'] !== undefined &&
-    response['genes'] !== undefined
-  ) {
+  if (response['fitness'] !== undefined) {
     // mostFittest processing work is done here instead of being in preload file
     // is to avoid race conditions because sideChart latest data is taken of it.
     // probably needs to moved on another file that imports reload file (when every
@@ -79,7 +75,7 @@ const treatResponse = (response: object) => {
     );
     // disable points on hover on chart if it's not just a step forward
     enableChartHover(response['first-step'], sideChart);
-  } else if (response['paused'] || response['finished'] || response['stopped'])
+  } else if (response['paused'] || response['stopped'] || response['finished'])
     enableChartHover(true, sideChart);
   else if (response['resumed']) enableChartHover(false, sideChart);
 };

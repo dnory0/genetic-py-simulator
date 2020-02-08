@@ -61,7 +61,7 @@ const blinkPlayBtn = () => {
 };
 let zoomViews = () => { };
 const ctrlClicked = (signal, goingToRun) => {
-    if (signal == 'step_f' && !lRSwitch.checked)
+    if (signal == 'step_f')
         prime.send('step-forward');
     if (signal == 'stop')
         setClickable(false);

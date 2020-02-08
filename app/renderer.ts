@@ -206,7 +206,7 @@ const ctrlClicked = (signal: string, goingToRun: boolean) => {
    * chart is not going to update that, this fixes it so the live Rendering
    * is enabled for only the this step.
    */
-  if (signal == 'step_f' && !lRSwitch.checked) prime.send('step-forward');
+  if (signal == 'step_f') prime.send('step-forward');
   /**
    * in heavy GA (GA that takes considerable amount of time to generate 1 generation)
    * buttons should be stopped on click instead of waiting GA stopped event.
