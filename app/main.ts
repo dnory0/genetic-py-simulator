@@ -10,10 +10,6 @@ const isDev = process.argv.some(arg => ['--dev', '-D', '-d'].includes(arg));
  */
 let mainWindow: BrowserWindow;
 /**
- * declared and initialized globally
- */
-// let pyshell: ChildProcess;
-/**
  * @param filePath  string path to an HTML file relative to the root of your application
  * @param options   constructor options for the browser window returned
  */
