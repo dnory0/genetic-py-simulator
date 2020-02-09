@@ -22,7 +22,13 @@ const createWindow = (filePath, { minWidth, minHeight, width, height, resizable,
         }
     });
     targetWindow.loadFile(filePath);
-    targetWindow.once('ready-to-show', targetWindow.show);
+    (() => {
+        let readyToShow = () => {
+            targetWindow.show();
+            require(path_1.join(__dirname, 'modules', 'load-settings.js'))(electron_1.app, mainWindow);
+        };
+        targetWindow.once('ready-to-show', readyToShow);
+    })();
     targetWindow.once('closed', () => {
         targetWindow = null;
     });

@@ -51,7 +51,13 @@ const createWindow = (
 
   targetWindow.loadFile(filePath);
 
-  targetWindow.once('ready-to-show', targetWindow.show);
+  (() => {
+    let readyToShow = () => {
+      targetWindow.show();
+      require(join(__dirname, 'modules', 'load-settings.js'))(app, mainWindow);
+    };
+    targetWindow.once('ready-to-show', readyToShow);
+  })();
 
   targetWindow.once('closed', () => {
     /**
