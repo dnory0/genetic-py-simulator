@@ -44,7 +44,7 @@ const clearChart: (chart: Chart, categories?: boolean) => void =
  * @param response response of pyshell
  */
 const treatResponse = (response: object) => {
-  if (response['fitness'] !== undefined) {
+  if (response['generation'] !== undefined) {
     // mostFittest processing work is done here instead of being in preload file
     // is to avoid race conditions because sideChart latest data is taken of it.
     // probably needs to moved on another file that imports reload file (when every
@@ -102,8 +102,7 @@ let sideChart: Chart = window['createChart']('side-chart', {
     title: {
       text: 'Gene'
     },
-    tickInterval: 1,
-    endOnTick: false
+    tickInterval: 1
   },
   series: [
     {

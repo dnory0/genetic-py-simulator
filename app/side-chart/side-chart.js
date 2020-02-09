@@ -6,7 +6,7 @@ let mostFittest = { fitness: -1, individuals: null };
 const enableChartHover = window['enableChartHover'];
 const clearChart = window['clearChart'];
 const treatResponse = (response) => {
-    if (response['fitness'] !== undefined) {
+    if (response['generation'] !== undefined) {
         if (mostFittest['fitness'] < response['fitness']) {
             mostFittest['fitness'] = response['fitness'];
             mostFittest['individuals'] = [
@@ -52,8 +52,7 @@ let sideChart = window['createChart']('side-chart', {
         title: {
             text: 'Gene'
         },
-        tickInterval: 1,
-        endOnTick: false
+        tickInterval: 1
     },
     series: [
         {

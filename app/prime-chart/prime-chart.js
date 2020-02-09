@@ -6,12 +6,19 @@ delete window['ipcRenderer'];
 const enableChartHover = window['enableChartHover'];
 const clearChart = window['clearChart'];
 const treatResponse = (response) => {
-    if (response['fitness'] !== undefined) {
+    if (response['generation'] !== undefined) {
+        if (response['fitness'] < primeChart.yAxis[0].getExtremes().min) {
+            primeChart.yAxis[0].setExtremes(response['fitness'], primeChart.yAxis[0].getExtremes().max, false);
+        }
+        if (primeChart.yAxis[0].getExtremes().max < response['fitness']) {
+            primeChart.yAxis[0].setExtremes(primeChart.yAxis[0].getExtremes().min, response['fitness'] + 0.05, false);
+        }
         primeChart.series[0].addPoint(parseInt(response['fitness']), liveRendering.isLive || liveRendering.stepForward, false, false);
         if (liveRendering.stepForward)
             liveRendering.stepForward = false;
     }
     else if (response['started']) {
+        primeChart.yAxis[0].setExtremes(response['fitness'], response['fitness'] + 0.1);
         clearChart(primeChart);
         enableChartHover(response['first-step'], primeChart);
     }

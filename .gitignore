@@ -104,3 +104,4 @@ import*
 lib*
 scripts/dist-python.*
 scripts/pyinstaller-install.*
+**/temp.*

@@ -43,7 +43,21 @@ const clearChart: (chart: Chart, categories?: boolean) => void =
  * @param response response of pyshell
  */
 const treatResponse = (response: object) => {
-  if (response['fitness'] !== undefined) {
+  if (response['generation'] !== undefined) {
+    if (response['fitness'] < primeChart.yAxis[0].getExtremes().min) {
+      primeChart.yAxis[0].setExtremes(
+        response['fitness'],
+        primeChart.yAxis[0].getExtremes().max,
+        false
+      );
+    }
+    if (primeChart.yAxis[0].getExtremes().max < response['fitness']) {
+      primeChart.yAxis[0].setExtremes(
+        primeChart.yAxis[0].getExtremes().min,
+        response['fitness'] + 0.05,
+        false
+      );
+    }
     // every point is added to primeChart
     primeChart.series[0].addPoint(
       parseInt(response['fitness']),
@@ -53,6 +67,10 @@ const treatResponse = (response: object) => {
     );
     if (liveRendering.stepForward) liveRendering.stepForward = false;
   } else if (response['started']) {
+    primeChart.yAxis[0].setExtremes(
+      response['fitness'],
+      response['fitness'] + 0.1
+    );
     // clear past results
     clearChart(primeChart);
     // disable points on hover on chart if it's not just a step forward
