@@ -8,16 +8,19 @@
   </head>
 
   <body>
+    <!-- #region Loading-->
     <div
       id="loading-bg"
-      style="height: 100%; text-align: center; position: absolute; transition: opacity 0.2s; height: 100%; width: 100%;"
+      style="height: 100%; text-align: center; position: absolute; transition: opacity 0.2s; height: 100%; width: 100%; overflow: hidden;"
     >
       <img
-        src="img/loading-bg.gif"
+        src="img/loading.svg"
         alt="Loading..."
-        style="height: 40vh; margin: auto; margin-top: 30vh;"
+        style="height: 32vh; margin: auto; margin-top: 33vh;"
       />
     </div>
+    <!-- #endregion -->
+    <!-- #region Main-->
     <div id="main">
       <div class="prime-container">
         <webview
@@ -207,6 +210,7 @@
       </div>
       <div class="bottom-container"></div>
     </div>
+    <!-- #endregion -->
     <script>
       let exports = {};
     </script>

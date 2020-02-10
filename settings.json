@@ -1,0 +1,41 @@
+{
+  "app": {
+    "width": 720,
+    "height": 500
+  },
+  "renderer": {
+    "ui": {
+      "horizontal": {
+        "height": 410
+      },
+      "vertical": {
+        "width": 440
+      }
+    },
+    "controls": {
+      "live-rendering": true
+    },
+    "parameters": {
+      "population": {
+        "size": 100,
+        "random": false
+      },
+      "genes": {
+        "number": 80,
+        "random": false
+      },
+      "crossover": {
+        "rate": 0.15,
+        "random": false
+      },
+      "mutation": {
+        "rate": 0.013,
+        "random": false
+      },
+      "delay": {
+        "rate": 0,
+        "random": false
+      }
+    }
+  }
+}

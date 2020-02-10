@@ -4,6 +4,10 @@ const electron_1 = require("electron");
 const path_1 = require("path");
 const isDev = process.argv.some(arg => ['--dev', '-D', '-d'].includes(arg));
 let mainWindow;
+let runSettings;
+let reloaded = false;
+let loadSettings = (fn) => require(path_1.join(__dirname, 'modules', 'load-settings.js'))(electron_1.app, fn);
+loadSettings((settings) => (runSettings = settings));
 const createWindow = (filePath, { minWidth, minHeight, width, height, resizable, minimizable, maximizable, parent, frame, webPreferences: { preload, webviewTag } } = {}) => {
     let targetWindow = new electron_1.BrowserWindow({
         minWidth,
@@ -22,7 +26,6 @@ const createWindow = (filePath, { minWidth, minHeight, width, height, resizable,
         }
     });
     targetWindow.loadFile(filePath);
-    targetWindow.once('ready-to-show', targetWindow.show);
     targetWindow.once('closed', () => {
         targetWindow = null;
     });
@@ -47,10 +50,34 @@ electron_1.app.once('ready', () => {
         mainWindow.setMenuBarVisibility(true);
         mainWindow.setAutoHideMenuBar(false);
     });
-    electron_1.app.applicationMenu = require(path_1.join(__dirname, 'modules', 'menubar.js'))(isDev, mainWindow);
+    electron_1.app.applicationMenu = require(path_1.join(__dirname, 'modules', 'menubar.js'))(isDev, mainWindow, () => (reloaded = true));
     mainWindow.webContents.on('ipc-message', (_ev, channel) => {
         if (channel == 'mode')
             mainWindow.webContents.send('mode', isDev);
+        else if (channel == 'settings' && reloaded)
+            loadSettings(settings => {
+                runSettings = settings;
+                mainWindow.webContents.send('settings', settings);
+            });
     });
+    (() => {
+        let readyToShow = () => {
+            mainWindow.webContents.send('settings', runSettings);
+            mainWindow.setSize(runSettings['app']['width'], runSettings['app']['height']);
+            mainWindow.show();
+        };
+        mainWindow.once('ready-to-show', () => {
+            if (runSettings)
+                readyToShow();
+            else {
+                let settingsTimer = setInterval(() => {
+                    if (!runSettings)
+                        return;
+                    clearInterval(settingsTimer);
+                    readyToShow();
+                }, 100);
+            }
+        });
+    })();
 });
 //# sourceMappingURL=main.js.map

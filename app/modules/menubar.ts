@@ -6,7 +6,11 @@ import {
   globalShortcut
 } from 'electron';
 
-module.exports = (isDev: boolean, targetWindow: BrowserWindow) => {
+module.exports = (
+  isDev: boolean,
+  targetWindow: BrowserWindow,
+  beforeReload: CallableFunction
+) => {
   delete require.cache[require.resolve('./menubar')];
   /**
    * zooms in on the renderer process
@@ -46,7 +50,12 @@ module.exports = (isDev: boolean, targetWindow: BrowserWindow) => {
       label: '&View',
       submenu: [
         {
-          role: 'reload'
+          label: '&Reload',
+          accelerator: 'Ctrl+R',
+          click: () => {
+            beforeReload();
+            targetWindow.reload();
+          }
         },
         { type: 'separator' },
         {

@@ -1,12 +1,7 @@
-import { ChildProcess } from 'child_process';
 import { IpcRenderer, WebviewTag, IpcRendererEvent, WebFrame } from 'electron';
 
 /***************************** passed by preload *****************************
  *****************************************************************************/
-/**
- * python process that executes GA
- */
-let pyshell: ChildProcess;
 /**
  * used to listen to zoom channel for wain process to send zoom in/out/reset.
  */
@@ -228,6 +223,26 @@ toStartBtn.onclick = () => ctrlClicked('replay', true);
 
 stepFBtn.onclick = () => ctrlClicked('step_f', false);
 
+/******** Declared Glabally to be when default settings are recieved ********/
+
+/**
+ * sends pyshel the input value & the accompanying checkbox value, also changes
+ * number input background to white if needed, note that this method should only
+ * be called when number input has valide value, else it might stop the GA.
+ */
+const sendParameter = (
+  numInput: HTMLInputElement,
+  checkInput: HTMLInputElement
+) => {
+  numInput.style.backgroundColor = '#fff';
+  window['sendSig'](
+    JSON.stringify({
+      [numInput.name]: parseFloat(numInput.value),
+      [checkInput.name]: checkInput.checked
+    })
+  );
+};
+
 /********************************* Views Setup *********************************/
 document.addEventListener('DOMContentLoaded', function loaded() {
   document.removeEventListener('DOMContentLoaded', loaded);
@@ -252,7 +267,7 @@ document.addEventListener('DOMContentLoaded', function loaded() {
       };
 
       zoomViews = window['ready'](
-        pyshell,
+        window['pyshell'],
         prime,
         side,
         treatResponse,
@@ -261,6 +276,7 @@ document.addEventListener('DOMContentLoaded', function loaded() {
       zoomViews();
       window['loaded']();
       delete window['ready'];
+      delete window['pyshell'];
       delete window['loaded'];
     };
 
@@ -271,24 +287,6 @@ document.addEventListener('DOMContentLoaded', function loaded() {
     side.addEventListener('dom-ready', () => ready());
   })();
   /**************************** Ranges change handling ****************************/
-
-  /**
-   * sends pyshel the input value & the accompanying checkbox value, also changes
-   * number input background to white if needed, note that this method should only
-   * be called when number input has valide value, else it might stop the GA.
-   */
-  const sendParameter = (
-    numInput: HTMLInputElement,
-    checkInput: HTMLInputElement
-  ) => {
-    numInput.style.backgroundColor = '#fff';
-    window['sendSig'](
-      JSON.stringify({
-        [numInput.name]: parseFloat(numInput.value),
-        [checkInput.name]: checkInput.checked
-      })
-    );
-  };
 
   /**
    * called when range inputs change value, to update accompanying number input & pass
@@ -465,8 +463,14 @@ document.addEventListener('DOMContentLoaded', function loaded() {
   /**
    * terminate pyshell process with its threads on close or reload
    */
-  window.addEventListener('beforeunload', () => window['sendSig']('exit'));
+  window.addEventListener('beforeunload', () => {
+    document.getElementById('main').style.display = 'none';
+    window['sendSig']('exit');
+  });
 });
+
+// request settings
+ipcRenderer.send('settings');
 
 // request mode
 ipcRenderer.send('mode');
@@ -480,6 +484,43 @@ ipcRenderer.once('mode', (_ev, isDev: boolean) => {
     delete window['k-shorts'];
   }
   window['isDev'] = isDev;
-  pyshell = window['pyshell'];
-  delete window['pyshell'];
+  // send updates to GA
+  sendParameter(popSize, pSRandom);
+  sendParameter(genesNum, gNRandom);
+  sendParameter(crossover, coRandom);
+  sendParameter(mutation, mutRandom);
+  sendParameter(delay, delayRandom);
+  // send live-rendering value to prime
+  prime.addEventListener('did-finish-load', () =>
+    prime.send('update-mode', lRSwitch.checked)
+  );
+});
+
+ipcRenderer.once('settings', (_ev: IpcRendererEvent, settings: object) => {
+  // apply on inputs && their random checkboxs, on ranges if present on a parameter
+  popSize.value = settings['renderer']['parameters']['population']['size'];
+  pSRandom.value = settings['renderer']['parameters']['population']['random'];
+  genesNum.value = settings['renderer']['parameters']['genes']['number'];
+  gNRandom.value = settings['renderer']['parameters']['genes']['random'];
+  crossover.value = settings['renderer']['parameters']['crossover']['rate'];
+  (<HTMLInputElement>crossover.parentElement.firstElementChild).value =
+    settings['renderer']['parameters']['crossover']['rate'];
+  coRandom.value = settings['renderer']['parameters']['crossover']['random'];
+  mutation.value = settings['renderer']['parameters']['mutation']['rate'];
+  (<HTMLInputElement>mutation.parentElement.firstElementChild).value =
+    settings['renderer']['parameters']['mutation']['rate'];
+  mutRandom.value = settings['renderer']['parameters']['mutation']['random'];
+  delay.value = settings['renderer']['parameters']['delay']['rate'];
+  (<HTMLInputElement>delay.parentElement.firstElementChild).value =
+    settings['renderer']['parameters']['delay']['rate'];
+  delayRandom.value = settings['renderer']['parameters']['delay']['random'];
+
+  // apply on live-rendering switch
+  lRSwitch.checked = settings['renderer']['controls']['live-rendering'];
+  // // send live-rendering value to prime
+  // prime.addEventListener('did-finish-load', () => {
+  //   prime.send('update-mode', lRSwitch.checked);
+  // });
+  // resize the prime chart container
+  prime.parentElement.style.height = settings['renderer']['ui']['horizontal'];
 });

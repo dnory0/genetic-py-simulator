@@ -140,7 +140,8 @@ class GAThread(threading.Thread):
         to_json({
             "started": True,
             "first-step": self.__pause_now,
-            "genesNum": pop.genes_num
+            "genesNum": pop.genes_num,
+            "fitness": pop.fittest().fitness(),
         })
         
         # first generated solutions (generation 0)

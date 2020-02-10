@@ -99,8 +99,8 @@ index.js
 SOURCES.md
 TODO.*
 IDEA.*
-settings.json
 import*
 lib*
 scripts/dist-python.*
 scripts/pyinstaller-install.*
+**/temp.*
