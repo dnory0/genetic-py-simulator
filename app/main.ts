@@ -10,6 +10,24 @@ const isDev = process.argv.some(arg => ['--dev', '-D', '-d'].includes(arg));
  */
 let mainWindow: BrowserWindow;
 /**
+ * settings
+ */
+let runSettings: object;
+/**
+ * on first loading is false, after reloading is set to true
+ */
+let reloaded = false;
+/**
+ * loads app settings
+ *
+ * @param fn callback function to execute after reading settings.json file
+ */
+let loadSettings = (fn: (settings: object) => void) =>
+  require(join(__dirname, 'modules', 'load-settings.js'))(app, fn);
+
+loadSettings((settings: object) => (runSettings = settings));
+
+/**
  * @param filePath  string path to an HTML file relative to the root of your application
  * @param options   constructor options for the browser window returned
  */
@@ -46,8 +64,6 @@ const createWindow = (
   });
 
   targetWindow.loadFile(filePath);
-
-  targetWindow.once('ready-to-show', targetWindow.show);
 
   targetWindow.once('closed', () => {
     /**
@@ -88,12 +104,41 @@ app.once('ready', () => {
    */
   app.applicationMenu = require(join(__dirname, 'modules', 'menubar.js'))(
     isDev,
-    mainWindow
+    mainWindow,
+    () => (reloaded = true)
   );
 
   mainWindow.webContents.on('ipc-message', (_ev, channel) => {
     if (channel == 'mode') mainWindow.webContents.send('mode', isDev);
+    else if (channel == 'settings' && reloaded)
+      loadSettings(settings => {
+        runSettings = settings;
+        mainWindow.webContents.send('settings', settings);
+      });
   });
+
+  (() => {
+    let readyToShow = () => {
+      mainWindow.webContents.send('settings', runSettings);
+      mainWindow.setSize(
+        runSettings['app']['width'],
+        runSettings['app']['height']
+      );
+
+      mainWindow.show();
+    };
+
+    mainWindow.once('ready-to-show', () => {
+      if (runSettings) readyToShow();
+      else {
+        let settingsTimer = setInterval(() => {
+          if (!runSettings) return;
+          clearInterval(settingsTimer);
+          readyToShow();
+        }, 100);
+      }
+    });
+  })();
 });
 
 // writeFile(
