@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-let pyshell;
 let ipcRenderer = window['ipcRenderer'];
 delete window['ipcRenderer'];
 let webFrame = window['webFrame'];
@@ -73,6 +72,13 @@ playBtn.onclick = () => ctrlClicked(isRunning ? 'pause' : 'play', !isRunning);
 stopBtn.onclick = () => ctrlClicked('stop', false);
 toStartBtn.onclick = () => ctrlClicked('replay', true);
 stepFBtn.onclick = () => ctrlClicked('step_f', false);
+const sendParameter = (numInput, checkInput) => {
+    numInput.style.backgroundColor = '#fff';
+    window['sendSig'](JSON.stringify({
+        [numInput.name]: parseFloat(numInput.value),
+        [checkInput.name]: checkInput.checked
+    }));
+};
 document.addEventListener('DOMContentLoaded', function loaded() {
     document.removeEventListener('DOMContentLoaded', loaded);
     (() => {
@@ -83,22 +89,16 @@ document.addEventListener('DOMContentLoaded', function loaded() {
                 delete window['isDev'];
                 lRSwitch.onchange = () => prime.send('update-mode', lRSwitch.checked);
             };
-            zoomViews = window['ready'](pyshell, prime, side, treatResponse, webFrame);
+            zoomViews = window['ready'](window['pyshell'], prime, side, treatResponse, webFrame);
             zoomViews();
             window['loaded']();
             delete window['ready'];
+            delete window['pyshell'];
             delete window['loaded'];
         };
         prime.addEventListener('dom-ready', () => ready());
         side.addEventListener('dom-ready', () => ready());
     })();
-    const sendParameter = (numInput, checkInput) => {
-        numInput.style.backgroundColor = '#fff';
-        window['sendSig'](JSON.stringify({
-            [numInput.name]: parseFloat(numInput.value),
-            [checkInput.name]: checkInput.checked
-        }));
-    };
     const rangeChange = (rangeInput, numberInput, checkbox) => {
         setTimeout(() => {
             numberInput.value = rangeInput.value;
@@ -199,8 +199,12 @@ document.addEventListener('DOMContentLoaded', function loaded() {
     });
     window['border']();
     delete window['border'];
-    window.addEventListener('beforeunload', () => window['sendSig']('exit'));
+    window.addEventListener('beforeunload', () => {
+        document.getElementById('main').style.display = 'none';
+        window['sendSig']('exit');
+    });
 });
+ipcRenderer.send('settings');
 ipcRenderer.send('mode');
 ipcRenderer.once('mode', (_ev, isDev) => {
     if (isDev) {
@@ -208,7 +212,31 @@ ipcRenderer.once('mode', (_ev, isDev) => {
         delete window['k-shorts'];
     }
     window['isDev'] = isDev;
-    pyshell = window['pyshell'];
-    delete window['pyshell'];
+    sendParameter(popSize, pSRandom);
+    sendParameter(genesNum, gNRandom);
+    sendParameter(crossover, coRandom);
+    sendParameter(mutation, mutRandom);
+    sendParameter(delay, delayRandom);
+    prime.addEventListener('did-finish-load', () => prime.send('update-mode', lRSwitch.checked));
+});
+ipcRenderer.once('settings', (_ev, settings) => {
+    popSize.value = settings['renderer']['parameters']['population']['size'];
+    pSRandom.value = settings['renderer']['parameters']['population']['random'];
+    genesNum.value = settings['renderer']['parameters']['genes']['number'];
+    gNRandom.value = settings['renderer']['parameters']['genes']['random'];
+    crossover.value = settings['renderer']['parameters']['crossover']['rate'];
+    crossover.parentElement.firstElementChild.value =
+        settings['renderer']['parameters']['crossover']['rate'];
+    coRandom.value = settings['renderer']['parameters']['crossover']['random'];
+    mutation.value = settings['renderer']['parameters']['mutation']['rate'];
+    mutation.parentElement.firstElementChild.value =
+        settings['renderer']['parameters']['mutation']['rate'];
+    mutRandom.value = settings['renderer']['parameters']['mutation']['random'];
+    delay.value = settings['renderer']['parameters']['delay']['rate'];
+    delay.parentElement.firstElementChild.value =
+        settings['renderer']['parameters']['delay']['rate'];
+    delayRandom.value = settings['renderer']['parameters']['delay']['random'];
+    lRSwitch.checked = settings['renderer']['controls']['live-rendering'];
+    prime.parentElement.style.height = settings['renderer']['ui']['horizontal'];
 });
 //# sourceMappingURL=renderer.js.map

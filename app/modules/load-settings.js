@@ -2,14 +2,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const path_1 = require("path");
 const fs_1 = require("fs");
-function loadSettings(app, mainWindow) {
+function loadSettings(app, fn) {
     delete require.cache['./load-settings'];
     let Settingspath = path_1.join(app.getPath('userData'), 'settings.json');
     let resetSettings = () => {
-        fs_1.readFile(path_1.join(app.getAppPath(), '..', 'settings.json'), { encoding: 'utf8' }, (err, data) => {
+        fs_1.readFile(path_1.join(__dirname, '..', '..', 'settings.json'), { encoding: 'utf8' }, (err, data) => {
             if (err)
                 throw err;
-            mainWindow.webContents.send('settings', JSON.parse(data));
+            fn(JSON.parse(data));
             fs_1.writeFile(Settingspath, data, err => {
                 if (err)
                     throw err;
@@ -22,7 +22,7 @@ function loadSettings(app, mainWindow) {
                 throw err;
             try {
                 let settings = JSON.parse(data);
-                mainWindow.webContents.send('settings', settings);
+                fn(settings);
             }
             catch (error) {
                 resetSettings();

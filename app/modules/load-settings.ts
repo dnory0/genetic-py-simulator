@@ -1,8 +1,15 @@
-import { App, BrowserWindow } from 'electron';
+import { App } from 'electron';
 import { join } from 'path';
 import { writeFile, existsSync, readFile } from 'fs';
 
-function loadSettings(app: App, mainWindow: BrowserWindow) {
+/**
+ * loads the app settings, if not found, or corrupted, it will load
+ * the default setting from app default installation direectory.
+ *
+ * @param app used to get the settings.json directory
+ * @param fn a callback to execute after loading and parsing the settings
+ */
+function loadSettings(app: App, fn: (s: object) => void) {
   delete require.cache['./load-settings'];
   /**
    * global app settings, loaded when main window ready to show.
@@ -10,11 +17,11 @@ function loadSettings(app: App, mainWindow: BrowserWindow) {
   let Settingspath = join(app.getPath('userData'), 'settings.json');
   let resetSettings = () => {
     readFile(
-      join(app.getAppPath(), '..', 'settings.json'),
+      join(__dirname, '..', '..', 'settings.json'),
       { encoding: 'utf8' },
       (err: NodeJS.ErrnoException, data: string) => {
         if (err) throw err;
-        mainWindow.webContents.send('settings', JSON.parse(data));
+        fn(JSON.parse(data));
         writeFile(Settingspath, data, err => {
           if (err) throw err;
         });
@@ -29,7 +36,7 @@ function loadSettings(app: App, mainWindow: BrowserWindow) {
         if (err) throw err;
         try {
           let settings = JSON.parse(data);
-          mainWindow.webContents.send('settings', settings);
+          fn(settings);
         } catch (error) {
           // console.error(error);
           resetSettings(); // my guess is the settings file has a json syntax error (usualy when altered by user)
