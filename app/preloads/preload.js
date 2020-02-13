@@ -8,6 +8,9 @@ window['webFrame'] = electron_1.webFrame;
 window['ready'] = require(path_1.join(__dirname, '..', 'modules', 'ready.js'));
 window['loaded'] = require(path_1.join(__dirname, '..', 'modules', 'loaded.js'));
 window['border'] = require(path_1.join(__dirname, '..', 'modules', 'border.js'));
+require(path_1.join(__dirname, '..', 'modules', 'load-settings.js'))(path_1.join(app.getPath('userData'), 'settings.json'), path_1.join(__dirname, '..', '..', 'settings.json'), (settings) => {
+    window['settings'] = settings;
+});
 electron_1.ipcRenderer.once('mode', (_ev, isDev) => {
     if (isDev)
         window['k-shorts'] = require(path_1.join(__dirname, '..', 'modules', 'k-shorts.js'));

@@ -54,6 +54,6 @@ let primeChart = window['createChart']('prime-chart', {
 });
 delete window['createChart'];
 ipcRenderer.on('data', (_event, data) => treatResponse(data));
-ipcRenderer.on('update-mode', (_ev, newLR) => (liveRendering.isLive = newLR));
+ipcRenderer.on('live-rendering', (_ev, newLR) => (liveRendering.isLive = newLR));
 ipcRenderer.on('step-forward', () => (liveRendering.stepForward = true));
 //# sourceMappingURL=prime-chart.js.map

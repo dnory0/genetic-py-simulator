@@ -51,6 +51,15 @@ let toStartBtn = <HTMLButtonElement>document.getElementById('to-start-btn');
  */
 let stepFBtn = <HTMLButtonElement>document.getElementById('step-forward-btn');
 
+/****************************** GA Settings ******************************/
+/**
+ * checkbox that acts as a switch for enabling/disabling live rendering,
+ * if enabled chart updates every time a point (Generation) is added,
+ * if disabled chart update when the GA is paused or stopped,
+ * default is enabled
+ */
+let lRSwitch = <HTMLInputElement>document.getElementById('live-rendering');
+
 /***************************** Parameters inputs *****************************/
 
 /**
@@ -103,15 +112,6 @@ let delay = <HTMLInputElement>document.getElementById('delay-rate');
 let delayRandom = <HTMLInputElement>(
   document.getElementById('random-delay-rate')
 );
-
-/****************************** GA Settings ******************************/
-/**
- * checkbox that acts as a switch for enabling/disabling live rendering,
- * if enabled chart updates every time a point (Generation) is added,
- * if disabled chart update when the GA is paused or stopped,
- * default is enabled
- */
-let lRSwitch = <HTMLInputElement>document.getElementById('live-rendering');
 
 /****************************** Python Part ******************************/
 
@@ -249,21 +249,64 @@ document.addEventListener('DOMContentLoaded', function loaded() {
   (() => {
     /**
      * unlock controls and parameters adjusting for user, also set pyshell communication
-     * triggered after both webviews finish loading.
+     * triggered after one of the webviews finish loading.
      */
     let ready = () => {
       /**
-       * hopefully free some memory space.
-       *
-       * Note: setting ready to undefined/null might result in error when
-       * second view finishs loading
+       * triggered after both webviews finish loading.
        */
       ready = () => {
         prime.send('mode', window['isDev']);
         side.send('mode', window['isDev']);
-        delete window['isDev'];
 
-        lRSwitch.onchange = () => prime.send('update-mode', lRSwitch.checked);
+        let settings = window['settings'];
+
+        // apply on inputs && their random checkboxs, on ranges if present on a parameter
+        popSize.value =
+          settings['renderer']['parameters']['population']['size'];
+        pSRandom.checked =
+          settings['renderer']['parameters']['population']['random'];
+        genesNum.value = settings['renderer']['parameters']['genes']['number'];
+        gNRandom.checked =
+          settings['renderer']['parameters']['genes']['random'];
+        crossover.value =
+          settings['renderer']['parameters']['crossover']['rate'];
+        (<HTMLInputElement>crossover.parentElement.firstElementChild).value =
+          settings['renderer']['parameters']['crossover']['rate'];
+        coRandom.checked =
+          settings['renderer']['parameters']['crossover']['random'];
+        mutation.value = settings['renderer']['parameters']['mutation']['rate'];
+        (<HTMLInputElement>mutation.parentElement.firstElementChild).value =
+          settings['renderer']['parameters']['mutation']['rate'];
+        mutRandom.checked =
+          settings['renderer']['parameters']['mutation']['random'];
+        delay.value = settings['renderer']['parameters']['delay']['rate'];
+        (<HTMLInputElement>delay.parentElement.firstElementChild).value =
+          settings['renderer']['parameters']['delay']['rate'];
+        delayRandom.checked =
+          settings['renderer']['parameters']['delay']['random'];
+
+        // send startup settings to pyshell
+        sendParameter(popSize, pSRandom);
+        sendParameter(genesNum, gNRandom);
+        sendParameter(crossover, coRandom);
+        sendParameter(mutation, mutRandom);
+        sendParameter(delay, delayRandom);
+
+        // apply on live-rendering switch
+        lRSwitch.checked = settings['renderer']['controls']['live-rendering'];
+
+        lRSwitch.onchange = () =>
+          prime.send('live-rendering', lRSwitch.checked);
+
+        prime.send('live-rendering', lRSwitch.checked);
+
+        // resize the prime chart container
+        prime.parentElement.style.height =
+          settings['renderer']['ui']['horizontal'];
+
+        delete window['isDev'];
+        delete window['settings'];
       };
 
       zoomViews = window['ready'](
@@ -273,8 +316,11 @@ document.addEventListener('DOMContentLoaded', function loaded() {
         treatResponse,
         webFrame
       );
+
       zoomViews();
+
       window['loaded']();
+
       delete window['ready'];
       delete window['pyshell'];
       delete window['loaded'];
@@ -469,9 +515,6 @@ document.addEventListener('DOMContentLoaded', function loaded() {
   });
 });
 
-// request settings
-ipcRenderer.send('settings');
-
 // request mode
 ipcRenderer.send('mode');
 
@@ -484,43 +527,45 @@ ipcRenderer.once('mode', (_ev, isDev: boolean) => {
     delete window['k-shorts'];
   }
   window['isDev'] = isDev;
-  // send updates to GA
-  sendParameter(popSize, pSRandom);
-  sendParameter(genesNum, gNRandom);
-  sendParameter(crossover, coRandom);
-  sendParameter(mutation, mutRandom);
-  sendParameter(delay, delayRandom);
-  // send live-rendering value to prime
-  prime.addEventListener('did-finish-load', () =>
-    prime.send('update-mode', lRSwitch.checked)
-  );
 });
 
-ipcRenderer.once('settings', (_ev: IpcRendererEvent, settings: object) => {
-  // apply on inputs && their random checkboxs, on ranges if present on a parameter
-  popSize.value = settings['renderer']['parameters']['population']['size'];
-  pSRandom.value = settings['renderer']['parameters']['population']['random'];
-  genesNum.value = settings['renderer']['parameters']['genes']['number'];
-  gNRandom.value = settings['renderer']['parameters']['genes']['random'];
-  crossover.value = settings['renderer']['parameters']['crossover']['rate'];
-  (<HTMLInputElement>crossover.parentElement.firstElementChild).value =
-    settings['renderer']['parameters']['crossover']['rate'];
-  coRandom.value = settings['renderer']['parameters']['crossover']['random'];
-  mutation.value = settings['renderer']['parameters']['mutation']['rate'];
-  (<HTMLInputElement>mutation.parentElement.firstElementChild).value =
-    settings['renderer']['parameters']['mutation']['rate'];
-  mutRandom.value = settings['renderer']['parameters']['mutation']['random'];
-  delay.value = settings['renderer']['parameters']['delay']['rate'];
-  (<HTMLInputElement>delay.parentElement.firstElementChild).value =
-    settings['renderer']['parameters']['delay']['rate'];
-  delayRandom.value = settings['renderer']['parameters']['delay']['random'];
-
-  // apply on live-rendering switch
-  lRSwitch.checked = settings['renderer']['controls']['live-rendering'];
-  // // send live-rendering value to prime
-  // prime.addEventListener('did-finish-load', () => {
-  //   prime.send('update-mode', lRSwitch.checked);
-  // });
-  // resize the prime chart container
-  prime.parentElement.style.height = settings['renderer']['ui']['horizontal'];
+ipcRenderer.on('cur-settings', () => {
+  ipcRenderer.send('cur-settings', {
+    main: {},
+    renderer: {
+      ui: {
+        horizontal: {
+          height: prime.parentElement.offsetHeight
+        },
+        vertical: {
+          width: 440
+        }
+      },
+      controls: {
+        'live-rendering': lRSwitch.checked
+      },
+      parameters: {
+        population: {
+          size: parseInt(popSize.value),
+          random: pSRandom.checked
+        },
+        genes: {
+          number: parseInt(genesNum.value),
+          random: gNRandom.checked
+        },
+        crossover: {
+          rate: parseFloat(crossover.value),
+          random: coRandom.checked
+        },
+        mutation: {
+          rate: parseFloat(mutation.value),
+          random: mutRandom.checked
+        },
+        delay: {
+          rate: parseFloat(delay.value),
+          random: delayRandom.checked
+        }
+      }
+    }
+  });
 });

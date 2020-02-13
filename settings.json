@@ -1,10 +1,13 @@
 {
-  "app": {
+  "main": {
     "width": 720,
-    "height": 500
+    "height": 500,
+    "fscreen": false,
+    "maximized": true
   },
   "renderer": {
     "ui": {
+      "zoom": 1,
       "horizontal": {
         "height": 410
       },
