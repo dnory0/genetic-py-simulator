@@ -10,6 +10,7 @@ let playBtn = document.getElementById('play-btn');
 let stopBtn = document.getElementById('stop-btn');
 let toStartBtn = document.getElementById('to-start-btn');
 let stepFBtn = document.getElementById('step-forward-btn');
+let lRSwitch = document.getElementById('live-rendering');
 let popSize = document.getElementById('pop-size');
 let pSRandom = document.getElementById('random-pop-size');
 let genesNum = document.getElementById('genes-num');
@@ -20,7 +21,6 @@ let mutation = document.getElementById('mutation-rate');
 let mutRandom = (document.getElementById('random-mutation-rate'));
 let delay = document.getElementById('delay-rate');
 let delayRandom = (document.getElementById('random-delay-rate'));
-let lRSwitch = document.getElementById('live-rendering');
 let isRunning = false;
 const treatResponse = (response) => {
     if (response['started']) {
@@ -86,8 +86,42 @@ document.addEventListener('DOMContentLoaded', function loaded() {
             ready = () => {
                 prime.send('mode', window['isDev']);
                 side.send('mode', window['isDev']);
-                delete window['isDev'];
+                let settings = window['settings'];
+                popSize.value =
+                    settings['renderer']['parameters']['population']['size'];
+                pSRandom.checked =
+                    settings['renderer']['parameters']['population']['random'];
+                genesNum.value = settings['renderer']['parameters']['genes']['number'];
+                gNRandom.checked =
+                    settings['renderer']['parameters']['genes']['random'];
+                crossover.value =
+                    settings['renderer']['parameters']['crossover']['rate'];
+                crossover.parentElement.firstElementChild.value =
+                    settings['renderer']['parameters']['crossover']['rate'];
+                coRandom.checked =
+                    settings['renderer']['parameters']['crossover']['random'];
+                mutation.value = settings['renderer']['parameters']['mutation']['rate'];
+                mutation.parentElement.firstElementChild.value =
+                    settings['renderer']['parameters']['mutation']['rate'];
+                mutRandom.checked =
+                    settings['renderer']['parameters']['mutation']['random'];
+                delay.value = settings['renderer']['parameters']['delay']['rate'];
+                delay.parentElement.firstElementChild.value =
+                    settings['renderer']['parameters']['delay']['rate'];
+                delayRandom.checked =
+                    settings['renderer']['parameters']['delay']['random'];
+                sendParameter(popSize, pSRandom);
+                sendParameter(genesNum, gNRandom);
+                sendParameter(crossover, coRandom);
+                sendParameter(mutation, mutRandom);
+                sendParameter(delay, delayRandom);
+                lRSwitch.checked = settings['renderer']['controls']['live-rendering'];
                 lRSwitch.onchange = () => prime.send('update-mode', lRSwitch.checked);
+                prime.send('update-mode', lRSwitch.checked);
+                prime.parentElement.style.height =
+                    settings['renderer']['ui']['horizontal'];
+                delete window['isDev'];
+                delete window['settings'];
             };
             zoomViews = window['ready'](window['pyshell'], prime, side, treatResponse, webFrame);
             zoomViews();
@@ -204,7 +238,6 @@ document.addEventListener('DOMContentLoaded', function loaded() {
         window['sendSig']('exit');
     });
 });
-ipcRenderer.send('settings');
 ipcRenderer.send('mode');
 ipcRenderer.once('mode', (_ev, isDev) => {
     if (isDev) {
@@ -212,31 +245,45 @@ ipcRenderer.once('mode', (_ev, isDev) => {
         delete window['k-shorts'];
     }
     window['isDev'] = isDev;
-    sendParameter(popSize, pSRandom);
-    sendParameter(genesNum, gNRandom);
-    sendParameter(crossover, coRandom);
-    sendParameter(mutation, mutRandom);
-    sendParameter(delay, delayRandom);
-    prime.addEventListener('did-finish-load', () => prime.send('update-mode', lRSwitch.checked));
 });
-ipcRenderer.once('settings', (_ev, settings) => {
-    popSize.value = settings['renderer']['parameters']['population']['size'];
-    pSRandom.value = settings['renderer']['parameters']['population']['random'];
-    genesNum.value = settings['renderer']['parameters']['genes']['number'];
-    gNRandom.value = settings['renderer']['parameters']['genes']['random'];
-    crossover.value = settings['renderer']['parameters']['crossover']['rate'];
-    crossover.parentElement.firstElementChild.value =
-        settings['renderer']['parameters']['crossover']['rate'];
-    coRandom.value = settings['renderer']['parameters']['crossover']['random'];
-    mutation.value = settings['renderer']['parameters']['mutation']['rate'];
-    mutation.parentElement.firstElementChild.value =
-        settings['renderer']['parameters']['mutation']['rate'];
-    mutRandom.value = settings['renderer']['parameters']['mutation']['random'];
-    delay.value = settings['renderer']['parameters']['delay']['rate'];
-    delay.parentElement.firstElementChild.value =
-        settings['renderer']['parameters']['delay']['rate'];
-    delayRandom.value = settings['renderer']['parameters']['delay']['random'];
-    lRSwitch.checked = settings['renderer']['controls']['live-rendering'];
-    prime.parentElement.style.height = settings['renderer']['ui']['horizontal'];
+ipcRenderer.on('cur-settings', () => {
+    ipcRenderer.send('cur-settings', {
+        app: {},
+        renderer: {
+            ui: {
+                horizontal: {
+                    height: prime.parentElement.offsetHeight
+                },
+                vertical: {
+                    width: 440
+                }
+            },
+            controls: {
+                'live-rendering': lRSwitch.checked
+            },
+            parameters: {
+                population: {
+                    size: parseInt(popSize.value),
+                    random: pSRandom.checked
+                },
+                genes: {
+                    number: parseInt(genesNum.value),
+                    random: gNRandom.checked
+                },
+                crossover: {
+                    rate: parseFloat(crossover.value),
+                    random: coRandom.checked
+                },
+                mutation: {
+                    rate: parseFloat(mutation.value),
+                    random: mutRandom.checked
+                },
+                delay: {
+                    rate: parseFloat(delay.value),
+                    random: delayRandom.checked
+                }
+            }
+        }
+    });
 });
 //# sourceMappingURL=renderer.js.map

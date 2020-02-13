@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const electron_1 = require("electron");
-module.exports = (isDev, targetWindow, beforeReload) => {
+module.exports = (isDev, targetWindow) => {
     delete require.cache[require.resolve('./menubar')];
     const zoomin = () => targetWindow.webContents.send('zoom', 'in');
     const zoomout = () => targetWindow.webContents.send('zoom', 'out');
@@ -29,12 +29,7 @@ module.exports = (isDev, targetWindow, beforeReload) => {
             label: '&View',
             submenu: [
                 {
-                    label: '&Reload',
-                    accelerator: 'Ctrl+R',
-                    click: () => {
-                        beforeReload();
-                        targetWindow.reload();
-                    }
+                    role: 'reload'
                 },
                 { type: 'separator' },
                 {

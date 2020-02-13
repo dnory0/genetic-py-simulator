@@ -1,5 +1,11 @@
-import { app, BrowserWindow, BrowserWindowConstructorOptions } from 'electron';
+import {
+  app,
+  BrowserWindow,
+  BrowserWindowConstructorOptions,
+  Rectangle
+} from 'electron';
 import { join } from 'path';
+import { writeFile } from 'fs';
 
 /**
  * set to true if app on development, false in production.
@@ -14,18 +20,15 @@ let mainWindow: BrowserWindow;
  */
 let runSettings: object;
 /**
- * on first loading is false, after reloading is set to true
- */
-let reloaded = false;
-/**
  * loads app settings
  *
  * @param fn callback function to execute after reading settings.json file
  */
-let loadSettings = (fn: (settings: object) => void) =>
-  require(join(__dirname, 'modules', 'load-settings.js'))(app, fn);
-
-loadSettings((settings: object) => (runSettings = settings));
+require(join(__dirname, 'modules', 'load-settings.js'))(
+  join(app.getPath('userData'), 'settings.json'),
+  join(__dirname, '..', 'settings.json'),
+  (settings: object) => (runSettings = settings)
+);
 
 /**
  * @param filePath  string path to an HTML file relative to the root of your application
@@ -75,7 +78,7 @@ const createWindow = (
 };
 
 app.once('ready', () => {
-  if (isDev) (<any>process.env['ELECTRON_DISABLE_SECURITY_WARNINGS']) = true;
+  (<any>process.env['ELECTRON_DISABLE_SECURITY_WARNINGS']) = true;
 
   // creates main window
   mainWindow = createWindow(join(__dirname, 'index.html'), {
@@ -104,26 +107,27 @@ app.once('ready', () => {
    */
   app.applicationMenu = require(join(__dirname, 'modules', 'menubar.js'))(
     isDev,
-    mainWindow,
-    () => (reloaded = true)
+    mainWindow
   );
 
   mainWindow.webContents.on('ipc-message', (_ev, channel) => {
     if (channel == 'mode') mainWindow.webContents.send('mode', isDev);
-    else if (channel == 'settings' && reloaded)
-      loadSettings(settings => {
-        runSettings = settings;
-        mainWindow.webContents.send('settings', settings);
-      });
   });
 
   (() => {
     let readyToShow = () => {
-      mainWindow.webContents.send('settings', runSettings);
       mainWindow.setSize(
-        runSettings['app']['width'],
-        runSettings['app']['height']
+        runSettings['app']['width'] ? runSettings['app']['width'] : 720,
+        runSettings['app']['height'] ? runSettings['app']['height'] : 500
       );
+      if (runSettings['app']['x'] && runSettings['app']['y'])
+        mainWindow.setBounds({
+          x: runSettings['app']['x'] ? runSettings['app']['x'] : -200,
+          y: runSettings['app']['y'] ? runSettings['app']['y'] : -200
+        } as Rectangle);
+
+      mainWindow.setFullScreen(runSettings['app']['fscreen'] ? true : false);
+      if (runSettings['app']['maximized']) mainWindow.maximize();
 
       mainWindow.show();
     };
@@ -139,15 +143,32 @@ app.once('ready', () => {
       }
     });
   })();
-});
 
-// writeFile(
-//   join(__dirname, '..', 'settings.json'),
-//   'test content 🚀🚀🚀🚀',
-//   (error: NodeJS.ErrnoException) => {
-//     if (error) throw error;
-//   }
-// );
+  mainWindow.on('close', () => {
+    mainWindow.webContents.send('cur-settings');
+    mainWindow.webContents.once(
+      'ipc-message',
+      (_ev, channel, settings: object) => {
+        if (channel != 'cur-settings') return;
+        settings['app']['fscreen'] = mainWindow.isFullScreen();
+        settings['app']['maximized'] = mainWindow.isMaximized();
+        settings['app']['width'] = mainWindow.getSize()[0];
+        settings['app']['height'] = mainWindow.getSize()[1];
+        if (mainWindow.getBounds().x && mainWindow.getBounds().y) {
+          settings['app']['x'] = mainWindow.getBounds().x;
+          settings['app']['y'] = mainWindow.getBounds().y;
+        }
+        writeFile(
+          join(app.getPath('userData'), 'settings.json'),
+          JSON.stringify(settings),
+          err => {
+            if (err) throw err;
+          }
+        );
+      }
+    );
+  });
+});
 
 // mkdir(
 //   isDev
