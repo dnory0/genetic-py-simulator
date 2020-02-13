@@ -24,6 +24,18 @@ window['loaded'] = require(join(__dirname, '..', 'modules', 'loaded.js'));
  * add resizabality for webviews and other parts of the UI
  */
 window['border'] = require(join(__dirname, '..', 'modules', 'border.js'));
+
+/**
+ * loads app settings
+ */
+require(join(__dirname, '..', 'modules', 'load-settings.js'))(
+  join(app.getPath('userData'), 'settings.json'),
+  join(__dirname, '..', '..', 'settings.json'),
+  (settings: object) => {
+    window['settings'] = settings;
+  }
+);
+
 ipcRenderer.once('mode', (_ev, isDev: boolean) => {
   /**
    * some keyboard shortcuts can't be implemented in the main process so they

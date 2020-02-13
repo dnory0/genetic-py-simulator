@@ -1,36 +1,35 @@
-import { App } from 'electron';
-import { join } from 'path';
 import { writeFile, existsSync, readFile } from 'fs';
 
 /**
  * loads the app settings, if not found, or corrupted, it will load
  * the default setting from app default installation direectory.
  *
- * @param app used to get the settings.json directory
+ * @param settingsPath path to application settings
+ * @param defSettingsPaththe default application settings path
  * @param fn a callback to execute after loading and parsing the settings
  */
-function loadSettings(app: App, fn: (s: object) => void) {
+function loadSettings(
+  settingsPath: string,
+  defSettingsPath: string,
+  fn: (s: object) => void
+) {
   delete require.cache['./load-settings'];
-  /**
-   * global app settings, loaded when main window ready to show.
-   */
-  let Settingspath = join(app.getPath('userData'), 'settings.json');
   let resetSettings = () => {
     readFile(
-      join(__dirname, '..', '..', 'settings.json'),
+      defSettingsPath,
       { encoding: 'utf8' },
       (err: NodeJS.ErrnoException, data: string) => {
         if (err) throw err;
         fn(JSON.parse(data));
-        writeFile(Settingspath, data, err => {
+        writeFile(settingsPath, data, err => {
           if (err) throw err;
         });
       }
     );
   };
-  if (existsSync(Settingspath)) {
+  if (existsSync(settingsPath)) {
     readFile(
-      Settingspath,
+      settingsPath,
       { encoding: 'utf8' },
       (err: NodeJS.ErrnoException, data: string) => {
         if (err) throw err;
