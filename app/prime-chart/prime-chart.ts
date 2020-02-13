@@ -120,7 +120,7 @@ ipcRenderer.on('data', (_event: IpcRendererEvent, data: object) =>
 );
 
 ipcRenderer.on(
-  'update-mode',
+  'live-rendering',
   (_ev, newLR: boolean) => (liveRendering.isLive = newLR)
 );
 ipcRenderer.on('step-forward', () => (liveRendering.stepForward = true));

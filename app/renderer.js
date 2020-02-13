@@ -116,8 +116,8 @@ document.addEventListener('DOMContentLoaded', function loaded() {
                 sendParameter(mutation, mutRandom);
                 sendParameter(delay, delayRandom);
                 lRSwitch.checked = settings['renderer']['controls']['live-rendering'];
-                lRSwitch.onchange = () => prime.send('update-mode', lRSwitch.checked);
-                prime.send('update-mode', lRSwitch.checked);
+                lRSwitch.onchange = () => prime.send('live-rendering', lRSwitch.checked);
+                prime.send('live-rendering', lRSwitch.checked);
                 prime.parentElement.style.height =
                     settings['renderer']['ui']['horizontal'];
                 delete window['isDev'];

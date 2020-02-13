@@ -296,9 +296,10 @@ document.addEventListener('DOMContentLoaded', function loaded() {
         // apply on live-rendering switch
         lRSwitch.checked = settings['renderer']['controls']['live-rendering'];
 
-        lRSwitch.onchange = () => prime.send('update-mode', lRSwitch.checked);
+        lRSwitch.onchange = () =>
+          prime.send('live-rendering', lRSwitch.checked);
 
-        prime.send('update-mode', lRSwitch.checked);
+        prime.send('live-rendering', lRSwitch.checked);
 
         // resize the prime chart container
         prime.parentElement.style.height =
