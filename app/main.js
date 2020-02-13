@@ -55,14 +55,14 @@ electron_1.app.once('ready', () => {
     });
     (() => {
         let readyToShow = () => {
-            mainWindow.setSize(runSettings['app']['width'] ? runSettings['app']['width'] : 720, runSettings['app']['height'] ? runSettings['app']['height'] : 500);
-            if (runSettings['app']['x'] && runSettings['app']['y'])
+            mainWindow.setSize(runSettings['main']['width'] ? runSettings['main']['width'] : 720, runSettings['main']['height'] ? runSettings['main']['height'] : 500);
+            if (runSettings['main']['x'] && runSettings['main']['y'])
                 mainWindow.setBounds({
-                    x: runSettings['app']['x'] ? runSettings['app']['x'] : -200,
-                    y: runSettings['app']['y'] ? runSettings['app']['y'] : -200
+                    x: runSettings['main']['x'] ? runSettings['main']['x'] : -200,
+                    y: runSettings['main']['y'] ? runSettings['main']['y'] : -200
                 });
-            mainWindow.setFullScreen(runSettings['app']['fscreen'] ? true : false);
-            if (runSettings['app']['maximized'])
+            mainWindow.setFullScreen(runSettings['main']['fscreen'] ? true : false);
+            if (runSettings['main']['maximized'])
                 mainWindow.maximize();
             mainWindow.show();
         };
@@ -84,13 +84,13 @@ electron_1.app.once('ready', () => {
         mainWindow.webContents.once('ipc-message', (_ev, channel, settings) => {
             if (channel != 'cur-settings')
                 return;
-            settings['app']['fscreen'] = mainWindow.isFullScreen();
-            settings['app']['maximized'] = mainWindow.isMaximized();
-            settings['app']['width'] = mainWindow.getSize()[0];
-            settings['app']['height'] = mainWindow.getSize()[1];
+            settings['main']['fscreen'] = mainWindow.isFullScreen();
+            settings['main']['maximized'] = mainWindow.isMaximized();
+            settings['main']['width'] = mainWindow.getSize()[0];
+            settings['main']['height'] = mainWindow.getSize()[1];
             if (mainWindow.getBounds().x && mainWindow.getBounds().y) {
-                settings['app']['x'] = mainWindow.getBounds().x;
-                settings['app']['y'] = mainWindow.getBounds().y;
+                settings['main']['x'] = mainWindow.getBounds().x;
+                settings['main']['y'] = mainWindow.getBounds().y;
             }
             fs_1.writeFile(path_1.join(electron_1.app.getPath('userData'), 'settings.json'), JSON.stringify(settings), err => {
                 if (err)

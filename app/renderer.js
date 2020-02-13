@@ -248,7 +248,7 @@ ipcRenderer.once('mode', (_ev, isDev) => {
 });
 ipcRenderer.on('cur-settings', () => {
     ipcRenderer.send('cur-settings', {
-        app: {},
+        main: {},
         renderer: {
             ui: {
                 horizontal: {
