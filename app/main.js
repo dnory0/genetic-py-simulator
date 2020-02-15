@@ -41,12 +41,12 @@ electron_1.app.once('ready', () => {
         }
     });
     mainWindow.on('enter-full-screen', () => {
-        mainWindow.setAutoHideMenuBar(true);
+        mainWindow.autoHideMenuBar = true;
         mainWindow.setMenuBarVisibility(false);
     });
     mainWindow.on('leave-full-screen', () => {
         mainWindow.setMenuBarVisibility(true);
-        mainWindow.setAutoHideMenuBar(false);
+        mainWindow.autoHideMenuBar = false;
     });
     electron_1.app.applicationMenu = require(path_1.join(__dirname, 'modules', 'menubar.js'))(isDev, mainWindow);
     mainWindow.webContents.on('ipc-message', (_ev, channel) => {
