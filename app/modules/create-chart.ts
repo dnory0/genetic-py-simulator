@@ -30,6 +30,7 @@ module.exports = (containerId: string, options: Options) => {
         lineWidth: 1.5
       },
       series: {
+        clip: false,
         animation: false,
         states: {
           hover: {
