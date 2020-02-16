@@ -60,6 +60,22 @@ let primeChart = window['createChart']('prime-chart', {
         },
         tickInterval: 1
     },
+    tooltip: {
+        formatter() {
+            return `
+          <div style="text-align: right">
+            Generation: <b>${!`${this.x}`.match(/\.5$/)
+                ? this.x
+                : `${this.x - 0.5} - ${this.x + 0.5}`}</b><br>
+            <span style="float: left;">
+            ${!`${this.x}`.match(/\.5$/) ? 'Fitness' : 'Deviation'}:&nbsp;
+            </span>
+            <b>${!`${this.x}`.match(/\.5$/)
+                ? this.y
+                : Math.abs(this.point.high - this.point.low)}</b>
+          </div>`;
+        }
+    },
     series: [
         {
             type: 'line',

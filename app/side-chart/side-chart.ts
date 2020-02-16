@@ -104,6 +104,18 @@ let sideChart: Chart = window['createChart']('side-chart', {
     },
     tickInterval: 1
   },
+  tooltip: {
+    formatter() {
+      return `
+          <div style="text-align: right">
+            Position: <b>${this.x}</b><br>
+            <span style="float: left;">
+              Gene:&nbsp;
+            </span>
+            <b>${this.y}</b>
+          </div>`;
+    }
+  },
   series: [
     {
       data: []
