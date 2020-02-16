@@ -135,24 +135,29 @@ class GAThread(threading.Thread):
     def run(self):
         # initializing the population
         pop = Population(g_pop_size, len(solution.genes))
+        # fittest fitness of the previous generation, used to send deviation value
+        prvFitness = pop.fittest().fitness()
 
         # started signal to the renderer process
         to_json({
             "started": True,
             "first-step": self.__pause_now,
             "genesNum": pop.genes_num,
-            "fitness": pop.fittest().fitness(),
+            "fitness": prvFitness,
         })
         
         # first generated solutions (generation 0)
         to_json({
-            "fitness": pop.fittest().fitness(),
+            "fitness": prvFitness,
             "generation": pop.generation,
             "genes": pop.fittest().genes
         })
 
         while True:
             Evolve.evolve_population(pop)
+
+            # takes the current generation fitness
+            curFitness = pop.fittest().fitness()
 
             # if g_delay_rate is 0 than just ignore it
             if g_delay_rate:
@@ -168,11 +173,19 @@ class GAThread(threading.Thread):
                 to_json({"stopped": True})
                 return
 
+            # moved down, so when GA is heavy (slow), user might stop it before the point is added
+            # the point must not be added, so ga stops before executing below code
             to_json({
-                "fitness": pop.fittest().fitness(),
+                "prv-fitness": prvFitness,
+                "fitness": curFitness,
                 "generation": pop.generation,
-                "genes": pop.fittest().genes
+                "genes": pop.fittest().genes,
+                # "deviation": abs(curFitness - prvFitness),
+                # "min": min(prvFitness, curFitness)
             })
+
+            # update prvFitness
+            prvFitness = curFitness
 
         # finished event
         to_json({"finished": True})

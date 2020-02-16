@@ -67,6 +67,8 @@ window['enableChartHover'] = (enable: boolean, chart: Chart) => {
 window['clearChart'] = (chart: Chart, categories: boolean = false) => {
   if (categories) chart.xAxis[0].setCategories([]);
   chart.series[0].setData([], true);
+  // side chart has only one serie
+  if (chart.series.length > 1) chart.series[2].setData([], true);
 };
 
 ipcRenderer.once('mode', (_ev, isDev) => {
