@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-let liveRendering = { isLive: true, stepForward: false };
+let liveRendering = { isLive: true, stepForward: false, replay: false };
 const ipcRenderer = window['ipcRenderer'];
 delete window['ipcRenderer'];
 const enableChartHover = window['enableChartHover'];
@@ -34,9 +34,12 @@ let treatResponse;
         else if (response['paused'] ||
             response['stopped'] ||
             response['finished']) {
-            primeChart.yAxis[0].setExtremes(min, max);
-            console.log(min + ', ' + max);
-            enableChartHover(true, primeChart);
+            if (liveRendering.replay)
+                liveRendering.replay = false;
+            else {
+                primeChart.yAxis[0].setExtremes(min, max);
+                enableChartHover(true, primeChart);
+            }
         }
         else if (response['resumed'])
             enableChartHover(false, primeChart);
@@ -79,4 +82,5 @@ delete window['createChart'];
 ipcRenderer.on('data', (_event, data) => treatResponse(data));
 ipcRenderer.on('live-rendering', (_ev, newLR) => (liveRendering.isLive = newLR));
 ipcRenderer.on('step-forward', () => (liveRendering.stepForward = true));
+ipcRenderer.on('replay', () => (liveRendering.replay = true));
 //# sourceMappingURL=prime-chart.js.map

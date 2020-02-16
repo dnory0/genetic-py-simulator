@@ -203,6 +203,12 @@ const ctrlClicked = (signal: string, goingToRun: boolean) => {
    */
   if (signal == 'step_f') prime.send('step-forward');
   /**
+   * clicking replay button (relaunch the algorithm) might show a flash of light of
+   * the chart before being removed, this alerts the prime of a replay event so it
+   * prevents the flash.
+   */
+  if (signal == 'replay') prime.send('replay');
+  /**
    * in heavy GA (GA that takes considerable amount of time to generate 1 generation)
    * buttons should be stopped on click instead of waiting GA stopped event.
    */

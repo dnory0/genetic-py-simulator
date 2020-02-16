@@ -8,9 +8,13 @@ import { IpcRendererEvent, IpcRenderer } from 'electron';
  * pressed step forward button, the chart is not going to update that,
  * to fix that, step forward button is set to true after the step forward
  * is pressed, then chart adds the point, redraw, and set step forward
- * button back to false.
+ * button back to false, replay used to remove the flash of showing the
+ * chart and removing it in milliseconds, because replay is stopped event
+ * (which triggers redraw the chart), and started event which clears past
+ * values, the solution is to recieve replay event from host when replay
+ * button is triggered to prevent chart redraw.
  */
-let liveRendering = { isLive: true, stepForward: false };
+let liveRendering = { isLive: true, stepForward: false, replay: false };
 
 /****************************** passed by preload ******************************
  *******************************************************************************/
@@ -86,10 +90,11 @@ let treatResponse: (response: object) => void;
       response['stopped'] ||
       response['finished']
     ) {
-      primeChart.yAxis[0].setExtremes(min, max);
-      console.log(min + ', ' + max);
-
-      enableChartHover(true, primeChart);
+      if (liveRendering.replay) liveRendering.replay = false;
+      else {
+        primeChart.yAxis[0].setExtremes(min, max);
+        enableChartHover(true, primeChart);
+      }
     } else if (response['resumed']) enableChartHover(false, primeChart);
   };
 })();
@@ -146,3 +151,4 @@ ipcRenderer.on(
   (_ev, newLR: boolean) => (liveRendering.isLive = newLR)
 );
 ipcRenderer.on('step-forward', () => (liveRendering.stepForward = true));
+ipcRenderer.on('replay', () => (liveRendering.replay = true));

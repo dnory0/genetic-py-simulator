@@ -62,6 +62,8 @@ let zoomViews = () => { };
 const ctrlClicked = (signal, goingToRun) => {
     if (signal == 'step_f')
         prime.send('step-forward');
+    if (signal == 'replay')
+        prime.send('replay');
     if (signal == 'stop')
         setClickable(false);
     window['sendSig'](signal);
