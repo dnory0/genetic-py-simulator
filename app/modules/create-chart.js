@@ -13,13 +13,13 @@ module.exports = (containerId, options) => {
             formatter() {
                 return `
           <div style="text-align: right">
-            Generation: <b>${Number.isSafeInteger(this.x)
+            Generation: <b>${!`${this.x}`.match(/\.5$/)
                     ? this.x
                     : `${this.x - 0.5} - ${this.x + 0.5}`}</b><br>
             <span style="float: left;">
-              ${Number.isSafeInteger(this.x) ? 'Fitness' : 'Deviation'}:&nbsp;
+              ${!`${this.x}`.match(/\.5$/) ? 'Fitness' : 'Deviation'}:&nbsp;
             </span>
-            <b>${Number.isSafeInteger(this.x)
+            <b>${!`${this.x}`.match(/\.5$/)
                     ? this.y
                     : Math.abs(this.point.high - this.point.low)}</b>
           </div>`;

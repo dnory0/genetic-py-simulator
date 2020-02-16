@@ -90,7 +90,7 @@ class Evolve:
     def update_population(parents: list, offsprings: list):
         for parent_couple, offspring_couple in zip(parents, offsprings):
             for parent, offspring in zip(parent_couple, offspring_couple):
-                if parent.fitness() < Individual.genes_fitness(offspring):
+                # if parent.fitness() < Individual.genes_fitness(offspring):
                     parent.replace_genes(offspring)
 
     @staticmethod
