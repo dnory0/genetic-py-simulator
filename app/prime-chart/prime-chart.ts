@@ -113,7 +113,7 @@ let primeChart: Chart = window['createChart']('prime-chart', {
   },
   yAxis: {
     title: {
-      text: 'Fitness'
+      text: 'Fitness/Deviation'
     },
     tickInterval: 1
   },

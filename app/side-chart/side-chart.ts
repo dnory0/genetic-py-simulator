@@ -95,12 +95,12 @@ let sideChart: Chart = window['createChart']('side-chart', {
   },
   xAxis: {
     title: {
-      text: 'Position'
+      text: 'Gene'
     }
   },
   yAxis: {
     title: {
-      text: 'Gene'
+      text: 'Value'
     },
     tickInterval: 1
   },
@@ -108,9 +108,9 @@ let sideChart: Chart = window['createChart']('side-chart', {
     formatter() {
       return `
           <div style="text-align: right">
-            Position: <b>${this.x}</b><br>
+            Gene: <b>${this.x}</b><br>
             <span style="float: left;">
-              Gene:&nbsp;
+              Value:&nbsp;
             </span>
             <b>${this.y}</b>
           </div>`;
