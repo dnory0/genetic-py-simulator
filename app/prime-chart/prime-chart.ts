@@ -42,51 +42,62 @@ const clearChart: (chart: Chart, categories?: boolean) => void =
  * figure out what response stands for and act uppon it
  * @param response response of pyshell
  */
-const treatResponse = (response: object) => {
-  if (response['generation'] !== undefined) {
-    if (response['fitness'] < primeChart.yAxis[0].getExtremes().min) {
-      primeChart.yAxis[0].setExtremes(
-        response['fitness'],
-        primeChart.yAxis[0].getExtremes().max,
+let treatResponse: (response: object) => void;
+
+(() => {
+  var min: number;
+  var max: number;
+  treatResponse = (response: object) => {
+    if (response['generation'] !== undefined) {
+      min = Math.min(min, response['fitness']);
+      max = Math.max(max, response['fitness'] + 0.001);
+      if (liveRendering.isLive || liveRendering.stepForward)
+        primeChart.yAxis[0].setExtremes(min, max, false);
+
+      // every point is added to primeChart
+      primeChart.series[0].addPoint(
+        parseInt(response['fitness']),
+        liveRendering.isLive || liveRendering.stepForward,
+        false,
         false
       );
-    }
-    if (primeChart.yAxis[0].getExtremes().max < response['fitness']) {
-      primeChart.yAxis[0].setExtremes(
-        primeChart.yAxis[0].getExtremes().min,
-        response['fitness'] + 0.05,
-        false
-      );
-    }
-    // every point is added to primeChart
-    primeChart.series[0].addPoint(
-      parseInt(response['fitness']),
-      liveRendering.isLive || liveRendering.stepForward,
-      false,
-      false
-    );
-    if (liveRendering.stepForward) liveRendering.stepForward = false;
-  } else if (response['started']) {
-    primeChart.yAxis[0].setExtremes(
-      response['fitness'],
-      response['fitness'] + 0.1
-    );
-    // clear past results
-    clearChart(primeChart);
-    // disable points on hover on chart if it's not just a step forward
-    enableChartHover(response['first-step'], primeChart);
-  } else if (response['paused'] || response['stopped'] || response['finished'])
-    enableChartHover(true, primeChart);
-  else if (response['resumed']) enableChartHover(false, primeChart);
-};
+      // to ignore the first generation (number 0) so it doesn't add -1 to xAxis
+      if (response['generation'])
+        primeChart.series[2].addPoint(
+          [
+            response['generation'] - 0.5,
+            Math.min(response['prv-fitness'], response['fitness']),
+            Math.max(response['prv-fitness'], response['fitness'])
+          ],
+          liveRendering.isLive || liveRendering.stepForward,
+          false,
+          false
+        );
+      if (liveRendering.stepForward) liveRendering.stepForward = false;
+    } else if (response['started']) {
+      min = Number.POSITIVE_INFINITY;
+      max = Number.NEGATIVE_INFINITY;
+      // clear past results
+      clearChart(primeChart);
+      // disable points on hover on chart if it's not just a step forward
+      enableChartHover(response['first-step'], primeChart);
+    } else if (
+      response['paused'] ||
+      response['stopped'] ||
+      response['finished']
+    ) {
+      primeChart.yAxis[0].setExtremes(min, max);
+      console.log(min + ', ' + max);
+
+      enableChartHover(true, primeChart);
+    } else if (response['resumed']) enableChartHover(false, primeChart);
+  };
+})();
 
 /**
  * updated every generation, receives the generation with its fittest fitness
  */
 let primeChart: Chart = window['createChart']('prime-chart', {
-  chart: {
-    type: 'line'
-  },
   title: {
     text: 'Fittest Fitness per Generation'
   },
@@ -103,7 +114,18 @@ let primeChart: Chart = window['createChart']('prime-chart', {
   },
   series: [
     {
+      type: 'line',
       name: 'CGA',
+      data: []
+    },
+    {
+      type: 'line',
+      name: 'QGA',
+      data: []
+    },
+    {
+      type: 'columnrange',
+      name: 'Deviation',
       data: []
     }
   ] as SeriesLineOptions[]

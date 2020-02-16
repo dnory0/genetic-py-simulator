@@ -36,6 +36,8 @@ window['clearChart'] = (chart, categories = false) => {
     if (categories)
         chart.xAxis[0].setCategories([]);
     chart.series[0].setData([], true);
+    if (chart.series.length > 1)
+        chart.series[2].setData([], true);
 };
 electron_1.ipcRenderer.once('mode', (_ev, isDev) => {
     if (!isDev)
