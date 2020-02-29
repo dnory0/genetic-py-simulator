@@ -1,5 +1,5 @@
 import { ipcRenderer } from 'electron';
-import { Chart } from 'highcharts';
+import { Chart, charts } from 'highcharts';
 import { join } from 'path';
 
 /**
@@ -31,11 +31,13 @@ window['enableChartHover'] = (enable: boolean, chart: Chart) => {
       tooltip: {
         enabled: enable
       },
-      navigator: {
-        enabled: enable
-      },
       xAxis: {
         crosshair: enable
+      },
+      legend: {
+        itemStyle: {
+          pointerEvents: enable ? 'all' : 'none'
+        }
       },
       plotOptions: {
         series: {
@@ -84,3 +86,7 @@ ipcRenderer.once('mode', (_ev, isDev) => {
     true
   );
 });
+
+window.addEventListener('mouseout', () =>
+  charts.forEach(chart => chart.pointer.reset())
+);

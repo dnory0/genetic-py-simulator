@@ -7,7 +7,9 @@ highcharts_more_1.default(Highcharts);
 module.exports = (containerId, options) => {
     delete require.cache[require.resolve('./create-pyshell')];
     return highcharts_1.chart(containerId, {
-        chart: {},
+        chart: {
+            spacingBottom: 3
+        },
         tooltip: {
             useHTML: true,
             formatter: options.tooltip.formatter
@@ -19,11 +21,15 @@ module.exports = (containerId, options) => {
             }
         },
         xAxis: {
-            tickInterval: 1,
+            crosshair: {
+                width: 1
+            },
             title: {
                 text: options.xAxis.title.text,
                 align: 'high'
-            }
+            },
+            tickInterval: 1,
+            min: options.xAxis.min
         },
         yAxis: {
             title: null,
@@ -51,9 +57,7 @@ module.exports = (containerId, options) => {
             text: options.yAxis.title.text,
             align: 'left'
         },
-        legend: {
-            enabled: false
-        },
+        legend: options.legend,
         credits: {
             enabled: false
         }

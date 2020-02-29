@@ -52,7 +52,8 @@ let primeChart = window['createChart']('prime-chart', {
     xAxis: {
         title: {
             text: 'Generation'
-        }
+        },
+        min: 0
     },
     yAxis: {
         title: {
@@ -75,6 +76,12 @@ let primeChart = window['createChart']('prime-chart', {
                 : Math.abs(this.point.high - this.point.low)}</b>
           </div>`;
         }
+    },
+    legend: {
+        floating: true,
+        itemMarginBottom: -5,
+        itemDistance: 10,
+        symbolPadding: 2
     },
     series: [
         {

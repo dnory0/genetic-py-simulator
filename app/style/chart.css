@@ -14,11 +14,6 @@ button {
   -webkit-user-drag: none;
 }
 
-/* changes the default cursor to chart's navigator */
-.highcharts-navigator-mask-inside {
-  cursor: all-scroll !important;
-}
-
 html,
 body {
   padding: 0;
@@ -28,13 +23,14 @@ body {
 
 .charts-container {
   height: 100vh;
+  overflow: auto;
 }
 
 .charts-container #prime-chart,
-.charts-container #side-chart {
+.charts-container #side-chart,
+.charts-container #side-chart2 {
   padding: 0;
   position: relative;
   width: 100%;
-  height: calc(100% + 12px);
 }
 /*# sourceMappingURL=chart.css.map */

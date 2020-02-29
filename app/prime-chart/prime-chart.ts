@@ -109,7 +109,8 @@ let primeChart: Chart = window['createChart']('prime-chart', {
   xAxis: {
     title: {
       text: 'Generation'
-    }
+    },
+    min: 0
   },
   yAxis: {
     title: {
@@ -136,6 +137,12 @@ let primeChart: Chart = window['createChart']('prime-chart', {
             }</b>
           </div>`;
     }
+  },
+  legend: {
+    floating: true,
+    itemMarginBottom: -5,
+    itemDistance: 10,
+    symbolPadding: 2
   },
   series: [
     {

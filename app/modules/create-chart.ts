@@ -8,7 +8,8 @@ module.exports = (containerId: string, options: Options) => {
   delete require.cache[require.resolve('./create-pyshell')];
   return chart(containerId, {
     chart: {
-      // zoomType: 'x'
+      // zoomType: 'x',
+      spacingBottom: 3
     },
     tooltip: {
       useHTML: true,
@@ -21,11 +22,15 @@ module.exports = (containerId: string, options: Options) => {
       }
     },
     xAxis: {
-      tickInterval: 1,
+      crosshair: {
+        width: 1
+      },
       title: {
         text: (<XAxisOptions>options.xAxis).title.text,
         align: 'high'
-      }
+      },
+      tickInterval: 1,
+      min: (<XAxisOptions>options.xAxis).min
     },
     yAxis: {
       title: null,
@@ -53,9 +58,7 @@ module.exports = (containerId: string, options: Options) => {
       text: (<YAxisOptions>options.yAxis).title.text,
       align: 'left'
     },
-    legend: {
-      enabled: false
-    },
+    legend: options.legend,
     credits: {
       enabled: false
     }

@@ -90,7 +90,7 @@ class Evolve:
     def update_population(parents: list, offsprings: list):
         for parent_couple, offspring_couple in zip(parents, offsprings):
             for parent, offspring in zip(parent_couple, offspring_couple):
-                # if parent.fitness() < Individual.genes_fitness(offspring):
+                if parent.fitness() < Individual.genes_fitness(offspring):
                     parent.replace_genes(offspring)
 
     @staticmethod
@@ -323,7 +323,7 @@ def final_value(min_val, given_val, is_random: bool):
     """
     if is_random:
         # detects whether should calculate int or float through min_val type
-        return random.randint(min_val, given_val) if (type(min_val) == int) else random.uniform(min_val, given_val)
+        return random.randint(min_val, given_val) if type(min_val) == int else random.uniform(min_val, given_val)
     return given_val
 
 def setup(command: dict):
