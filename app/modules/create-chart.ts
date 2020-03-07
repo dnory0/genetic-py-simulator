@@ -2,6 +2,7 @@ import { Options, chart, XAxisOptions, YAxisOptions } from 'highcharts';
 
 import * as Highcharts from 'highcharts';
 import HighchartsMore from 'highcharts/highcharts-more';
+
 HighchartsMore(Highcharts);
 
 module.exports = (containerId: string, options: Options) => {
@@ -30,12 +31,19 @@ module.exports = (containerId: string, options: Options) => {
         align: 'high'
       },
       tickInterval: 1,
-      min: (<XAxisOptions>options.xAxis).min
+      min: (<XAxisOptions>options.xAxis).min,
+      labels: (<XAxisOptions>options.xAxis).labels
+    },
+    colorAxis: {
+      minColor: Highcharts.getOptions().colors[2],
+      maxColor: Highcharts.getOptions().colors[8]
     },
     yAxis: {
       title: null,
       tickInterval: 1,
-      endOnTick: false
+      endOnTick: false,
+      labels: (<YAxisOptions>options.yAxis).labels,
+      gridLineWidth: (<YAxisOptions>options.yAxis).gridLineWidth
     },
     series: options.series,
     plotOptions: {

@@ -29,12 +29,19 @@ module.exports = (containerId, options) => {
                 align: 'high'
             },
             tickInterval: 1,
-            min: options.xAxis.min
+            min: options.xAxis.min,
+            labels: options.xAxis.labels
+        },
+        colorAxis: {
+            minColor: Highcharts.getOptions().colors[2],
+            maxColor: Highcharts.getOptions().colors[8]
         },
         yAxis: {
             title: null,
             tickInterval: 1,
-            endOnTick: false
+            endOnTick: false,
+            labels: options.yAxis.labels,
+            gridLineWidth: options.yAxis.gridLineWidth
         },
         series: options.series,
         plotOptions: {

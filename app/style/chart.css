@@ -27,8 +27,7 @@ body {
 }
 
 .charts-container #prime-chart,
-.charts-container #side-chart,
-.charts-container #side-chart2 {
+.charts-container #side-chart {
   padding: 0;
   position: relative;
   width: 100%;

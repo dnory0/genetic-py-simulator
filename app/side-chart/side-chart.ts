@@ -1,4 +1,4 @@
-import { Chart, SeriesLineOptions, Options } from 'highcharts';
+import { Chart, Options } from 'highcharts';
 import { IpcRenderer, IpcRendererEvent } from 'electron';
 
 /****************************** passed by preload ******************************
@@ -57,77 +57,79 @@ const treatResponse = (response: object) => {
           genes: response['genes']
         }
       ];
+
+      sideChart.series[1].setData(
+        sideChart.series[0].data.map(aData => [aData.x, 1.5, aData.value]),
+        true,
+        false
+      );
+
+      sideChart.series[0].setData(
+        (<any[]>response['genes']).map((gene, i) => [i, 0.1, gene]),
+        true,
+        false
+      );
     } else if (mostFittest['fitness'] == response['fitness']) {
-      mostFittest['individuals'].unshift({
+      mostFittest['individuals'].push({
         generation: response['generation'],
         genes: response['genes']
       });
     }
-    sideChart.series[0].setData(mostFittest.individuals[0].genes, true, false);
-    sideChart2.series[0].setData(mostFittest.individuals[0].genes, true, false);
   } else if (response['started']) {
     clearChart(sideChart);
-    clearChart(sideChart2);
     // clean mostFittest object before start recieving data
     mostFittest['fitness'] = -1;
     mostFittest['individuals'] = null;
-    // setting up xAxis for fittest and current chart
-    sideChart.xAxis[0].setCategories(
-      [...Array(response['genesNum']).keys()].map(v => `${++v}`)
-    );
-    sideChart2.xAxis[0].setCategories(
-      [...Array(response['genesNum']).keys()].map(v => `${++v}`)
-    );
     // disable points on hover on chart if it's not just a step forward
     enableChartHover(response['first-step'], sideChart);
-    enableChartHover(response['first-step'], sideChart2);
-  } else if (
-    response['paused'] ||
-    response['stopped'] ||
-    response['finished']
-  ) {
+  } else if (response['paused'] || response['stopped'] || response['finished'])
     enableChartHover(true, sideChart);
-    enableChartHover(true, sideChart2);
-  } else if (response['resumed']) {
-    enableChartHover(false, sideChart);
-    enableChartHover(false, sideChart2);
-  }
+  else if (response['resumed']) enableChartHover(false, sideChart);
 };
 
 /**
- * updated every time a new most fittest appear, receives most fittest genes.
+ * updated every time it receives a new fittest genes.
  *
- * most fittest is a new fittest which its fitness value is better than every
- * fittest in the previous generations
+ * fittest is a placed below, and previous fittest is placed above
  */
 let sideChart: Chart = window['createChart']('side-chart', {
-  chart: {
-    type: 'line'
-  },
   title: {
-    text: null
+    text: 'Genes'
   },
   xAxis: {
     title: {
-      text: null
+      text: 'Gene'
+    },
+    labels: {
+      formatter() {
+        return (this.value + 1).toString();
+      }
     }
   },
   yAxis: {
     title: {
-      text: null
+      text: 'Value'
     },
-    tickInterval: 1
+    tickInterval: 1,
+    labels: {
+      enabled: false
+    },
+    gridLineWidth: 0
   },
   tooltip: {
     formatter() {
       return `
-          <div style="text-align: right">
-            Gene: <b>${this.x}</b><br>
-            <span style="float: left;">
-              Value:&nbsp;
-            </span>
-            <b>${this.y}</b>
-          </div>`;
+      <div style="width: 80px">
+        <div><b>${
+          Number.parseInt(
+            this.series.getName().match(/(?<=Series )[0-9]+/)[0]
+          ) == 1
+            ? 'Fittest'
+            : 'Prev Fittest'
+        }:</b></div>
+        <div>Gene:&nbsp<b style="float: right">${this.point.x + 1}</b></div>
+        <div>Value:&nbsp<b style="float: right">${this.point.value}</b></div>
+      </div>`;
     }
   },
   legend: {
@@ -135,97 +137,17 @@ let sideChart: Chart = window['createChart']('side-chart', {
   },
   series: [
     {
+      type: 'heatmap',
       data: []
-    }
-  ] as SeriesLineOptions[]
-} as Options);
-
-let sideChart2: Chart = window['createChart']('side-chart2', {
-  chart: {
-    type: 'line'
-  },
-  title: {
-    text: null
-  },
-  xAxis: {
-    title: {
-      text: null
-    }
-  },
-  yAxis: {
-    title: {
-      text: null
     },
-    tickInterval: 1
-  },
-  tooltip: {
-    formatter() {
-      return `
-          <div style="text-align: right">
-            Gene: <b>${this.x}</b><br>
-            <span style="float: left;">
-              Value:&nbsp;
-            </span>
-            <b>${this.y}</b>
-          </div>`;
-    }
-  },
-  legend: {
-    enabled: false
-  },
-  series: [
     {
-      color: 'red',
+      type: 'heatmap',
       data: []
     }
-  ] as SeriesLineOptions[]
+  ]
 } as Options);
 
 delete window['createChart'];
-
-['mousemove', 'touchmove', 'touchstart'].forEach(function(eventType) {
-  document
-    .getElementById('charts-container')
-    .addEventListener(eventType, function(e) {
-      var chart: Chart, point: any, i: any, event: any;
-
-      for (i = 0; i < 2; i = i + 1) {
-        chart = [sideChart, sideChart2][i];
-        // Find coordinates within the chart
-        event = chart.pointer.normalize(<any>e);
-        // Get the hovered point
-        point = (<any>chart.series[0]).searchPoint(event, true);
-
-        if (point) {
-          point.highlight(e);
-        }
-      }
-    });
-});
-
-let charts = [sideChart, sideChart2];
-
-window['sync-charts']();
-
-['mousemove', 'touchmove', 'touchstart'].forEach(function(eventType) {
-  document
-    .getElementById('charts-container')
-    .addEventListener(eventType, function(e) {
-      var chart, point, i, event;
-
-      for (i = 0; i < charts.length; i = i + 1) {
-        chart = charts[i];
-        // Find coordinates within the chart
-        event = chart.pointer.normalize(e);
-        // Get the hovered point
-        point = chart.series[0].searchPoint(event, true);
-
-        if (point) {
-          point.highlight(e);
-        }
-      }
-    });
-});
 
 ipcRenderer.on('data', (_event: IpcRendererEvent, response: object) =>
   treatResponse(response)

@@ -17,7 +17,7 @@ let treatResponse;
                 primeChart.yAxis[0].setExtremes(min, max, false);
             primeChart.series[0].addPoint(parseInt(response['fitness']), liveRendering.isLive || liveRendering.stepForward, false, false);
             if (response['generation'])
-                primeChart.series[2].addPoint([
+                primeChart.series[1].addPoint([
                     response['generation'] - 0.5,
                     Math.min(response['prv-fitness'], response['fitness']),
                     Math.max(response['prv-fitness'], response['fitness'])
@@ -47,19 +47,26 @@ let treatResponse;
 })();
 let primeChart = window['createChart']('prime-chart', {
     title: {
-        text: 'Fittest Fitness per Generation'
+        text: 'Fittest per Generation'
     },
     xAxis: {
         title: {
             text: 'Generation'
         },
-        min: 0
+        min: 0,
+        labels: {
+            enabled: true
+        }
     },
     yAxis: {
         title: {
             text: 'Fitness/Deviation'
         },
-        tickInterval: 1
+        tickInterval: 1,
+        labels: {
+            enabled: true
+        },
+        gridLineWidth: 1
     },
     tooltip: {
         formatter() {
@@ -90,13 +97,13 @@ let primeChart = window['createChart']('prime-chart', {
             data: []
         },
         {
-            type: 'line',
-            name: 'QGA',
+            type: 'columnrange',
+            name: 'Deviation',
             data: []
         },
         {
-            type: 'columnrange',
-            name: 'Deviation',
+            type: 'line',
+            name: 'QGA',
             data: []
         }
     ]

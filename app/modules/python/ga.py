@@ -1,10 +1,10 @@
-import time
-import threading
-import json
-import random
-import sys
-import importlib
-import types
+from time import sleep
+from threading import Thread, Lock, Condition
+from json import loads, dumps
+from random import random, randint, randrange, uniform
+from sys import argv, exit
+# import importlib
+# import types
 
 
 class Population:
@@ -42,7 +42,7 @@ class Individual:
             self.genes = [int(gene) for gene in genes]
         else:
             # rand 0s and 1s list
-            self.genes = [1 if random.random() >= .5 else 0 for _ in range(genes_num)]
+            self.genes = [1 if random() >= .5 else 0 for _ in range(genes_num)]
 
     # call genes_fitness if possible
     def fitness(self) -> int:
@@ -62,7 +62,7 @@ class Evolve:
     def to_couples(pop_inds: list, pop_size: int) -> list:
         parents = []
         for _ in range(pop_size // 2):
-            couple = [pop_inds.pop(random.randrange(0, len(pop_inds))) for _ in range(2)]
+            couple = [pop_inds.pop(randrange(0, len(pop_inds))) for _ in range(2)]
             parents.append(couple)
         return parents
 
@@ -82,7 +82,7 @@ class Evolve:
         for couple in offsprings:
             for offspring in couple:
                 for index in range(genes_num):
-                    if random.randint(0, 999)/1000 < mutation_rate:
+                    if randint(0, 999)/1000 < mutation_rate:
                         offspring[index] = 0 if offspring[index] else 1
         return offsprings
 
@@ -113,18 +113,18 @@ class Evolve:
         pop.generation += 1
 
 
-class GAThread(threading.Thread):
+class GAThread(Thread):
     """
     separate thread to run Genetic Algorithm while not blocking
     the main thread.
     """
 
     def __init__(self):
-        threading.Thread.__init__(self)
+        Thread.__init__(self)
         # flag if start method has been called
         self.start_triggered = False
         # thread pause condition
-        self.pause_cond = threading.Condition(threading.Lock())
+        self.pause_cond = Condition(Lock())
         # flag to pause thread
         self.__pause_now = False
         # flag to state thread state
@@ -161,7 +161,7 @@ class GAThread(threading.Thread):
 
             # if g_delay_rate is 0 than just ignore it
             if g_delay_rate:
-                time.sleep(g_delay_rate)
+                sleep(g_delay_rate)
 
             # pause check, moved down to avoid another iteration if stop event
             # was triggered after a pause event
@@ -213,7 +213,7 @@ class GAThread(threading.Thread):
         if not self.start_triggered:
             self.start_triggered = True
             self.paused = False
-            threading.Thread.start(self)
+            Thread.start(self)
 
     def pause(self):
         """
@@ -258,7 +258,7 @@ class GAThread(threading.Thread):
             self.__pause_now = True
             # fixes the blocking that happens when user clicks step_f multiple times on a heavy GA
             self.paused = False
-            threading.Thread.start(self)
+            Thread.start(self)
             return
         # release if paused, it will lock automatically after one generation
         # because __pause_now is set to True
@@ -295,44 +295,41 @@ class GAThread(threading.Thread):
 
 
 def to_json(word: dict):
-    """ prints a dict to json and flush it for instant respond (doesn't buffer output)
+    """ 
+    prints a dict to json and flush it for instant respond (doesn't buffer output)
     """
-    print(json.dumps(word), flush=True)
+    print(dumps(word), flush=True)
 
-""" dsddsds """
-fitness_module = None
+# it's going to hold imported fitness function
+fitness_function = None
 
 # initialized when user sends play, replay or step_f signal if it's first step forward
 ga_thread = None
 solution = None
 
-# global settings, changed every time user passes them
+# default values for the global settings, changes every time user passes them
 g_crossover_rate = .5
 g_mutation_rate = .06
-g_delay_rate = 0
 
 # initialized every time GA is initialized,
 # if user passes them after GA started it will do nothing
-g_pop_size = int(sys.argv[1]) if len(sys.argv) > 1 else random.randint(1, 500)
-g_genes_num = int(sys.argv[2]) if len(sys.argv) > 2 else random.randint(1, 200)
-g_delay_rate = int(sys.argv[3]) if len(sys.argv) > 3 else g_delay_rate
+g_pop_size = int(argv[1]) if len(argv) > 1 else randint(1, 500)
+g_genes_num = int(argv[2]) if len(argv) > 2 else randint(1, 200)
+g_delay_rate = int(argv[3]) if len(argv) > 3 else 0
 
 def final_value(min_val, given_val, is_random: bool):
-    """ called when a signal is received, if random flag set to True it will return
+    """
+    called when a signal is received, if random flag set to True it will return
     value between min_val and given_val, else it returns given_val 
     """
     if is_random:
         # detects whether should calculate int or float through min_val type
-        return random.randint(min_val, given_val) if type(min_val) == int else random.uniform(min_val, given_val)
+        return randint(min_val, given_val) if type(min_val) == int else uniform(min_val, given_val)
     return given_val
 
-def setup(command: dict):
-    pass
-
-
-
 def update_parameters(command: dict):
-    """ check crossover & mutation rate new updates and apply them
+    """
+    check crossover & mutation rate new updates and apply them
     """
     global g_pop_size
     global g_genes_num
@@ -354,29 +351,16 @@ def update_parameters(command: dict):
     if type(command.get('delay_rate')) is not type(None):
         # sleep in seconds
         g_delay_rate = round(final_value(.0, command.get('delay_rate'), command.get('random_delay_rate')), 2)
-    # to_json({
-    #     "pop": g_pop_size,
-    #     "rnPop": command.get('random_pop_size'),
-    #     "genes": g_genes_num,
-    #     "rnGenes": command.get('random_genes_num'),
-    #     "crossover": g_crossover_rate,
-    #     "rnCO": command.get('random_crossover_rate'),
-    #     "mutation": g_mutation_rate,
-    #     "rnMut": command.get('random_mutation_rate'),
-    #     "delay": g_delay_rate,
-    #     "rnDelay": command.get('random_delay_rate')
-    # })
-
 
 def init_ga():
-    """ Initialize new GA thread with a new solution
-     """
+    """
+    Initialize new GA thread with a new solution
+    """
     global ga_thread
     ga_thread = GAThread()
     # initialize solution
     global solution
     solution = Individual(genes_num=g_genes_num)
-
 
 # possible to add condition here in near future
 while True:
@@ -406,10 +390,10 @@ while True:
     elif cmd == 'exit':
         if ga_thread is not None:
             ga_thread.stop()
-        sys.exit(0)
+        exit(0)
     else:
         try:
-            load = json.loads(cmd)
+            load = loads(cmd)
         except:
             pass
         else:
