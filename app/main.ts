@@ -92,14 +92,14 @@ app.once('ready', () => {
 
   // enable autohide on menubar on fullscreen
   mainWindow.on('enter-full-screen', () => {
-    mainWindow.setAutoHideMenuBar(true);
+    mainWindow.autoHideMenuBar = true;
     mainWindow.setMenuBarVisibility(false);
   });
 
   // disable autohide on menubar on fullscreen
   mainWindow.on('leave-full-screen', () => {
     mainWindow.setMenuBarVisibility(true);
-    mainWindow.setAutoHideMenuBar(false);
+    mainWindow.autoHideMenuBar = false;
   });
 
   /**

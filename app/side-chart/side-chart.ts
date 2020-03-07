@@ -1,4 +1,4 @@
-import { Chart, SeriesLineOptions, Options } from 'highcharts';
+import { Chart, Options } from 'highcharts';
 import { IpcRenderer, IpcRendererEvent } from 'electron';
 
 /****************************** passed by preload ******************************
@@ -57,22 +57,29 @@ const treatResponse = (response: object) => {
           genes: response['genes']
         }
       ];
+
+      sideChart.series[1].setData(
+        sideChart.series[0].data.map(aData => [aData.x, 1.5, aData.value]),
+        true,
+        false
+      );
+
+      sideChart.series[0].setData(
+        (<any[]>response['genes']).map((gene, i) => [i, 0.1, gene]),
+        true,
+        false
+      );
     } else if (mostFittest['fitness'] == response['fitness']) {
-      mostFittest['individuals'].unshift({
+      mostFittest['individuals'].push({
         generation: response['generation'],
         genes: response['genes']
       });
     }
-    sideChart.series[0].setData(mostFittest.individuals[0].genes, true, false);
   } else if (response['started']) {
     clearChart(sideChart);
     // clean mostFittest object before start recieving data
     mostFittest['fitness'] = -1;
     mostFittest['individuals'] = null;
-    // setting up xAxis for fittest and current chart
-    sideChart.xAxis[0].setCategories(
-      [...Array(response['genesNum']).keys()].map(v => `${++v}`)
-    );
     // disable points on hover on chart if it's not just a step forward
     enableChartHover(response['first-step'], sideChart);
   } else if (response['paused'] || response['stopped'] || response['finished'])
@@ -81,35 +88,65 @@ const treatResponse = (response: object) => {
 };
 
 /**
- * updated every time a new most fittest appear, receives most fittest genes.
+ * updated every time it receives a new fittest genes.
  *
- * most fittest is a new fittest which its fitness value is better than every
- * fittest in the previous generations
+ * fittest is a placed below, and previous fittest is placed above
  */
 let sideChart: Chart = window['createChart']('side-chart', {
-  chart: {
-    type: 'line'
-  },
   title: {
-    text: 'Best Fittest Genes'
+    text: 'Genes'
   },
   xAxis: {
     title: {
-      text: 'Position'
+      text: 'Gene'
+    },
+    labels: {
+      formatter() {
+        return (this.value + 1).toString();
+      }
     }
   },
   yAxis: {
     title: {
-      text: 'Gene'
+      text: 'Value'
     },
-    tickInterval: 1
+    tickInterval: 1,
+    labels: {
+      enabled: false
+    },
+    gridLineWidth: 0
+  },
+  tooltip: {
+    formatter() {
+      return `
+      <div style="width: 80px">
+        <div><b>${
+          Number.parseInt(
+            this.series.getName().match(/(?<=Series )[0-9]+/)[0]
+          ) == 1
+            ? 'Fittest'
+            : 'Prev Fittest'
+        }:</b></div>
+        <div>Gene:&nbsp<b style="float: right">${this.point.x + 1}</b></div>
+        <div>Value:&nbsp<b style="float: right">${this.point.value}</b></div>
+      </div>`;
+    }
+  },
+  legend: {
+    enabled: false
   },
   series: [
     {
+      type: 'heatmap',
+      data: []
+    },
+    {
+      type: 'heatmap',
       data: []
     }
-  ] as SeriesLineOptions[]
+  ]
 } as Options);
+
 delete window['createChart'];
 
 ipcRenderer.on('data', (_event: IpcRendererEvent, response: object) =>

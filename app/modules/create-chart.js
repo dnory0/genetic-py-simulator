@@ -1,10 +1,19 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const highcharts_1 = require("highcharts");
+const Highcharts = require("highcharts");
+const highcharts_more_1 = require("highcharts/highcharts-more");
+highcharts_more_1.default(Highcharts);
 module.exports = (containerId, options) => {
     delete require.cache[require.resolve('./create-pyshell')];
     return highcharts_1.chart(containerId, {
-        chart: {},
+        chart: {
+            spacingBottom: 3
+        },
+        tooltip: {
+            useHTML: true,
+            formatter: options.tooltip.formatter
+        },
         title: {
             text: options.title.text,
             style: {
@@ -12,16 +21,27 @@ module.exports = (containerId, options) => {
             }
         },
         xAxis: {
-            tickInterval: 1,
+            crosshair: {
+                width: 1
+            },
             title: {
                 text: options.xAxis.title.text,
                 align: 'high'
-            }
+            },
+            tickInterval: 1,
+            min: options.xAxis.min,
+            labels: options.xAxis.labels
+        },
+        colorAxis: {
+            minColor: Highcharts.getOptions().colors[2],
+            maxColor: Highcharts.getOptions().colors[8]
         },
         yAxis: {
             title: null,
             tickInterval: 1,
-            endOnTick: false
+            endOnTick: false,
+            labels: options.yAxis.labels,
+            gridLineWidth: options.yAxis.gridLineWidth
         },
         series: options.series,
         plotOptions: {
@@ -29,6 +49,7 @@ module.exports = (containerId, options) => {
                 lineWidth: 1.5
             },
             series: {
+                clip: false,
                 animation: false,
                 states: {
                     hover: {
@@ -43,9 +64,7 @@ module.exports = (containerId, options) => {
             text: options.yAxis.title.text,
             align: 'left'
         },
-        legend: {
-            enabled: false
-        },
+        legend: options.legend,
         credits: {
             enabled: false
         }
