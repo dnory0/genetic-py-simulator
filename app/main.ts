@@ -59,6 +59,7 @@ const createWindow = (
     maximizable,
     parent,
     frame,
+    modal: true,
     show: false,
     webPreferences: {
       preload,
@@ -105,13 +106,40 @@ app.once('ready', () => {
   /**
    * sets menu and free module after it's done
    */
-  app.applicationMenu = require(join(__dirname, 'modules', 'menubar.js'))(
-    isDev,
-    mainWindow
+  mainWindow.setMenu(
+    require(join(__dirname, 'modules', 'menubar.js'))(isDev, mainWindow)
   );
 
   mainWindow.webContents.on('ipc-message', (_ev, channel) => {
     if (channel == 'mode') mainWindow.webContents.send('mode', isDev);
+    else if (channel == 'conf-ga') {
+      const gaWindow = createWindow(
+        join(__dirname, 'conf-ga', 'conf-ga.html'),
+        {
+          parent: mainWindow,
+          webPreferences: {
+            preload: null,
+            webviewTag: false
+          }
+        }
+      );
+
+      gaWindow.once('ready-to-show', gaWindow.show);
+
+      gaWindow.removeMenu();
+
+      gaWindow.once('closed', _ev => {
+        if (channel == 'conf-ga')
+          mainWindow.webContents.send('conf-ga', { test: true });
+      });
+      // gaWindow.webContents.once(
+      //   'ipc-message',
+      //   (_ev, channel, gaconf: String) => {
+      //     if (channel == 'conf-ga')
+      //       mainWindow.webContents.send('conf-ga', gaconf);
+      //   }
+      // );
+    }
   });
 
   (() => {
@@ -169,12 +197,3 @@ app.once('ready', () => {
     );
   });
 });
-
-// mkdir(
-//   isDev
-//     ? join(__dirname, '..', 'libs')
-//     : join(__dirname, '..', '..', '..', 'libs'),
-//   (error: NodeJS.ErrnoException) => {
-//     if (error && error.errno != -17) throw error;
-//   }
-// );

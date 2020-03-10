@@ -18,6 +18,7 @@ const createWindow = (filePath, { minWidth, minHeight, width, height, resizable,
         maximizable,
         parent,
         frame,
+        modal: true,
         show: false,
         webPreferences: {
             preload,
@@ -48,10 +49,25 @@ electron_1.app.once('ready', () => {
         mainWindow.setMenuBarVisibility(true);
         mainWindow.autoHideMenuBar = false;
     });
-    electron_1.app.applicationMenu = require(path_1.join(__dirname, 'modules', 'menubar.js'))(isDev, mainWindow);
+    mainWindow.setMenu(require(path_1.join(__dirname, 'modules', 'menubar.js'))(isDev, mainWindow));
     mainWindow.webContents.on('ipc-message', (_ev, channel) => {
         if (channel == 'mode')
             mainWindow.webContents.send('mode', isDev);
+        else if (channel == 'conf-ga') {
+            const gaWindow = createWindow(path_1.join(__dirname, 'conf-ga', 'conf-ga.html'), {
+                parent: mainWindow,
+                webPreferences: {
+                    preload: null,
+                    webviewTag: false
+                }
+            });
+            gaWindow.once('ready-to-show', gaWindow.show);
+            gaWindow.removeMenu();
+            gaWindow.once('closed', _ev => {
+                if (channel == 'conf-ga')
+                    mainWindow.webContents.send('conf-ga', { test: true });
+            });
+        }
     });
     (() => {
         let readyToShow = () => {

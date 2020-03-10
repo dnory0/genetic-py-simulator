@@ -11,6 +11,7 @@ let stopBtn = document.getElementById('stop-btn');
 let toStartBtn = document.getElementById('to-start-btn');
 let stepFBtn = document.getElementById('step-forward-btn');
 let lRSwitch = document.getElementById('live-rendering');
+let confGABtn = document.getElementById('conf-ga-btn');
 let popSize = document.getElementById('pop-size');
 let pSRandom = document.getElementById('random-pop-size');
 let genesNum = document.getElementById('genes-num');
@@ -235,10 +236,19 @@ document.addEventListener('DOMContentLoaded', function loaded() {
     });
     window['border']();
     delete window['border'];
-    window.addEventListener('beforeunload', () => {
-        document.getElementById('main').style.display = 'none';
-        window['sendSig']('exit');
-    });
+    (() => {
+        let main = document.getElementById('main');
+        confGABtn.onclick = () => {
+            ipcRenderer.send('conf-ga');
+            ipcRenderer.once('conf-ga', (_ev, newGAConf) => {
+                console.log(newGAConf);
+            });
+        };
+        window.addEventListener('beforeunload', () => {
+            main.style.display = 'none';
+            window['sendSig']('exit');
+        });
+    })();
 });
 ipcRenderer.send('mode');
 ipcRenderer.once('mode', (_ev, isDev) => {

@@ -60,6 +60,11 @@ let stepFBtn = <HTMLButtonElement>document.getElementById('step-forward-btn');
  */
 let lRSwitch = <HTMLInputElement>document.getElementById('live-rendering');
 
+/**
+ * opens GA configuration panel to configure next run of the GA.
+ */
+let confGABtn = <HTMLInputElement>document.getElementById('conf-ga-btn');
+
 /***************************** Parameters inputs *****************************/
 
 /**
@@ -512,13 +517,24 @@ document.addEventListener('DOMContentLoaded', function loaded() {
   window['border']();
   delete window['border'];
 
-  /**
-   * terminate pyshell process with its threads on close or reload
-   */
-  window.addEventListener('beforeunload', () => {
-    document.getElementById('main').style.display = 'none';
-    window['sendSig']('exit');
-  });
+  (() => {
+    let main = <HTMLDivElement>document.getElementById('main');
+
+    confGABtn.onclick = () => {
+      ipcRenderer.send('conf-ga');
+      ipcRenderer.once('conf-ga', (_ev, newGAConf: object) => {
+        console.log(newGAConf);
+      });
+    };
+
+    /**
+     * terminate pyshell process with its threads on close or reload
+     */
+    window.addEventListener('beforeunload', () => {
+      main.style.display = 'none';
+      window['sendSig']('exit');
+    });
+  })();
 });
 
 // request mode

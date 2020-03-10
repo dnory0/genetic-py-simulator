@@ -103,6 +103,10 @@ body {
   -webkit-box-direction: normal;
       -ms-flex-direction: column;
           flex-direction: column;
+  -webkit-transition: -webkit-filter 0.12s ease-in;
+  transition: -webkit-filter 0.12s ease-in;
+  transition: filter 0.12s ease-in;
+  transition: filter 0.12s ease-in, -webkit-filter 0.12s ease-in;
 }
 
 #main .prime-container {
@@ -183,7 +187,7 @@ body {
   display: block;
 }
 
-#main .middle-container .controls-container .state-controls-container .ga-settings button {
+#main .middle-container .controls-container .state-controls-container .conf-ga button {
   padding: 5px 4px 5px 5px;
   border: none;
   border-radius: 4px;
@@ -192,11 +196,11 @@ body {
   background-color: white;
 }
 
-#main .middle-container .controls-container .state-controls-container .ga-settings button:hover:not(:disabled) {
+#main .middle-container .controls-container .state-controls-container .conf-ga button:hover:not(:disabled) {
   background-color: #c4c4c4;
 }
 
-#main .middle-container .controls-container .state-controls-container .ga-settings button img {
+#main .middle-container .controls-container .state-controls-container .conf-ga button img {
   width: 18px;
   float: left;
 }
