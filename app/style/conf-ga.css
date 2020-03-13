@@ -1,0 +1,91 @@
+textarea,
+input,
+div,
+button {
+  outline: none !important;
+  margin: 0;
+}
+
+* {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  -webkit-user-drag: none;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  height: 100%;
+}
+
+.parameters-container {
+  /* Track */
+  /* Handle */
+  /* Handle on hover */
+}
+
+.parameters-container::-webkit-scrollbar {
+  width: 12px;
+}
+
+.parameters-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.parameters-container::-webkit-scrollbar-thumb {
+  background: #aaa;
+}
+
+.parameters-container::-webkit-scrollbar-thumb:hover {
+  background: #777;
+}
+
+.browse {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.browse > input[type='text'] {
+  min-width: 280px;
+  height: 24px;
+  outline: none;
+  padding: 1px 5px;
+  border: 1px #a2a2a2 solid;
+  font-size: 14px;
+}
+
+.browse > button {
+  background-color: #e8e8e8;
+  font-weight: bold;
+  height: 28px;
+  outline: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  margin-left: -1px;
+  border: 1px #a2a2a2 solid;
+}
+
+.browse > button:hover {
+  background-color: #d2d2d2;
+}
+
+.browse > button img {
+  position: relative;
+  top: 3px;
+  width: 20px;
+  height: 20px;
+}
+
+.browse > button::after {
+  content: 'browse...';
+  position: relative;
+  top: -3px;
+}
+/*# sourceMappingURL=conf-ga.css.map */

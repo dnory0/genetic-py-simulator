@@ -31,6 +31,12 @@ const createWindow = (filePath, { minWidth, minHeight, width, height, resizable,
     });
     return targetWindow;
 };
+const browse = (window, options, resolved, rejected) => {
+    electron_1.dialog
+        .showOpenDialog(window, options)
+        .then(resolved)
+        .catch(rejected);
+};
 electron_1.app.once('ready', () => {
     process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true;
     mainWindow = createWindow(path_1.join(__dirname, 'index.html'), {
@@ -57,16 +63,32 @@ electron_1.app.once('ready', () => {
             const gaWindow = createWindow(path_1.join(__dirname, 'conf-ga', 'conf-ga.html'), {
                 parent: mainWindow,
                 webPreferences: {
-                    preload: null,
-                    webviewTag: false
+                    preload: path_1.join(__dirname, 'preloads', 'conf-ga-preload.js')
                 }
             });
             gaWindow.once('ready-to-show', gaWindow.show);
-            gaWindow.removeMenu();
-            gaWindow.once('closed', _ev => {
-                if (channel == 'conf-ga')
-                    mainWindow.webContents.send('conf-ga', { test: true });
+            gaWindow.webContents.on('ipc-message', (_ev, gaChannel, confGA) => {
+                if (gaChannel == 'conf-ga') {
+                    console.log(confGA);
+                    mainWindow.webContents.send('conf-ga', confGA);
+                }
+                else if (gaChannel == 'browse')
+                    browse(gaWindow, {
+                        title: 'Open GA Configuration file',
+                        defaultPath: electron_1.app.getPath('desktop'),
+                        filters: [
+                            {
+                                name: 'Python',
+                                extensions: ['py']
+                            }
+                        ],
+                        properties: ['openFile']
+                    }, result => gaWindow.webContents.send('browsed-path', result), reason => {
+                        if (reason)
+                            throw reason;
+                    });
             });
+            gaWindow.once('closed', _ev => mainWindow.webContents.send('conf-ga-finished'));
         }
     });
     (() => {

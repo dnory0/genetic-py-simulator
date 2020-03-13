@@ -522,9 +522,18 @@ document.addEventListener('DOMContentLoaded', function loaded() {
 
     confGABtn.onclick = () => {
       ipcRenderer.send('conf-ga');
-      ipcRenderer.once('conf-ga', (_ev, newGAConf: object) => {
-        console.log(newGAConf);
-      });
+      (() => {
+        let newGAConfListener = (_ev, newGAConf: object) => {
+          console.log(newGAConf);
+          // add treatment
+        };
+
+        ipcRenderer.on('conf-ga', newGAConfListener);
+        ipcRenderer.once('conf-ga-finished', () => {
+          ipcRenderer.removeListener('conf-ga', newGAConfListener);
+          console.log('conf-ga-finished');
+        });
+      })();
     };
 
     /**

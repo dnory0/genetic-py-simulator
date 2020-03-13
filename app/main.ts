@@ -2,7 +2,10 @@ import {
   app,
   BrowserWindow,
   BrowserWindowConstructorOptions,
-  Rectangle
+  Rectangle,
+  dialog,
+  OpenDialogOptions,
+  OpenDialogReturnValue
 } from 'electron';
 import { join } from 'path';
 import { writeFile } from 'fs';
@@ -78,6 +81,26 @@ const createWindow = (
   return targetWindow;
 };
 
+/**
+ * opens dialog to browse for a specific file
+ *
+ * @param window parent window of the dialog.
+ * @param options dialog options.
+ * @param resolved function to be executed when dialog resolves.
+ * @param rejected function to be executed when dialog rejectes, usually when browse is canceled.
+ */
+const browse = (
+  window: BrowserWindow,
+  options: OpenDialogOptions,
+  resolved: (path: OpenDialogReturnValue) => any,
+  rejected: (reason: any) => any
+) => {
+  dialog
+    .showOpenDialog(window, options)
+    .then(resolved)
+    .catch(rejected);
+};
+
 app.once('ready', () => {
   (<any>process.env['ELECTRON_DISABLE_SECURITY_WARNINGS']) = true;
 
@@ -118,27 +141,48 @@ app.once('ready', () => {
         {
           parent: mainWindow,
           webPreferences: {
-            preload: null,
-            webviewTag: false
+            preload: join(__dirname, 'preloads', 'conf-ga-preload.js')
           }
         }
       );
 
       gaWindow.once('ready-to-show', gaWindow.show);
 
-      gaWindow.removeMenu();
+      // gaWindow.removeMenu();
 
-      gaWindow.once('closed', _ev => {
-        if (channel == 'conf-ga')
-          mainWindow.webContents.send('conf-ga', { test: true });
-      });
-      // gaWindow.webContents.once(
-      //   'ipc-message',
-      //   (_ev, channel, gaconf: String) => {
-      //     if (channel == 'conf-ga')
-      //       mainWindow.webContents.send('conf-ga', gaconf);
-      //   }
-      // );
+      // gaWindow.webContents.toggleDevTools();
+
+      gaWindow.webContents.on(
+        'ipc-message',
+        (_ev, gaChannel, confGA: object) => {
+          if (gaChannel == 'conf-ga') {
+            console.log(confGA);
+            mainWindow.webContents.send('conf-ga', confGA);
+          } else if (gaChannel == 'browse')
+            browse(
+              gaWindow,
+              {
+                title: 'Open GA Configuration file',
+                defaultPath: app.getPath('desktop'),
+                // TODO: read from runSettings
+                filters: [
+                  {
+                    name: 'Python',
+                    extensions: ['py']
+                  }
+                ],
+                properties: ['openFile']
+              },
+              result => gaWindow.webContents.send('browsed-path', result),
+              reason => {
+                if (reason) throw reason;
+              }
+            );
+        }
+      );
+      gaWindow.once('closed', _ev =>
+        mainWindow.webContents.send('conf-ga-finished')
+      );
     }
   });
 

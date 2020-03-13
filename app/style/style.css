@@ -22,6 +22,28 @@ body {
   height: 100%;
 }
 
+.parameters-container {
+  /* Track */
+  /* Handle */
+  /* Handle on hover */
+}
+
+.parameters-container::-webkit-scrollbar {
+  width: 12px;
+}
+
+.parameters-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.parameters-container::-webkit-scrollbar-thumb {
+  background: #aaa;
+}
+
+.parameters-container::-webkit-scrollbar-thumb:hover {
+  background: #777;
+}
+
 /* Borders used between 2 resizable DIVs */
 .border {
   background-clip: content-box;
@@ -50,28 +72,6 @@ body {
   background-color: #cebbbb;
   width: 1px;
   margin: 3px 6px;
-}
-
-.parameters-container {
-  /* Track */
-  /* Handle */
-  /* Handle on hover */
-}
-
-.parameters-container::-webkit-scrollbar {
-  width: 12px;
-}
-
-.parameters-container::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-.parameters-container::-webkit-scrollbar-thumb {
-  background: #aaa;
-}
-
-.parameters-container::-webkit-scrollbar-thumb:hover {
-  background: #777;
 }
 
 .resize-cover {
@@ -103,10 +103,6 @@ body {
   -webkit-box-direction: normal;
       -ms-flex-direction: column;
           flex-direction: column;
-  -webkit-transition: -webkit-filter 0.12s ease-in;
-  transition: -webkit-filter 0.12s ease-in;
-  transition: filter 0.12s ease-in;
-  transition: filter 0.12s ease-in, -webkit-filter 0.12s ease-in;
 }
 
 #main .prime-container {

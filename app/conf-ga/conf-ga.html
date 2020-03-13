@@ -4,10 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GA Configuration</title>
+    <link rel="stylesheet" href="../style/conf-ga.css" />
   </head>
   <body>
     <div class="main">
-      pop size<br />
+      <!-- pop size<br />
       genes num<br />
       fitness function---upload<br />
       crossover value, crossover way<br />
@@ -15,6 +16,18 @@
       0s or switch with other genes near)<br />
       replace new generation directly, or choose best between father and
       offspring<br />
+      <button id="conf-ga-sender">Click Me</button> -->
+      <h2>GA Configuration</h2>
+      <div class="browse">
+        <input type="text" id="ff-path" />
+        <button id="browse-btn">
+          <img src="../img/browse.png" />
+        </button>
+      </div>
     </div>
+    <script>
+      let exports = {};
+    </script>
+    <script src="conf-ga.js"></script>
   </body>
 </html>

@@ -240,9 +240,16 @@ document.addEventListener('DOMContentLoaded', function loaded() {
         let main = document.getElementById('main');
         confGABtn.onclick = () => {
             ipcRenderer.send('conf-ga');
-            ipcRenderer.once('conf-ga', (_ev, newGAConf) => {
-                console.log(newGAConf);
-            });
+            (() => {
+                let newGAConfListener = (_ev, newGAConf) => {
+                    console.log(newGAConf);
+                };
+                ipcRenderer.on('conf-ga', newGAConfListener);
+                ipcRenderer.once('conf-ga-finished', () => {
+                    ipcRenderer.removeListener('conf-ga', newGAConfListener);
+                    console.log('conf-ga-finished');
+                });
+            })();
         };
         window.addEventListener('beforeunload', () => {
             main.style.display = 'none';

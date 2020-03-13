@@ -1,8 +1,8 @@
 import { ChildProcess } from 'child_process';
 import { ipcRenderer, webFrame, remote } from 'electron';
 import { join } from 'path';
-
 const { app } = remote;
+
 /**
  * preloaded globally
  */
