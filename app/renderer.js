@@ -305,4 +305,6 @@ ipcRenderer.on('cur-settings', () => {
         }
     });
 });
+let ps = window['getGlobal']('ps');
+ps.stdout.on('data', (data) => console.log(data.toString()));
 //# sourceMappingURL=renderer.js.map

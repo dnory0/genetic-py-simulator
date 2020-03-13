@@ -9,6 +9,7 @@ import {
 } from 'electron';
 import { join } from 'path';
 import { writeFile } from 'fs';
+import { spawn, ChildProcess } from 'child_process';
 
 /**
  * set to true if app on development, false in production.
@@ -113,6 +114,13 @@ app.once('ready', () => {
       webviewTag: true
     }
   });
+
+  let ps = spawn('python3', [join(__dirname, 'modules', 'python', 'ga.py')]);
+  global['ps'] = ps;
+  ps.stdin.write('play\n');
+  ps.stdout.on('data', (data: Buffer) => console.log(data.toString()));
+
+  // console.log(<ChildProcess>global['hi']);
 
   // enable autohide on menubar on fullscreen
   mainWindow.on('enter-full-screen', () => {

@@ -1,7 +1,9 @@
-import { ipcRenderer } from 'electron';
+import { ipcRenderer, remote } from 'electron';
 import { Chart, charts } from 'highcharts';
 import { join } from 'path';
+import { ChildProcess } from 'child_process';
 
+const { getGlobal } = remote;
 /**
  * allows communication between this webview & renderer process
  */
@@ -89,3 +91,6 @@ ipcRenderer.once('mode', (_ev, isDev) => {
 window.addEventListener('mouseout', () =>
   charts.forEach(chart => chart.pointer.reset())
 );
+
+let ps = <ChildProcess>getGlobal('ps');
+ps.stdout.on('data', (data: Buffer) => console.log(data.toString()));

@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const electron_1 = require("electron");
 const path_1 = require("path");
 const fs_1 = require("fs");
+const child_process_1 = require("child_process");
 const isDev = process.argv.some(arg => ['--dev', '-D', '-d'].includes(arg));
 let mainWindow;
 let runSettings;
@@ -47,6 +48,10 @@ electron_1.app.once('ready', () => {
             webviewTag: true
         }
     });
+    let ps = child_process_1.spawn('python3', [path_1.join(__dirname, 'modules', 'python', 'ga.py')]);
+    global['ps'] = ps;
+    ps.stdin.write('play\n');
+    ps.stdout.on('data', (data) => console.log(data.toString()));
     mainWindow.on('enter-full-screen', () => {
         mainWindow.autoHideMenuBar = true;
         mainWindow.setMenuBarVisibility(false);
