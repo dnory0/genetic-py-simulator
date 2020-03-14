@@ -25,13 +25,14 @@ let checkPath = (path) => {
             console.log('path should point to a python file (ends with .py).');
             break;
         default:
-            ffPath.value = '/home/dnory0/Desktop/lists.py';
+            console.log('possible.');
             break;
     }
 };
 ipcRenderer.on('browsed-path', (_ev, result) => {
     if (result.canceled)
         return;
+    ffPath.value = result.filePaths[0];
     checkPath(result.filePaths[0]);
 });
 //# sourceMappingURL=conf-ga.js.map

@@ -109,7 +109,7 @@ let primeChart = window['createChart']('prime-chart', {
     ]
 });
 delete window['createChart'];
-ipcRenderer.on('data', (_event, data) => treatResponse(data));
+window['ready'](treatResponse);
 ipcRenderer.on('live-rendering', (_ev, newLR) => (liveRendering.isLive = newLR));
 ipcRenderer.on('step-forward', () => (liveRendering.stepForward = true));
 ipcRenderer.on('replay', () => (liveRendering.replay = true));

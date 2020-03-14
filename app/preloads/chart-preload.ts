@@ -92,5 +92,13 @@ window.addEventListener('mouseout', () =>
   charts.forEach(chart => chart.pointer.reset())
 );
 
-let ps = <ChildProcess>getGlobal('ps');
-ps.stdout.on('data', (data: Buffer) => console.log(data.toString()));
+window['ready'] = (treatResponse: (response: object) => void) => {
+  delete window['ready'];
+  (<ChildProcess>getGlobal('pyshell')).stdout.on('data', (response: Buffer) => {
+    response
+      .toString()
+      .split(/(?<=\n)/g)
+      .map((data: string) => JSON.parse(data))
+      .forEach((data: object) => treatResponse(data));
+  });
+};

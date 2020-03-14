@@ -1,5 +1,4 @@
 import { IpcRenderer, WebviewTag, IpcRendererEvent, WebFrame } from 'electron';
-import { ChildProcess } from 'child_process';
 
 /***************************** passed by preload *****************************
  *****************************************************************************/
@@ -601,5 +600,3 @@ ipcRenderer.on('cur-settings', () => {
     }
   });
 });
-let ps = <ChildProcess>window['getGlobal']('ps');
-ps.stdout.on('data', (data: Buffer) => console.log(data.toString()));

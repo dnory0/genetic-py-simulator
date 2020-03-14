@@ -57,12 +57,7 @@ ipcRenderer.once('mode', (_ev, isDev: boolean) => {
   /**
    * python process responsible for executing genetic algorithm.
    */
-  const pyshell: ChildProcess = require(join(
-    __dirname,
-    '..',
-    'modules',
-    'create-pyshell.js'
-  ))(app);
+  const pyshell: ChildProcess = getGlobal('pyshell');
   window['pyshell'] = pyshell;
 
   /************************* states controller part *************************/

@@ -54,6 +54,14 @@ electron_1.ipcRenderer.once('mode', (_ev, isDev) => {
     }, true);
 });
 window.addEventListener('mouseout', () => highcharts_1.charts.forEach(chart => chart.pointer.reset()));
-let ps = getGlobal('ps');
-ps.stdout.on('data', (data) => console.log(data.toString()));
+window['ready'] = (treatResponse) => {
+    delete window['ready'];
+    getGlobal('pyshell').stdout.on('data', (response) => {
+        response
+            .toString()
+            .split(/(?<=\n)/g)
+            .map((data) => JSON.parse(data))
+            .forEach((data) => treatResponse(data));
+    });
+};
 //# sourceMappingURL=chart-preload.js.map

@@ -15,7 +15,7 @@ require(path_1.join(__dirname, '..', 'modules', 'load-settings.js'))(path_1.join
 electron_1.ipcRenderer.once('mode', (_ev, isDev) => {
     if (isDev)
         window['k-shorts'] = require(path_1.join(__dirname, '..', 'modules', 'k-shorts.js'));
-    const pyshell = require(path_1.join(__dirname, '..', 'modules', 'create-pyshell.js'))(app);
+    const pyshell = getGlobal('pyshell');
     window['pyshell'] = pyshell;
     window['sendSig'] = (signal) => pyshell.stdin.write(`${signal}\n`);
 });

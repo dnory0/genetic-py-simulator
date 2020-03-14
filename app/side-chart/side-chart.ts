@@ -1,5 +1,5 @@
 import { Chart, Options } from 'highcharts';
-import { IpcRenderer, IpcRendererEvent } from 'electron';
+import { IpcRenderer } from 'electron';
 
 /****************************** passed by preload ******************************
  *******************************************************************************/
@@ -149,6 +149,4 @@ let sideChart: Chart = window['createChart']('side-chart', {
 
 delete window['createChart'];
 
-ipcRenderer.on('data', (_event: IpcRendererEvent, response: object) =>
-  treatResponse(response)
-);
+window['ready'](treatResponse);

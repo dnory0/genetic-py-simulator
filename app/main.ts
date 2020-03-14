@@ -9,7 +9,7 @@ import {
 } from 'electron';
 import { join } from 'path';
 import { writeFile } from 'fs';
-import { spawn, ChildProcess } from 'child_process';
+import { ChildProcess } from 'child_process';
 
 /**
  * set to true if app on development, false in production.
@@ -19,6 +19,15 @@ const isDev = process.argv.some(arg => ['--dev', '-D', '-d'].includes(arg));
  * main window
  */
 let mainWindow: BrowserWindow;
+/**
+ * python process responsible for executing genetic algorithm.
+ */
+const pyshell: ChildProcess = require(join(
+  __dirname,
+  'modules',
+  'create-pyshell.js'
+))(app);
+global['pyshell'] = pyshell;
 /**
  * settings
  */
@@ -115,14 +124,6 @@ app.once('ready', () => {
     }
   });
 
-  let ps = spawn('python3', [join(__dirname, 'modules', 'python', 'ga.py')]);
-  global['ps'] = ps;
-  ps.stdin.write('play\n');
-  ps.stdout.on('data', (data: Buffer) => console.log(data.toString()));
-
-  // console.log(<ChildProcess>global['hi']);
-
-  // enable autohide on menubar on fullscreen
   mainWindow.on('enter-full-screen', () => {
     mainWindow.autoHideMenuBar = true;
     mainWindow.setMenuBarVisibility(false);
@@ -164,7 +165,6 @@ app.once('ready', () => {
         'ipc-message',
         (_ev, gaChannel, confGA: object) => {
           if (gaChannel == 'conf-ga') {
-            console.log(confGA);
             mainWindow.webContents.send('conf-ga', confGA);
           } else if (gaChannel == 'browse')
             browse(

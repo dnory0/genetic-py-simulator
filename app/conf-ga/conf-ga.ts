@@ -29,7 +29,6 @@ browseBtn.onclick = () => {
 };
 
 ffPath.onkeyup = () => checkPath(ffPath.value);
-// ffPath.onkeyup = () => console.log(ffPath.value);
 
 let checkPath = (path: string) => {
   let checkCode = isValidPath(path);
@@ -47,12 +46,13 @@ let checkPath = (path: string) => {
       console.log('path should point to a python file (ends with .py).');
       break;
     default:
-      ffPath.value = '/home/dnory0/Desktop/lists.py';
+      console.log('possible.');
       break;
   }
 };
 
 ipcRenderer.on('browsed-path', (_ev, result: OpenDialogReturnValue) => {
   if (result.canceled) return;
+  ffPath.value = result.filePaths[0];
   checkPath(result.filePaths[0]);
 });
