@@ -1,7 +1,7 @@
 import { ChildProcess } from 'child_process';
 import { ipcRenderer, webFrame, remote } from 'electron';
 import { join } from 'path';
-const { app } = remote;
+const { app, getGlobal } = remote;
 
 /**
  * preloaded globally
@@ -11,6 +11,10 @@ window['ipcRenderer'] = ipcRenderer;
  * used to resize webviews
  */
 window['webFrame'] = webFrame;
+/**
+ *
+ */
+window['getGlobal'] = getGlobal;
 /*************************** Modules part ***************************/
 /**
  * opens pyshell communication and returns webviews zoom factor resetter.
@@ -53,12 +57,7 @@ ipcRenderer.once('mode', (_ev, isDev: boolean) => {
   /**
    * python process responsible for executing genetic algorithm.
    */
-  const pyshell: ChildProcess = require(join(
-    __dirname,
-    '..',
-    'modules',
-    'create-pyshell.js'
-  ))(app);
+  const pyshell: ChildProcess = getGlobal('pyshell');
   window['pyshell'] = pyshell;
 
   /************************* states controller part *************************/

@@ -1,7 +1,9 @@
-import { ipcRenderer } from 'electron';
+import { ipcRenderer, remote } from 'electron';
 import { Chart, charts } from 'highcharts';
 import { join } from 'path';
+import { ChildProcess } from 'child_process';
 
+const { getGlobal } = remote;
 /**
  * allows communication between this webview & renderer process
  */
@@ -89,3 +91,14 @@ ipcRenderer.once('mode', (_ev, isDev) => {
 window.addEventListener('mouseout', () =>
   charts.forEach(chart => chart.pointer.reset())
 );
+
+window['ready'] = (treatResponse: (response: object) => void) => {
+  delete window['ready'];
+  (<ChildProcess>getGlobal('pyshell')).stdout.on('data', (response: Buffer) => {
+    response
+      .toString()
+      .split(/(?<=\n)/g)
+      .map((data: string) => JSON.parse(data))
+      .forEach((data: object) => treatResponse(data));
+  });
+};

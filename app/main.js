@@ -5,6 +5,8 @@ const path_1 = require("path");
 const fs_1 = require("fs");
 const isDev = process.argv.some(arg => ['--dev', '-D', '-d'].includes(arg));
 let mainWindow;
+const pyshell = require(path_1.join(__dirname, 'modules', 'create-pyshell.js'))(electron_1.app);
+global['pyshell'] = pyshell;
 let runSettings;
 require(path_1.join(__dirname, 'modules', 'load-settings.js'))(path_1.join(electron_1.app.getPath('userData'), 'settings.json'), path_1.join(__dirname, '..', 'settings.json'), (settings) => (runSettings = settings));
 const createWindow = (filePath, { minWidth, minHeight, width, height, resizable, minimizable, maximizable, parent, frame, webPreferences: { preload, webviewTag } } = {}) => {
@@ -69,7 +71,6 @@ electron_1.app.once('ready', () => {
             gaWindow.once('ready-to-show', gaWindow.show);
             gaWindow.webContents.on('ipc-message', (_ev, gaChannel, confGA) => {
                 if (gaChannel == 'conf-ga') {
-                    console.log(confGA);
                     mainWindow.webContents.send('conf-ga', confGA);
                 }
                 else if (gaChannel == 'browse')

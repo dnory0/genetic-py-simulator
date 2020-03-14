@@ -29,6 +29,7 @@ let ffPath = <HTMLInputElement>document.getElementById('ff-path');
 browseBtn.onclick = () => {
   ipcRenderer.once('browsed-path', (_ev, result: OpenDialogReturnValue) => {
     if (result.canceled) return;
+    ffPath.value = result.filePaths[0];
     checkPath(result.filePaths[0]);
   });
   ipcRenderer.send('browse');
@@ -52,7 +53,7 @@ let checkPath = (path: string) => {
       console.log('path should point to a python file (ends with .py).');
       break;
     default:
-      ffPath.value = '/home/dnory0/Desktop/lists.py';
+      console.log('possible.');
       break;
   }
 };

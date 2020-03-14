@@ -87,5 +87,5 @@ let sideChart = window['createChart']('side-chart', {
     ]
 });
 delete window['createChart'];
-ipcRenderer.on('data', (_event, response) => treatResponse(response));
+window['ready'](treatResponse);
 //# sourceMappingURL=side-chart.js.map

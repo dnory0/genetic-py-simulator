@@ -1,5 +1,5 @@
 import { Chart, SeriesLineOptions, Options } from 'highcharts';
-import { IpcRendererEvent, IpcRenderer } from 'electron';
+import { IpcRenderer } from 'electron';
 
 /**
  * by default the chart updates whenever it has a point added to it,
@@ -176,9 +176,7 @@ delete window['createChart'];
  */
 // window['fittestHistory'] = [];
 
-ipcRenderer.on('data', (_event: IpcRendererEvent, data: object) =>
-  treatResponse(data)
-);
+window['ready'](treatResponse);
 
 ipcRenderer.on(
   'live-rendering',
