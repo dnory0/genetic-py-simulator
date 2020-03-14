@@ -1,18 +1,21 @@
 import { IpcRenderer, OpenDialogReturnValue } from 'electron';
 
 let ipcRenderer: IpcRenderer = window['ipcRenderer'];
+
 /**
  * checks if path is valid, check conditions are ordered and return value is as follows:
  *
  * - ```-1``` if path does not exist.
  * - ```-2``` if path is not an absolute path.
  * - ```-3``` if path does not point to a file.
- * - ```-4``` if the file extention is not ```.py```.
+ * - ```-4``` if the file extention is not equal to the given ```ext```.
  * - ```0``` if path matchs all conditions.
  *
- * @param confGAPath GA configuration path to check
+ * @param confGAPath GA configuration path to check.
+ * @param ext extension name, default is ```.py```.
  */
-let isValidPath: (confGAPath: string) => number = window['isValidPath'];
+let validatePath: (confGAPath: string, ext?: string) => number =
+  window['validatePath'];
 
 /**
  * browse button
@@ -24,15 +27,17 @@ let browseBtn = <HTMLButtonElement>document.getElementById('browse-btn');
 let ffPath = <HTMLInputElement>document.getElementById('ff-path');
 
 browseBtn.onclick = () => {
+  ipcRenderer.once('browsed-path', (_ev, result: OpenDialogReturnValue) => {
+    if (result.canceled) return;
+    checkPath(result.filePaths[0]);
+  });
   ipcRenderer.send('browse');
-  console.log('browse');
 };
 
-ffPath.onkeyup = () => checkPath(ffPath.value);
-// ffPath.onkeyup = () => console.log(ffPath.value);
+ffPath.onkeydown = () => checkPath(ffPath.value);
 
 let checkPath = (path: string) => {
-  let checkCode = isValidPath(path);
+  let checkCode = validatePath(path);
   switch (checkCode) {
     case -1:
       console.log("path doesn't exist.");
@@ -51,8 +56,3 @@ let checkPath = (path: string) => {
       break;
   }
 };
-
-ipcRenderer.on('browsed-path', (_ev, result: OpenDialogReturnValue) => {
-  if (result.canceled) return;
-  checkPath(result.filePaths[0]);
-});

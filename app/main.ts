@@ -175,12 +175,13 @@ app.once('ready', () => {
               },
               result => gaWindow.webContents.send('browsed-path', result),
               reason => {
+                gaWindow.webContents.send('browsed-path', { canceled: true });
                 if (reason) throw reason;
               }
             );
         }
       );
-      gaWindow.once('closed', _ev =>
+      gaWindow.once('closed', () =>
         mainWindow.webContents.send('conf-ga-finished')
       );
     }

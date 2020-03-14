@@ -3,7 +3,7 @@ from threading import Thread, Lock, Condition
 from json import loads, dumps
 from random import random, randint, randrange, uniform
 from sys import argv, exit
-# import importlib
+# from importlib import import_module
 # import types
 
 
@@ -351,6 +351,8 @@ def update_parameters(command: dict):
     if type(command.get('delay_rate')) is not type(None):
         # sleep in seconds
         g_delay_rate = round(final_value(.0, command.get('delay_rate'), command.get('random_delay_rate')), 2)
+    # if command.get('ff'):
+    #     import_module(command.get('ff'))
 
 def init_ga():
     """

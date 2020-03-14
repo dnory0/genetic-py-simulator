@@ -1,16 +1,20 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 let ipcRenderer = window['ipcRenderer'];
-let isValidPath = window['isValidPath'];
+let validatePath = window['validatePath'];
 let browseBtn = document.getElementById('browse-btn');
 let ffPath = document.getElementById('ff-path');
 browseBtn.onclick = () => {
+    ipcRenderer.once('browsed-path', (_ev, result) => {
+        if (result.canceled)
+            return;
+        checkPath(result.filePaths[0]);
+    });
     ipcRenderer.send('browse');
-    console.log('browse');
 };
-ffPath.onkeyup = () => checkPath(ffPath.value);
+ffPath.onkeydown = () => checkPath(ffPath.value);
 let checkPath = (path) => {
-    let checkCode = isValidPath(path);
+    let checkCode = validatePath(path);
     switch (checkCode) {
         case -1:
             console.log("path doesn't exist.");
@@ -29,9 +33,4 @@ let checkPath = (path) => {
             break;
     }
 };
-ipcRenderer.on('browsed-path', (_ev, result) => {
-    if (result.canceled)
-        return;
-    checkPath(result.filePaths[0]);
-});
 //# sourceMappingURL=conf-ga.js.map

@@ -6,7 +6,7 @@ import HighchartsMore from 'highcharts/highcharts-more';
 HighchartsMore(Highcharts);
 
 module.exports = (containerId: string, options: Options) => {
-  delete require.cache[require.resolve('./create-pyshell')];
+  delete require.cache[require.resolve('./create-chart')];
   return chart(containerId, {
     chart: {
       // zoomType: 'x',

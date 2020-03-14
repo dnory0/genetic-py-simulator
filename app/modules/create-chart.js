@@ -5,7 +5,7 @@ const Highcharts = require("highcharts");
 const highcharts_more_1 = require("highcharts/highcharts-more");
 highcharts_more_1.default(Highcharts);
 module.exports = (containerId, options) => {
-    delete require.cache[require.resolve('./create-pyshell')];
+    delete require.cache[require.resolve('./create-chart')];
     return highcharts_1.chart(containerId, {
         chart: {
             spacingBottom: 3
