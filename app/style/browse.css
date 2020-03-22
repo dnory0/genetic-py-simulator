@@ -5,7 +5,9 @@
 }
 
 .browse > input[type='text'] {
-  min-width: 280px;
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
   height: 24px;
   outline: none;
   padding: 1px 5px;
@@ -17,6 +19,7 @@
   background-color: #e8e8e8;
   font-weight: bold;
   height: 28px;
+  width: 36px;
   outline: none;
   -webkit-user-select: none;
      -moz-user-select: none;
@@ -32,14 +35,14 @@
 
 .browse > button img {
   position: relative;
-  top: 3px;
+  top: 2px;
   width: 20px;
   height: 20px;
 }
 
-.browse > button::after {
+.browse > button.browse-txt::after {
   content: 'browse...';
   position: relative;
-  top: -3px;
+  top: -4px;
 }
 /*# sourceMappingURL=browse.css.map */

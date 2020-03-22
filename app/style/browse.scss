@@ -2,7 +2,7 @@
   display: flex;
 
   > input[type='text'] {
-    min-width: 280px;
+    flex: 1;
     height: 24px;
     outline: none;
     padding: 1px 5px;
@@ -14,6 +14,7 @@
     background-color: #e8e8e8;
     font-weight: bold;
     height: 28px;
+    width: 36px;
     outline: none;
     user-select: none;
     margin-left: -1px;
@@ -25,15 +26,15 @@
 
     img {
       position: relative;
-      top: 3px;
+      top: 2px;
       width: 20px;
       height: 20px;
     }
 
-    &::after {
+    &.browse-txt::after {
       content: 'browse...';
       position: relative;
-      top: -3px;
+      top: -4px;
     }
   }
 }

@@ -51,7 +51,9 @@ body {
 }
 
 .browse > input[type='text'] {
-  min-width: 280px;
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
   height: 24px;
   outline: none;
   padding: 1px 5px;
@@ -63,6 +65,7 @@ body {
   background-color: #e8e8e8;
   font-weight: bold;
   height: 28px;
+  width: 36px;
   outline: none;
   -webkit-user-select: none;
      -moz-user-select: none;
@@ -78,14 +81,292 @@ body {
 
 .browse > button img {
   position: relative;
-  top: 3px;
+  top: 2px;
   width: 20px;
   height: 20px;
 }
 
-.browse > button::after {
+.browse > button.browse-txt::after {
   content: 'browse...';
   position: relative;
-  top: -3px;
+  top: -4px;
+}
+
+/* Borders used between 2 resizable DIVs */
+.border {
+  background-clip: content-box;
+  background-color: #cebbbb;
+  position: relative;
+  z-index: 1;
+}
+
+.border.hor {
+  cursor: ns-resize;
+  padding: 4px 0;
+  height: 1px;
+  min-height: 1px;
+}
+
+.border.ver {
+  cursor: ew-resize;
+  padding: 0 4px;
+  width: 1px;
+  min-width: 1px;
+  height: 100%;
+}
+
+/* Border between content that need to be devided sementically */
+.separator {
+  background-color: #cebbbb;
+  width: 1px;
+  margin: 3px 6px;
+}
+
+#main {
+  height: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+
+#main .configuration {
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  height: calc(100% - 45px);
+}
+
+#main .configuration .parameters {
+  width: 380px;
+}
+
+#main .configuration .parameters .title {
+  margin: 0;
+  padding: 8px 0;
+  font-size: 17px;
+  font-family: sans-serif;
+}
+
+#main .configuration .parameters .title.pad {
+  padding-left: 5px;
+}
+
+#main .configuration .parameters .parameter {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+#main .configuration .parameters .parameter p.param-name {
+  font-size: 13px;
+  padding: 10px 5px;
+  margin: 0;
+  font-family: sans-serif;
+  width: 100px;
+}
+
+#main .configuration .parameters .parameter .param-settings {
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+}
+
+#main .configuration .parameters .parameter .param-settings .param-value {
+  width: 130px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+#main .configuration .parameters .parameter .param-settings .param-value input[type='number'] {
+  width: 80px;
+  padding-top: 2px;
+  padding-left: 2px;
+  height: 19px;
+  font-size: 17px;
+  border: 1px solid #7b7b7b;
+  border-radius: 2px;
+}
+
+#main .configuration .parameters .parameter .param-settings .param-value input[type='number']:focus {
+  -webkit-box-shadow: 0 0 0 1px #df9a00, 0 0 0 4px rgba(223, 165, 0, 0.3);
+          box-shadow: 0 0 0 1px #df9a00, 0 0 0 4px rgba(223, 165, 0, 0.3);
+}
+
+#main .configuration .parameters .parameter .param-settings .param-value input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+
+#main .configuration .parameters .parameter .param-settings .other-settings {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+#main .configuration .parameters .parameter .param-settings .other-settings > * {
+  margin: 6px;
+}
+
+#main .configuration .border {
+  cursor: default;
+  padding: 0;
+}
+
+#main .configuration .details {
+  -webkit-box-flex: 1.1;
+      -ms-flex: 1.1;
+          flex: 1.1;
+}
+
+#main .conf-ga-file {
+  padding: 10px 5px;
+  font-family: sans-serif;
+}
+
+#main .save-cancel-revert {
+  padding: 12px 8px 8px;
+  text-align: right;
+  border-top: solid #cebbbb 1px;
+  background-color: whitesmoke;
+}
+
+#main .save-cancel-revert .right {
+  margin-left: auto;
+}
+
+button {
+  width: 64px;
+  height: 24px;
+  border-radius: 3px;
+  background-color: white;
+  border: 1px solid #999999;
+}
+
+button#browse-btn {
+  border-radius: 0;
+}
+
+button:hover:not(:disabled), button.hover:not(:disabled) {
+  background-color: #d9d9d9;
+}
+
+button:disabled {
+  background-color: whitesmoke;
+}
+
+button#save-btn {
+  background-color: #137cff;
+  color: whitesmoke;
+  border: none;
+}
+
+button#save-btn:hover:not(:disabled), button#save-btn.hover:not(:disabled) {
+  background-color: #0037ec;
+}
+
+button#save-btn:disabled {
+  background-color: #4e9dff;
+}
+
+input[type='range'] {
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+}
+
+input[type='range']:not(:disabled) {
+  cursor: pointer;
+}
+
+input[type='range']:disabled {
+  opacity: 0.6;
+}
+
+input[type='range']::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 5px;
+  background: #555555;
+  border-radius: 3px;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+input[type='range']::-webkit-slider-thumb {
+  border: 1px solid #000000;
+  height: 14px;
+  width: 14px;
+  border-radius: 7px;
+  background: #272727;
+  -webkit-appearance: none;
+  margin-top: -5px;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+input[type='range']:not(:disabled):hover::-webkit-slider-thumb {
+  background: #6b6b6b;
+}
+
+input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
+  background: #272727;
+}
+
+.checkbox-wrapper {
+  width: 24px;
+  height: 24px;
+  position: relative;
+}
+
+.checkbox-wrapper input[type='checkbox'] {
+  opacity: 0;
+  height: 24px;
+  width: 24px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 2px;
+}
+
+.checkbox-wrapper input[type='checkbox'] + label {
+  height: 24px;
+  width: 24px;
+  padding: 3px;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  position: absolute;
+  left: 0;
+  border-radius: 2px;
+}
+
+.checkbox-wrapper input[type='checkbox'] + label > img {
+  opacity: 0.5;
+  height: 18px;
+}
+
+.checkbox-wrapper input[type='checkbox']:not(:disabled) + label:hover {
+  background-color: #c4c4c4;
+}
+
+.checkbox-wrapper input[type='checkbox']:checked + label > img {
+  opacity: 1;
 }
 /*# sourceMappingURL=conf-ga.css.map */

@@ -5,6 +5,7 @@ const path_1 = require("path");
 const fs_1 = require("fs");
 const isDev = process.argv.some(arg => ['--dev', '-D', '-d'].includes(arg));
 let mainWindow;
+let gaWindow;
 const pyshell = require(path_1.join(__dirname, 'modules', 'create-pyshell.js'))(electron_1.app);
 global['pyshell'] = pyshell;
 let runSettings;
@@ -20,7 +21,6 @@ const createWindow = (filePath, { minWidth, minHeight, width, height, resizable,
         maximizable,
         parent,
         frame,
-        modal: true,
         show: false,
         webPreferences: {
             preload,
@@ -62,7 +62,9 @@ electron_1.app.once('ready', () => {
         if (channel == 'mode')
             mainWindow.webContents.send('mode', isDev);
         else if (channel == 'conf-ga') {
-            const gaWindow = createWindow(path_1.join(__dirname, 'conf-ga', 'conf-ga.html'), {
+            gaWindow = createWindow(path_1.join(__dirname, 'conf-ga', 'conf-ga.html'), {
+                minWidth: 680,
+                minHeight: 480,
                 parent: mainWindow,
                 webPreferences: {
                     preload: path_1.join(__dirname, 'preloads', 'conf-ga-preload.js')
@@ -79,7 +81,7 @@ electron_1.app.once('ready', () => {
                         defaultPath: electron_1.app.getPath('desktop'),
                         filters: [
                             {
-                                name: 'Python',
+                                name: 'Python File (.py)',
                                 extensions: ['py']
                             }
                         ],
@@ -91,6 +93,10 @@ electron_1.app.once('ready', () => {
                     });
             });
             gaWindow.once('closed', () => mainWindow.webContents.send('conf-ga-finished'));
+        }
+        else if (channel == 'close-conf-ga') {
+            if (gaWindow && !gaWindow.isDestroyed())
+                gaWindow.close();
         }
     });
     (() => {
@@ -139,4 +145,5 @@ electron_1.app.once('ready', () => {
         });
     });
 });
+electron_1.app.once('will-quit', () => pyshell.stdin.write('exit\n'));
 //# sourceMappingURL=main.js.map

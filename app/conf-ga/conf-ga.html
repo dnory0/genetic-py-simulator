@@ -7,22 +7,124 @@
     <link rel="stylesheet" href="../style/conf-ga.css" />
   </head>
   <body>
-    <div class="main">
-      <!-- pop size<br />
-      genes num<br />
-      fitness function---upload<br />
-      crossover value, crossover way<br />
-      mutation value, mutation way(ex: replace with opposite in case of 1s and
-      0s or switch with other genes near)<br />
-      replace new generation directly, or choose best between father and
-      offspring<br />
-      <button id="conf-ga-sender">Click Me</button> -->
-      <h2>GA Configuration</h2>
-      <div class="browse">
-        <input type="text" id="ff-path" />
-        <button id="browse-btn">
-          <img src="../img/browse.png" />
-        </button>
+    <div id="main">
+      <div class="configuration">
+        <div class="parameters">
+          <div class="conf-ga-file">
+            <p class="title">GA Configuration File:</p>
+            <div class="browse">
+              <input type="text" id="ff-path" />
+              <button id="browse-btn">
+                <img src="../img/browse.png" />
+              </button>
+            </div>
+          </div>
+          <div class="border hor"></div>
+          <p class="title pad">GA Configuration Manually:</p>
+          <div class="parameter">
+            <p class="param-name">Population Size:</p>
+            <div class="param-settings">
+              <div class="param-value">
+                <input
+                  type="number"
+                  min="1"
+                  step="1"
+                  id="pop-size"
+                  name="pop_size"
+                />
+              </div>
+              <div class="other-settings">
+                <button>Random</button>
+                <div class="checkbox-wrapper">
+                  <input
+                    type="checkbox"
+                    name="lock_pop_size"
+                    id="lock-pop-size"
+                  />
+                  <label for="lock-pop-size">
+                    <img src="../img/lock.png" />
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="parameter">
+            <p class="param-name">Genes Number:</p>
+            <div class="param-settings">
+              <div class="param-value">
+                <input
+                  type="number"
+                  min="1"
+                  step="1"
+                  id="genes-num"
+                  name="genes_num"
+                />
+              </div>
+              <div class="other-settings">
+                <button>Random</button>
+                <div class="checkbox-wrapper">
+                  <input
+                    type="checkbox"
+                    name="lock_genes_num"
+                    id="lock-genes-num"
+                  />
+                  <label for="lock-genes-num">
+                    <img src="../img/lock.png" />
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="parameter">
+            <p class="param-name">Crossover Rate:</p>
+            <div class="param-settings">
+              <div class="param-value">
+                <input type="range" min="0.001" max="1" step="0.001" />
+              </div>
+              <div class="other-settings">
+                <button>Random</button>
+              </div>
+            </div>
+          </div>
+          <div class="parameter">
+            <p class="param-name">Mutation Rate:</p>
+            <div class="param-settings">
+              <div class="param-value">
+                <input type="range" min="0" max="1" step="0.001" />
+              </div>
+              <div class="other-settings">
+                <button>Random</button>
+              </div>
+            </div>
+          </div>
+          <div class="parameter">
+            <p class="param-name">Delay Rate:</p>
+            <div class="param-settings">
+              <div class="param-value">
+                <input type="range" min="0" max="5" step="0.05" />
+              </div>
+              <div class="other-settings">
+                <button>Random</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="border ver"></div>
+        <div class="details"></div>
+      </div>
+
+      <div class="save-cancel-revert">
+        <div class="right">
+          <button id="save-btn" disabled>
+            <span class="alt-trigger">S</span>ave
+          </button>
+          <button id="cancel-btn" disabled>
+            <span class="alt-trigger">C</span>ancel
+          </button>
+          <button id="revert-btn">
+            <span class="alt-trigger">R</span>evert
+          </button>
+        </div>
       </div>
     </div>
     <script>

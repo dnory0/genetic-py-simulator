@@ -363,6 +363,7 @@ body {
 
 #main .middle-container .checkbox-wrapper input[type='checkbox'] + label > img {
   opacity: 0.5;
+  height: 18px;
 }
 
 #main .middle-container .checkbox-wrapper input[type='checkbox']:not(:disabled) + label:hover {

@@ -20,6 +20,10 @@ const isDev = process.argv.some(arg => ['--dev', '-D', '-d'].includes(arg));
  */
 let mainWindow: BrowserWindow;
 /**
+ * GA Configuration Window
+ */
+let gaWindow: BrowserWindow;
+/**
  * python process responsible for executing genetic algorithm.
  */
 const pyshell: ChildProcess = require(join(
@@ -72,7 +76,6 @@ const createWindow = (
     maximizable,
     parent,
     frame,
-    modal: true,
     show: false,
     webPreferences: {
       preload,
@@ -145,15 +148,14 @@ app.once('ready', () => {
   mainWindow.webContents.on('ipc-message', (_ev, channel) => {
     if (channel == 'mode') mainWindow.webContents.send('mode', isDev);
     else if (channel == 'conf-ga') {
-      const gaWindow = createWindow(
-        join(__dirname, 'conf-ga', 'conf-ga.html'),
-        {
-          parent: mainWindow,
-          webPreferences: {
-            preload: join(__dirname, 'preloads', 'conf-ga-preload.js')
-          }
+      gaWindow = createWindow(join(__dirname, 'conf-ga', 'conf-ga.html'), {
+        minWidth: 680,
+        minHeight: 480,
+        parent: mainWindow,
+        webPreferences: {
+          preload: join(__dirname, 'preloads', 'conf-ga-preload.js')
         }
-      );
+      });
 
       gaWindow.once('ready-to-show', gaWindow.show);
 
@@ -171,11 +173,11 @@ app.once('ready', () => {
               gaWindow,
               {
                 title: 'Open GA Configuration file',
-                defaultPath: app.getPath('desktop'),
                 // TODO: read from runSettings
+                defaultPath: app.getPath('desktop'),
                 filters: [
                   {
-                    name: 'Python',
+                    name: 'Python File (.py)',
                     extensions: ['py']
                   }
                 ],
@@ -192,6 +194,8 @@ app.once('ready', () => {
       gaWindow.once('closed', () =>
         mainWindow.webContents.send('conf-ga-finished')
       );
+    } else if (channel == 'close-conf-ga') {
+      if (gaWindow && !gaWindow.isDestroyed()) gaWindow.close();
     }
   });
 
@@ -250,3 +254,5 @@ app.once('ready', () => {
     );
   });
 });
+
+app.once('will-quit', () => pyshell.stdin.write('exit\n'));

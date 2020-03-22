@@ -252,8 +252,8 @@ document.addEventListener('DOMContentLoaded', function loaded() {
             })();
         };
         window.addEventListener('beforeunload', () => {
+            ipcRenderer.send('close-conf-ga');
             main.style.display = 'none';
-            window['sendSig']('exit');
         });
     })();
 });

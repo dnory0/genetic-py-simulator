@@ -540,8 +540,9 @@ document.addEventListener('DOMContentLoaded', function loaded() {
      * terminate pyshell process with its threads on close or reload
      */
     window.addEventListener('beforeunload', () => {
+      ipcRenderer.send('close-conf-ga');
       main.style.display = 'none';
-      window['sendSig']('exit');
+      // window['sendSig']('exit');
     });
   })();
 });

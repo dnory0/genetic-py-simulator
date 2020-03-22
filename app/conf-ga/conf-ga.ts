@@ -17,26 +17,6 @@ let ipcRenderer: IpcRenderer = window['ipcRenderer'];
 let validatePath: (confGAPath: string, ext?: string) => number =
   window['validatePath'];
 
-/**
- * browse button
- */
-let browseBtn = <HTMLButtonElement>document.getElementById('browse-btn');
-/**
- * input that takes the path to ga configuration
- */
-let ffPath = <HTMLInputElement>document.getElementById('ff-path');
-
-browseBtn.onclick = () => {
-  ipcRenderer.once('browsed-path', (_ev, result: OpenDialogReturnValue) => {
-    if (result.canceled) return;
-    ffPath.value = result.filePaths[0];
-    checkPath(result.filePaths[0]);
-  });
-  ipcRenderer.send('browse');
-};
-
-ffPath.onkeydown = () => checkPath(ffPath.value);
-
 let checkPath = (path: string) => {
   let checkCode = validatePath(path);
   switch (checkCode) {
@@ -57,3 +37,111 @@ let checkPath = (path: string) => {
       break;
   }
 };
+
+/**
+ * browse button
+ */
+let browseBtn = <HTMLButtonElement>document.getElementById('browse-btn');
+
+/**
+ * input that takes the path to ga configuration
+ */
+let ffPath = <HTMLInputElement>document.getElementById('ff-path');
+
+/**
+ * save button
+ */
+let saveBtn = <HTMLButtonElement>document.getElementById('save-btn');
+/**
+ * cancel button
+ */
+let cancelBtn = <HTMLButtonElement>document.getElementById('cancel-btn');
+/**
+ * revert button
+ */
+let revertBtn = <HTMLButtonElement>document.getElementById('revert-btn');
+
+browseBtn.onclick = () => {
+  ipcRenderer.once('browsed-path', (_ev, result: OpenDialogReturnValue) => {
+    if (result.canceled) return;
+    ffPath.value = result.filePaths[0];
+    checkPath(result.filePaths[0]);
+  });
+  ipcRenderer.send('browse');
+};
+
+ffPath.onkeypress = () => checkPath(ffPath.value);
+
+(() => {
+  function saveConfig() {
+    // TODO:
+    console.log('save triggered');
+  }
+
+  saveBtn.onclick = () => {
+    saveConfig();
+  };
+})();
+
+cancelBtn.onclick = () => {
+  console.log('cancel triggered');
+};
+
+revertBtn.onclick = () => {
+  console.log('revert triggered');
+};
+
+window.onkeydown = (ev: KeyboardEvent) => {
+  if (ev.key == 'Alt') {
+    Array.from(document.getElementsByClassName('alt-trigger')).forEach(
+      (altTrigger: HTMLSpanElement) => {
+        if (!(<HTMLButtonElement>altTrigger.parentElement).disabled)
+          altTrigger.style.textDecoration = 'underline';
+      }
+    );
+  } else if (ev.altKey) {
+    switch (ev.key) {
+      case 's':
+        if (!saveBtn.disabled) saveBtn.classList.add('hover');
+        break;
+      case 'c':
+        if (!cancelBtn.disabled) cancelBtn.classList.add('hover');
+        break;
+      case 'r':
+        if (!revertBtn.disabled) revertBtn.classList.add('hover');
+        break;
+    }
+  }
+};
+
+(() => {
+  function altTriggered(button: HTMLButtonElement) {
+    if (!button.disabled) {
+      button.classList.remove('hover');
+      button.click();
+    }
+  }
+
+  window.onkeyup = (ev: KeyboardEvent) => {
+    if (ev.key == 'Alt') {
+      Array.from(document.getElementsByClassName('alt-trigger')).forEach(
+        (altTrigger: HTMLSpanElement) => {
+          if (!(<HTMLButtonElement>altTrigger.parentElement).disabled)
+            altTrigger.style.textDecoration = 'none';
+        }
+      );
+    } else if (ev.altKey) {
+      switch (ev.key) {
+        case 's':
+          altTriggered(saveBtn);
+          break;
+        case 'c':
+          altTriggered(cancelBtn);
+          break;
+        case 'r':
+          altTriggered(revertBtn);
+          break;
+      }
+    }
+  };
+})();
