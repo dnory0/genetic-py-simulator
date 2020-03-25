@@ -41,9 +41,7 @@ window['clearChart'] = (chart, categories = false) => {
         chart.xAxis[0].setCategories([]);
     chart.series.forEach(serie => serie.setData([], true));
 };
-electron_1.ipcRenderer.once('mode', (_ev, isDev) => {
-    if (!isDev)
-        return;
+if (getGlobal('isDev'))
     window.addEventListener('keyup', (event) => {
         if (event.code == 'Backquote')
             if (event.ctrlKey)
@@ -52,7 +50,6 @@ electron_1.ipcRenderer.once('mode', (_ev, isDev) => {
                 else
                     electron_1.ipcRenderer.sendToHost('devTools', 'prime');
     }, true);
-});
 window.addEventListener('mouseout', () => highcharts_1.charts.forEach(chart => chart.pointer.reset()));
 window['ready'] = (treatResponse) => {
     delete window['ready'];

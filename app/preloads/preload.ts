@@ -28,6 +28,18 @@ window['loaded'] = require(join(__dirname, '..', 'modules', 'loaded.js'));
  * add resizabality for webviews and other parts of the UI
  */
 window['border'] = require(join(__dirname, '..', 'modules', 'border.js'));
+/**
+ * parameters part
+ */
+window['params'] = require('../modules/params');
+/**
+ * settings affecter
+ */
+window['affectSettings'] = require('../modules/affect-settings');
+/**
+ * settings autosaver
+ */
+window['saveSettings'] = require('../modules/save-settings');
 
 /**
  * loads app settings
@@ -40,30 +52,24 @@ require(join(__dirname, '..', 'modules', 'load-settings.js'))(
   }
 );
 
-ipcRenderer.once('mode', (_ev, isDev: boolean) => {
-  /**
-   * some keyboard shortcuts can't be implemented in the main process so they
-   * are implemented in the renderer process
-   */
-  if (isDev)
-    window['k-shorts'] = require(join(
-      __dirname,
-      '..',
-      'modules',
-      'k-shorts.js'
-    ));
+/**
+ * some keyboard shortcuts can't be implemented in the main process so they
+ * are implemented in the renderer process
+ */
+window['isDev'] = getGlobal('isDev');
+if (window['isDev'])
+  window['k-shorts'] = require(join(__dirname, '..', 'modules', 'k-shorts.js'));
 
-  /*************************** Python part ***************************/
-  /**
-   * python process responsible for executing genetic algorithm.
-   */
-  const pyshell: ChildProcess = getGlobal('pyshell');
-  window['pyshell'] = pyshell;
+/*************************** Python part ***************************/
+/**
+ * python process responsible for executing genetic algorithm.
+ */
+const pyshell: ChildProcess = getGlobal('pyshell');
+window['pyshell'] = pyshell;
 
-  /************************* states controller part *************************/
-  /**
-   * send signal to GA
-   * @param signal play | pause | stop | replay | step_f | exit
-   */
-  window['sendSig'] = (signal: string) => pyshell.stdin.write(`${signal}\n`);
-});
+/************************* states controller part *************************/
+/**
+ * send signal to GA
+ * @param signal play | pause | stop | replay | step_f | exit
+ */
+window['sendSig'] = (signal: string) => pyshell.stdin.write(`${signal}\n`);

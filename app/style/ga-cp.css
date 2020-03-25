@@ -1,0 +1,516 @@
+textarea,
+input,
+div,
+button {
+  outline: none !important;
+  margin: 0;
+}
+
+* {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  -webkit-user-drag: none;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  height: 100%;
+}
+
+.scrollbar {
+  overflow-x: hidden;
+  overflow-y: auto;
+  /* Track */
+  /* Handle */
+  /* Handle on hover */
+}
+
+.scrollbar::-webkit-scrollbar {
+  width: 12px;
+}
+
+.scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.scrollbar::-webkit-scrollbar-thumb {
+  background: #aaa;
+}
+
+.scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #777;
+}
+
+.browse {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.browse > input[type='text'] {
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  height: 24px;
+  outline: none;
+  padding: 1px 5px;
+  border: 1px #a2a2a2 solid;
+  font-size: 14px;
+}
+
+.browse > button {
+  background-color: #e8e8e8;
+  font-weight: bold;
+  height: 28px;
+  width: 36px;
+  outline: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  margin-left: -1px;
+  border: 1px #a2a2a2 solid;
+  border-radius: 0;
+}
+
+.browse > button:hover {
+  background-color: #d2d2d2;
+}
+
+.browse > button img {
+  position: relative;
+  top: 2px;
+  width: 20px;
+  height: 20px;
+}
+
+.browse > button.browse-txt::after {
+  content: 'browse...';
+  position: relative;
+  top: -4px;
+}
+
+/* Borders used between 2 resizable DIVs */
+.border {
+  background-clip: content-box;
+  background-color: #cebbbb;
+  position: relative;
+  z-index: 1;
+}
+
+.border.hor {
+  cursor: ns-resize;
+  padding: 4px 0;
+  height: 1px;
+  min-height: 1px;
+}
+
+.border.ver {
+  cursor: ew-resize;
+  padding: 0 4px;
+  width: 1px;
+  min-width: 1px;
+  height: 100%;
+}
+
+/* Border between content that need to be devided sementically */
+.separator {
+  background-color: #cebbbb;
+  width: 1px;
+  margin: 3px 6px;
+}
+
+button {
+  width: 64px;
+  height: 24px;
+  border-radius: 3px;
+  background-color: white;
+  border: 1px solid #999999;
+}
+
+button:hover:not(:disabled), button.alt-pressed:not(:disabled) {
+  background-color: #d9d9d9;
+}
+
+button:disabled {
+  background-color: whitesmoke;
+}
+
+input[type='range'] {
+  width: 120px;
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+}
+
+input[type='range']:not(:disabled) {
+  cursor: pointer;
+}
+
+input[type='range']:disabled {
+  opacity: 0.6;
+}
+
+input[type='range']::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 5px;
+  background: #555555;
+  border-radius: 3px;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+input[type='range']::-webkit-slider-thumb {
+  border: 1px solid #000000;
+  height: 14px;
+  width: 14px;
+  border-radius: 7px;
+  background: #272727;
+  -webkit-appearance: none;
+  margin-top: -5px;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+input[type='range']:not(:disabled):hover::-webkit-slider-thumb {
+  background: #6b6b6b;
+}
+
+input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
+  background: #272727;
+}
+
+.checkbox-wrapper {
+  width: 24px;
+  height: 24px;
+  position: relative;
+}
+
+.checkbox-wrapper input[type='checkbox'] {
+  opacity: 0;
+  height: 24px;
+  width: 24px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 2px;
+}
+
+.checkbox-wrapper input[type='checkbox'] + label {
+  height: 24px;
+  width: 24px;
+  padding: 3px;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  position: absolute;
+  left: 0;
+  border-radius: 2px;
+}
+
+.checkbox-wrapper input[type='checkbox'] + label > img {
+  opacity: 0.5;
+  height: 18px;
+}
+
+.checkbox-wrapper input[type='checkbox']:not(:disabled) + label:hover {
+  background-color: #c4c4c4;
+}
+
+.checkbox-wrapper input[type='checkbox']:checked + label > img {
+  opacity: 1;
+}
+
+.sign {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.sign .title {
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  margin: 0;
+  padding: 8px 0;
+  font-size: 17px;
+  font-family: sans-serif;
+}
+
+.sign .random-all-btn {
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  width: fit-content;
+  margin: 6px;
+}
+
+.params-file,
+.params-man {
+  padding: 10px 6px;
+}
+
+.params-file {
+  font-family: sans-serif;
+}
+
+.params-man {
+  padding-right: 0;
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+}
+
+.params-man .complex-param {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: reverse;
+      -ms-flex-direction: row-reverse;
+          flex-direction: row-reverse;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+}
+
+.params-man .param {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.params-man .param .param-name {
+  font-size: 13px;
+  font-family: sans-serif;
+  width: 100px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.params-man .param .param-name > p {
+  margin: 0;
+}
+
+.params-man .param .param-settings {
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: left;
+      -ms-flex-pack: left;
+          justify-content: left;
+}
+
+.params-man .param .param-settings .param-value {
+  width: 130px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.params-man .param .param-settings .param-value input[type='text'] {
+  width: 80px;
+  padding: 2px 2px 1px;
+  height: 19px;
+  font-size: 17px;
+  border: 1px solid #7b7b7b;
+  border-radius: 2px;
+  text-align: right;
+}
+
+.params-man .param .param-settings .param-value input[type='text'].valid, .params-man .param .param-settings .param-value input[type='text'].valid:focus {
+  -webkit-box-shadow: 0 0 0 1px #6cdf00, 0 0 0 4px rgba(0, 255, 0, 0.3);
+          box-shadow: 0 0 0 1px #6cdf00, 0 0 0 4px rgba(0, 255, 0, 0.3);
+}
+
+.params-man .param .param-settings .param-value input[type='text'].invalid, .params-man .param .param-settings .param-value input[type='text'].invalid:focus {
+  -webkit-box-shadow: 0 0 0 1px #df0000, 0 0 0 4px rgba(255, 0, 0, 0.3);
+          box-shadow: 0 0 0 1px #df0000, 0 0 0 4px rgba(255, 0, 0, 0.3);
+}
+
+.params-man .param .param-settings .param-value input[type='text']:focus {
+  -webkit-box-shadow: 0 0 0 1px #df9a00, 0 0 0 4px rgba(223, 165, 0, 0.3);
+          box-shadow: 0 0 0 1px #df9a00, 0 0 0 4px rgba(223, 165, 0, 0.3);
+}
+
+.params-man .param .param-settings .other-settings {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.params-man .param .param-settings .other-settings > * {
+  margin: 6px;
+}
+
+.params-man input[type='checkbox'].param-enabler {
+  margin: 11px;
+}
+
+.params-man input[type='checkbox'].param-enabler,
+.params-man input[type='checkbox'].force-textfields {
+  width: 14px;
+  height: 14px;
+}
+
+.params-man input[type='checkbox'].param-enabler + div,
+.params-man input[type='checkbox'].force-textfields + div {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.params-man input[type='checkbox'].param-enabler:checked + div,
+.params-man input[type='checkbox'].force-textfields:checked + div {
+  pointer-events: all;
+  opacity: 1;
+}
+
+#main {
+  height: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+
+#main .configuration {
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  height: calc(100% - 45px);
+}
+
+#main .configuration .params {
+  width: 432px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  overflow-y: auto;
+  background-color: whitesmoke;
+}
+
+#main .configuration .params .sign {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+#main .configuration .params .sign .title {
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  margin: 0;
+  padding: 8px 0;
+  font-size: 17px;
+  font-family: sans-serif;
+}
+
+#main .configuration .params .sign .random-all-btn {
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  width: fit-content;
+  margin: 6px;
+}
+
+#main .configuration .params .params-file,
+#main .configuration .params .params-man {
+  padding: 10px 6px;
+}
+
+#main .configuration .params .params-file {
+  font-family: sans-serif;
+}
+
+#main .configuration .border {
+  cursor: default;
+  padding: 0;
+}
+
+#main .configuration .details {
+  background-color: aliceblue;
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+}
+
+#main .bottom {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  padding: 12px 8px 8px;
+  border-top: solid #cebbbb 1px;
+  background-color: whitesmoke;
+}
+
+#main .bottom .left {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: reverse;
+      -ms-flex-direction: row-reverse;
+          flex-direction: row-reverse;
+}
+
+#main .bottom .left input[type='checkbox'].force-textfields {
+  margin: 0 5px;
+}
+
+#main .bottom .left label {
+  font-family: sans-serif;
+  font-size: 14px;
+}
+
+#main input[type='checkbox'].param-enabler,
+#main input[type='checkbox'].force-textfields {
+  width: 14px;
+  height: 14px;
+}
+
+#main input[type='checkbox'].param-enabler + div,
+#main input[type='checkbox'].force-textfields + div {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+#main input[type='checkbox'].param-enabler:checked + div,
+#main input[type='checkbox'].force-textfields:checked + div {
+  pointer-events: all;
+  opacity: 1;
+}
+/*# sourceMappingURL=ga-cp.css.map */

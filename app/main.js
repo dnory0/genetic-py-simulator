@@ -4,6 +4,7 @@ const electron_1 = require("electron");
 const path_1 = require("path");
 const fs_1 = require("fs");
 const isDev = process.argv.some(arg => ['--dev', '-D', '-d'].includes(arg));
+global['isDev'] = isDev;
 let mainWindow;
 let gaWindow;
 const pyshell = require(path_1.join(__dirname, 'modules', 'create-pyshell.js'))(electron_1.app);
@@ -58,24 +59,24 @@ electron_1.app.once('ready', () => {
         mainWindow.autoHideMenuBar = false;
     });
     mainWindow.setMenu(require(path_1.join(__dirname, 'modules', 'menubar.js'))(isDev, mainWindow));
-    mainWindow.webContents.on('ipc-message', (_ev, channel) => {
-        if (channel == 'mode')
-            mainWindow.webContents.send('mode', isDev);
-        else if (channel == 'conf-ga') {
-            gaWindow = createWindow(path_1.join(__dirname, 'conf-ga', 'conf-ga.html'), {
+    mainWindow.webContents.on('ipc-message', (_ev, channel, args) => {
+        if (channel == 'ga-cp') {
+            gaWindow = createWindow(path_1.join(__dirname, 'ga-cp', 'ga-cp.html'), {
                 minWidth: 680,
                 minHeight: 480,
                 parent: mainWindow,
                 webPreferences: {
-                    preload: path_1.join(__dirname, 'preloads', 'conf-ga-preload.js')
+                    preload: path_1.join(__dirname, 'preloads', 'ga-cp-preload.js')
                 }
             });
             gaWindow.once('ready-to-show', gaWindow.show);
-            gaWindow.webContents.on('ipc-message', (_ev, gaChannel, confGA) => {
-                if (gaChannel == 'conf-ga') {
-                    mainWindow.webContents.send('conf-ga', confGA);
+            if (!isDev)
+                gaWindow.removeMenu();
+            gaWindow.webContents.on('ipc-message', (_ev, gaChannel, gaCPConfig) => {
+                if (gaChannel == 'ga-cp-finished') {
+                    mainWindow.webContents.send('ga-cp-finished', gaCPConfig);
                 }
-                else if (gaChannel == 'browse')
+                else if (gaChannel == 'browse') {
                     browse(gaWindow, {
                         title: 'Open GA Configuration file',
                         defaultPath: electron_1.app.getPath('desktop'),
@@ -91,10 +92,14 @@ electron_1.app.once('ready', () => {
                         if (reason)
                             throw reason;
                     });
+                }
+                else if (gaChannel == 'settings') {
+                    gaWindow.webContents.send('settings', args);
+                }
             });
-            gaWindow.once('closed', () => mainWindow.webContents.send('conf-ga-finished'));
+            gaWindow.once('closed', () => mainWindow.webContents.send('ga-cp-finished'));
         }
-        else if (channel == 'close-conf-ga') {
+        else if (channel == 'close-ga-cp') {
             if (gaWindow && !gaWindow.isDestroyed())
                 gaWindow.close();
         }
@@ -126,9 +131,9 @@ electron_1.app.once('ready', () => {
         });
     })();
     mainWindow.on('close', () => {
-        mainWindow.webContents.send('cur-settings');
+        mainWindow.webContents.send('settings');
         mainWindow.webContents.once('ipc-message', (_ev, channel, settings) => {
-            if (channel != 'cur-settings')
+            if (channel != 'settings')
                 return;
             settings['main']['fscreen'] = mainWindow.isFullScreen();
             settings['main']['maximized'] = mainWindow.isMaximized();

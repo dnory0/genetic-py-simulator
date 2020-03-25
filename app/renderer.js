@@ -11,17 +11,13 @@ let stopBtn = document.getElementById('stop-btn');
 let toStartBtn = document.getElementById('to-start-btn');
 let stepFBtn = document.getElementById('step-forward-btn');
 let lRSwitch = document.getElementById('live-rendering');
-let confGABtn = document.getElementById('conf-ga-btn');
+let gaCPBtn = document.getElementById('ga-cp-btn');
 let popSize = document.getElementById('pop-size');
-let pSRandom = document.getElementById('random-pop-size');
 let genesNum = document.getElementById('genes-num');
-let gNRandom = document.getElementById('random-genes-num');
-let crossover = document.getElementById('crossover-rate');
-let coRandom = (document.getElementById('random-crossover-rate'));
-let mutation = document.getElementById('mutation-rate');
-let mutRandom = (document.getElementById('random-mutation-rate'));
-let delay = document.getElementById('delay-rate');
-let delayRandom = (document.getElementById('random-delay-rate'));
+let coRate = document.getElementById('co-rate');
+let mutRate = document.getElementById('mut-rate');
+let delRate = document.getElementById('del-rate');
+let settings = window['settings'];
 let isRunning = false;
 const treatResponse = (response) => {
     if (response['started']) {
@@ -75,11 +71,10 @@ playBtn.onclick = () => ctrlClicked(isRunning ? 'pause' : 'play', !isRunning);
 stopBtn.onclick = () => ctrlClicked('stop', false);
 toStartBtn.onclick = () => ctrlClicked('replay', true);
 stepFBtn.onclick = () => ctrlClicked('step_f', false);
-const sendParameter = (numInput, checkInput) => {
+const sendParameter = (numInput) => {
     numInput.style.backgroundColor = '#fff';
     window['sendSig'](JSON.stringify({
-        [numInput.name]: parseFloat(numInput.value),
-        [checkInput.name]: checkInput.checked
+        [numInput.name]: parseFloat(numInput.value)
     }));
 };
 document.addEventListener('DOMContentLoaded', function loaded() {
@@ -87,39 +82,15 @@ document.addEventListener('DOMContentLoaded', function loaded() {
     (() => {
         let ready = () => {
             ready = () => {
-                prime.send('mode', window['isDev']);
-                side.send('mode', window['isDev']);
-                let settings = window['settings'];
-                popSize.value =
-                    settings['renderer']['parameters']['population']['size'];
-                pSRandom.checked =
-                    settings['renderer']['parameters']['population']['random'];
-                genesNum.value = settings['renderer']['parameters']['genes']['number'];
-                gNRandom.checked =
-                    settings['renderer']['parameters']['genes']['random'];
-                crossover.value =
-                    settings['renderer']['parameters']['crossover']['rate'];
-                crossover.parentElement.firstElementChild.value =
-                    settings['renderer']['parameters']['crossover']['rate'];
-                coRandom.checked =
-                    settings['renderer']['parameters']['crossover']['random'];
-                mutation.value = settings['renderer']['parameters']['mutation']['rate'];
-                mutation.parentElement.firstElementChild.value =
-                    settings['renderer']['parameters']['mutation']['rate'];
-                mutRandom.checked =
-                    settings['renderer']['parameters']['mutation']['random'];
-                delay.value = settings['renderer']['parameters']['delay']['rate'];
-                delay.parentElement.firstElementChild.value =
-                    settings['renderer']['parameters']['delay']['rate'];
-                delayRandom.checked =
-                    settings['renderer']['parameters']['delay']['random'];
-                sendParameter(popSize, pSRandom);
-                sendParameter(genesNum, gNRandom);
-                sendParameter(crossover, coRandom);
-                sendParameter(mutation, mutRandom);
-                sendParameter(delay, delayRandom);
-                lRSwitch.checked = settings['renderer']['controls']['live-rendering'];
-                lRSwitch.onchange = () => prime.send('live-rendering', lRSwitch.checked);
+                window['affectSettings'](settings['renderer']['input']);
+                sendParameter(popSize);
+                sendParameter(genesNum);
+                sendParameter(coRate);
+                sendParameter(mutRate);
+                sendParameter(delRate);
+                lRSwitch.addEventListener('change', () => {
+                    prime.send('live-rendering', lRSwitch.checked);
+                });
                 prime.send('live-rendering', lRSwitch.checked);
                 prime.parentElement.style.height =
                     settings['renderer']['ui']['horizontal'];
@@ -136,78 +107,8 @@ document.addEventListener('DOMContentLoaded', function loaded() {
         prime.addEventListener('dom-ready', () => ready());
         side.addEventListener('dom-ready', () => ready());
     })();
-    const rangeChange = (rangeInput, numberInput, checkbox) => {
-        setTimeout(() => {
-            numberInput.value = rangeInput.value;
-            sendParameter(numberInput, checkbox);
-        }, 0);
-    };
-    const numberChange = (rangeInput, numberInput) => {
-        setTimeout(() => {
-            rangeInput.value = numberInput.value;
-        }, 0);
-    };
-    Array.from(document.getElementsByClassName('input-wrapper')).forEach((wrapper) => {
-        const first = wrapper.firstElementChild;
-        const last = wrapper.lastElementChild;
-        const checkbox = (wrapper.nextElementSibling.firstElementChild);
-        first.onmousedown = () => {
-            first.onmousemove = () => rangeChange(first, last, checkbox);
-            rangeChange(first, last, checkbox);
-            first.onmouseup = () => (first.onmouseup = first.onmousemove = null);
-        };
-    });
-    const parameterChanged = (numInput, checkInput, mustBeInt, event) => {
-        setTimeout(() => {
-            if (isNaN(numInput.value) ||
-                [
-                    'Control',
-                    'Shift',
-                    'Alt',
-                    'CapsLock',
-                    'AltGraph',
-                    'Tab',
-                    'Enter',
-                    'ArrowLeft',
-                    'ArrowRight',
-                    'Home',
-                    'End'
-                ].includes(event.key))
-                return;
-            if (mustBeInt &&
-                !isNaN(parseInt(numInput.value)) &&
-                parseInt(numInput.value) == numInput.value) {
-                numInput.value = `${parseInt(numInput.value) + 1}`;
-                numInput.value = `${parseInt(numInput.value) - 1}`;
-            }
-            if (((mustBeInt && !numInput.value.includes('.')) || !mustBeInt) &&
-                (isNaN(parseFloat(numInput.min)) ||
-                    parseFloat(numInput.value) >= parseFloat(numInput.min)) &&
-                (isNaN(parseFloat(numInput.max)) ||
-                    parseFloat(numInput.value) <= parseFloat(numInput.max))) {
-                sendParameter(numInput, checkInput);
-                if (!mustBeInt)
-                    numberChange(numInput.previousElementSibling, numInput);
-            }
-            else
-                numInput.style.backgroundColor = '#ff4343b8';
-        }, 0);
-    };
-    popSize.onkeyup = pSRandom.onchange = (event) => {
-        parameterChanged(popSize, pSRandom, true, event);
-    };
-    genesNum.onkeyup = gNRandom.onchange = (event) => {
-        parameterChanged(genesNum, gNRandom, true, event);
-    };
-    crossover.onkeyup = coRandom.onchange = (event) => {
-        parameterChanged(crossover, coRandom, false, event);
-    };
-    mutation.onkeyup = mutRandom.onchange = (event) => {
-        parameterChanged(mutation, mutRandom, false, event);
-    };
-    delay.onkeyup = delayRandom.onchange = (event) => {
-        parameterChanged(delay, delayRandom, false, event);
-    };
+    window['params']();
+    window['saveSettings'](settings['renderer']['input']);
     ipcRenderer.on('zoom', (_event, type) => {
         if (type == 'in') {
             if (webFrame.getZoomFactor() < 1.8)
@@ -238,71 +139,25 @@ document.addEventListener('DOMContentLoaded', function loaded() {
     delete window['border'];
     (() => {
         let main = document.getElementById('main');
-        confGABtn.onclick = () => {
-            ipcRenderer.send('conf-ga');
-            (() => {
-                let newGAConfListener = (_ev, newGAConf) => {
-                    console.log(newGAConf);
-                };
-                ipcRenderer.on('conf-ga', newGAConfListener);
-                ipcRenderer.once('conf-ga-finished', () => {
-                    ipcRenderer.removeListener('conf-ga', newGAConfListener);
-                    console.log('conf-ga-finished');
-                });
-            })();
+        gaCPBtn.onclick = () => {
+            ipcRenderer.send('ga-cp', settings);
+            main.style.pointerEvents = 'none';
+            main.style.filter = 'blur(1px)';
+            ipcRenderer.once('ga-cp-finished', (_ev, newSettings) => {
+                main.style.pointerEvents = 'all';
+                main.style.filter = 'none';
+                console.log(`ga-cp-finished: ${newSettings}`);
+            });
         };
         window.addEventListener('beforeunload', () => {
-            ipcRenderer.send('close-conf-ga');
+            ipcRenderer.send('close-ga-cp');
             main.style.display = 'none';
         });
     })();
 });
-ipcRenderer.send('mode');
-ipcRenderer.once('mode', (_ev, isDev) => {
-    if (isDev) {
-        window['k-shorts'](prime, side, ipcRenderer);
-        delete window['k-shorts'];
-    }
-    window['isDev'] = isDev;
-});
-ipcRenderer.on('cur-settings', () => {
-    ipcRenderer.send('cur-settings', {
-        main: {},
-        renderer: {
-            ui: {
-                horizontal: {
-                    height: prime.parentElement.offsetHeight
-                },
-                vertical: {
-                    width: 440
-                }
-            },
-            controls: {
-                'live-rendering': lRSwitch.checked
-            },
-            parameters: {
-                population: {
-                    size: parseInt(popSize.value),
-                    random: pSRandom.checked
-                },
-                genes: {
-                    number: parseInt(genesNum.value),
-                    random: gNRandom.checked
-                },
-                crossover: {
-                    rate: parseFloat(crossover.value),
-                    random: coRandom.checked
-                },
-                mutation: {
-                    rate: parseFloat(mutation.value),
-                    random: mutRandom.checked
-                },
-                delay: {
-                    rate: parseFloat(delay.value),
-                    random: delayRandom.checked
-                }
-            }
-        }
-    });
-});
+if (window['isDev']) {
+    window['k-shorts'](prime, side, ipcRenderer);
+    delete window['k-shorts'];
+}
+ipcRenderer.on('settings', () => ipcRenderer.send('settings', settings));
 //# sourceMappingURL=renderer.js.map

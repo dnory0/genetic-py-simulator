@@ -10,18 +10,19 @@ import { isAbsolute, extname } from 'path';
  * - ```-4``` if the file extention is not equal to the given ```ext```.
  * - ```0``` if path matchs all conditions.
  *
- * @param confGAPath GA configuration path to check.
+ * @param gaConfigPath GA configuration path to check.
  * @param ext extension name, default is ```.py```.
  */
-let validatePath = (confGAPath: string, ext: string = '.py') =>
-  existsSync(confGAPath)
-    ? isAbsolute(confGAPath)
-      ? statSync(confGAPath).isFile()
-        ? extname(confGAPath).toLowerCase() == ext
+function validatePath(gaConfigPath: string, ext: string = '.py') {
+  return existsSync(gaConfigPath)
+    ? isAbsolute(gaConfigPath)
+      ? statSync(gaConfigPath).isFile()
+        ? extname(gaConfigPath).toLowerCase() == ext
           ? 0
           : -4
         : -3
       : -2
     : -1;
+}
 
 module.exports = validatePath;

@@ -1,9 +1,10 @@
-import { Options, chart, XAxisOptions, YAxisOptions } from 'highcharts';
-
-import * as Highcharts from 'highcharts';
-import HighchartsMore from 'highcharts/highcharts-more';
-
-HighchartsMore(Highcharts);
+import {
+  Options,
+  chart,
+  XAxisOptions,
+  YAxisOptions,
+  getOptions
+} from 'highcharts';
 
 module.exports = (containerId: string, options: Options) => {
   delete require.cache[require.resolve('./create-chart')];
@@ -35,8 +36,8 @@ module.exports = (containerId: string, options: Options) => {
       labels: (<XAxisOptions>options.xAxis).labels
     },
     colorAxis: {
-      minColor: Highcharts.getOptions().colors[2],
-      maxColor: Highcharts.getOptions().colors[8]
+      minColor: getOptions().colors[2],
+      maxColor: getOptions().colors[8]
     },
     yAxis: {
       title: null,

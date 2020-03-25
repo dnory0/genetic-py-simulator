@@ -15,6 +15,7 @@ import { ChildProcess } from 'child_process';
  * set to true if app on development, false in production.
  */
 const isDev = process.argv.some(arg => ['--dev', '-D', '-d'].includes(arg));
+global['isDev'] = isDev;
 /**
  * main window
  */
@@ -145,30 +146,27 @@ app.once('ready', () => {
     require(join(__dirname, 'modules', 'menubar.js'))(isDev, mainWindow)
   );
 
-  mainWindow.webContents.on('ipc-message', (_ev, channel) => {
-    if (channel == 'mode') mainWindow.webContents.send('mode', isDev);
-    else if (channel == 'conf-ga') {
-      gaWindow = createWindow(join(__dirname, 'conf-ga', 'conf-ga.html'), {
+  mainWindow.webContents.on('ipc-message', (_ev, channel, args) => {
+    if (channel == 'ga-cp') {
+      gaWindow = createWindow(join(__dirname, 'ga-cp', 'ga-cp.html'), {
         minWidth: 680,
         minHeight: 480,
         parent: mainWindow,
         webPreferences: {
-          preload: join(__dirname, 'preloads', 'conf-ga-preload.js')
+          preload: join(__dirname, 'preloads', 'ga-cp-preload.js')
         }
       });
 
       gaWindow.once('ready-to-show', gaWindow.show);
 
-      // gaWindow.removeMenu();
-
-      // gaWindow.webContents.toggleDevTools();
+      if (!isDev) gaWindow.removeMenu();
 
       gaWindow.webContents.on(
         'ipc-message',
-        (_ev, gaChannel, confGA: object) => {
-          if (gaChannel == 'conf-ga') {
-            mainWindow.webContents.send('conf-ga', confGA);
-          } else if (gaChannel == 'browse')
+        (_ev, gaChannel, gaCPConfig: object) => {
+          if (gaChannel == 'ga-cp-finished') {
+            mainWindow.webContents.send('ga-cp-finished', gaCPConfig);
+          } else if (gaChannel == 'browse') {
             browse(
               gaWindow,
               {
@@ -189,12 +187,16 @@ app.once('ready', () => {
                 if (reason) throw reason;
               }
             );
+          } else if (gaChannel == 'settings') {
+            gaWindow.webContents.send('settings', args);
+          }
         }
       );
+
       gaWindow.once('closed', () =>
-        mainWindow.webContents.send('conf-ga-finished')
+        mainWindow.webContents.send('ga-cp-finished')
       );
-    } else if (channel == 'close-conf-ga') {
+    } else if (channel == 'close-ga-cp') {
       if (gaWindow && !gaWindow.isDestroyed()) gaWindow.close();
     }
   });
@@ -230,11 +232,11 @@ app.once('ready', () => {
   })();
 
   mainWindow.on('close', () => {
-    mainWindow.webContents.send('cur-settings');
+    mainWindow.webContents.send('settings');
     mainWindow.webContents.once(
       'ipc-message',
       (_ev, channel, settings: object) => {
-        if (channel != 'cur-settings') return;
+        if (channel != 'settings') return;
         settings['main']['fscreen'] = mainWindow.isFullScreen();
         settings['main']['maximized'] = mainWindow.isMaximized();
         settings['main']['width'] = mainWindow.getSize()[0];

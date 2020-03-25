@@ -27,6 +27,7 @@
           user-select: none;
   margin-left: -1px;
   border: 1px #a2a2a2 solid;
+  border-radius: 0;
 }
 
 .browse > button:hover {

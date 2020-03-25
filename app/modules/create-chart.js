@@ -1,9 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const highcharts_1 = require("highcharts");
-const Highcharts = require("highcharts");
-const highcharts_more_1 = require("highcharts/highcharts-more");
-highcharts_more_1.default(Highcharts);
 module.exports = (containerId, options) => {
     delete require.cache[require.resolve('./create-chart')];
     return highcharts_1.chart(containerId, {
@@ -33,8 +30,8 @@ module.exports = (containerId, options) => {
             labels: options.xAxis.labels
         },
         colorAxis: {
-            minColor: Highcharts.getOptions().colors[2],
-            maxColor: Highcharts.getOptions().colors[8]
+            minColor: highcharts_1.getOptions().colors[2],
+            maxColor: highcharts_1.getOptions().colors[8]
         },
         yAxis: {
             title: null,

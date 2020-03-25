@@ -1,0 +1,118 @@
+.sign {
+  display: flex;
+
+  .title {
+    flex: 1;
+    margin: 0;
+    padding: 8px 0;
+    font-size: 17px;
+    font-family: sans-serif;
+  }
+
+  .random-all-btn {
+    width: fit-content;
+    margin: 6px;
+  }
+}
+
+.params-file,
+.params-man {
+  padding: 10px 6px;
+}
+
+.params-file {
+  font-family: sans-serif;
+}
+
+.params-man {
+  padding-right: 0;
+  flex: 1;
+
+  .complex-param {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+  }
+
+  .param {
+    display: flex;
+    align-items: center;
+
+    .param-name {
+      font-size: 13px;
+      font-family: sans-serif;
+      width: 100px;
+      display: flex;
+      align-items: center;
+
+      > p {
+        margin: 0;
+      }
+    }
+
+    .param-settings {
+      flex: 1;
+      display: flex;
+      justify-content: left;
+
+      .param-value {
+        width: 130px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        input[type='text'] {
+          width: 80px;
+          padding: 2px 2px 1px;
+          height: 19px;
+          font-size: 17px;
+          border: 1px solid #7b7b7b;
+          border-radius: 2px;
+          text-align: right;
+
+          &.valid,
+          &.valid:focus {
+            box-shadow: 0 0 0 1px #6cdf00, 0 0 0 4px rgba(0, 255, 0, 0.3);
+          }
+
+          &.invalid,
+          &.invalid:focus {
+            box-shadow: 0 0 0 1px #df0000, 0 0 0 4px rgba(255, 0, 0, 0.3);
+          }
+
+          &:focus {
+            box-shadow: 0 0 0 1px #df9a00, 0 0 0 4px rgba(223, 165, 0, 0.3);
+          }
+        }
+      }
+
+      .other-settings {
+        display: flex;
+
+        > * {
+          margin: 6px;
+        }
+      }
+    }
+  }
+
+  input[type='checkbox'].param-enabler {
+    margin: 11px;
+  }
+
+  input[type='checkbox'].param-enabler,
+  input[type='checkbox'].force-textfields {
+    width: 14px;
+    height: 14px;
+
+    & + div {
+      pointer-events: none;
+      opacity: 0.5;
+    }
+
+    &:checked + div {
+      pointer-events: all;
+      opacity: 1;
+    }
+  }
+}

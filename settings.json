@@ -15,29 +15,25 @@
         "width": 440
       }
     },
-    "controls": {
-      "live-rendering": true
-    },
-    "parameters": {
-      "population": {
-        "size": 100,
-        "random": false
+    "input": {
+      "live-rendering": {
+        "enabled": true
       },
-      "genes": {
-        "number": 80,
-        "random": false
+      "params-path": "",
+      "pop-size": 100,
+      "genes-num": 80,
+      "co-rate": 0.15,
+      "mut-rate": 0.013,
+      "del-rate": {
+        "value": 0,
+        "enabled": false
       },
-      "crossover": {
-        "rate": 0.15,
-        "random": false
+      "max-gen": {
+        "value": 0,
+        "enabled": false
       },
-      "mutation": {
-        "rate": 0.013,
-        "random": false
-      },
-      "delay": {
-        "rate": 0,
-        "random": false
+      "force-textfields": {
+        "enabled": false
       }
     }
   }

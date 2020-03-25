@@ -317,16 +317,6 @@ g_pop_size = int(argv[1]) if len(argv) > 1 else randint(1, 500)
 g_genes_num = int(argv[2]) if len(argv) > 2 else randint(1, 200)
 g_delay_rate = int(argv[3]) if len(argv) > 3 else 0
 
-def final_value(min_val, given_val, is_random: bool):
-    """
-    called when a signal is received, if random flag set to True it will return
-    value between min_val and given_val, else it returns given_val 
-    """
-    if is_random:
-        # detects whether should calculate int or float through min_val type
-        return randint(min_val, given_val) if type(min_val) == int else uniform(min_val, given_val)
-    return given_val
-
 def update_parameters(command: dict):
     """
     check crossover & mutation rate new updates and apply them
@@ -336,21 +326,22 @@ def update_parameters(command: dict):
     global g_crossover_rate
     global g_mutation_rate
     global g_delay_rate
+
     if command.get('pop_size'):
         # population size
-        g_pop_size = final_value(1, command.get('pop_size'), command.get('random_pop_size'))
+        g_pop_size = command.get('pop_size')
     if command.get('genes_num'):
         # genes number
-        g_genes_num = final_value(1, command.get('genes_num'), command.get('random_genes_num'))
+        g_genes_num = command.get('genes_num')
     if command.get('crossover_rate'):
         # crossover rate change, it should not be 0
-        g_crossover_rate = round(final_value(.001, command.get('crossover_rate'), command.get('random_crossover_rate')), 3)
+        g_crossover_rate = command.get('crossover_rate')
     if type(command.get('mutation_rate')) is not type(None):
         # mutation rate change, can be 0
-        g_mutation_rate = round(final_value(.0, command.get('mutation_rate'), command.get('random_mutation_rate')), 3)
+        g_mutation_rate = command.get('mutation_rate')
     if type(command.get('delay_rate')) is not type(None):
         # sleep in seconds
-        g_delay_rate = round(final_value(.0, command.get('delay_rate'), command.get('random_delay_rate')), 2)
+        g_delay_rate = command.get('delay_rate')
     # if command.get('ff'):
     #     import_module(command.get('ff'))
 

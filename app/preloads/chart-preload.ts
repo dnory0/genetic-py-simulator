@@ -74,8 +74,7 @@ window['clearChart'] = (chart: Chart, categories: boolean = false) => {
   chart.series.forEach(serie => serie.setData([], true));
 };
 
-ipcRenderer.once('mode', (_ev, isDev) => {
-  if (!isDev) return;
+if (getGlobal('isDev'))
   window.addEventListener(
     'keyup',
     (event: KeyboardEvent) => {
@@ -86,7 +85,6 @@ ipcRenderer.once('mode', (_ev, isDev) => {
     },
     true
   );
-});
 
 window.addEventListener('mouseout', () =>
   charts.forEach(chart => chart.pointer.reset())
