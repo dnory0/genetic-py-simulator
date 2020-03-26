@@ -32,85 +32,88 @@
     display: flex;
     flex-direction: row-reverse;
     justify-content: space-between;
-  }
 
-  .param {
-    display: flex;
-    align-items: center;
-
-    .param-name {
-      font-size: 13px;
-      font-family: sans-serif;
-      width: 100px;
+    .param {
       display: flex;
       align-items: center;
-
-      > p {
-        margin: 0;
-      }
-    }
-
-    .param-settings {
       flex: 1;
-      display: flex;
-      justify-content: left;
 
-      .param-value {
-        width: 130px;
+      .param-name {
+        font-size: 13px;
+        font-family: sans-serif;
+        width: 100px;
         display: flex;
-        justify-content: center;
         align-items: center;
 
-        input[type='text'] {
-          width: 80px;
-          padding: 2px 2px 1px;
-          height: 19px;
-          font-size: 17px;
-          border: 1px solid #7b7b7b;
-          border-radius: 2px;
-          text-align: right;
-
-          &.valid,
-          &.valid:focus {
-            box-shadow: 0 0 0 1px #6cdf00, 0 0 0 4px rgba(0, 255, 0, 0.3);
-          }
-
-          &.invalid,
-          &.invalid:focus {
-            box-shadow: 0 0 0 1px #df0000, 0 0 0 4px rgba(255, 0, 0, 0.3);
-          }
-
-          &:focus {
-            box-shadow: 0 0 0 1px #df9a00, 0 0 0 4px rgba(223, 165, 0, 0.3);
-          }
+        > p {
+          margin: 0;
         }
       }
 
-      .other-settings {
+      .param-settings {
+        flex: 1;
         display: flex;
+        justify-content: left;
 
-        > * {
-          margin: 6px;
+        .param-value {
+          width: 130px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+
+          input[type='text'] {
+            width: 80px;
+            padding: 2px 2px 1px;
+            height: 19px;
+            font-size: 17px;
+            border: 1px solid #7b7b7b;
+            border-radius: 2px;
+            text-align: right;
+
+            &.valid,
+            &.valid:focus {
+              box-shadow: 0 0 0 1px #6cdf00, 0 0 0 4px rgba(0, 255, 0, 0.3);
+            }
+
+            &.invalid,
+            &.invalid:focus {
+              box-shadow: 0 0 0 1px #df0000, 0 0 0 4px rgba(255, 0, 0, 0.3);
+            }
+
+            &:focus {
+              box-shadow: 0 0 0 1px #df9a00, 0 0 0 4px rgba(223, 165, 0, 0.3);
+            }
+          }
+        }
+
+        .other-settings {
+          display: flex;
+
+          > * {
+            margin: 6px;
+          }
         }
       }
     }
   }
 
-  input[type='checkbox'].param-enabler {
+  input[type='checkbox'].param-enabled {
     margin: 11px;
   }
 
-  input[type='checkbox'].param-enabler,
-  input[type='checkbox'].force-textfields {
+  input[type='checkbox'].param-enabled,
+  input[type='checkbox'].force-tf-enabled {
     width: 14px;
     height: 14px;
+  }
 
-    & + div {
+  input[type='checkbox'].param-enabled {
+    & ~ div {
       pointer-events: none;
       opacity: 0.5;
     }
 
-    &:checked + div {
+    &:checked ~ div {
       pointer-events: all;
       opacity: 1;
     }

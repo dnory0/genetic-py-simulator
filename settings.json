@@ -16,23 +16,39 @@
       }
     },
     "input": {
-      "live-rendering": {
+      "lr": {
         "enabled": true
       },
-      "params-path": "",
-      "pop-size": 100,
-      "genes-num": 80,
-      "co-rate": 0.15,
-      "mut-rate": 0.013,
+      "params-path": {
+        "value": ""
+      },
+      "pop-size": {
+        "value": 100,
+        "disable-on-run": true,
+        "pin": true
+      },
+      "genes-num": {
+        "value": 80,
+        "disable-on-run": true,
+        "pin": true
+      },
+      "co-rate": {
+        "value": 0.15
+      },
+      "mut-rate": {
+        "value": 0.013
+      },
       "del-rate": {
         "value": 0,
-        "enabled": false
+        "pin": true,
+        "enabled": true
       },
       "max-gen": {
         "value": 0,
+        "pin": false,
         "enabled": false
       },
-      "force-textfields": {
+      "force-tf": {
         "enabled": false
       }
     }

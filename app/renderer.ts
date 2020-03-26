@@ -58,7 +58,7 @@ let stepFBtn = <HTMLButtonElement>document.getElementById('step-forward-btn');
  * if disabled chart update when the GA is paused or stopped,
  * default is enabled
  */
-let lRSwitch = <HTMLInputElement>document.getElementById('live-rendering');
+let lRSwitch = <HTMLInputElement>document.getElementById('lr-enabled');
 
 /**
  * opens GA configuration panel to configure next run of the GA.
@@ -92,6 +92,7 @@ let delRate = <HTMLInputElement>document.getElementById('del-rate');
  * running settings
  */
 let settings: object = window['settings'];
+// console.log(settings);
 
 /****************************** Python Part ******************************/
 
@@ -238,7 +239,7 @@ document.addEventListener('DOMContentLoaded', function loaded() {
        * triggered after both webviews finish loading.
        */
       ready = () => {
-        window['affectSettings'](settings['renderer']['input']);
+        window['affectSettings'](settings['renderer']['input'], 'main');
 
         // send startup settings to pyshell
         sendParameter(popSize);
@@ -247,15 +248,13 @@ document.addEventListener('DOMContentLoaded', function loaded() {
         sendParameter(mutRate);
         sendParameter(delRate);
 
-        lRSwitch.addEventListener('change', () => {
-          prime.send('live-rendering', lRSwitch.checked);
-        });
-
-        prime.send('live-rendering', lRSwitch.checked);
-
-        // resize the prime chart container
-        prime.parentElement.style.height =
-          settings['renderer']['ui']['horizontal'];
+        (() => {
+          let lRSwitchUpdater = () => {
+            prime.send('live-rendering', lRSwitch.checked);
+          };
+          lRSwitch.addEventListener('change', lRSwitchUpdater);
+          lRSwitchUpdater();
+        })();
 
         delete window['isDev'];
         delete window['settings'];
@@ -333,7 +332,12 @@ document.addEventListener('DOMContentLoaded', function loaded() {
       ipcRenderer.once('ga-cp-finished', (_ev, newSettings: object) => {
         main.style.pointerEvents = 'all';
         main.style.filter = 'none';
-        console.log(`ga-cp-finished: ${newSettings}`);
+        if (newSettings) {
+          settings['renderer']['input'] = newSettings['renderer']['input'];
+          // console.log(newSettings);
+          saveSettings(settings['renderer']['input']);
+          affectSettings(settings['renderer']['input'], 'main');
+        }
       });
     };
 

@@ -1,11 +1,31 @@
-function affectSettings(settings) {
+function affectSettings(settings, window) {
     Array.from(document.getElementsByTagName('input')).forEach(input => {
-        if (input.type == 'checkbox')
-            input.checked = settings[input.id.replace('-enabler', '')]['enabled'];
-        else if (input.classList.contains('is-disable-able'))
+        if (input.type == 'checkbox') {
+            let type = (input.id.match(/(?<=-)[^-]*$/)[0]);
+            input.checked = settings[input.id.replace(`-${type}`, '')][type];
+            if (window == 'main') {
+                if (type == 'pin' || type == 'enabled') {
+                    let complexParam = ((type == 'pin'
+                        ? input.parentElement.parentElement.parentElement.parentElement
+                            .parentElement
+                        : input.parentElement));
+                    if (!input.checked) {
+                        complexParam.classList.add('hide');
+                    }
+                    else if (type == 'pin' &&
+                        (!(complexParam.children.length > 1) ||
+                            complexParam.firstElementChild.checked)) {
+                        complexParam.classList.remove('hide');
+                    }
+                }
+            }
+        }
+        else {
             input.value = settings[input.id]['value'];
-        else
-            input.value = settings[input.id];
+            if (window == 'main' && settings[input.id]['disable-on-run']) {
+                input.classList.add('disable-on-run');
+            }
+        }
     });
 }
 module.exports = affectSettings;

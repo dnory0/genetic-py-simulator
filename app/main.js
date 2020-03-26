@@ -75,6 +75,7 @@ electron_1.app.once('ready', () => {
             gaWindow.webContents.on('ipc-message', (_ev, gaChannel, gaCPConfig) => {
                 if (gaChannel == 'ga-cp-finished') {
                     mainWindow.webContents.send('ga-cp-finished', gaCPConfig);
+                    gaWindow.destroy();
                 }
                 else if (gaChannel == 'browse') {
                     browse(gaWindow, {

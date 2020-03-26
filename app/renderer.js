@@ -10,7 +10,7 @@ let playBtn = document.getElementById('play-btn');
 let stopBtn = document.getElementById('stop-btn');
 let toStartBtn = document.getElementById('to-start-btn');
 let stepFBtn = document.getElementById('step-forward-btn');
-let lRSwitch = document.getElementById('live-rendering');
+let lRSwitch = document.getElementById('lr-enabled');
 let gaCPBtn = document.getElementById('ga-cp-btn');
 let popSize = document.getElementById('pop-size');
 let genesNum = document.getElementById('genes-num');
@@ -82,18 +82,19 @@ document.addEventListener('DOMContentLoaded', function loaded() {
     (() => {
         let ready = () => {
             ready = () => {
-                window['affectSettings'](settings['renderer']['input']);
+                window['affectSettings'](settings['renderer']['input'], 'main');
                 sendParameter(popSize);
                 sendParameter(genesNum);
                 sendParameter(coRate);
                 sendParameter(mutRate);
                 sendParameter(delRate);
-                lRSwitch.addEventListener('change', () => {
-                    prime.send('live-rendering', lRSwitch.checked);
-                });
-                prime.send('live-rendering', lRSwitch.checked);
-                prime.parentElement.style.height =
-                    settings['renderer']['ui']['horizontal'];
+                (() => {
+                    let lRSwitchUpdater = () => {
+                        prime.send('live-rendering', lRSwitch.checked);
+                    };
+                    lRSwitch.addEventListener('change', lRSwitchUpdater);
+                    lRSwitchUpdater();
+                })();
                 delete window['isDev'];
                 delete window['settings'];
             };
@@ -146,7 +147,11 @@ document.addEventListener('DOMContentLoaded', function loaded() {
             ipcRenderer.once('ga-cp-finished', (_ev, newSettings) => {
                 main.style.pointerEvents = 'all';
                 main.style.filter = 'none';
-                console.log(`ga-cp-finished: ${newSettings}`);
+                if (newSettings) {
+                    settings['renderer']['input'] = newSettings['renderer']['input'];
+                    saveSettings(settings['renderer']['input']);
+                    affectSettings(settings['renderer']['input'], 'main');
+                }
             });
         };
         window.addEventListener('beforeunload', () => {

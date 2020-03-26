@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 let ipcRenderer = window['ipcRenderer'];
+let revertSettings;
 let settings;
 let validatePath = window['validatePath'];
 let checkPath = (path) => {
@@ -37,33 +38,46 @@ browseBtn.onclick = () => {
     });
     ipcRenderer.send('browse');
 };
-paramsPath.onkeypress = () => checkPath(paramsPath.value);
+paramsPath.onkeyup = () => checkPath(paramsPath.value);
 (() => {
-    function saveConfig() {
-        console.log('save triggered');
-    }
     saveBtn.onclick = () => {
-        saveConfig();
+        ipcRenderer.send('ga-cp-finished', settings);
     };
+    cancelBtn.onclick = () => {
+        ipcRenderer.send('ga-cp-finished');
+    };
+    revertBtn.onclick = () => {
+        revertBtn.disabled = true;
+        saveBtn.disabled = true;
+        settings = revertSettings;
+        affectSettings(revertSettings['renderer']['input'], 'gaCP');
+    };
+    Array.from(document.getElementsByTagName('input')).forEach(input => {
+        let eventListener = () => {
+            revertBtn.disabled = false;
+            saveBtn.disabled = false;
+        };
+        if (input.type == 'checkbox')
+            input.addEventListener('change', eventListener);
+        else {
+            input.addEventListener('keyup', eventListener);
+            if (input.classList.contains('textfieldable'))
+                input.addEventListener('change', eventListener);
+        }
+    });
 })();
-cancelBtn.onclick = () => {
-    console.log('cancel triggered');
-};
-revertBtn.onclick = () => {
-    console.log('revert triggered');
-};
 window['altTriggers']();
 window['params']();
 document.getElementById('random-all-btn').onclick = () => {
     (Array.from(document.getElementsByClassName('random-btn'))).forEach(randomBtn => {
         var param = randomBtn.parentElement.parentElement.parentElement;
-        if (param.parentElement.classList.contains('complex-param') &&
+        if (param.previousElementSibling &&
             !param.previousElementSibling.checked)
             return;
         randomBtn.click();
     });
 };
-document.getElementById('force-textfields').addEventListener('change', ev => {
+document.getElementById('force-tf-enabled').addEventListener('change', ev => {
     Array.from(document.getElementsByClassName('textfieldable')).forEach((textfieldable) => {
         textfieldable.type = ev.target.checked
             ? 'text'
@@ -72,7 +86,8 @@ document.getElementById('force-textfields').addEventListener('change', ev => {
 });
 ipcRenderer.once('settings', (_ev, args) => {
     settings = args;
-    window['affectSettings'](settings['renderer']['input']);
+    revertSettings = JSON.parse(JSON.stringify(args));
+    window['affectSettings'](settings['renderer']['input'], 'gaCP');
     window['saveSettings'](settings['renderer']['input']);
 });
 ipcRenderer.send('settings');

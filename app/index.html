@@ -61,11 +61,11 @@
               <div class="checkbox-wrapper">
                 <input
                   type="checkbox"
-                  name="live-rendering"
-                  id="live-rendering"
+                  name="live_rendering"
+                  id="lr-enabled"
                   checked
                 />
-                <label title="Live Rendering" for="live-rendering">
+                <label title="Live Rendering" for="lr-enabled">
                   <img src="img/live-rendering.png" />
                 </label>
               </div>
@@ -78,144 +78,132 @@
             </div>
           </div>
           <div class="params-man scrollbar">
-            <div class="param">
-              <div class="param-name">
-                <p>Population Size</p>
-              </div>
-              <div class="param-settings">
-                <div class="param-value">
-                  <input
-                    type="text"
-                    min="1"
-                    step="1"
-                    id="pop-size"
-                    name="pop_size"
-                    pattern="^[-+]?\d*\.?0*$"
-                    inputmode="numeric"
-                    required
-                  />
+            <div class="complex-param">
+              <div class="param">
+                <div class="param-name">
+                  <p>Population Size</p>
                 </div>
-                <div class="other-settings">
-                  <button class="random-btn">Random</button>
-                  <!-- <div class="checkbox-wrapper">
+                <div class="param-settings">
+                  <div class="param-value">
                     <input
-                      type="checkbox"
-                      name="lock_pop_size"
-                      id="lock-pop-size"
+                      type="text"
+                      min="1"
+                      step="1"
+                      id="pop-size"
+                      name="pop_size"
+                      pattern="^[-+]?\d*\.?0*$"
+                      inputmode="numeric"
+                      required
                     />
-                    <label for="lock-pop-size">
-                      <img src="../img/lock.png" />
-                    </label>
                   </div>
-                  <div class="checkbox-wrapper">
-                    <input
-                      type="checkbox"
-                      name="lock_pop_size"
-                      id="lock-pop-size"
-                    />
-                    <label for="lock-pop-size">
-                      <img src="../img/lock.png" />
-                    </label>
+                  <div class="other-settings">
+                    <button class="random-btn">Random</button>
+                    <div class="checkbox-wrapper hide">
+                      <input
+                        type="checkbox"
+                        name="pop_size_pin"
+                        id="pop-size-pin"
+                      />
+                      <label for="pop-size-pin">
+                        <img src="img/pin.png" />
+                      </label>
+                    </div>
                   </div>
-                  <div class="checkbox-wrapper">
+                </div>
+              </div>
+            </div>
+            <div class="complex-param">
+              <div class="param">
+                <div class="param-name">
+                  <p>Genes Number</p>
+                </div>
+                <div class="param-settings">
+                  <div class="param-value">
                     <input
-                      type="checkbox"
-                      name="lock_pop_size"
-                      id="lock-pop-size"
+                      type="text"
+                      min="1"
+                      step="1"
+                      id="genes-num"
+                      name="genes_num"
+                      pattern="^[-+]?\d*\.?0*$"
+                      inputmode="numeric"
+                      required
                     />
-                    <label for="lock-pop-size">
-                      <img src="../img/lock.png" />
-                    </label>
-                  </div> -->
+                  </div>
+                  <div class="other-settings">
+                    <button class="random-btn">Random</button>
+                    <div class="checkbox-wrapper hide">
+                      <input
+                        type="checkbox"
+                        name="genes_num_pin"
+                        id="genes-num-pin"
+                      />
+                      <label for="genes-num-pin">
+                        <img src="img/pin.png" />
+                      </label>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-            <div class="param">
-              <div class="param-name">
-                <p>Genes Number</p>
-              </div>
-              <div class="param-settings">
-                <div class="param-value">
-                  <input
-                    type="text"
-                    min="1"
-                    step="1"
-                    id="genes-num"
-                    name="genes_num"
-                    pattern="^[-+]?\d*\.?0*$"
-                    inputmode="numeric"
-                    required
-                  />
+            <div class="complex-param">
+              <div class="param">
+                <div class="param-name">
+                  <p>Crossover Rate</p>
                 </div>
-                <div class="other-settings">
-                  <button class="random-btn">Random</button>
-                  <!-- <div class="checkbox-wrapper">
+                <div class="param-settings">
+                  <div class="param-value">
                     <input
-                      type="checkbox"
-                      name="lock_genes_num"
-                      id="lock-genes-num"
+                      type="range"
+                      inputmode="numeric"
+                      min="0.001"
+                      max="1"
+                      step="0.001"
+                      id="co-rate"
+                      name="co_rate"
+                      pattern="^[-+]?\d*\.?\d*$"
+                      class="textfieldable"
+                      required
                     />
-                    <label for="lock-genes-num">
-                      <img src="../img/lock.png" />
-                    </label>
-                  </div> -->
+                  </div>
+                  <div class="other-settings">
+                    <button class="random-btn">Random</button>
+                  </div>
                 </div>
               </div>
             </div>
-            <div class="param">
-              <div class="param-name">
-                <p>Crossover Rate</p>
-              </div>
-              <div class="param-settings">
-                <div class="param-value">
-                  <input
-                    type="range"
-                    inputmode="numeric"
-                    min="0.001"
-                    max="1"
-                    step="0.001"
-                    id="co-rate"
-                    name="co_rate"
-                    pattern="^[-+]?\d*\.?\d*$"
-                    class="textfieldable"
-                    required
-                  />
+            <div class="complex-param">
+              <div class="param">
+                <div class="param-name">
+                  <p>Mutation Rate</p>
                 </div>
-                <div class="other-settings">
-                  <button class="random-btn">Random</button>
-                </div>
-              </div>
-            </div>
-            <div class="param">
-              <div class="param-name">
-                <p>Mutation Rate</p>
-              </div>
-              <div class="param-settings">
-                <div class="param-value">
-                  <input
-                    type="range"
-                    inputmode="numeric"
-                    min="0"
-                    max="1"
-                    step="0.001"
-                    id="mut-rate"
-                    name="mut_rate"
-                    pattern="^[-+]?\d*\.?\d*$"
-                    class="textfieldable"
-                    required
-                  />
-                </div>
-                <div class="other-settings">
-                  <button class="random-btn">Random</button>
+                <div class="param-settings">
+                  <div class="param-value">
+                    <input
+                      type="range"
+                      inputmode="numeric"
+                      min="0"
+                      max="1"
+                      step="0.001"
+                      id="mut-rate"
+                      name="mut_rate"
+                      pattern="^[-+]?\d*\.?\d*$"
+                      class="textfieldable"
+                      required
+                    />
+                  </div>
+                  <div class="other-settings">
+                    <button class="random-btn">Random</button>
+                  </div>
                 </div>
               </div>
             </div>
             <div class="complex-param">
               <input
-                class="param-enabler"
+                class="param-enabled hide"
                 type="checkbox"
-                name="del_rate_enabler"
-                id="del-rate-enabler"
+                name="del_rate_enabled"
+                id="del-rate-enabled"
               />
               <div class="param">
                 <div class="param-name">
@@ -238,16 +226,26 @@
                   </div>
                   <div class="other-settings">
                     <button class="random-btn">Random</button>
+                    <div class="checkbox-wrapper hide">
+                      <input
+                        type="checkbox"
+                        name="del_rate_pin"
+                        id="del-rate-pin"
+                      />
+                      <label for="del-rate-pin">
+                        <img src="img/pin.png" />
+                      </label>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
             <div class="complex-param">
               <input
-                class="param-enabler"
+                class="param-enabled hide"
                 type="checkbox"
-                name="max_gen_enabler"
-                id="max-gen-enabler"
+                name="max_gen_enabled"
+                id="max-gen-enabled"
               />
               <div class="param">
                 <div class="param-name">
@@ -269,61 +267,20 @@
                   </div>
                   <div class="other-settings">
                     <button class="random-btn">Random</button>
-                    <!-- <div class="checkbox-wrapper">
+                    <div class="checkbox-wrapper hide">
                       <input
                         type="checkbox"
-                        name="lock_max_gen"
-                        id="lock-max-gen"
+                        name="max_gen_pin"
+                        id="max-gen-pin"
                       />
-                      <label for="lock-max-gen">
-                        <img src="../img/lock.png" />
-                      </label>
-                    </div> -->
-                  </div>
-                </div>
-              </div>
-            </div>
-            <!-- <div class="complex-param">
-              <input
-                class="param-enabler"
-                type="checkbox"
-                name="fitness_func_enabler"
-                id="fitness-func-enabler"
-              />
-              <div class="param">
-                <div class="param-name">
-                  <p>Fitness Function</p>
-                </div>
-                <div class="param-settings">
-                  <div class="param-value">
-                    <input
-                      type="text"
-                      min="1"
-                      step="1"
-                      id="gen-max"
-                      name="gen_max"
-                      pattern="^[-+]?\d*\.?0*$"
-                      class="is-disable-able"
-                      inputmode="numeric"
-                      required
-                    />
-                  </div>
-                  <div class="other-settings">
-                    <button class="random-btn">Random</button>
-                    <div class="checkbox-wrapper">
-                      <input
-                        type="checkbox"
-                        name="lock_gen_max"
-                        id="lock-gen-max"
-                      />
-                      <label for="lock-gen-max">
-                        <img src="../img/lock.png" />
+                      <label for="max-gen-pin">
+                        <img src="img/pin.png" />
                       </label>
                     </div>
                   </div>
                 </div>
               </div>
-            </div> -->
+            </div>
           </div>
         </div>
         <div class="border ver"></div>

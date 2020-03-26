@@ -2,6 +2,10 @@ import { IpcRenderer, OpenDialogReturnValue } from 'electron';
 
 let ipcRenderer: IpcRenderer = window['ipcRenderer'];
 /**
+ * revert settings, not updated when inputs change value, used for the revert button
+ */
+let revertSettings: object;
+/**
  * current settings
  */
 let settings: object;
@@ -73,26 +77,38 @@ browseBtn.onclick = () => {
   ipcRenderer.send('browse');
 };
 
-paramsPath.onkeypress = () => checkPath(paramsPath.value);
+paramsPath.onkeyup = () => checkPath(paramsPath.value);
 
 (() => {
-  function saveConfig() {
-    // TODO:
-    console.log('save triggered');
-  }
-
   saveBtn.onclick = () => {
-    saveConfig();
+    ipcRenderer.send('ga-cp-finished', settings);
   };
+
+  cancelBtn.onclick = () => {
+    ipcRenderer.send('ga-cp-finished');
+  };
+
+  revertBtn.onclick = () => {
+    revertBtn.disabled = true;
+    saveBtn.disabled = true;
+    settings = revertSettings;
+    affectSettings(revertSettings['renderer']['input'], 'gaCP');
+  };
+
+  Array.from(document.getElementsByTagName('input')).forEach(input => {
+    let eventListener = () => {
+      revertBtn.disabled = false;
+      saveBtn.disabled = false;
+    };
+    if (input.type == 'checkbox')
+      input.addEventListener('change', eventListener);
+    else {
+      input.addEventListener('keyup', eventListener);
+      if (input.classList.contains('textfieldable'))
+        input.addEventListener('change', eventListener);
+    }
+  });
 })();
-
-cancelBtn.onclick = () => {
-  console.log('cancel triggered');
-};
-
-revertBtn.onclick = () => {
-  console.log('revert triggered');
-};
 
 /**
  * add ability for some labels/buttons to be triggered by pressing the altKey
@@ -108,8 +124,9 @@ window['params']();
     Array.from(document.getElementsByClassName('random-btn'))
   )).forEach(randomBtn => {
     var param = randomBtn.parentElement.parentElement.parentElement;
+
     if (
-      param.parentElement.classList.contains('complex-param') &&
+      <HTMLInputElement>param.previousElementSibling &&
       !(<HTMLInputElement>param.previousElementSibling).checked
     )
       return;
@@ -118,7 +135,7 @@ window['params']();
   });
 };
 
-document.getElementById('force-textfields').addEventListener('change', ev => {
+document.getElementById('force-tf-enabled').addEventListener('change', ev => {
   Array.from(document.getElementsByClassName('textfieldable')).forEach(
     (textfieldable: HTMLInputElement) => {
       textfieldable.type = (<HTMLInputElement>ev.target).checked
@@ -130,7 +147,9 @@ document.getElementById('force-textfields').addEventListener('change', ev => {
 
 ipcRenderer.once('settings', (_ev, args) => {
   settings = args;
-  window['affectSettings'](settings['renderer']['input']);
+  revertSettings = JSON.parse(JSON.stringify(args));
+
+  window['affectSettings'](settings['renderer']['input'], 'gaCP');
   /**
    * add functionality to update settings onchange event for inputs
    */

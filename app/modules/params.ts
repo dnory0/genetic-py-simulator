@@ -84,6 +84,8 @@ function params() {
       ).toString();
       if (!(<unknown>input.classList.replace('invalid', 'valid')))
         input.classList.add('valid');
+      // console.log(input);
+
       input.dispatchEvent(new Event('keyup'));
     };
   });

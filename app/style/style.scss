@@ -29,10 +29,10 @@
     flex: 1;
 
     .controls-container {
-      min-width: 360px;
+      min-width: 324px;
       display: flex;
       flex-flow: column;
-      width: 360px;
+      width: 324px;
       margin-right: -4px;
       overflow: hidden;
 
@@ -124,5 +124,9 @@
     right: 0;
     padding: 0 6px;
     box-sizing: border-box;
+  }
+
+  .hide {
+    display: none !important;
   }
 }

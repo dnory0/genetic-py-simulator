@@ -1,24 +1,16 @@
 function saveSettings(settings) {
     let cbEventListener = (ev) => {
-        settings[ev.target.id.replace('-enabler', '')]['enabled'] = ev.target.checked;
-        console.log('hi');
+        let input = ev.target;
+        let type = input.id.match(/(?<=-)[^-]*$/)[0];
+        settings[input.id.replace(`-${type}`, '')][type] = input.checked;
     };
     let inputEventListener = (ev) => {
-        settings[ev.target.id] = (ev.target).value;
-        console.log('hi');
-    };
-    let disableAbleEventListener = (ev) => {
-        settings[ev.target.id]['value'] = (ev.target).value;
-        console.log('hi');
+        let input = ev.target;
+        settings[input.id]['value'] = input.value;
     };
     Array.from(document.getElementsByTagName('input')).forEach(input => {
         if (input.type == 'checkbox')
             input.onchange = cbEventListener;
-        else if (input.classList.contains('is-disable-able')) {
-            input.onkeyup = disableAbleEventListener;
-            if (input.classList.contains('textfieldable'))
-                input.onchange = disableAbleEventListener;
-        }
         else {
             input.onkeyup = inputEventListener;
             if (input.classList.contains('textfieldable'))

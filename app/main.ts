@@ -166,6 +166,7 @@ app.once('ready', () => {
         (_ev, gaChannel, gaCPConfig: object) => {
           if (gaChannel == 'ga-cp-finished') {
             mainWindow.webContents.send('ga-cp-finished', gaCPConfig);
+            gaWindow.destroy();
           } else if (gaChannel == 'browse') {
             browse(
               gaWindow,

@@ -16,7 +16,7 @@
     height: calc(100% - 45px);
 
     .params {
-      width: 432px;
+      width: 390px;
       display: flex;
       flex-direction: column;
       overflow-y: auto;
@@ -72,7 +72,7 @@
       align-items: center;
       flex-direction: row-reverse;
 
-      input[type='checkbox'].force-textfields {
+      input[type='checkbox'].force-tf-enabled {
         margin: 0 5px;
       }
 
@@ -81,21 +81,22 @@
         font-size: 14px;
       }
     }
-  }
 
-  input[type='checkbox'].param-enabler,
-  input[type='checkbox'].force-textfields {
-    width: 14px;
-    height: 14px;
+    .right {
+      #save-btn {
+        background-color: #137cff;
+        color: whitesmoke;
+        border: none;
 
-    & + div {
-      pointer-events: none;
-      opacity: 0.5;
-    }
+        &:hover:not(:disabled),
+        &.hover:not(:disabled) {
+          background-color: #0037ec;
+        }
 
-    &:checked + div {
-      pointer-events: all;
-      opacity: 1;
+        &:disabled {
+          background-color: #4e9dff;
+        }
+      }
     }
   }
 }
