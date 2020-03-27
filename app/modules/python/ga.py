@@ -152,14 +152,15 @@ class GAThread(Thread):
             "generation": pop.generation,
             "genes": pop.fittest().genes
         })
-
-        while True:
+        
+        while g_max_gen == False or pop.generation < g_max_gen:
+        # while True:
             Evolve.evolve_population(pop)
 
             # takes the current generation fitness
             curFitness = pop.fittest().fitness()
 
-            # if g_delay_rate is 0 than just ignore it
+            # if g_delay_rate is 0 or False than just ignore it
             if g_delay_rate:
                 sleep(g_delay_rate)
 
@@ -186,6 +187,12 @@ class GAThread(Thread):
 
             # update prvFitness
             prvFitness = curFitness
+            to_json({
+                'g_max_gen': g_max_gen,
+                'g_max_gen == False': g_max_gen == False,
+                'pop.generation < g_max_gen': pop.generation < g_max_gen,
+                'the_cond': g_max_gen == False or pop.generation < g_max_gen
+            })
 
         # finished event
         to_json({"finished": True})
@@ -316,6 +323,7 @@ g_mutation_rate = .06
 g_pop_size = int(argv[1]) if len(argv) > 1 else randint(1, 500)
 g_genes_num = int(argv[2]) if len(argv) > 2 else randint(1, 200)
 g_delay_rate = int(argv[3]) if len(argv) > 3 else 0
+g_max_gen = False
 
 def update_parameters(command: dict):
     """
@@ -326,6 +334,7 @@ def update_parameters(command: dict):
     global g_crossover_rate
     global g_mutation_rate
     global g_delay_rate
+    global g_max_gen
 
     if command.get('pop_size'):
         # population size
@@ -342,6 +351,11 @@ def update_parameters(command: dict):
     if type(command.get('delay_rate')) is not type(None):
         # sleep in seconds
         g_delay_rate = command.get('delay_rate')
+    if type(command.get('max_gen')) is not type(None):
+        # maximum generations
+        g_max_gen = command.get('max_gen')
+        
+    
     # if command.get('ff'):
     #     import_module(command.get('ff'))
 
@@ -359,6 +373,7 @@ def init_ga():
 while True:
     # read a command
     cmd = input()
+    # to_json(cmd)
     if cmd == 'play':
         if ga_thread is not None and ga_thread.is_alive():
             ga_thread.resume()

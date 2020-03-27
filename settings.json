@@ -24,12 +24,10 @@
       },
       "pop-size": {
         "value": 100,
-        "disable-on-run": true,
         "pin": true
       },
       "genes-num": {
         "value": 80,
-        "disable-on-run": true,
         "pin": true
       },
       "co-rate": {
@@ -44,7 +42,7 @@
         "enabled": true
       },
       "max-gen": {
-        "value": 0,
+        "value": 1,
         "pin": false,
         "enabled": false
       },

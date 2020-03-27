@@ -1,4 +1,13 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const electron_1 = require("electron");
 const path_1 = require("path");
@@ -22,6 +31,7 @@ const createWindow = (filePath, { minWidth, minHeight, width, height, resizable,
         maximizable,
         parent,
         frame,
+        modal: true,
         show: false,
         webPreferences: {
             preload,
@@ -60,6 +70,17 @@ electron_1.app.once('ready', () => {
     });
     mainWindow.setMenu(require(path_1.join(__dirname, 'modules', 'menubar.js'))(isDev, mainWindow));
     mainWindow.webContents.on('ipc-message', (_ev, channel, args) => {
+        let confirmClose = () => {
+            return electron_1.dialog.showMessageBox(gaWindow, {
+                type: 'question',
+                title: 'Are you sure?',
+                message: 'You have unsaved changes, are you sure you want to close?',
+                cancelId: 0,
+                defaultId: 1,
+                buttons: ['Ca&ncel', '&Confirm'],
+                normalizeAccessKeys: true
+            });
+        };
         if (channel == 'ga-cp') {
             gaWindow = createWindow(path_1.join(__dirname, 'ga-cp', 'ga-cp.html'), {
                 minWidth: 680,
@@ -76,6 +97,21 @@ electron_1.app.once('ready', () => {
                 if (gaChannel == 'ga-cp-finished') {
                     mainWindow.webContents.send('ga-cp-finished', gaCPConfig);
                     gaWindow.destroy();
+                }
+                else if (gaChannel == 'close-confirm') {
+                    (() => __awaiter(void 0, void 0, void 0, function* () {
+                        yield confirmClose()
+                            .then(result => {
+                            if (result.response) {
+                                mainWindow.webContents.send('ga-cp-finished', gaCPConfig);
+                                gaWindow.destroy();
+                            }
+                        })
+                            .catch(reason => {
+                            if (reason)
+                                throw reason;
+                        });
+                    }))();
                 }
                 else if (gaChannel == 'browse') {
                     browse(gaWindow, {
@@ -98,9 +134,12 @@ electron_1.app.once('ready', () => {
                     gaWindow.webContents.send('settings', args);
                 }
             });
-            gaWindow.once('closed', () => mainWindow.webContents.send('ga-cp-finished'));
+            gaWindow.on('close', ev => {
+                ev.preventDefault();
+                gaWindow.webContents.send('close-confirm');
+            });
         }
-        else if (channel == 'close-ga-cp') {
+        else if (channel == '') {
             if (gaWindow && !gaWindow.isDestroyed())
                 gaWindow.close();
         }

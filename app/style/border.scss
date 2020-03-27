@@ -6,18 +6,24 @@
   z-index: 1;
 
   &.hor {
-    cursor: ns-resize;
-    padding: 4px 0;
     height: 1px;
     min-height: 1px;
+
+    &.resize {
+      cursor: ns-resize;
+      padding: 4px 0;
+    }
   }
 
   &.ver {
-    cursor: ew-resize;
-    padding: 0 4px;
     width: 1px;
     min-width: 1px;
     height: 100%;
+
+    &.resize {
+      cursor: ew-resize;
+      padding: 0 4px;
+    }
   }
 }
 

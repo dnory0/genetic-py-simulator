@@ -66,27 +66,14 @@ let lRSwitch = <HTMLInputElement>document.getElementById('lr-enabled');
 let gaCPBtn = <HTMLInputElement>document.getElementById('ga-cp-btn');
 
 /***************************** Parameters inputs *****************************/
-
 /**
- * number of individuals in a population, needs to be more than 1
+ * ga input parameters.
  */
-let popSize = <HTMLInputElement>document.getElementById('pop-size');
-/**
- * number of genes per individual, at least needs to be set to 1.
- */
-let genesNum = <HTMLInputElement>document.getElementById('genes-num');
-/**
- * crossover rate, it's in ]0,1] range.
- */
-let coRate = <HTMLInputElement>document.getElementById('co-rate');
-/**
- * mutation rate, range of values is [0,1].
- */
-let mutRate = <HTMLInputElement>document.getElementById('mut-rate');
-/**
- * delay rate, range of [0,5]
- */
-let delRate = <HTMLInputElement>document.getElementById('del-rate');
+let gaParams = <HTMLInputElement[]>(
+  (<HTMLDivElement[]>(
+    Array.from(document.getElementsByClassName('param-value'))
+  )).map(paramValue => paramValue.firstElementChild)
+);
 
 /**
  * running settings
@@ -102,16 +89,41 @@ let settings: object = window['settings'];
 let isRunning = false;
 
 /**
+ * toggles ```disable-on-run```, if activate is true it activates
+ * inputs with their random buttons, else it disactivates them.
+ *
+ * @param activate default is true
+ */
+let toggleDisableOnRun = (activate = true) => {
+  gaParams.forEach(gaParam => {
+    if (!gaParam.classList.contains('disable-on-run')) return;
+    gaParam.disabled = !activate;
+    (<HTMLButtonElement>(
+      gaParam.parentElement.nextElementSibling.firstElementChild
+    )).disabled = !activate;
+    gaParam.parentElement.parentElement.title = activate
+      ? null
+      : 'Disabled when GA is Running';
+  });
+};
+
+/**
  * figure out what response stands for and act uppon it
  * @param response response of pyshell
  */
 const treatResponse = (response: object) => {
+  // console.log(response);
+
   if (response['started']) {
+    toggleDisableOnRun(false);
     // to be able to change in ga state
     setClickable();
   } else if (response['finished']) {
-    setClickable(false);
+    isRunning = false;
+    setClickable(isRunning);
     blinkPlayBtn();
+    toggleDisableOnRun(true);
+    switchPlayBtn();
   }
 };
 
@@ -122,12 +134,14 @@ const treatResponse = (response: object) => {
  * switch the play/pause button image depending on isRunning state.
  */
 const switchPlayBtn = () => {
-  (<HTMLImageElement>playBtn.querySelector('.play')).style.display = isRunning
-    ? 'none'
-    : 'block';
-  (<HTMLImageElement>playBtn.querySelector('.pause')).style.display = isRunning
-    ? 'block'
-    : 'none';
+  (<HTMLImageElement>playBtn.querySelector('.play')).classList.toggle(
+    'hide',
+    isRunning
+  );
+  (<HTMLImageElement>playBtn.querySelector('.pause')).classList.toggle(
+    'hide',
+    !isRunning
+  );
 };
 
 /**
@@ -193,7 +207,10 @@ const ctrlClicked = (signal: string, goingToRun: boolean) => {
    * in heavy GA (GA that takes considerable amount of time to generate 1 generation)
    * buttons should be stopped on click instead of waiting GA stopped event.
    */
-  if (signal == 'stop') setClickable(false);
+  if (signal == 'stop') {
+    setClickable(goingToRun);
+    toggleDisableOnRun(true);
+  }
 
   window['sendSig'](signal);
   isRunning = goingToRun;
@@ -217,13 +234,33 @@ stepFBtn.onclick = () => ctrlClicked('step_f', false);
  * number input background to white if needed, note that this method should only
  * be called when number input has valide value, else it might stop the GA.
  */
-const sendParameter = (numInput: HTMLInputElement) => {
-  numInput.style.backgroundColor = '#fff';
+const sendParameter = (key: string, value: any) => {
   window['sendSig'](
     JSON.stringify({
-      [numInput.name]: parseFloat(numInput.value)
+      [key]: parseFloat(value) || value
     })
   );
+};
+
+/**
+ * sends updates to ga after affecting settings to gaParams
+ */
+let sendParams = () => {
+  gaParams.forEach(gaParam => {
+    let value: any;
+    value =
+      gaParam.classList.contains('is-disable-able') &&
+      !(<HTMLInputElement>(
+        gaParam.parentElement.parentElement.parentElement.previousElementSibling
+      )).checked
+        ? false
+        : gaParam.value;
+    // console.log({
+    //   [gaParam.name]: value
+    // });
+
+    sendParameter(gaParam.name, value);
+  });
 };
 
 /********************************* Views Setup *********************************/
@@ -242,16 +279,26 @@ document.addEventListener('DOMContentLoaded', function loaded() {
         window['affectSettings'](settings['renderer']['input'], 'main');
 
         // send startup settings to pyshell
-        sendParameter(popSize);
-        sendParameter(genesNum);
-        sendParameter(coRate);
-        sendParameter(mutRate);
-        sendParameter(delRate);
+        sendParams();
 
         (() => {
+          let eventListener = (ev: Event) => {
+            let gaParam = <HTMLInputElement>ev.target;
+            sendParameter(gaParam.name, gaParam.value);
+          };
+          /**
+           * update ga when parameters change values
+           */
+          gaParams.forEach(gaParam => {
+            gaParam.addEventListener('keyup', eventListener);
+            if (gaParam.classList.contains('textfieldable'))
+              gaParam.addEventListener('change', eventListener);
+          });
+
           let lRSwitchUpdater = () => {
             prime.send('live-rendering', lRSwitch.checked);
           };
+
           lRSwitch.addEventListener('change', lRSwitchUpdater);
           lRSwitchUpdater();
         })();
@@ -327,16 +374,14 @@ document.addEventListener('DOMContentLoaded', function loaded() {
 
     gaCPBtn.onclick = () => {
       ipcRenderer.send('ga-cp', settings);
-      main.style.pointerEvents = 'none';
-      main.style.filter = 'blur(1px)';
+      main.classList.toggle('blur', true);
       ipcRenderer.once('ga-cp-finished', (_ev, newSettings: object) => {
-        main.style.pointerEvents = 'all';
-        main.style.filter = 'none';
+        main.classList.toggle('blur', false);
         if (newSettings) {
           settings['renderer']['input'] = newSettings['renderer']['input'];
-          // console.log(newSettings);
           saveSettings(settings['renderer']['input']);
           affectSettings(settings['renderer']['input'], 'main');
+          sendParams();
         }
       });
     };
@@ -346,7 +391,7 @@ document.addEventListener('DOMContentLoaded', function loaded() {
      */
     window.addEventListener('beforeunload', () => {
       ipcRenderer.send('close-ga-cp');
-      main.style.display = 'none';
+      main.classList.add('hide');
       // window['sendSig']('exit');
     });
   })();

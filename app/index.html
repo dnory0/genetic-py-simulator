@@ -21,7 +21,7 @@
     </div>
     <!-- #endregion -->
     <!-- #region Main-->
-    <div id="main">
+    <div id="main" class="blur">
       <div class="prime-container">
         <webview
           id="prime-chart"
@@ -34,14 +34,14 @@
         ></webview>
         <div class="resize-cover for-prime"></div>
       </div>
-      <div class="border hor"></div>
+      <div class="border hor resize"></div>
       <div class="middle-container">
         <div class="controls-container">
           <div class="state-controls-container">
             <div class="state-controls">
               <button title="Play/Pause" id="play-btn">
-                <img class="default play" src="img/play-btn.png" />
-                <img class="pause" src="img/pause-btn.png" />
+                <img class="play" src="img/play-btn.png" />
+                <img class="pause hide" src="img/pause-btn.png" />
               </button>
               <button title="Stop" id="stop-btn" disabled>
                 <img src="img/stop-btn.png" />
@@ -77,6 +77,7 @@
               </button>
             </div>
           </div>
+          <div class="border hor"></div>
           <div class="params-man scrollbar">
             <div class="complex-param">
               <div class="param">
@@ -93,6 +94,7 @@
                       name="pop_size"
                       pattern="^[-+]?\d*\.?0*$"
                       inputmode="numeric"
+                      class="disable-on-run"
                       required
                     />
                   </div>
@@ -127,6 +129,7 @@
                       name="genes_num"
                       pattern="^[-+]?\d*\.?0*$"
                       inputmode="numeric"
+                      class="disable-on-run"
                       required
                     />
                   </div>
@@ -260,7 +263,7 @@
                       id="max-gen"
                       name="max_gen"
                       pattern="^[-+]?\d*\.?0*$"
-                      class="is-disable-able"
+                      class="is-disable-able disable-on-run"
                       inputmode="numeric"
                       required
                     />
@@ -281,6 +284,12 @@
                 </div>
               </div>
             </div>
+            <input
+              type="checkbox"
+              name="force_textfields"
+              class="force-tf-enabled hide"
+              id="force-tf-enabled"
+            />
           </div>
         </div>
         <div class="border ver"></div>
@@ -297,6 +306,7 @@
           <div class="resize-cover for-side"></div>
         </div>
       </div>
+      <div class="border hor"></div>
       <div class="bottom-container"></div>
     </div>
     <!-- #endregion -->

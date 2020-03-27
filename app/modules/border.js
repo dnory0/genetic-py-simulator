@@ -2,6 +2,8 @@ module.exports = function () {
     delete require.cache[require.resolve('./border')];
     const pxSlicer = (element, minRes) => window.getComputedStyle(element)[minRes].slice(0, -2);
     Array.from(document.getElementsByClassName('border')).forEach((border) => {
+        if (!border.classList.contains('resize'))
+            return;
         var prevSib = border.previousElementSibling, nextSib = border.nextElementSibling, prevDisp = prevSib.style.display, nextDisp = nextSib.style.display;
         var prevRes, minPrevRes, minNextRes, client, winRes;
         if (border.classList.contains('ver')) {

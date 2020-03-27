@@ -12,29 +12,36 @@ let toStartBtn = document.getElementById('to-start-btn');
 let stepFBtn = document.getElementById('step-forward-btn');
 let lRSwitch = document.getElementById('lr-enabled');
 let gaCPBtn = document.getElementById('ga-cp-btn');
-let popSize = document.getElementById('pop-size');
-let genesNum = document.getElementById('genes-num');
-let coRate = document.getElementById('co-rate');
-let mutRate = document.getElementById('mut-rate');
-let delRate = document.getElementById('del-rate');
+let gaParams = ((Array.from(document.getElementsByClassName('param-value'))).map(paramValue => paramValue.firstElementChild));
 let settings = window['settings'];
 let isRunning = false;
+let toggleDisableOnRun = (activate = true) => {
+    gaParams.forEach(gaParam => {
+        if (!gaParam.classList.contains('disable-on-run'))
+            return;
+        gaParam.disabled = !activate;
+        (gaParam.parentElement.nextElementSibling.firstElementChild).disabled = !activate;
+        gaParam.parentElement.parentElement.title = activate
+            ? null
+            : 'Disabled when GA is Running';
+    });
+};
 const treatResponse = (response) => {
     if (response['started']) {
+        toggleDisableOnRun(false);
         setClickable();
     }
     else if (response['finished']) {
-        setClickable(false);
+        isRunning = false;
+        setClickable(isRunning);
         blinkPlayBtn();
+        toggleDisableOnRun(true);
+        switchPlayBtn();
     }
 };
 const switchPlayBtn = () => {
-    playBtn.querySelector('.play').style.display = isRunning
-        ? 'none'
-        : 'block';
-    playBtn.querySelector('.pause').style.display = isRunning
-        ? 'block'
-        : 'none';
+    playBtn.querySelector('.play').classList.toggle('hide', isRunning);
+    playBtn.querySelector('.pause').classList.toggle('hide', !isRunning);
 };
 const setClickable = (clickable = true) => {
     Array.from(document.querySelector('.state-controls').children).forEach((element, index) => {
@@ -61,8 +68,10 @@ const ctrlClicked = (signal, goingToRun) => {
         prime.send('step-forward');
     if (signal == 'replay')
         prime.send('replay');
-    if (signal == 'stop')
-        setClickable(false);
+    if (signal == 'stop') {
+        setClickable(goingToRun);
+        toggleDisableOnRun(true);
+    }
     window['sendSig'](signal);
     isRunning = goingToRun;
     switchPlayBtn();
@@ -71,11 +80,21 @@ playBtn.onclick = () => ctrlClicked(isRunning ? 'pause' : 'play', !isRunning);
 stopBtn.onclick = () => ctrlClicked('stop', false);
 toStartBtn.onclick = () => ctrlClicked('replay', true);
 stepFBtn.onclick = () => ctrlClicked('step_f', false);
-const sendParameter = (numInput) => {
-    numInput.style.backgroundColor = '#fff';
+const sendParameter = (key, value) => {
     window['sendSig'](JSON.stringify({
-        [numInput.name]: parseFloat(numInput.value)
+        [key]: parseFloat(value) || value
     }));
+};
+let sendParams = () => {
+    gaParams.forEach(gaParam => {
+        let value;
+        value =
+            gaParam.classList.contains('is-disable-able') &&
+                !(gaParam.parentElement.parentElement.parentElement.previousElementSibling).checked
+                ? false
+                : gaParam.value;
+        sendParameter(gaParam.name, value);
+    });
 };
 document.addEventListener('DOMContentLoaded', function loaded() {
     document.removeEventListener('DOMContentLoaded', loaded);
@@ -83,12 +102,17 @@ document.addEventListener('DOMContentLoaded', function loaded() {
         let ready = () => {
             ready = () => {
                 window['affectSettings'](settings['renderer']['input'], 'main');
-                sendParameter(popSize);
-                sendParameter(genesNum);
-                sendParameter(coRate);
-                sendParameter(mutRate);
-                sendParameter(delRate);
+                sendParams();
                 (() => {
+                    let eventListener = (ev) => {
+                        let gaParam = ev.target;
+                        sendParameter(gaParam.name, gaParam.value);
+                    };
+                    gaParams.forEach(gaParam => {
+                        gaParam.addEventListener('keyup', eventListener);
+                        if (gaParam.classList.contains('textfieldable'))
+                            gaParam.addEventListener('change', eventListener);
+                    });
                     let lRSwitchUpdater = () => {
                         prime.send('live-rendering', lRSwitch.checked);
                     };
@@ -142,21 +166,20 @@ document.addEventListener('DOMContentLoaded', function loaded() {
         let main = document.getElementById('main');
         gaCPBtn.onclick = () => {
             ipcRenderer.send('ga-cp', settings);
-            main.style.pointerEvents = 'none';
-            main.style.filter = 'blur(1px)';
+            main.classList.toggle('blur', true);
             ipcRenderer.once('ga-cp-finished', (_ev, newSettings) => {
-                main.style.pointerEvents = 'all';
-                main.style.filter = 'none';
+                main.classList.toggle('blur', false);
                 if (newSettings) {
                     settings['renderer']['input'] = newSettings['renderer']['input'];
                     saveSettings(settings['renderer']['input']);
                     affectSettings(settings['renderer']['input'], 'main');
+                    sendParams();
                 }
             });
         };
         window.addEventListener('beforeunload', () => {
             ipcRenderer.send('close-ga-cp');
-            main.style.display = 'none';
+            main.classList.add('hide');
         });
     })();
 });

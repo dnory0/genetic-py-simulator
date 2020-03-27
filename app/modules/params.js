@@ -6,14 +6,14 @@ function params() {
         input.onkeydown = ev => {
             if (ArrowsKeys.includes(ev.key)) {
                 ev.preventDefault();
-                input.value = ((Number.parseFloat(input.value) || 0) +
+                input.value = ((parseFloat(input.value) || 0) +
                     (ev.ctrlKey
-                        ? Number.parseFloat(input.step) * 100
+                        ? parseFloat(input.step) * 100
                         : ev.shiftKey
-                            ? Number.parseFloat(input.step) * 10
-                            : Number.parseFloat(input.step)) *
+                            ? parseFloat(input.step) * 10
+                            : parseFloat(input.step)) *
                         (ev.key == 'ArrowUp' ? 1 : -1))
-                    .toFixed(Number.isSafeInteger(Number.parseFloat(input.step))
+                    .toFixed(Number.isSafeInteger(parseFloat(input.step))
                     ? 0
                     : input.step.split('.')[1].length)
                     .toString();
@@ -23,10 +23,8 @@ function params() {
             if (ev.key == 'Tab')
                 return;
             if (input.checkValidity() &&
-                (input.min == '' ||
-                    Number.parseFloat(input.min) <= Number.parseFloat(input.value)) &&
-                (input.max == '' ||
-                    Number.parseFloat(input.value) <= Number.parseFloat(input.max))) {
+                (input.min == '' || parseFloat(input.min) <= parseFloat(input.value)) &&
+                (input.max == '' || parseFloat(input.value) <= parseFloat(input.max))) {
                 if (!input.classList.replace('invalid', 'valid'))
                     input.classList.add('valid');
             }
@@ -45,9 +43,7 @@ function params() {
         }
         let randomBtn = (input.parentElement.nextElementSibling.firstElementChild);
         randomBtn.onclick = () => {
-            input.value = rangedRandom(input.max == ''
-                ? Number.parseFloat(input.step) * 1000
-                : Number.parseFloat(input.max), input.min == '' ? 0 : Number.parseFloat(input.min), Number.isSafeInteger(Number.parseFloat(input.step))).toString();
+            input.value = rangedRandom(input.max == '' ? parseFloat(input.step) * 1000 : parseFloat(input.max), input.min == '' ? 0 : parseFloat(input.min), Number.isSafeInteger(parseFloat(input.step))).toString();
             if (!input.classList.replace('invalid', 'valid'))
                 input.classList.add('valid');
             input.dispatchEvent(new Event('keyup'));

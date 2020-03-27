@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 let ipcRenderer = window['ipcRenderer'];
 let revertSettings;
 let settings;
+let isClosable = true;
 let validatePath = window['validatePath'];
 let checkPath = (path) => {
     let checkCode = validatePath(path);
@@ -27,7 +28,7 @@ let checkPath = (path) => {
 let browseBtn = document.getElementById('browse-btn');
 let paramsPath = document.getElementById('params-path');
 let saveBtn = document.getElementById('save-btn');
-let cancelBtn = document.getElementById('cancel-btn');
+let closeBtn = document.getElementById('close-btn');
 let revertBtn = document.getElementById('revert-btn');
 browseBtn.onclick = () => {
     ipcRenderer.once('browsed-path', (_ev, result) => {
@@ -43,19 +44,24 @@ paramsPath.onkeyup = () => checkPath(paramsPath.value);
     saveBtn.onclick = () => {
         ipcRenderer.send('ga-cp-finished', settings);
     };
-    cancelBtn.onclick = () => {
-        ipcRenderer.send('ga-cp-finished');
+    closeBtn.onclick = () => {
+        if (isClosable)
+            ipcRenderer.send('ga-cp-finished');
+        else
+            ipcRenderer.send('close-confirm');
     };
     revertBtn.onclick = () => {
         revertBtn.disabled = true;
         saveBtn.disabled = true;
+        isClosable = true;
         settings = revertSettings;
-        affectSettings(revertSettings['renderer']['input'], 'gaCP');
+        affectSettings(revertSettings['renderer']['input'], 'ga-cp');
     };
     Array.from(document.getElementsByTagName('input')).forEach(input => {
         let eventListener = () => {
             revertBtn.disabled = false;
             saveBtn.disabled = false;
+            isClosable = false;
         };
         if (input.type == 'checkbox')
             input.addEventListener('change', eventListener);
@@ -87,8 +93,14 @@ document.getElementById('force-tf-enabled').addEventListener('change', ev => {
 ipcRenderer.once('settings', (_ev, args) => {
     settings = args;
     revertSettings = JSON.parse(JSON.stringify(args));
-    window['affectSettings'](settings['renderer']['input'], 'gaCP');
+    window['affectSettings'](settings['renderer']['input'], 'ga-cp');
     window['saveSettings'](settings['renderer']['input']);
 });
 ipcRenderer.send('settings');
+ipcRenderer.on('close-confirm', () => {
+    if (isClosable)
+        ipcRenderer.send('ga-cp-finished');
+    else
+        ipcRenderer.send('close-confirm');
+});
 //# sourceMappingURL=ga-cp.js.map

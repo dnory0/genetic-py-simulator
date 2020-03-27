@@ -15,6 +15,23 @@ button {
   }
 }
 
+input[type='text']:not(#params-path),
+input.tab-triggered {
+  &.valid,
+  &.valid:focus {
+    box-shadow: 0 0 0 1px #6cdf00, 0 0 0 4px rgba(0, 255, 0, 0.3);
+  }
+
+  &.invalid,
+  &.invalid:focus {
+    box-shadow: 0 0 0 1px #df0000, 0 0 0 4px rgba(255, 0, 0, 0.3);
+  }
+
+  &:focus {
+    box-shadow: 0 0 0 1px #df9a00, 0 0 0 4px rgba(223, 165, 0, 0.3);
+  }
+}
+
 input[type='range'] {
   width: 120px;
   appearance: none;

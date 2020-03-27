@@ -64,7 +64,7 @@ let sideChart = window['createChart']('side-chart', {
         formatter() {
             return `
       <div style="width: 80px">
-        <div><b>${Number.parseInt(this.series.getName().match(/(?<=Series )[0-9]+/)[0]) == 1
+        <div><b>${parseInt(this.series.getName().match(/(?<=Series )[0-9]+/)[0]) == 1
                 ? 'Fittest'
                 : 'Prev Fittest'}:</b></div>
         <div>Gene:&nbsp<b style="float: right">${this.point.x + 1}</b></div>

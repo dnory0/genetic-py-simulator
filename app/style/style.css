@@ -55,18 +55,24 @@ body {
 }
 
 .border.hor {
-  cursor: ns-resize;
-  padding: 4px 0;
   height: 1px;
   min-height: 1px;
 }
 
+.border.hor.resize {
+  cursor: ns-resize;
+  padding: 4px 0;
+}
+
 .border.ver {
-  cursor: ew-resize;
-  padding: 0 4px;
   width: 1px;
   min-width: 1px;
   height: 100%;
+}
+
+.border.ver.resize {
+  cursor: ew-resize;
+  padding: 0 4px;
 }
 
 /* Border between content that need to be devided sementically */
@@ -106,6 +112,26 @@ button:hover:not(:disabled), button.alt-pressed:not(:disabled) {
 
 button:disabled {
   background-color: whitesmoke;
+}
+
+input[type='text']:not(#params-path).valid, input[type='text']:not(#params-path).valid:focus,
+input.tab-triggered.valid,
+input.tab-triggered.valid:focus {
+  -webkit-box-shadow: 0 0 0 1px #6cdf00, 0 0 0 4px rgba(0, 255, 0, 0.3);
+          box-shadow: 0 0 0 1px #6cdf00, 0 0 0 4px rgba(0, 255, 0, 0.3);
+}
+
+input[type='text']:not(#params-path).invalid, input[type='text']:not(#params-path).invalid:focus,
+input.tab-triggered.invalid,
+input.tab-triggered.invalid:focus {
+  -webkit-box-shadow: 0 0 0 1px #df0000, 0 0 0 4px rgba(255, 0, 0, 0.3);
+          box-shadow: 0 0 0 1px #df0000, 0 0 0 4px rgba(255, 0, 0, 0.3);
+}
+
+input[type='text']:not(#params-path):focus,
+input.tab-triggered:focus {
+  -webkit-box-shadow: 0 0 0 1px #df9a00, 0 0 0 4px rgba(223, 165, 0, 0.3);
+          box-shadow: 0 0 0 1px #df9a00, 0 0 0 4px rgba(223, 165, 0, 0.3);
 }
 
 input[type='range'] {
@@ -307,21 +333,6 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
   text-align: right;
 }
 
-.params-man .complex-param .param .param-settings .param-value input[type='text'].valid, .params-man .complex-param .param .param-settings .param-value input[type='text'].valid:focus {
-  -webkit-box-shadow: 0 0 0 1px #6cdf00, 0 0 0 4px rgba(0, 255, 0, 0.3);
-          box-shadow: 0 0 0 1px #6cdf00, 0 0 0 4px rgba(0, 255, 0, 0.3);
-}
-
-.params-man .complex-param .param .param-settings .param-value input[type='text'].invalid, .params-man .complex-param .param .param-settings .param-value input[type='text'].invalid:focus {
-  -webkit-box-shadow: 0 0 0 1px #df0000, 0 0 0 4px rgba(255, 0, 0, 0.3);
-          box-shadow: 0 0 0 1px #df0000, 0 0 0 4px rgba(255, 0, 0, 0.3);
-}
-
-.params-man .complex-param .param .param-settings .param-value input[type='text']:focus {
-  -webkit-box-shadow: 0 0 0 1px #df9a00, 0 0 0 4px rgba(223, 165, 0, 0.3);
-          box-shadow: 0 0 0 1px #df9a00, 0 0 0 4px rgba(223, 165, 0, 0.3);
-}
-
 .params-man .complex-param .param .param-settings .other-settings {
   display: -webkit-box;
   display: -ms-flexbox;
@@ -353,11 +364,7 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
 }
 
 #main {
-  pointer-events: none;
   height: 100%;
-  opacity: 0;
-  -webkit-transition: opacity 0.4s;
-  transition: opacity 0.4s;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -388,7 +395,6 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
 }
 
 #main .middle-container .controls-container {
-  min-width: 324px;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -397,7 +403,6 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
       -ms-flex-flow: column;
           flex-flow: column;
   width: 324px;
-  margin-right: -4px;
   overflow: hidden;
 }
 
@@ -411,7 +416,10 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
   padding: 4px 4px;
   position: -webkit-sticky;
   position: sticky;
-  border-bottom: 1px solid #cebbbb;
+}
+
+#main .middle-container .controls-container .state-controls-container > div > *:not(:first-child) {
+  margin-left: 5px;
 }
 
 #main .middle-container .controls-container .state-controls-container .state-controls {
@@ -424,36 +432,6 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
   -webkit-box-align: center;
       -ms-flex-align: center;
           align-items: center;
-}
-
-#main .middle-container .controls-container .state-controls-container .state-controls button {
-  padding: 5px 4px 5px 5px;
-  border: none;
-  border-radius: 4px;
-  width: 28px;
-  height: 28px;
-  background-color: white;
-}
-
-#main .middle-container .controls-container .state-controls-container .state-controls button:hover:not(:disabled) {
-  background-color: #c4c4c4;
-}
-
-#main .middle-container .controls-container .state-controls-container .state-controls button img {
-  width: 18px;
-  float: left;
-}
-
-#main .middle-container .controls-container .state-controls-container .state-controls button:disabled {
-  opacity: 0.6;
-}
-
-#main .middle-container .controls-container .state-controls-container .state-controls button#play-btn img {
-  display: none;
-}
-
-#main .middle-container .controls-container .state-controls-container .state-controls button#play-btn img.default {
-  display: block;
 }
 
 #main .middle-container .controls-container .state-controls-container .chart-settings {
@@ -474,21 +452,25 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
   display: flex;
 }
 
-#main .middle-container .controls-container .state-controls-container .ga-cp button {
-  padding-left: 5px;
-  width: 28px;
-  height: 28px;
+#main .middle-container .controls-container .state-controls-container button {
+  padding-left: 4px;
   border: none;
+  width: 26px;
+  height: 26px;
 }
 
-#main .middle-container .controls-container .state-controls-container .ga-cp button img {
+#main .middle-container .controls-container .state-controls-container button img {
   width: 18px;
   float: left;
 }
 
+#main .middle-container .controls-container .state-controls-container button:disabled {
+  opacity: 0.6;
+  background-color: white;
+}
+
 #main .middle-container .side-container {
   position: relative;
-  margin-left: -4px;
   -webkit-box-flex: 1;
       -ms-flex: 1;
           flex: 1;
@@ -498,7 +480,6 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
 }
 
 #main .bottom-container {
-  border-top: 1px solid #cebbbb;
   height: 24px;
   min-height: 24px;
   bottom: 0;
@@ -509,7 +490,17 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
           box-sizing: border-box;
 }
 
-#main .hide {
+#main .no-padding {
+  padding: 0;
+}
+
+.blur {
+  pointer-events: none;
+  -webkit-filter: blur(1px);
+          filter: blur(1px);
+}
+
+.hide {
   display: none !important;
 }
 /*# sourceMappingURL=style.css.map */

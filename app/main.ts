@@ -77,6 +77,7 @@ const createWindow = (
     maximizable,
     parent,
     frame,
+    modal: true,
     show: false,
     webPreferences: {
       preload,
@@ -147,6 +148,18 @@ app.once('ready', () => {
   );
 
   mainWindow.webContents.on('ipc-message', (_ev, channel, args) => {
+    let confirmClose = () => {
+      return dialog.showMessageBox(gaWindow, {
+        type: 'question',
+        title: 'Are you sure?',
+        message: 'You have unsaved changes, are you sure you want to close?',
+        cancelId: 0,
+        defaultId: 1,
+        buttons: ['Ca&ncel', '&Confirm'],
+        normalizeAccessKeys: true
+      });
+    };
+
     if (channel == 'ga-cp') {
       gaWindow = createWindow(join(__dirname, 'ga-cp', 'ga-cp.html'), {
         minWidth: 680,
@@ -167,6 +180,19 @@ app.once('ready', () => {
           if (gaChannel == 'ga-cp-finished') {
             mainWindow.webContents.send('ga-cp-finished', gaCPConfig);
             gaWindow.destroy();
+          } else if (gaChannel == 'close-confirm') {
+            (async () => {
+              await confirmClose()
+                .then(result => {
+                  if (result.response) {
+                    mainWindow.webContents.send('ga-cp-finished', gaCPConfig);
+                    gaWindow.destroy();
+                  }
+                })
+                .catch(reason => {
+                  if (reason) throw reason;
+                });
+            })();
           } else if (gaChannel == 'browse') {
             browse(
               gaWindow,
@@ -193,11 +219,11 @@ app.once('ready', () => {
           }
         }
       );
-
-      gaWindow.once('closed', () =>
-        mainWindow.webContents.send('ga-cp-finished')
-      );
-    } else if (channel == 'close-ga-cp') {
+      gaWindow.on('close', ev => {
+        ev.preventDefault();
+        gaWindow.webContents.send('close-confirm');
+      });
+    } else if (channel == '') {
       if (gaWindow && !gaWindow.isDestroyed()) gaWindow.close();
     }
   });

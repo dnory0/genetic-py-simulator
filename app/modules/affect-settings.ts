@@ -2,9 +2,9 @@
  * affect given settings to every input on the document.
  *
  * @param settings inputs settings object
- * @param window targeted window: ```main``` | ```gaCP```
+ * @param window targeted window: ```main``` | ```ga-cp```
  */
-function affectSettings(settings: object, window: 'main' | 'gaCP') {
+function affectSettings(settings: object, window: 'main' | 'ga-cp') {
   Array.from(document.getElementsByTagName('input')).forEach(input => {
     // console.log(input);
     if (input.type == 'checkbox') {
@@ -14,7 +14,13 @@ function affectSettings(settings: object, window: 'main' | 'gaCP') {
 
       input.checked = settings[input.id.replace(`-${type}`, '')][type];
 
-      if (window == 'main') {
+      if (input.id == 'force-tf-enabled') {
+        Array.from(document.getElementsByClassName('textfieldable')).forEach(
+          (textfieldable: HTMLInputElement) => {
+            textfieldable.type = input.checked ? 'text' : 'range';
+          }
+        );
+      } else if (window == 'main') {
         if (type == 'pin' || type == 'enabled') {
           let complexParam = <HTMLDivElement>(
             (type == 'pin'

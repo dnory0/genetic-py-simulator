@@ -3,7 +3,12 @@ function affectSettings(settings, window) {
         if (input.type == 'checkbox') {
             let type = (input.id.match(/(?<=-)[^-]*$/)[0]);
             input.checked = settings[input.id.replace(`-${type}`, '')][type];
-            if (window == 'main') {
+            if (input.id == 'force-tf-enabled') {
+                Array.from(document.getElementsByClassName('textfieldable')).forEach((textfieldable) => {
+                    textfieldable.type = input.checked ? 'text' : 'range';
+                });
+            }
+            else if (window == 'main') {
                 if (type == 'pin' || type == 'enabled') {
                     let complexParam = ((type == 'pin'
                         ? input.parentElement.parentElement.parentElement.parentElement

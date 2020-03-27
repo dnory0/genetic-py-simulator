@@ -10,6 +10,10 @@ let revertSettings: object;
  */
 let settings: object;
 /**
+ *
+ */
+let isClosable = true;
+/**
  * checks if path is valid, check conditions are ordered and return value is as follows:
  *
  * - ```-1``` if path does not exist.
@@ -60,9 +64,9 @@ let paramsPath = <HTMLInputElement>document.getElementById('params-path');
  */
 let saveBtn = <HTMLButtonElement>document.getElementById('save-btn');
 /**
- * cancel button
+ * close button
  */
-let cancelBtn = <HTMLButtonElement>document.getElementById('cancel-btn');
+let closeBtn = <HTMLButtonElement>document.getElementById('close-btn');
 /**
  * revert button
  */
@@ -80,25 +84,35 @@ browseBtn.onclick = () => {
 paramsPath.onkeyup = () => checkPath(paramsPath.value);
 
 (() => {
+  /**
+   * bottom-right buttons setup
+   */
   saveBtn.onclick = () => {
     ipcRenderer.send('ga-cp-finished', settings);
   };
 
-  cancelBtn.onclick = () => {
-    ipcRenderer.send('ga-cp-finished');
+  closeBtn.onclick = () => {
+    if (isClosable) ipcRenderer.send('ga-cp-finished');
+    else ipcRenderer.send('close-confirm');
   };
 
   revertBtn.onclick = () => {
     revertBtn.disabled = true;
     saveBtn.disabled = true;
+    isClosable = true;
     settings = revertSettings;
-    affectSettings(revertSettings['renderer']['input'], 'gaCP');
+    affectSettings(revertSettings['renderer']['input'], 'ga-cp');
   };
 
+  /**
+   * if any input changed value make the window not closable
+   * without confirmation, enable revert and save buttons.
+   */
   Array.from(document.getElementsByTagName('input')).forEach(input => {
     let eventListener = () => {
       revertBtn.disabled = false;
       saveBtn.disabled = false;
+      isClosable = false;
     };
     if (input.type == 'checkbox')
       input.addEventListener('change', eventListener);
@@ -119,6 +133,9 @@ window['altTriggers']();
  */
 window['params']();
 
+/**
+ * random all button
+ */
 (<HTMLButtonElement>document.getElementById('random-all-btn')).onclick = () => {
   (<HTMLButtonElement[]>(
     Array.from(document.getElementsByClassName('random-btn'))
@@ -134,7 +151,9 @@ window['params']();
     randomBtn.click();
   });
 };
-
+/**
+ * force textfields input that applies to textfieldable inputs
+ */
 document.getElementById('force-tf-enabled').addEventListener('change', ev => {
   Array.from(document.getElementsByClassName('textfieldable')).forEach(
     (textfieldable: HTMLInputElement) => {
@@ -147,9 +166,10 @@ document.getElementById('force-tf-enabled').addEventListener('change', ev => {
 
 ipcRenderer.once('settings', (_ev, args) => {
   settings = args;
+  // creates a copy.
   revertSettings = JSON.parse(JSON.stringify(args));
 
-  window['affectSettings'](settings['renderer']['input'], 'gaCP');
+  window['affectSettings'](settings['renderer']['input'], 'ga-cp');
   /**
    * add functionality to update settings onchange event for inputs
    */
@@ -157,3 +177,12 @@ ipcRenderer.once('settings', (_ev, args) => {
 });
 
 ipcRenderer.send('settings');
+/**
+ * if user tries to close window using the top bar close button, window has to
+ * assure that the window is closable (no input has changed value), if closable
+ * it closes immediately, else it shows confirmation dialog.
+ */
+ipcRenderer.on('close-confirm', () => {
+  if (isClosable) ipcRenderer.send('ga-cp-finished');
+  else ipcRenderer.send('close-confirm');
+});
