@@ -86,10 +86,6 @@ if (getGlobal('isDev'))
     true
   );
 
-window.addEventListener('mouseout', () =>
-  charts.forEach(chart => chart.pointer.reset())
-);
-
 window['ready'] = (treatResponse: (response: object) => void) => {
   delete window['ready'];
   (<ChildProcess>getGlobal('pyshell')).stdout.on('data', (response: Buffer) => {

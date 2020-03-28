@@ -187,12 +187,12 @@ class GAThread(Thread):
 
             # update prvFitness
             prvFitness = curFitness
-            to_json({
-                'g_max_gen': g_max_gen,
-                'g_max_gen == False': g_max_gen == False,
-                'pop.generation < g_max_gen': pop.generation < g_max_gen,
-                'the_cond': g_max_gen == False or pop.generation < g_max_gen
-            })
+            # to_json({
+            #     'g_max_gen': g_max_gen,
+            #     'g_max_gen == False': g_max_gen == False,
+            #     'pop.generation < g_max_gen': pop.generation < g_max_gen,
+            #     'the_cond': g_max_gen == False or pop.generation < g_max_gen
+            # })
 
         # finished event
         to_json({"finished": True})

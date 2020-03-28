@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const electron_1 = require("electron");
-const highcharts_1 = require("highcharts");
 const path_1 = require("path");
 const { getGlobal } = electron_1.remote;
 window['ipcRenderer'] = electron_1.ipcRenderer;
@@ -50,7 +49,6 @@ if (getGlobal('isDev'))
                 else
                     electron_1.ipcRenderer.sendToHost('devTools', 'prime');
     }, true);
-window.addEventListener('mouseout', () => highcharts_1.charts.forEach(chart => chart.pointer.reset()));
 window['ready'] = (treatResponse) => {
     delete window['ready'];
     getGlobal('pyshell').stdout.on('data', (response) => {
