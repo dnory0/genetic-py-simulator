@@ -22,7 +22,44 @@
     <!-- #endregion -->
     <!-- #region Main-->
     <div id="main" class="blur">
-      <div class="prime-container">
+      <div class="prime-container fullscreenable">
+        <div class="chart-actions">
+          <div class="checkbox-wrapper">
+            <input
+              type="checkbox"
+              name="live_rendering"
+              id="lr-enabled"
+              checked
+            />
+            <label title="Live Rendering" for="lr-enabled">
+              <img src="img/live-rendering.png" />
+            </label>
+          </div>
+          <div class="dropdown">
+            <button class="drop-btn prime" title="Export to a file">
+              <img src="img/save.png" />
+            </button>
+            <div class="dropdown-content hide">
+              <button title="Export JPEG/JPG" id="export-jpeg">
+                JPEG/JPG
+              </button>
+              <button
+                title="Export PNG (chart without background)"
+                id="export-png"
+              >
+                PNG (without background)
+              </button>
+              <button title="Export SVG" id="export-svg">
+                SVG
+              </button>
+            </div>
+            <div class="dropdown-pointer hide" title="Export JPEG/JPG"></div>
+          </div>
+          <button title="Toggle Fullscreen" class="fscreen-btn">
+            <img src="img/maximize.png" />
+            <img src="img/minimize.png" />
+          </button>
+        </div>
         <webview
           id="prime-chart"
           src="prime-chart/prime-chart.html"
@@ -32,7 +69,7 @@
           nodeintegration
           preload="preloads/prime-preload"
         ></webview>
-        <div class="resize-cover for-prime"></div>
+        <div class="resize-cover hide for-prime"></div>
       </div>
       <div class="border hor resize"></div>
       <div class="middle-container">
@@ -55,20 +92,6 @@
               <button title="Next Generation" id="step-forward-btn">
                 <img src="img/step-forward-btn.png" />
               </button>
-            </div>
-            <div class="separator"></div>
-            <div class="chart-settings">
-              <div class="checkbox-wrapper">
-                <input
-                  type="checkbox"
-                  name="live_rendering"
-                  id="lr-enabled"
-                  checked
-                />
-                <label title="Live Rendering" for="lr-enabled">
-                  <img src="img/live-rendering.png" />
-                </label>
-              </div>
             </div>
             <div class="separator"></div>
             <div class="ga-cp">
@@ -293,7 +316,34 @@
           </div>
         </div>
         <div class="border ver"></div>
-        <div class="side-container">
+        <div class="side-container fullscreenable">
+          <div class="chart-actions">
+            <div class="dropdown">
+              <button class="drop-btn side" title="Export to a file">
+                <img src="img/save.png" />
+              </button>
+              <div class="dropdown-content hide">
+                <button title="Export JPEG/JPG" id="export-jpeg">
+                  JPEG/JPG
+                </button>
+                <button
+                  title="Export PNG (chart without background)"
+                  id="export-png"
+                >
+                  PNG (without background)
+                </button>
+                <button title="Export SVG" id="export-svg">
+                  SVG
+                </button>
+              </div>
+              <div class="dropdown-pointer hide" title="Export JPEG/JPG"></div>
+            </div>
+
+            <button title="Toggle Fullscreen" class="fscreen-btn">
+              <img src="img/maximize.png" />
+              <img src="img/minimize.png" />
+            </button>
+          </div>
           <webview
             id="side-chart"
             src="side-chart/side-chart.html"
@@ -303,7 +353,7 @@
             nodeintegration
             preload="preloads/side-preload"
           ></webview>
-          <div class="resize-cover for-side"></div>
+          <div class="resize-cover hide for-side"></div>
         </div>
       </div>
       <div class="border hor"></div>

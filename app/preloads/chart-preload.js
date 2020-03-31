@@ -1,7 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const electron_1 = require("electron");
+const Highcharts = require("highcharts");
 const path_1 = require("path");
+const exporting_1 = require("highcharts/modules/exporting");
+const offline_exporting_1 = require("highcharts/modules/offline-exporting");
+const export_data_1 = require("highcharts/modules/export-data");
+exporting_1.default(Highcharts);
+offline_exporting_1.default(Highcharts);
+export_data_1.default(Highcharts);
 const { getGlobal } = electron_1.remote;
 window['ipcRenderer'] = electron_1.ipcRenderer;
 window['createChart'] = require(path_1.join(__dirname, '..', 'modules', 'create-chart'));
@@ -15,6 +22,9 @@ window['enableChartHover'] = (enable, chart) => {
         },
         legend: {
             itemStyle: {
+                pointerEvents: enable ? 'all' : 'none'
+            },
+            itemCheckboxStyle: {
                 pointerEvents: enable ? 'all' : 'none'
             }
         },

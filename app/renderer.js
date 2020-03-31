@@ -80,6 +80,73 @@ playBtn.onclick = () => ctrlClicked(isRunning ? 'pause' : 'play', !isRunning);
 stopBtn.onclick = () => ctrlClicked('stop', false);
 toStartBtn.onclick = () => ctrlClicked('replay', true);
 stepFBtn.onclick = () => ctrlClicked('step_f', false);
+(() => {
+    function toggleFullscreen(fscreenBtn) {
+        if (document.fullscreenElement)
+            document.exitFullscreen();
+        else
+            fscreenBtn.parentElement.parentElement.requestFullscreen();
+    }
+    Array.from(document.getElementsByClassName('fscreen-btn')).forEach((fscreenBtn) => {
+        fscreenBtn.onclick = () => toggleFullscreen(fscreenBtn);
+    });
+    let clean = (eventListener) => {
+        Array.from(document.getElementsByClassName('resize-cover')).forEach((resizeCover) => {
+            resizeCover.classList.add('hide');
+        });
+        window.removeEventListener('click', eventListener);
+    };
+    Array.from(document.getElementsByClassName('drop-btn')).forEach((exportBtn) => {
+        console.log(exportBtn.nextElementSibling);
+        let dropdownContent = exportBtn.nextElementSibling;
+        let dropdownPointer = dropdownContent.nextElementSibling;
+        let exportTypes = Array.from(dropdownContent.children);
+        let eventListener = () => {
+            dropdownPointer.classList.toggle('hide', true);
+            dropdownContent.classList.toggle('hide', true);
+            clean(eventListener);
+        };
+        exportBtn.addEventListener('click', () => {
+            dropdownPointer.classList.toggle('hide');
+            dropdownContent.classList.toggle('hide');
+            Array.from(document.getElementsByClassName('resize-cover')).forEach((resizeCover) => {
+                resizeCover.classList.remove('hide');
+            });
+            if (dropdownContent.classList.contains('hide'))
+                clean(eventListener);
+            else {
+                setTimeout(() => {
+                    window.addEventListener('click', eventListener);
+                }, 0);
+            }
+        });
+        exportTypes.forEach((exportType, index) => {
+            if (index == 0) {
+                let mouseoverEventListener = () => {
+                    exportType.style.backgroundColor = '#d9d9d9';
+                    dropdownPointer.style.backgroundColor = '#d9d9d9';
+                };
+                let mouseleaveEventListener = () => {
+                    exportType.style.backgroundColor = 'white';
+                    dropdownPointer.style.backgroundColor = 'white';
+                };
+                exportType.addEventListener('mouseover', mouseoverEventListener);
+                exportType.addEventListener('mouseleave', mouseleaveEventListener);
+                dropdownPointer.addEventListener('mouseover', mouseoverEventListener);
+                dropdownPointer.addEventListener('mouseleave', mouseleaveEventListener);
+                dropdownPointer.addEventListener('click', () => exportType.click());
+            }
+            exportType.addEventListener('click', () => {
+                clean(eventListener);
+                if (exportBtn.classList.contains('prime'))
+                    prime.send('export', exportType.id.replace('export-', ''));
+                else
+                    side.send('export', exportType.id.replace('export-', ''));
+                exportBtn.click();
+            });
+        });
+    });
+})();
 const sendParameter = (key, value) => {
     window['sendSig'](JSON.stringify({
         [key]: parseFloat(value) || value
@@ -180,6 +247,7 @@ document.addEventListener('DOMContentLoaded', function loaded() {
         window.addEventListener('beforeunload', () => {
             ipcRenderer.send('close-ga-cp');
             main.classList.add('hide');
+            window['sendSig']('stop');
         });
     })();
 });

@@ -5,11 +5,13 @@ module.exports = (containerId, options) => {
     delete require.cache[require.resolve('./create-chart')];
     return highcharts_1.chart(containerId, {
         chart: {
-            spacingBottom: 3
+            spacingBottom: 3,
+            backgroundColor: 'transparent'
         },
         tooltip: {
             useHTML: true,
-            formatter: options.tooltip.formatter
+            formatter: options.tooltip.formatter,
+            positioner: options.tooltip.positioner
         },
         title: {
             text: options.title.text,
@@ -39,6 +41,9 @@ module.exports = (containerId, options) => {
             endOnTick: false,
             labels: options.yAxis.labels,
             gridLineWidth: options.yAxis.gridLineWidth
+        },
+        exporting: {
+            enabled: false
         },
         series: options.series,
         plotOptions: {

@@ -11,11 +11,13 @@ module.exports = (containerId: string, options: Options) => {
   return chart(containerId, {
     chart: {
       // zoomType: 'x',
-      spacingBottom: 3
+      spacingBottom: 3,
+      backgroundColor: 'transparent'
     },
     tooltip: {
       useHTML: true,
-      formatter: options.tooltip.formatter
+      formatter: options.tooltip.formatter,
+      positioner: options.tooltip.positioner
     },
     title: {
       text: options.title.text,
@@ -45,6 +47,9 @@ module.exports = (containerId: string, options: Options) => {
       endOnTick: false,
       labels: (<YAxisOptions>options.yAxis).labels,
       gridLineWidth: (<YAxisOptions>options.yAxis).gridLineWidth
+    },
+    exporting: {
+      enabled: false
     },
     series: options.series,
     plotOptions: {

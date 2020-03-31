@@ -82,6 +82,17 @@ let primeChart = window['createChart']('prime-chart', {
                 ? this.y
                 : Math.abs(this.point.high - this.point.low)}</b>
           </div>`;
+        },
+        positioner(labelWidth, labelHeight, point) {
+            return point.plotX + labelWidth + 80 < this.chart.plotWidth
+                ? {
+                    x: point.plotX,
+                    y: point.plotY + 5
+                }
+                : {
+                    x: point.plotX - labelWidth / 1.5 - 6,
+                    y: labelHeight + point.plotY
+                };
         }
     },
     legend: {
@@ -113,4 +124,23 @@ window['ready'](treatResponse);
 ipcRenderer.on('live-rendering', (_ev, newLR) => (liveRendering.isLive = newLR));
 ipcRenderer.on('step-forward', () => (liveRendering.stepForward = true));
 ipcRenderer.on('replay', () => (liveRendering.replay = true));
+ipcRenderer.on('export', (_ev, actionType) => {
+    switch (actionType) {
+        case 'png':
+            primeChart.exportChartLocal({
+                type: 'image/png'
+            });
+            break;
+        case 'jpeg':
+            primeChart.exportChartLocal({
+                type: 'image/jpeg'
+            });
+            break;
+        case 'svg':
+            primeChart.exportChartLocal({
+                type: 'image/svg+xml'
+            });
+            break;
+    }
+});
 //# sourceMappingURL=prime-chart.js.map

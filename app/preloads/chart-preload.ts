@@ -1,7 +1,16 @@
 import { ipcRenderer, remote } from 'electron';
-import { Chart, charts } from 'highcharts';
+import * as Highcharts from 'highcharts';
+import { Chart } from 'highcharts';
 import { join } from 'path';
 import { ChildProcess } from 'child_process';
+
+import exporting from 'highcharts/modules/exporting';
+import offlineExporting from 'highcharts/modules/offline-exporting';
+import exportData from 'highcharts/modules/export-data';
+
+exporting(Highcharts);
+offlineExporting(Highcharts);
+exportData(Highcharts);
 
 const { getGlobal } = remote;
 /**
@@ -38,6 +47,9 @@ window['enableChartHover'] = (enable: boolean, chart: Chart) => {
       },
       legend: {
         itemStyle: {
+          pointerEvents: enable ? 'all' : 'none'
+        },
+        itemCheckboxStyle: {
           pointerEvents: enable ? 'all' : 'none'
         }
       },

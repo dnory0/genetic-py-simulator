@@ -2,9 +2,9 @@
  * affect given settings to every input on the document.
  *
  * @param settings inputs settings object
- * @param window targeted window: ```main``` | ```ga-cp```
+ * @param targetedWindow targeted window: ```main``` | ```ga-cp```
  */
-function affectSettings(settings: object, window: 'main' | 'ga-cp') {
+function affectSettings(settings: object, targetedWindow: 'main' | 'ga-cp') {
   Array.from(document.getElementsByTagName('input')).forEach(input => {
     // console.log(input);
     if (input.type == 'checkbox') {
@@ -20,8 +20,8 @@ function affectSettings(settings: object, window: 'main' | 'ga-cp') {
             textfieldable.type = input.checked ? 'text' : 'range';
           }
         );
-      } else if (window == 'main') {
-        if (type == 'pin' || type == 'enabled') {
+      } else if (targetedWindow == 'main') {
+        if ((type == 'pin' || type == 'enabled') && input.id != 'lr-enabled') {
           let complexParam = <HTMLDivElement>(
             (type == 'pin'
               ? input.parentElement.parentElement.parentElement.parentElement
@@ -42,7 +42,7 @@ function affectSettings(settings: object, window: 'main' | 'ga-cp') {
       }
     } else {
       input.value = settings[input.id]['value'];
-      if (window == 'main' && settings[input.id]['disable-on-run']) {
+      if (targetedWindow == 'main' && settings[input.id]['disable-on-run']) {
         input.classList.add('disable-on-run');
       }
     }

@@ -38,7 +38,7 @@ module.exports = function() {
         // the mouse move event is triggered on the webviews instead of the main window
         document
           .querySelectorAll('.resize-cover')
-          .forEach((ele: HTMLDivElement) => (ele.style.display = 'block'));
+          .forEach((ele: HTMLDivElement) => ele.classList.remove('hide'));
         window.onmousemove = (e: MouseEvent) => {
           //  resizes only and no hiding and showing
           if (
@@ -82,7 +82,7 @@ module.exports = function() {
           window.onmousemove = window.onmouseup = null;
           document
             .querySelectorAll('.resize-cover')
-            .forEach((ele: HTMLDivElement) => (ele.style.display = 'none'));
+            .forEach((ele: HTMLDivElement) => ele.classList.add('hide'));
         };
       };
     }

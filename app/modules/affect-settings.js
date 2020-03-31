@@ -1,4 +1,4 @@
-function affectSettings(settings, window) {
+function affectSettings(settings, targetedWindow) {
     Array.from(document.getElementsByTagName('input')).forEach(input => {
         if (input.type == 'checkbox') {
             let type = (input.id.match(/(?<=-)[^-]*$/)[0]);
@@ -8,8 +8,8 @@ function affectSettings(settings, window) {
                     textfieldable.type = input.checked ? 'text' : 'range';
                 });
             }
-            else if (window == 'main') {
-                if (type == 'pin' || type == 'enabled') {
+            else if (targetedWindow == 'main') {
+                if ((type == 'pin' || type == 'enabled') && input.id != 'lr-enabled') {
                     let complexParam = ((type == 'pin'
                         ? input.parentElement.parentElement.parentElement.parentElement
                             .parentElement
@@ -27,7 +27,7 @@ function affectSettings(settings, window) {
         }
         else {
             input.value = settings[input.id]['value'];
-            if (window == 'main' && settings[input.id]['disable-on-run']) {
+            if (targetedWindow == 'main' && settings[input.id]['disable-on-run']) {
                 input.classList.add('disable-on-run');
             }
         }
