@@ -1,18 +1,22 @@
-import { Chart, SeriesLineOptions, Options } from 'highcharts';
+import {
+  Chart,
+  SeriesLineOptions,
+  Options,
+  TooltipPositionerPointObject,
+  Tooltip
+} from 'highcharts';
 import { IpcRenderer } from 'electron';
 
 /**
- * by default the chart updates whenever it has a point added to it,
- * user can disable that from the interface switch so the chart updates
- * when the GA is paused or stopped. however if its disabled and user
- * pressed step forward button, the chart is not going to update that,
- * to fix that, step forward button is set to true after the step forward
- * is pressed, then chart adds the point, redraw, and set step forward
- * button back to false, replay used to remove the flash of showing the
- * chart and removing it in milliseconds, because replay is stopped event
- * (which triggers redraw the chart), and started event which clears past
- * values, the solution is to recieve replay event from host when replay
- * button is triggered to prevent chart redraw.
+ * by default the chart updates whenever it has a point added to it, user can disable that
+ * from the interface switch so the chart updates when the GA is paused or stopped. However,
+ * if live rendering is disabled and user presses step forward button, the chart is not going to
+ * redraw the new added point, to fix that, stepForward flag is set to true after the step forward
+ * button is pressed, then chart adds the point, redraw, and set step forward button back to false,
+ * replay used to remove the flash of showing the chart and removing it in milliseconds, because
+ * replay is (stopped event (which redraws the chart) + started event which clears past values),
+ * the solution is to recieve replay event from host when replay button is triggered to prevent
+ * chart redraw.
  */
 let liveRendering = { isLive: true, stepForward: false, replay: false };
 
@@ -143,6 +147,22 @@ let primeChart: Chart = window['createChart']('prime-chart', {
                 : Math.abs(this.point.high - this.point.low)
             }</b>
           </div>`;
+    },
+    // to avoid the action buttons overlapping the tooltip
+    positioner(
+      labelWidth: number,
+      labelHeight: number,
+      point: TooltipPositionerPointObject
+    ) {
+      return point.plotX + labelWidth + 80 < (<Tooltip>this).chart.plotWidth
+        ? {
+            x: point.plotX,
+            y: point.plotY + 5
+          }
+        : {
+            x: point.plotX - labelWidth / 1.5 - 6,
+            y: labelHeight + point.plotY
+          };
     }
   },
   legend: {
@@ -184,3 +204,23 @@ ipcRenderer.on(
 );
 ipcRenderer.on('step-forward', () => (liveRendering.stepForward = true));
 ipcRenderer.on('replay', () => (liveRendering.replay = true));
+
+ipcRenderer.on('export', (_ev, actionType: string) => {
+  switch (actionType) {
+    case 'png':
+      primeChart.exportChartLocal({
+        type: 'image/png'
+      });
+      break;
+    case 'jpeg':
+      primeChart.exportChartLocal({
+        type: 'image/jpeg'
+      });
+      break;
+    case 'svg':
+      primeChart.exportChartLocal({
+        type: 'image/svg+xml'
+      });
+      break;
+  }
+});

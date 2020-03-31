@@ -23,7 +23,7 @@ module.exports = function () {
         border.onmousedown = () => {
             document
                 .querySelectorAll('.resize-cover')
-                .forEach((ele) => (ele.style.display = 'block'));
+                .forEach((ele) => ele.classList.remove('hide'));
             window.onmousemove = (e) => {
                 if (e[client] >= minPrevRes &&
                     e[client] <= window[winRes] - minNextRes)
@@ -64,7 +64,7 @@ module.exports = function () {
                 window.onmousemove = window.onmouseup = null;
                 document
                     .querySelectorAll('.resize-cover')
-                    .forEach((ele) => (ele.style.display = 'none'));
+                    .forEach((ele) => ele.classList.add('hide'));
             };
         };
     });

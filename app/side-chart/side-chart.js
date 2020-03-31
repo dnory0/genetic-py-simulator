@@ -88,4 +88,24 @@ let sideChart = window['createChart']('side-chart', {
 });
 delete window['createChart'];
 window['ready'](treatResponse);
+ipcRenderer.on('export', (_ev, actionType) => {
+    console.log(actionType);
+    switch (actionType) {
+        case 'png':
+            sideChart.exportChartLocal({
+                type: 'image/png'
+            });
+            break;
+        case 'jpeg':
+            sideChart.exportChartLocal({
+                type: 'image/jpeg'
+            });
+            break;
+        case 'svg':
+            sideChart.exportChartLocal({
+                type: 'image/svg+xml'
+            });
+            break;
+    }
+});
 //# sourceMappingURL=side-chart.js.map

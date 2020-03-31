@@ -83,7 +83,6 @@ body {
 }
 
 .resize-cover {
-  display: none;
   position: absolute;
   top: 0;
   height: 100%;
@@ -379,10 +378,11 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
   min-height: 280px;
   height: calc(70% + 13px);
   margin-bottom: -4px;
+  background-color: white;
 }
 
 #main .middle-container {
-  min-height: 140px;
+  min-height: 165px;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -418,59 +418,9 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
   position: sticky;
 }
 
-#main .middle-container .controls-container .state-controls-container > div > *:not(:first-child) {
-  margin-left: 5px;
-}
-
-#main .middle-container .controls-container .state-controls-container .state-controls {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-}
-
-#main .middle-container .controls-container .state-controls-container .chart-settings {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-}
-
-#main .middle-container .controls-container .state-controls-container .ga-cp {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-}
-
-#main .middle-container .controls-container .state-controls-container button {
-  padding-left: 4px;
-  border: none;
-  width: 26px;
-  height: 26px;
-}
-
-#main .middle-container .controls-container .state-controls-container button img {
-  width: 18px;
-  float: left;
-}
-
-#main .middle-container .controls-container .state-controls-container button:disabled {
-  opacity: 0.6;
-  background-color: white;
-}
-
 #main .middle-container .side-container {
   position: relative;
+  background-color: white;
   -webkit-box-flex: 1;
       -ms-flex: 1;
           flex: 1;
@@ -490,8 +440,143 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
           box-sizing: border-box;
 }
 
-#main .no-padding {
-  padding: 0;
+#main .state-controls-container > div:not(.separator),
+#main .chart-actions {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+#main .state-controls-container > div:not(.separator) > *,
+#main .state-controls-container > div:not(.separator) .drop-btn,
+#main .chart-actions > *,
+#main .chart-actions .drop-btn {
+  border: none;
+  width: 24px;
+  height: 24px;
+}
+
+#main .state-controls-container > div:not(.separator) > *:not(div),
+#main .state-controls-container > div:not(.separator) .drop-btn:not(div),
+#main .chart-actions > *:not(div),
+#main .chart-actions .drop-btn:not(div) {
+  padding-left: 3px;
+}
+
+#main .state-controls-container > div:not(.separator) > *:not(:first-child),
+#main .state-controls-container > div:not(.separator) .drop-btn:not(:first-child),
+#main .chart-actions > *:not(:first-child),
+#main .chart-actions .drop-btn:not(:first-child) {
+  margin-left: 5px;
+}
+
+#main .state-controls-container > div:not(.separator) > *:disabled,
+#main .state-controls-container > div:not(.separator) .drop-btn:disabled,
+#main .chart-actions > *:disabled,
+#main .chart-actions .drop-btn:disabled {
+  opacity: 0.6;
+  background-color: white;
+}
+
+#main .state-controls-container > div:not(.separator) > * img,
+#main .state-controls-container > div:not(.separator) .drop-btn img,
+#main .chart-actions > * img,
+#main .chart-actions .drop-btn img {
+  width: 18px;
+  float: left;
+}
+
+#main .state-controls-container > div:not(.separator) .dropdown-content,
+#main .chart-actions .dropdown-content {
+  position: relative;
+  right: 145px;
+  width: 180px;
+  z-index: 10000;
+  border: 1px solid #cebbbb;
+  -webkit-box-shadow: #cebbbb 3px 3px 8px;
+          box-shadow: #cebbbb 3px 3px 8px;
+}
+
+#main .state-controls-container > div:not(.separator) .dropdown-content button,
+#main .chart-actions .dropdown-content button {
+  width: -webkit-fill-available;
+  height: 28px;
+  border: none;
+  border-radius: 0;
+  text-align: left;
+}
+
+#main .chart-actions {
+  z-index: 1;
+  position: absolute;
+  top: 3px;
+  right: 3px;
+}
+
+#main .chart-actions .dropdown-pointer {
+  -webkit-transform: rotate(45deg);
+          transform: rotate(45deg);
+  border: 1px solid #cebbbb;
+  border-right: 0;
+  border-bottom: 0;
+  height: 6px;
+  width: 6px;
+  position: absolute;
+  top: 24px;
+  right: 37px;
+  background-color: white;
+  z-index: 10000;
+}
+
+#main .chart-actions > *:not(:hover),
+#main .chart-actions .drop-btn:not(:hover) {
+  background-color: transparent;
+}
+
+#main .chart-actions .dropdown-content > button {
+  z-index: 10001;
+}
+
+#main .fullscreenable > .chart-actions > button.fscreen-btn > img:last-child {
+  display: none;
+}
+
+#main .fullscreenable:-webkit-full-screen > .chart-actions > button.fscreen-btn > img:first-child {
+  display: none;
+}
+
+#main .fullscreenable:-moz-full-screen > .chart-actions > button.fscreen-btn > img:first-child {
+  display: none;
+}
+
+#main .fullscreenable:-ms-fullscreen > .chart-actions > button.fscreen-btn > img:first-child {
+  display: none;
+}
+
+#main .fullscreenable:fullscreen > .chart-actions > button.fscreen-btn > img:first-child {
+  display: none;
+}
+
+#main .fullscreenable:-webkit-full-screen > .chart-actions > button.fscreen-btn > img:last-child {
+  display: block;
+}
+
+#main .fullscreenable:-moz-full-screen > .chart-actions > button.fscreen-btn > img:last-child {
+  display: block;
+}
+
+#main .fullscreenable:-ms-fullscreen > .chart-actions > button.fscreen-btn > img:last-child {
+  display: block;
+}
+
+#main .fullscreenable:fullscreen > .chart-actions > button.fscreen-btn > img:last-child {
+  display: block;
 }
 
 .blur {
