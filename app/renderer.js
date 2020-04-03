@@ -22,7 +22,7 @@ let toggleDisableOnRun = (activate = true) => {
         gaParam.disabled = !activate;
         (gaParam.parentElement.nextElementSibling.firstElementChild).disabled = !activate;
         gaParam.parentElement.parentElement.title = activate
-            ? null
+            ? ''
             : 'Disabled when GA is Running';
     });
 };
@@ -145,6 +145,22 @@ stepFBtn.onclick = () => ctrlClicked('step_f', false);
             });
         });
     });
+})();
+(() => {
+    let contCont = document.querySelector('.controls-container');
+    let borderHide = document.querySelector('.border-hide');
+    let hidePane = document.getElementById('pane-hide-btn');
+    let showPane = document.getElementById('pane-show-btn');
+    hidePane.onclick = () => {
+        showPane.parentElement.classList.toggle('hide', false);
+        contCont.classList.toggle('hide', true);
+        borderHide.classList.toggle('hide', true);
+    };
+    showPane.onclick = () => {
+        showPane.parentElement.classList.toggle('hide', true);
+        contCont.classList.toggle('hide', false);
+        borderHide.classList.toggle('hide', false);
+    };
 })();
 const sendParameter = (key, value) => {
     window['sendSig'](JSON.stringify({

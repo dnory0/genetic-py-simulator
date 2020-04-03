@@ -102,7 +102,7 @@ let toggleDisableOnRun = (activate = true) => {
       gaParam.parentElement.nextElementSibling.firstElementChild
     )).disabled = !activate;
     gaParam.parentElement.parentElement.title = activate
-      ? null
+      ? ''
       : 'Disabled when GA is Running';
   });
 };
@@ -309,6 +309,24 @@ stepFBtn.onclick = () => ctrlClicked('step_f', false);
   );
 })();
 
+(() => {
+  let contCont = <HTMLDivElement>document.querySelector('.controls-container');
+  let borderHide = <HTMLDivElement>document.querySelector('.border-hide');
+  let hidePane = <HTMLButtonElement>document.getElementById('pane-hide-btn');
+  let showPane = <HTMLButtonElement>document.getElementById('pane-show-btn');
+
+  hidePane.onclick = () => {
+    showPane.parentElement.classList.toggle('hide', false);
+    contCont.classList.toggle('hide', true);
+    borderHide.classList.toggle('hide', true);
+  };
+
+  showPane.onclick = () => {
+    showPane.parentElement.classList.toggle('hide', true);
+    contCont.classList.toggle('hide', false);
+    borderHide.classList.toggle('hide', false);
+  };
+})();
 /******** Declared Glabally to be when default settings are recieved ********/
 
 /**

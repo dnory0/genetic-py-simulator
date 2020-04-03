@@ -79,7 +79,7 @@ body {
 .separator {
   background-color: #cebbbb;
   width: 1px;
-  margin: 3px 6px;
+  margin: 3px;
 }
 
 .resize-cover {
@@ -382,6 +382,7 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
 }
 
 #main .middle-container {
+  position: relative;
   min-height: 165px;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -413,9 +414,23 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
   -webkit-box-pack: center;
       -ms-flex-pack: center;
           justify-content: center;
-  padding: 4px 4px;
+  padding: 4px;
   position: -webkit-sticky;
   position: sticky;
+}
+
+#main .middle-container .controls-container .state-controls-container .ga-cp {
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  -webkit-box-pack: end;
+      -ms-flex-pack: end;
+          justify-content: flex-end;
+}
+
+#main .middle-container .controls-container .state-controls-container .pane-hide button > img {
+  -webkit-transform: rotate(180deg);
+          transform: rotate(180deg);
 }
 
 #main .middle-container .side-container {
@@ -441,6 +456,7 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
 }
 
 #main .state-controls-container > div:not(.separator),
+#main .pane-show,
 #main .chart-actions {
   display: -webkit-box;
   display: -ms-flexbox;
@@ -455,6 +471,8 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
 
 #main .state-controls-container > div:not(.separator) > *,
 #main .state-controls-container > div:not(.separator) .drop-btn,
+#main .pane-show > *,
+#main .pane-show .drop-btn,
 #main .chart-actions > *,
 #main .chart-actions .drop-btn {
   border: none;
@@ -464,6 +482,8 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
 
 #main .state-controls-container > div:not(.separator) > *:not(div),
 #main .state-controls-container > div:not(.separator) .drop-btn:not(div),
+#main .pane-show > *:not(div),
+#main .pane-show .drop-btn:not(div),
 #main .chart-actions > *:not(div),
 #main .chart-actions .drop-btn:not(div) {
   padding-left: 3px;
@@ -471,6 +491,8 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
 
 #main .state-controls-container > div:not(.separator) > *:not(:first-child),
 #main .state-controls-container > div:not(.separator) .drop-btn:not(:first-child),
+#main .pane-show > *:not(:first-child),
+#main .pane-show .drop-btn:not(:first-child),
 #main .chart-actions > *:not(:first-child),
 #main .chart-actions .drop-btn:not(:first-child) {
   margin-left: 5px;
@@ -478,6 +500,8 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
 
 #main .state-controls-container > div:not(.separator) > *:disabled,
 #main .state-controls-container > div:not(.separator) .drop-btn:disabled,
+#main .pane-show > *:disabled,
+#main .pane-show .drop-btn:disabled,
 #main .chart-actions > *:disabled,
 #main .chart-actions .drop-btn:disabled {
   opacity: 0.6;
@@ -486,6 +510,8 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
 
 #main .state-controls-container > div:not(.separator) > * img,
 #main .state-controls-container > div:not(.separator) .drop-btn img,
+#main .pane-show > * img,
+#main .pane-show .drop-btn img,
 #main .chart-actions > * img,
 #main .chart-actions .drop-btn img {
   width: 18px;
@@ -493,6 +519,7 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
 }
 
 #main .state-controls-container > div:not(.separator) .dropdown-content,
+#main .pane-show .dropdown-content,
 #main .chart-actions .dropdown-content {
   position: relative;
   right: 145px;
@@ -504,12 +531,25 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
 }
 
 #main .state-controls-container > div:not(.separator) .dropdown-content button,
+#main .pane-show .dropdown-content button,
 #main .chart-actions .dropdown-content button {
   width: -webkit-fill-available;
   height: 28px;
   border: none;
   border-radius: 0;
   text-align: left;
+}
+
+#main .pane-show {
+  z-index: 1;
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 4px;
+}
+
+#main .pane-show > button:not(:hover) {
+  background-color: transparent;
 }
 
 #main .chart-actions {

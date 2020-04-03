@@ -8,7 +8,7 @@
   </head>
 
   <body>
-    <!-- #region Loading-->
+    <!-- #region Loading (empty after load) -->
     <div
       id="loading-bg"
       style="height: 100%; text-align: center; position: absolute; transition: opacity 0.2s; height: 100%; width: 100%; overflow: hidden;"
@@ -20,7 +20,7 @@
       />
     </div>
     <!-- #endregion -->
-    <!-- #region Main-->
+    <!-- #region Main -->
     <div id="main" class="blur">
       <div class="prime-container fullscreenable">
         <div class="chart-actions">
@@ -93,10 +93,15 @@
                 <img src="img/step-forward-btn.png" />
               </button>
             </div>
-            <div class="separator"></div>
             <div class="ga-cp">
               <button title="GA Control Panel" id="ga-cp-btn">
                 <img src="img/settings.png" />
+              </button>
+            </div>
+            <div class="separator"></div>
+            <div class="pane-hide">
+              <button id="pane-hide-btn" title="Hide Pane">
+                <img src="img/show-hide-pane.png" />
               </button>
             </div>
           </div>
@@ -315,7 +320,12 @@
             />
           </div>
         </div>
-        <div class="border ver"></div>
+        <div class="border ver border-hide"></div>
+        <div class="pane-show hide">
+          <button id="pane-show-btn" title="Show Left Pane">
+            <img src="img/show-hide-pane.png" />
+          </button>
+        </div>
         <div class="side-container fullscreenable">
           <div class="chart-actions">
             <div class="dropdown">
