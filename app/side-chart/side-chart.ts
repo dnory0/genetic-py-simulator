@@ -150,8 +150,6 @@ delete window['createChart'];
 window['ready'](treatResponse);
 
 ipcRenderer.on('export', (_ev, actionType: string) => {
-  console.log(actionType);
-
   switch (actionType) {
     case 'png':
       sideChart.exportChartLocal({

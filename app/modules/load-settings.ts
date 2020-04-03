@@ -1,4 +1,4 @@
-import { writeFile, existsSync, readFile } from 'fs';
+import { existsSync, writeFileSync, readFileSync } from 'fs';
 
 /**
  * loads the app settings, if not found, or corrupted, it will load
@@ -6,45 +6,22 @@ import { writeFile, existsSync, readFile } from 'fs';
  *
  * @param settingsPath path to application settings
  * @param defSettingsPaththe default application settings path
- * @param fn a callback to execute after loading and parsing the settings
  */
-function loadSettings(
-  settingsPath: string,
-  defSettingsPath: string,
-  fn: (s: object) => void
-) {
+
+function loadSettings(settingsPath: string, defSettingsPath: string) {
   delete require.cache['./load-settings'];
-  let resetSettings = () => {
-    readFile(
-      defSettingsPath,
-      { encoding: 'utf8' },
-      (err: NodeJS.ErrnoException, data: string) => {
-        if (err) throw err;
-        fn(JSON.parse(data));
-        writeFile(settingsPath, data, err => {
-          if (err) throw err;
-        });
-      }
-    );
-  };
+  let loadedSettings: string;
   if (existsSync(settingsPath)) {
-    readFile(
-      settingsPath,
-      { encoding: 'utf8' },
-      (err: NodeJS.ErrnoException, data: string) => {
-        if (err) throw err;
-        try {
-          let settings = JSON.parse(data);
-          fn(settings);
-        } catch (error) {
-          // console.error(error);
-          resetSettings(); // my guess is the settings file has a json syntax error (usualy when altered by user)
-          // implement settings corrupted msg.
-          // console.log('oops');
-        }
-      }
-    );
-  } else resetSettings(); // on a fresh installation or when file is deleted
+    try {
+      return JSON.parse(readFileSync(settingsPath, { encoding: 'utf8' }));
+    } catch (error) {}
+  }
+  // on a fresh installation or when settings file is deleted
+  loadedSettings = readFileSync(defSettingsPath, {
+    encoding: 'utf8'
+  });
+  writeFileSync(settingsPath, loadedSettings);
+  return JSON.parse(loadedSettings);
 }
 
 module.exports = loadSettings;

@@ -66,7 +66,7 @@ paramsPath.onkeyup = () => checkPath(paramsPath.value);
         if (input.type == 'checkbox')
             input.addEventListener('change', eventListener);
         else {
-            input.addEventListener('keyup', eventListener);
+            input.addEventListener('keypress', eventListener);
             if (input.classList.contains('textfieldable'))
                 input.addEventListener('change', eventListener);
         }

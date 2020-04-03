@@ -1,34 +1,20 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs_1 = require("fs");
-function loadSettings(settingsPath, defSettingsPath, fn) {
+function loadSettings(settingsPath, defSettingsPath) {
     delete require.cache['./load-settings'];
-    let resetSettings = () => {
-        fs_1.readFile(defSettingsPath, { encoding: 'utf8' }, (err, data) => {
-            if (err)
-                throw err;
-            fn(JSON.parse(data));
-            fs_1.writeFile(settingsPath, data, err => {
-                if (err)
-                    throw err;
-            });
-        });
-    };
+    let loadedSettings;
     if (fs_1.existsSync(settingsPath)) {
-        fs_1.readFile(settingsPath, { encoding: 'utf8' }, (err, data) => {
-            if (err)
-                throw err;
-            try {
-                let settings = JSON.parse(data);
-                fn(settings);
-            }
-            catch (error) {
-                resetSettings();
-            }
-        });
+        try {
+            return JSON.parse(fs_1.readFileSync(settingsPath, { encoding: 'utf8' }));
+        }
+        catch (error) { }
     }
-    else
-        resetSettings();
+    loadedSettings = fs_1.readFileSync(defSettingsPath, {
+        encoding: 'utf8'
+    });
+    fs_1.writeFileSync(settingsPath, loadedSettings);
+    return JSON.parse(loadedSettings);
 }
 module.exports = loadSettings;
 //# sourceMappingURL=load-settings.js.map

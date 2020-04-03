@@ -44,12 +44,14 @@ window['saveSettings'] = require('../modules/save-settings');
 /**
  * loads app settings
  */
-require(join(__dirname, '..', 'modules', 'load-settings.js'))(
+window['settings'] = require(join(
+  __dirname,
+  '..',
+  'modules',
+  'load-settings.js'
+))(
   join(app.getPath('userData'), 'settings.json'),
-  join(__dirname, '..', '..', 'settings.json'),
-  (settings: object) => {
-    window['settings'] = settings;
-  }
+  join(__dirname, '..', '..', 'settings.json')
 );
 
 /**

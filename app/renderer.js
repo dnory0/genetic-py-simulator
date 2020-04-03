@@ -97,7 +97,6 @@ stepFBtn.onclick = () => ctrlClicked('step_f', false);
         window.removeEventListener('click', eventListener);
     };
     Array.from(document.getElementsByClassName('drop-btn')).forEach((exportBtn) => {
-        console.log(exportBtn.nextElementSibling);
         let dropdownContent = exportBtn.nextElementSibling;
         let dropdownPointer = dropdownContent.nextElementSibling;
         let exportTypes = Array.from(dropdownContent.children);

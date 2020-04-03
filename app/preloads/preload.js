@@ -12,9 +12,7 @@ window['border'] = require(path_1.join(__dirname, '..', 'modules', 'border.js'))
 window['params'] = require('../modules/params');
 window['affectSettings'] = require('../modules/affect-settings');
 window['saveSettings'] = require('../modules/save-settings');
-require(path_1.join(__dirname, '..', 'modules', 'load-settings.js'))(path_1.join(app.getPath('userData'), 'settings.json'), path_1.join(__dirname, '..', '..', 'settings.json'), (settings) => {
-    window['settings'] = settings;
-});
+window['settings'] = require(path_1.join(__dirname, '..', 'modules', 'load-settings.js'))(path_1.join(app.getPath('userData'), 'settings.json'), path_1.join(__dirname, '..', '..', 'settings.json'));
 window['isDev'] = getGlobal('isDev');
 if (window['isDev'])
     window['k-shorts'] = require(path_1.join(__dirname, '..', 'modules', 'k-shorts.js'));

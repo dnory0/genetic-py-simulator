@@ -34,18 +34,15 @@ const pyshell: ChildProcess = require(join(
 ))(app);
 global['pyshell'] = pyshell;
 /**
- * settings
+ * load settings
  */
-let runSettings: object;
-/**
- * loads app settings
- *
- * @param fn callback function to execute after reading settings.json file
- */
-require(join(__dirname, 'modules', 'load-settings.js'))(
+let runSettings: object = require(join(
+  __dirname,
+  'modules',
+  'load-settings.js'
+))(
   join(app.getPath('userData'), 'settings.json'),
-  join(__dirname, '..', 'settings.json'),
-  (settings: object) => (runSettings = settings)
+  join(__dirname, '..', 'settings.json')
 );
 
 /**

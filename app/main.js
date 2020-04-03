@@ -18,8 +18,7 @@ let mainWindow;
 let gaWindow;
 const pyshell = require(path_1.join(__dirname, 'modules', 'create-pyshell.js'))(electron_1.app);
 global['pyshell'] = pyshell;
-let runSettings;
-require(path_1.join(__dirname, 'modules', 'load-settings.js'))(path_1.join(electron_1.app.getPath('userData'), 'settings.json'), path_1.join(__dirname, '..', 'settings.json'), (settings) => (runSettings = settings));
+let runSettings = require(path_1.join(__dirname, 'modules', 'load-settings.js'))(path_1.join(electron_1.app.getPath('userData'), 'settings.json'), path_1.join(__dirname, '..', 'settings.json'));
 const createWindow = (filePath, { minWidth, minHeight, width, height, resizable, minimizable, maximizable, parent, frame, webPreferences: { preload, webviewTag } } = {}) => {
     let targetWindow = new electron_1.BrowserWindow({
         minWidth,
