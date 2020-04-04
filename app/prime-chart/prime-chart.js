@@ -69,6 +69,7 @@ let primeChart = window['createChart']('prime-chart', {
         gridLineWidth: 1
     },
     tooltip: {
+        useHTML: true,
         formatter() {
             return `
           <div style="text-align: right">
@@ -84,16 +85,15 @@ let primeChart = window['createChart']('prime-chart', {
           </div>`;
         },
         positioner(labelWidth, labelHeight, point) {
-            return point.plotX + labelWidth + 80 < this.chart.plotWidth
-                ? {
-                    x: point.plotX,
-                    y: point.plotY + 5
-                }
-                : {
-                    x: point.plotX - labelWidth / 1.5 - 6,
-                    y: labelHeight + point.plotY
-                };
-        }
+            var x = point.plotX + labelWidth + 80 < this.chart.plotWidth
+                ? point.plotX + 38
+                : point.plotX - (labelWidth - 38);
+            var y = point.plotY + (point.plotY > 30 ? 4 : labelHeight + 25);
+            return { x, y };
+        },
+        shadow: false,
+        outside: false,
+        hideDelay: 250
     },
     legend: {
         floating: true,

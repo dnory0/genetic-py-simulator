@@ -61,16 +61,26 @@ let sideChart = window['createChart']('side-chart', {
         gridLineWidth: 0
     },
     tooltip: {
+        useHTML: true,
         formatter() {
             return `
-      <div style="width: 80px">
-        <div><b>${parseInt(this.series.getName().match(/(?<=Series )[0-9]+/)[0]) == 1
+        <span><b>${parseInt(this.series.getName().match(/(?<=Series )[0-9]+/)[0]) == 1
                 ? 'Fittest'
-                : 'Prev Fittest'}:</b></div>
-        <div>Gene:&nbsp<b style="float: right">${this.point.x + 1}</b></div>
-        <div>Value:&nbsp<b style="float: right">${this.point.value}</b></div>
-      </div>`;
-        }
+                : 'Prev Fittest'}:</b></span>
+        <span>Gene:&nbsp<b>${this.point.x + 1}</b></span>
+        <span>Value:&nbsp<b>${this.point.value}</b></span>
+      `;
+        },
+        positioner: function () {
+            return {
+                x: 0,
+                y: this.chart.chartHeight - this.label.height + 6
+            };
+        },
+        borderWidth: 0,
+        backgroundColor: 'transparent',
+        shadow: false,
+        hideDelay: 250
     },
     legend: {
         enabled: false

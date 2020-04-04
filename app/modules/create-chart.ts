@@ -14,11 +14,7 @@ module.exports = (containerId: string, options: Options) => {
       spacingBottom: 3,
       backgroundColor: 'transparent'
     },
-    tooltip: {
-      useHTML: true,
-      formatter: options.tooltip.formatter,
-      positioner: options.tooltip.positioner
-    },
+    tooltip: options.tooltip,
     title: {
       text: options.title.text,
       style: {
