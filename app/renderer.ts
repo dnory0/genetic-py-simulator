@@ -227,6 +227,7 @@ toStartBtn.onclick = () => ctrlClicked('replay', true);
 
 stepFBtn.onclick = () => ctrlClicked('step_f', false);
 
+// export to file functionality functionality
 (() => {
   function toggleFullscreen(fscreenBtn: HTMLButtonElement) {
     if (document.fullscreenElement) document.exitFullscreen();
@@ -309,6 +310,7 @@ stepFBtn.onclick = () => ctrlClicked('step_f', false);
   );
 })();
 
+// controls pane hide and show functionality
 (() => {
   let contCont = <HTMLDivElement>document.querySelector('.controls-container');
   let borderHide = <HTMLDivElement>document.querySelector('.border-hide');

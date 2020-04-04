@@ -16,6 +16,7 @@
     height: calc(70% + 13px);
     margin-bottom: -4px;
     background-color: white;
+    flex: 1;
   }
 
   .middle-container {
@@ -25,7 +26,6 @@
     height: calc(30% - 37px);
     margin-top: -4px;
     overflow: hidden;
-    flex: 1;
 
     .controls-container {
       display: flex;

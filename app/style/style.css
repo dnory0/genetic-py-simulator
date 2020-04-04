@@ -379,6 +379,9 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
   height: calc(70% + 13px);
   margin-bottom: -4px;
   background-color: white;
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
 }
 
 #main .middle-container {
@@ -390,9 +393,6 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
   height: calc(30% - 37px);
   margin-top: -4px;
   overflow: hidden;
-  -webkit-box-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
 }
 
 #main .middle-container .controls-container {
