@@ -10,16 +10,26 @@ module.exports = (containerId: string, options: Options) => {
   delete require.cache[require.resolve('./create-chart')];
   return chart(containerId, {
     chart: {
-      // zoomType: 'x',
+      resetZoomButton: {
+        theme: {
+          style: {
+            pointerEvents: 'none',
+            opacity: 0
+          }
+        }
+      },
       spacingBottom: 3,
-      backgroundColor: 'transparent'
+      marginRight: 3,
+      backgroundColor: 'white',
+      events: options.chart.events,
+      panning: {
+        enabled: true
+      },
+      panKey: 'ctrl'
     },
     tooltip: options.tooltip,
     title: {
-      text: options.title.text,
-      style: {
-        padding: '80px'
-      }
+      text: options.title.text
     },
     xAxis: {
       crosshair: {
@@ -31,7 +41,8 @@ module.exports = (containerId: string, options: Options) => {
       },
       tickInterval: 1,
       min: (<XAxisOptions>options.xAxis).min,
-      labels: (<XAxisOptions>options.xAxis).labels
+      labels: (<XAxisOptions>options.xAxis).labels,
+      minRange: (<XAxisOptions>options.xAxis).minRange
     },
     colorAxis: {
       minColor: getOptions().colors[2],
@@ -40,7 +51,6 @@ module.exports = (containerId: string, options: Options) => {
     yAxis: {
       title: null,
       tickInterval: 1,
-      endOnTick: false,
       labels: (<YAxisOptions>options.yAxis).labels,
       gridLineWidth: (<YAxisOptions>options.yAxis).gridLineWidth
     },
@@ -49,17 +59,15 @@ module.exports = (containerId: string, options: Options) => {
     },
     series: options.series,
     plotOptions: {
-      line: {
-        lineWidth: 1.5
-      },
       series: {
-        clip: false,
+        lineWidth: options.plotOptions.series.lineWidth,
         animation: false,
         states: {
           hover: {
             halo: {
               opacity: 0
-            }
+            },
+            lineWidth: 1
           }
         }
       }

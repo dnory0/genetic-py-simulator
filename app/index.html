@@ -24,6 +24,9 @@
     <div id="main" class="blur">
       <div class="prime-container fullscreenable">
         <div class="chart-actions">
+          <button title="Zoom out" class="zoom-out-btn prime">
+            <img src="img/zoom-out.png" />
+          </button>
           <div class="checkbox-wrapper">
             <input
               type="checkbox"
@@ -86,7 +89,12 @@
               <button title="Relaunch the Algorithm" id="to-start-btn" disabled>
                 <img src="img/to-start-btn.png" />
               </button>
-              <button title="Previous Generation" id="step-back-btn" disabled>
+              <button
+                title="Previous Generation"
+                id="step-back-btn"
+                class="hide"
+                disabled
+              >
                 <img src="img/step-back-btn.png" />
               </button>
               <button title="Next Generation" id="step-forward-btn">
@@ -328,6 +336,9 @@
         </div>
         <div class="side-container fullscreenable">
           <div class="chart-actions">
+            <button title="Zoom out" class="zoom-out-btn side">
+              <img src="img/zoom-out.png" />
+            </button>
             <div class="dropdown">
               <button class="drop-btn side" title="Export to a file">
                 <img src="img/save.png" />

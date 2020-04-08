@@ -13,19 +13,19 @@ module.exports = function() {
       if (!border.classList.contains('resize')) return;
       var prevSib = <HTMLDivElement>border.previousElementSibling,
         nextSib = <HTMLDivElement>border.nextElementSibling;
-      var prevRes: string, // width | height          if border is vertical, it's going to work on width, otherwise it's the height.
+      var res: string, // width | height          if border is vertical, it's going to work on width, otherwise it's the height.
         minPrevRes: number, // minimal resulotion of the previous sibling in pixel, if mouse descended enaugh the prevSib is going to be hidden.
         minNextRes: number, // minimal resulotion of the next sibling in pixel, if mouse ascended enaugh the nextSib is going to be hidden.
         client: string, // clientX | clientY          if border is vertical, the x value of the mouse is the interest, else it's the y value.
         winRes: string; // innerWidth | innerHeight   the window is set with relative mesures, the width/height needs to be calculated.
       if (border.classList.contains('ver')) {
-        prevRes = 'width';
+        res = 'width';
         minPrevRes = pxSlicer(prevSib, 'minWidth');
         minNextRes = pxSlicer(nextSib, 'minWidth');
         client = 'clientX';
         winRes = 'innerWidth';
       } else if (border.classList.contains('hor')) {
-        prevRes = 'height';
+        res = 'height';
         minPrevRes = pxSlicer(prevSib, 'minHeight');
         minNextRes = pxSlicer(nextSib, 'minHeight');
         client = 'clientY';
@@ -43,7 +43,7 @@ module.exports = function() {
             e[client] <= window[winRes] - minNextRes
           )
             // resizer is just one line, and resizes the container which doesn't have flex: 1 (bottom container is not conuted)
-            nextSib.style[prevRes] = window[winRes] - 24 - e[client] + 'px';
+            nextSib.style[res] = window[winRes] - 24 - e[client] + 'px';
         };
         window.onmouseup = () => {
           window.onmousemove = window.onmouseup = null;
@@ -52,6 +52,8 @@ module.exports = function() {
             .forEach((ele: HTMLDivElement) => ele.classList.add('hide'));
         };
       };
+      // double click will resize middle container to minimum
+      border.ondblclick = () => (nextSib.style[res] = minNextRes + 'px');
     }
   );
 };

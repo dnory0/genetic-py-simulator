@@ -112,8 +112,6 @@ let toggleDisableOnRun = (activate = true) => {
  * @param response response of pyshell
  */
 const treatResponse = (response: object) => {
-  // console.log(response);
-
   if (response['started']) {
     toggleDisableOnRun(false);
     // to be able to change in ga state
@@ -227,13 +225,13 @@ toStartBtn.onclick = () => ctrlClicked('replay', true);
 
 stepFBtn.onclick = () => ctrlClicked('step_f', false);
 
-// export to file functionality functionality
+// chart actions functionality
 (() => {
   function toggleFullscreen(fscreenBtn: HTMLButtonElement) {
     if (document.fullscreenElement) document.exitFullscreen();
     else fscreenBtn.parentElement.parentElement.requestFullscreen();
   }
-
+  // full screen
   Array.from(document.getElementsByClassName('fscreen-btn')).forEach(
     (fscreenBtn: HTMLButtonElement) => {
       fscreenBtn.onclick = () => toggleFullscreen(fscreenBtn);
@@ -249,6 +247,7 @@ stepFBtn.onclick = () => ctrlClicked('step_f', false);
     window.removeEventListener('click', eventListener);
   };
 
+  // export to file functionality
   Array.from(document.getElementsByClassName('drop-btn')).forEach(
     (exportBtn: HTMLButtonElement) => {
       let dropdownContent = <HTMLDivElement>exportBtn.nextElementSibling;
@@ -308,6 +307,15 @@ stepFBtn.onclick = () => ctrlClicked('step_f', false);
       });
     }
   );
+
+  (<HTMLButtonElement[]>(
+    Array.from(document.getElementsByClassName('zoom-out-btn'))
+  )).forEach(zoomOutBtn => {
+    zoomOutBtn.addEventListener('click', () => {
+      if (zoomOutBtn.classList.contains('prime')) prime.send('zoom-out');
+      else side.send('zoom-out');
+    });
+  });
 })();
 
 // controls pane hide and show functionality

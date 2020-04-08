@@ -12,7 +12,7 @@ export_data_1.default(Highcharts);
 const { getGlobal } = electron_1.remote;
 window['ipcRenderer'] = electron_1.ipcRenderer;
 window['createChart'] = require(path_1.join(__dirname, '..', 'modules', 'create-chart'));
-window['enableChartHover'] = (enable, chart) => {
+window['toggleChartHover'] = (chart, enable) => {
     chart.update({
         tooltip: {
             enabled: enable
@@ -32,7 +32,7 @@ window['enableChartHover'] = (enable, chart) => {
             series: {
                 marker: {
                     enabled: enable,
-                    radius: enable ? 2 : null
+                    radius: enable ? 1.5 : null
                 },
                 states: {
                     hover: {
@@ -68,5 +68,14 @@ window['ready'] = (treatResponse) => {
             .map((data) => JSON.parse(data))
             .forEach((data) => treatResponse(data));
     });
+};
+window['toggleZoom'] = (chart) => {
+    if (window['zoomed'])
+        return;
+    chart.update({
+        chart: {
+            zoomType: 'x'
+        }
+    }, true, false, false);
 };
 //# sourceMappingURL=chart-preload.js.map

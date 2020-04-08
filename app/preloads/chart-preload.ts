@@ -33,10 +33,10 @@ window['createChart'] = require(join(
 ));
 /**
  * enables or disable the hover settings for the passed chart
- * @param enable decides if to disable hover settings or enable them.
  * @param chart chart to apply hover settings on
+ * @param enable decides if to disable hover settings or enable them.
  */
-window['enableChartHover'] = (enable: boolean, chart: Chart) => {
+window['toggleChartHover'] = (chart: Chart, enable: boolean) => {
   chart.update(
     {
       tooltip: {
@@ -57,7 +57,7 @@ window['enableChartHover'] = (enable: boolean, chart: Chart) => {
         series: {
           marker: {
             enabled: enable,
-            radius: enable ? 2 : null
+            radius: enable ? 1.5 : null
           },
           states: {
             hover: {
@@ -107,4 +107,22 @@ window['ready'] = (treatResponse: (response: object) => void) => {
       .map((data: string) => JSON.parse(data))
       .forEach((data: object) => treatResponse(data));
   });
+};
+
+/**
+ * enables the zoom functionality for the passed chart
+ * @param chart chart to toggle its zoom functionality
+ */
+window['toggleZoom'] = (chart: Chart) => {
+  if (window['zoomed']) return;
+  chart.update(
+    {
+      chart: {
+        zoomType: 'x'
+      }
+    },
+    true,
+    false,
+    false
+  );
 };

@@ -1,9 +1,4 @@
-import {
-  Chart,
-  Options,
-  TooltipPositionerPointObject,
-  Tooltip
-} from 'highcharts';
+import { Chart, Options, Tooltip } from 'highcharts';
 import { IpcRenderer } from 'electron';
 
 /****************************** passed by preload ******************************
@@ -30,11 +25,11 @@ let mostFittest: {
 
 /**
  * enables or disable the hover settings for the passed chart
- * @param enable decides if to disable hover settings or enable them.
  * @param chart chart to apply hover settings on
+ * @param enable decides if to disable hover settings or enable them.
  */
-const enableChartHover: (enable: boolean, chart: Highcharts.Chart) => void =
-  window['enableChartHover'];
+const toggleChartHover: (chart: Chart, enable: boolean) => void =
+  window['toggleChartHover'];
 
 /**
  * clears chart data and xAxis if needed and redraw instantly
@@ -43,6 +38,12 @@ const enableChartHover: (enable: boolean, chart: Highcharts.Chart) => void =
  */
 const clearChart: (chart: Chart, categories?: boolean) => void =
   window['clearChart'];
+
+/**
+ * enables the zoom functionality for the passed chart
+ * @param chart chart to toggle its zoom functionality
+ */
+const toggleZoom: (chart: Chart) => void = window['toggleZoom'];
 
 /**
  * figure out what response stands for and act uppon it
@@ -64,13 +65,13 @@ const treatResponse = (response: object) => {
       ];
 
       sideChart.series[1].setData(
-        sideChart.series[0].data.map(aData => [aData.x, 1.5, aData.value]),
+        sideChart.series[0].data.map(aData => [aData.x, 2.5, aData.value]),
         true,
         false
       );
 
       sideChart.series[0].setData(
-        (<any[]>response['genes']).map((gene, i) => [i, 0.1, gene]),
+        (<any[]>response['genes']).map((gene, i) => [i, 0.5, gene]),
         true,
         false
       );
@@ -82,14 +83,23 @@ const treatResponse = (response: object) => {
     }
   } else if (response['started']) {
     clearChart(sideChart);
+    sideChart.xAxis[0].setExtremes(null, null, true, true);
     // clean mostFittest object before start recieving data
     mostFittest['fitness'] = -1;
     mostFittest['individuals'] = null;
     // disable points on hover on chart if it's not just a step forward
-    enableChartHover(response['first-step'], sideChart);
-  } else if (response['paused'] || response['stopped'] || response['finished'])
-    enableChartHover(true, sideChart);
-  else if (response['resumed']) enableChartHover(false, sideChart);
+    toggleChartHover(sideChart, response['first-step']);
+    if (response['first-step']) toggleZoom(sideChart);
+  } else if (
+    response['paused'] ||
+    response['stopped'] ||
+    response['finished']
+  ) {
+    toggleChartHover(sideChart, true);
+    toggleZoom(sideChart);
+  } else if (response['resumed']) {
+    toggleChartHover(sideChart, false);
+  }
 };
 
 /**
@@ -98,6 +108,9 @@ const treatResponse = (response: object) => {
  * fittest is a placed below, and previous fittest is placed above
  */
 let sideChart: Chart = window['createChart']('side-chart', {
+  chart: {
+    events: {}
+  },
   title: {
     text: 'Genes'
   },
@@ -105,11 +118,13 @@ let sideChart: Chart = window['createChart']('side-chart', {
     title: {
       text: 'Gene'
     },
+    min: 0,
     labels: {
       formatter() {
         return (this.value + 1).toString();
       }
-    }
+    },
+    minRange: 4
   },
   yAxis: {
     title: {
@@ -126,38 +141,53 @@ let sideChart: Chart = window['createChart']('side-chart', {
     formatter() {
       return `
         <span><b>${
-          parseInt(this.series.getName().match(/(?<=Series )[0-9]+/)[0]) == 1
-            ? 'Fittest'
-            : 'Prev Fittest'
+          this.series.getName() == 'F' ? 'Fittest' : 'Prev Fittest'
         }:</b></span>
         <span>Gene:&nbsp<b>${this.point.x + 1}</b></span>
         <span>Value:&nbsp<b>${this.point.value}</b></span>
       `;
     },
-    positioner: function() {
-      return {
-        x: 0,
-        y: this.chart.chartHeight - this.label.height + 6
-      };
+    positioner(labelWidth, labelHeight, point) {
+      var x =
+        point.plotX + labelWidth + 80 < (<Tooltip>this).chart.plotWidth
+          ? point.plotX + 9
+          : point.plotX - (labelWidth - 9);
+      var y = point.plotY + (point.plotY > 30 ? 0 : labelHeight + 58);
+      return { x, y };
+      // return { x: point.plotX + 9, y: point.plotY + 5 };
+      // return {
+      //   x: 0,
+      //   y: this.chart.chartHeight - this.label.height + 6
+      // };
     },
-    borderWidth: 0,
-    backgroundColor: 'transparent',
     shadow: false,
+    outside: false,
     hideDelay: 250
+    // borderWidth: 0,
+    // backgroundColor: 'transparent',
+    // shadow: false,
+    // hideDelay: 250
   },
   legend: {
     enabled: false
   },
   series: [
     {
+      name: 'PF',
       type: 'heatmap',
       data: []
     },
     {
+      name: 'F',
       type: 'heatmap',
       data: []
     }
-  ]
+  ],
+  plotOptions: {
+    series: {
+      lineWidth: 0
+    }
+  }
 } as Options);
 
 delete window['createChart'];
@@ -167,9 +197,10 @@ window['ready'](treatResponse);
 ipcRenderer.on('export', (_ev, actionType: string) => {
   switch (actionType) {
     case 'png':
-      sideChart.exportChartLocal({
-        type: 'image/png'
-      });
+      alert('disabled for now because of bugs');
+      // sideChart.exportChartLocal({
+      //   type: 'image/png'
+      // });
       break;
     case 'jpeg':
       sideChart.exportChartLocal({
@@ -182,4 +213,8 @@ ipcRenderer.on('export', (_ev, actionType: string) => {
       });
       break;
   }
+});
+
+ipcRenderer.on('zoom-out', () => {
+  sideChart.xAxis[0].setExtremes(null, null, true, true);
 });

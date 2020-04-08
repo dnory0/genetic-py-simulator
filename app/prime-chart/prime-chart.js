@@ -1,51 +1,80 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 let liveRendering = { isLive: true, stepForward: false, replay: false };
+let isRunning = false;
 const ipcRenderer = window['ipcRenderer'];
 delete window['ipcRenderer'];
-const enableChartHover = window['enableChartHover'];
+const toggleChartHover = window['toggleChartHover'];
 const clearChart = window['clearChart'];
+const toggleZoom = window['toggleZoom'];
 let treatResponse;
-(() => {
-    var min;
-    var max;
-    treatResponse = (response) => {
-        if (response['generation'] !== undefined) {
-            min = Math.min(min, response['fitness']);
-            max = Math.max(max, response['fitness'] + 0.001);
-            if (liveRendering.isLive || liveRendering.stepForward)
-                primeChart.yAxis[0].setExtremes(min, max, false);
-            primeChart.series[0].addPoint(parseInt(response['fitness']), liveRendering.isLive || liveRendering.stepForward, false, false);
-            if (response['generation'])
-                primeChart.series[1].addPoint([
-                    response['generation'] - 0.5,
-                    Math.min(response['prv-fitness'], response['fitness']),
-                    Math.max(response['prv-fitness'], response['fitness'])
-                ], liveRendering.isLive || liveRendering.stepForward, false, false);
-            if (liveRendering.stepForward)
-                liveRendering.stepForward = false;
+var min = Infinity, max = -Infinity;
+let updateExtremes = (newValue) => {
+    if (newValue == undefined)
+        (min = Infinity), (max = -Infinity);
+    else
+        (min = Math.min(min, newValue)), (max = Math.max(max, newValue));
+};
+treatResponse = (response) => {
+    if (response['generation'] !== undefined) {
+        updateExtremes(response['fitness']);
+        if ((liveRendering.isLive || liveRendering.stepForward) &&
+            !window['zoomed']) {
+            primeChart.yAxis[0].setExtremes(min, max, false);
         }
-        else if (response['started']) {
-            min = Number.POSITIVE_INFINITY;
-            max = Number.NEGATIVE_INFINITY;
-            clearChart(primeChart);
-            enableChartHover(response['first-step'], primeChart);
-        }
-        else if (response['paused'] ||
-            response['stopped'] ||
-            response['finished']) {
-            if (liveRendering.replay)
-                liveRendering.replay = false;
-            else {
+        primeChart.series[0].addPoint(parseInt(response['fitness']), liveRendering.isLive || liveRendering.stepForward, false, false);
+        if (response['generation'])
+            primeChart.series[1].addPoint([
+                response['generation'] - 0.5,
+                Math.min(response['prv-fitness'], response['fitness']),
+                Math.max(response['prv-fitness'], response['fitness'])
+            ], liveRendering.isLive || liveRendering.stepForward, false, false);
+        if (liveRendering.stepForward)
+            liveRendering.stepForward = false;
+    }
+    else if (response['started']) {
+        isRunning = true;
+        updateExtremes();
+        clearChart(primeChart);
+        toggleChartHover(primeChart, response['first-step']);
+        primeChart.xAxis[0].setExtremes(0, null, true, false);
+        window['zoomed'] = false;
+        if (response['first-step'])
+            toggleZoom(primeChart);
+    }
+    else if (response['paused'] ||
+        response['stopped'] ||
+        response['finished']) {
+        isRunning = false;
+        if (liveRendering.replay)
+            liveRendering.replay = false;
+        else {
+            if (!window['zoomed']) {
                 primeChart.yAxis[0].setExtremes(min, max);
-                enableChartHover(true, primeChart);
+            }
+            toggleChartHover(primeChart, true);
+            toggleZoom(primeChart);
+        }
+    }
+    else if (response['resumed']) {
+        isRunning = true;
+        toggleChartHover(primeChart, false);
+        primeChart.xAxis[0].setExtremes(0, null, true, false);
+        window['zoomed'] = false;
+    }
+};
+let primeChart = window['createChart']('prime-chart', {
+    chart: {
+        events: {
+            selection() {
+                if (isRunning)
+                    return;
+                window['zoomed'] = true;
+                this.yAxis[0].setExtremes(null, null, false);
+                return null;
             }
         }
-        else if (response['resumed'])
-            enableChartHover(false, primeChart);
-    };
-})();
-let primeChart = window['createChart']('prime-chart', {
+    },
     title: {
         text: 'Fittest per Generation'
     },
@@ -56,7 +85,8 @@ let primeChart = window['createChart']('prime-chart', {
         min: 0,
         labels: {
             enabled: true
-        }
+        },
+        minRange: 4
     },
     yAxis: {
         title: {
@@ -117,7 +147,12 @@ let primeChart = window['createChart']('prime-chart', {
             name: 'QGA',
             data: []
         }
-    ]
+    ],
+    plotOptions: {
+        series: {
+            lineWidth: 1
+        }
+    }
 });
 delete window['createChart'];
 window['ready'](treatResponse);
@@ -127,9 +162,7 @@ ipcRenderer.on('replay', () => (liveRendering.replay = true));
 ipcRenderer.on('export', (_ev, actionType) => {
     switch (actionType) {
         case 'png':
-            primeChart.exportChartLocal({
-                type: 'image/png'
-            });
+            alert('disabled for now because of bugs');
             break;
         case 'jpeg':
             primeChart.exportChartLocal({
@@ -142,5 +175,11 @@ ipcRenderer.on('export', (_ev, actionType) => {
             });
             break;
     }
+});
+ipcRenderer.on('zoom-out', () => {
+    primeChart.xAxis[0].setExtremes(0, null, false);
+    primeChart.yAxis[0].setExtremes(min, max, false);
+    primeChart.redraw(true);
+    window['zoomed'] = false;
 });
 //# sourceMappingURL=prime-chart.js.map

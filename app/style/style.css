@@ -433,6 +433,10 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
           transform: rotate(180deg);
 }
 
+#main .middle-container .controls-container .params-man {
+  padding: 0 0 0 6px;
+}
+
 #main .middle-container .side-container {
   position: relative;
   background-color: white;

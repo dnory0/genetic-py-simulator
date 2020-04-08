@@ -145,6 +145,14 @@ stepFBtn.onclick = () => ctrlClicked('step_f', false);
             });
         });
     });
+    (Array.from(document.getElementsByClassName('zoom-out-btn'))).forEach(zoomOutBtn => {
+        zoomOutBtn.addEventListener('click', () => {
+            if (zoomOutBtn.classList.contains('prime'))
+                prime.send('zoom-out');
+            else
+                side.send('zoom-out');
+        });
+    });
 })();
 (() => {
     let contCont = document.querySelector('.controls-container');
