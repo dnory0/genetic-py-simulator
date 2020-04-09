@@ -110,15 +110,19 @@ window['ready'] = (treatResponse: (response: object) => void) => {
 };
 
 /**
- * enables the zoom functionality for the passed chart
+ * enables and disables the zoom functionality for the passed chart
  * @param chart chart to toggle its zoom functionality
+ * @param enable if true, enables zooming, else disables it
  */
-window['toggleZoom'] = (chart: Chart) => {
+window['toggleZoom'] = (chart: Chart, enable: boolean) => {
   if (window['zoomed']) return;
   chart.update(
     {
       chart: {
-        zoomType: 'x'
+        zoomType: enable ? 'x' : null,
+        panning: {
+          enabled: enable
+        }
       }
     },
     true,

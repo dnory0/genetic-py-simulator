@@ -16,8 +16,8 @@ const treatResponse = (response) => {
                     genes: response['genes']
                 }
             ];
-            sideChart.series[1].setData(sideChart.series[0].data.map(aData => [aData.x, 2.5, aData.value]), true, false);
-            sideChart.series[0].setData(response['genes'].map((gene, i) => [i, 0.5, gene]), true, false);
+            sideChart.series[0].setData(sideChart.series[1].data.map(aData => [aData.x, 0.5, aData.value]), true, false);
+            sideChart.series[1].setData(response['genes'].map((gene, i) => [i, 2.5, gene]), true, false);
         }
         else if (mostFittest['fitness'] == response['fitness']) {
             mostFittest['individuals'].push({
@@ -32,17 +32,18 @@ const treatResponse = (response) => {
         mostFittest['fitness'] = -1;
         mostFittest['individuals'] = null;
         toggleChartHover(sideChart, response['first-step']);
-        if (response['first-step'])
-            toggleZoom(sideChart);
+        toggleZoom(sideChart, response['first-step']);
     }
     else if (response['paused'] ||
         response['stopped'] ||
         response['finished']) {
         toggleChartHover(sideChart, true);
-        toggleZoom(sideChart);
+        toggleZoom(sideChart, true);
     }
     else if (response['resumed']) {
+        sideChart.xAxis[0].setExtremes(0, null, true, false);
         toggleChartHover(sideChart, false);
+        toggleZoom(sideChart, false);
     }
 };
 let sideChart = window['createChart']('side-chart', {

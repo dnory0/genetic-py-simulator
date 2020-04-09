@@ -51,10 +51,12 @@ const clearChart: (chart: Chart, categories?: boolean) => void =
   window['clearChart'];
 
 /**
- * enables the zoom functionality for the passed chart
+ * enables and disables the zoom functionality for the passed chart
  * @param chart chart to toggle its zoom functionality
+ * @param enable if true, enables zooming, else disables it
  */
-const toggleZoom: (chart: Chart) => void = window['toggleZoom'];
+const toggleZoom: (chart: Chart, enable: boolean) => void =
+  window['toggleZoom'];
 
 /**
  * figure out what response stands for and act uppon it
@@ -108,10 +110,10 @@ treatResponse = (response: object) => {
     // clear past results
     clearChart(primeChart);
     // disable points on hover on chart if it's not just a step forward
-    toggleChartHover(primeChart, response['first-step']);
     primeChart.xAxis[0].setExtremes(0, null, true, false);
     window['zoomed'] = false;
-    if (response['first-step']) toggleZoom(primeChart);
+    toggleChartHover(primeChart, response['first-step']);
+    toggleZoom(primeChart, response['first-step']);
   } else if (
     response['paused'] ||
     response['stopped'] ||
@@ -123,16 +125,15 @@ treatResponse = (response: object) => {
       if (!window['zoomed']) {
         primeChart.yAxis[0].setExtremes(min, max);
       }
-
       toggleChartHover(primeChart, true);
-      toggleZoom(primeChart);
+      toggleZoom(primeChart, true);
     }
   } else if (response['resumed']) {
     isRunning = true;
-
-    toggleChartHover(primeChart, false);
     primeChart.xAxis[0].setExtremes(0, null, true, false);
     window['zoomed'] = false;
+    toggleChartHover(primeChart, false);
+    toggleZoom(primeChart, false);
   }
 };
 

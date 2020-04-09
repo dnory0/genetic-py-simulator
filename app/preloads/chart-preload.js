@@ -69,12 +69,15 @@ window['ready'] = (treatResponse) => {
             .forEach((data) => treatResponse(data));
     });
 };
-window['toggleZoom'] = (chart) => {
+window['toggleZoom'] = (chart, enable) => {
     if (window['zoomed'])
         return;
     chart.update({
         chart: {
-            zoomType: 'x'
+            zoomType: enable ? 'x' : null,
+            panning: {
+                enabled: enable
+            }
         }
     }, true, false, false);
 };

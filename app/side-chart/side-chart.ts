@@ -40,10 +40,12 @@ const clearChart: (chart: Chart, categories?: boolean) => void =
   window['clearChart'];
 
 /**
- * enables the zoom functionality for the passed chart
+ * enables and disables the zoom functionality for the passed chart
  * @param chart chart to toggle its zoom functionality
+ * @param enable if true, enables zooming, else disables it
  */
-const toggleZoom: (chart: Chart) => void = window['toggleZoom'];
+const toggleZoom: (chart: Chart, enable: boolean) => void =
+  window['toggleZoom'];
 
 /**
  * figure out what response stands for and act uppon it
@@ -64,14 +66,14 @@ const treatResponse = (response: object) => {
         }
       ];
 
-      sideChart.series[1].setData(
-        sideChart.series[0].data.map(aData => [aData.x, 2.5, aData.value]),
+      sideChart.series[0].setData(
+        sideChart.series[1].data.map(aData => [aData.x, 0.5, aData.value]),
         true,
         false
       );
 
-      sideChart.series[0].setData(
-        (<any[]>response['genes']).map((gene, i) => [i, 0.5, gene]),
+      sideChart.series[1].setData(
+        (<any[]>response['genes']).map((gene, i) => [i, 2.5, gene]),
         true,
         false
       );
@@ -89,16 +91,18 @@ const treatResponse = (response: object) => {
     mostFittest['individuals'] = null;
     // disable points on hover on chart if it's not just a step forward
     toggleChartHover(sideChart, response['first-step']);
-    if (response['first-step']) toggleZoom(sideChart);
+    toggleZoom(sideChart, response['first-step']);
   } else if (
     response['paused'] ||
     response['stopped'] ||
     response['finished']
   ) {
     toggleChartHover(sideChart, true);
-    toggleZoom(sideChart);
+    toggleZoom(sideChart, true);
   } else if (response['resumed']) {
+    sideChart.xAxis[0].setExtremes(0, null, true, false);
     toggleChartHover(sideChart, false);
+    toggleZoom(sideChart, false);
   }
 };
 
