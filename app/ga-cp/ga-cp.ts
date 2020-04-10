@@ -164,7 +164,25 @@ document.getElementById('force-tf-enabled').addEventListener('change', ev => {
   );
 });
 
-ipcRenderer.once('settings', (_ev, args) => {
+let toggleDisableOnRun = (activate = true) => {
+  (<HTMLInputElement[]>(
+    (<HTMLDivElement[]>(
+      Array.from(document.getElementsByClassName('param-value'))
+    )).map(paramValue => paramValue.firstElementChild)
+  )).forEach(gaParam => {
+    if (!gaParam.classList.contains('disable-on-run')) return;
+    settings['renderer']['input'][gaParam.id]['disable'] = !activate;
+    gaParam.disabled = !activate;
+    (<HTMLButtonElement>(
+      gaParam.parentElement.nextElementSibling.firstElementChild
+    )).disabled = !activate;
+    gaParam.parentElement.parentElement.title = activate
+      ? ''
+      : 'Disabled when GA is Running';
+  });
+};
+
+ipcRenderer.once('settings', (_ev, args: object) => {
   settings = args;
   // creates a copy.
   revertSettings = JSON.parse(JSON.stringify(args));
@@ -174,9 +192,16 @@ ipcRenderer.once('settings', (_ev, args) => {
    * add functionality to update settings onchange event for inputs
    */
   window['saveSettings'](settings['renderer']['input']);
+  // apply one of the .disable-on-run to be
+  toggleDisableOnRun(!settings['renderer']['input']['pop-size']['disable']);
 });
 
+// request settings
 ipcRenderer.send('settings');
+
+ipcRenderer.on('update-settings', (_ev, activate: boolean) => {
+  toggleDisableOnRun(activate);
+});
 /**
  * if user tries to close window using the top bar close button, window has to
  * assure that the window is closable (no input has changed value), if closable

@@ -69,18 +69,11 @@ electron_1.app.once('ready', () => {
     });
     mainWindow.setMenu(require(path_1.join(__dirname, 'modules', 'menubar.js'))(isDev, mainWindow));
     mainWindow.webContents.on('ipc-message', (_ev, channel, args) => {
-        let confirmClose = () => {
-            return electron_1.dialog.showMessageBox(gaWindow, {
-                type: 'question',
-                title: 'Are you sure?',
-                message: 'You have unsaved changes, are you sure you want to close?',
-                cancelId: 0,
-                defaultId: 1,
-                buttons: ['Ca&ncel', '&Confirm'],
-                normalizeAccessKeys: true
-            });
-        };
         if (channel == 'ga-cp') {
+            if (gaWindow && !gaWindow.isDestroyed()) {
+                gaWindow.webContents.send('update-settings', args);
+                return;
+            }
             gaWindow = createWindow(path_1.join(__dirname, 'ga-cp', 'ga-cp.html'), {
                 minWidth: 680,
                 minHeight: 480,
@@ -99,7 +92,17 @@ electron_1.app.once('ready', () => {
                 }
                 else if (gaChannel == 'close-confirm') {
                     (() => __awaiter(void 0, void 0, void 0, function* () {
-                        yield confirmClose()
+                        yield (() => {
+                            return electron_1.dialog.showMessageBox(gaWindow, {
+                                type: 'question',
+                                title: 'Are you sure?',
+                                message: 'You have unsaved changes, are you sure you want to close?',
+                                cancelId: 0,
+                                defaultId: 1,
+                                buttons: ['Ca&ncel', '&Confirm'],
+                                normalizeAccessKeys: true
+                            });
+                        })()
                             .then(result => {
                             if (result.response) {
                                 mainWindow.webContents.send('ga-cp-finished', gaCPConfig);
@@ -137,10 +140,6 @@ electron_1.app.once('ready', () => {
                 ev.preventDefault();
                 gaWindow.webContents.send('close-confirm');
             });
-        }
-        else if (channel == '') {
-            if (gaWindow && !gaWindow.isDestroyed())
-                gaWindow.close();
         }
     });
     (() => {

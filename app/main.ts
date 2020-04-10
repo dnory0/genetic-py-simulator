@@ -145,19 +145,11 @@ app.once('ready', () => {
   );
 
   mainWindow.webContents.on('ipc-message', (_ev, channel, args) => {
-    let confirmClose = () => {
-      return dialog.showMessageBox(gaWindow, {
-        type: 'question',
-        title: 'Are you sure?',
-        message: 'You have unsaved changes, are you sure you want to close?',
-        cancelId: 0,
-        defaultId: 1,
-        buttons: ['Ca&ncel', '&Confirm'],
-        normalizeAccessKeys: true
-      });
-    };
-
     if (channel == 'ga-cp') {
+      if (gaWindow && !gaWindow.isDestroyed()) {
+        gaWindow.webContents.send('update-settings', args);
+        return;
+      }
       gaWindow = createWindow(join(__dirname, 'ga-cp', 'ga-cp.html'), {
         minWidth: 680,
         minHeight: 480,
@@ -179,7 +171,18 @@ app.once('ready', () => {
             gaWindow.destroy();
           } else if (gaChannel == 'close-confirm') {
             (async () => {
-              await confirmClose()
+              await (() => {
+                return dialog.showMessageBox(gaWindow, {
+                  type: 'question',
+                  title: 'Are you sure?',
+                  message:
+                    'You have unsaved changes, are you sure you want to close?',
+                  cancelId: 0,
+                  defaultId: 1,
+                  buttons: ['Ca&ncel', '&Confirm'],
+                  normalizeAccessKeys: true
+                });
+              })()
                 .then(result => {
                   if (result.response) {
                     mainWindow.webContents.send('ga-cp-finished', gaCPConfig);
@@ -220,8 +223,6 @@ app.once('ready', () => {
         ev.preventDefault();
         gaWindow.webContents.send('close-confirm');
       });
-    } else if (channel == '') {
-      if (gaWindow && !gaWindow.isDestroyed()) gaWindow.close();
     }
   });
 

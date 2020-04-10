@@ -90,13 +90,29 @@ document.getElementById('force-tf-enabled').addEventListener('change', ev => {
             : 'range';
     });
 });
+let toggleDisableOnRun = (activate = true) => {
+    ((Array.from(document.getElementsByClassName('param-value'))).map(paramValue => paramValue.firstElementChild)).forEach(gaParam => {
+        if (!gaParam.classList.contains('disable-on-run'))
+            return;
+        settings['renderer']['input'][gaParam.id]['disable'] = !activate;
+        gaParam.disabled = !activate;
+        (gaParam.parentElement.nextElementSibling.firstElementChild).disabled = !activate;
+        gaParam.parentElement.parentElement.title = activate
+            ? ''
+            : 'Disabled when GA is Running';
+    });
+};
 ipcRenderer.once('settings', (_ev, args) => {
     settings = args;
     revertSettings = JSON.parse(JSON.stringify(args));
     window['affectSettings'](settings['renderer']['input'], 'ga-cp');
     window['saveSettings'](settings['renderer']['input']);
+    toggleDisableOnRun(!settings['renderer']['input']['pop-size']['disable']);
 });
 ipcRenderer.send('settings');
+ipcRenderer.on('update-settings', (_ev, activate) => {
+    toggleDisableOnRun(activate);
+});
 ipcRenderer.on('close-confirm', () => {
     if (isClosable)
         ipcRenderer.send('ga-cp-finished');

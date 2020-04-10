@@ -15,16 +15,20 @@ let gaCPBtn = document.getElementById('ga-cp-btn');
 let gaParams = ((Array.from(document.getElementsByClassName('param-value'))).map(paramValue => paramValue.firstElementChild));
 let settings = window['settings'];
 let isRunning = false;
+let isGACPOpen = false;
 let toggleDisableOnRun = (activate = true) => {
     gaParams.forEach(gaParam => {
         if (!gaParam.classList.contains('disable-on-run'))
             return;
+        settings['renderer']['input'][gaParam.id]['disable'] = !activate;
         gaParam.disabled = !activate;
         (gaParam.parentElement.nextElementSibling.firstElementChild).disabled = !activate;
         gaParam.parentElement.parentElement.title = activate
             ? ''
             : 'Disabled when GA is Running';
     });
+    if (activate && isGACPOpen)
+        ipcRenderer.send('ga-cp', activate);
 };
 const treatResponse = (response) => {
     if (response['started']) {
@@ -213,6 +217,7 @@ document.addEventListener('DOMContentLoaded', function loaded() {
                 delete window['settings'];
             };
             zoomViews = window['ready'](window['pyshell'], prime, side, treatResponse, webFrame);
+            toggleDisableOnRun(true);
             zoomViews();
             window['loaded']();
             delete window['ready'];
@@ -255,9 +260,11 @@ document.addEventListener('DOMContentLoaded', function loaded() {
     (() => {
         let main = document.getElementById('main');
         gaCPBtn.onclick = () => {
+            isGACPOpen = true;
             ipcRenderer.send('ga-cp', settings);
             main.classList.toggle('blur', true);
             ipcRenderer.once('ga-cp-finished', (_ev, newSettings) => {
+                isGACPOpen = false;
                 main.classList.toggle('blur', false);
                 if (newSettings) {
                     settings['renderer']['input'] = newSettings['renderer']['input'];

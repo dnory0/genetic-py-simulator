@@ -79,7 +79,6 @@ let gaParams = <HTMLInputElement[]>(
  * running settings
  */
 let settings: object = window['settings'];
-// console.log(settings);
 
 /****************************** Python Part ******************************/
 
@@ -87,6 +86,8 @@ let settings: object = window['settings'];
  * by default user needs to hit the play button to run pyshell
  */
 let isRunning = false;
+
+let isGACPOpen = false;
 
 /**
  * toggles ```disable-on-run```, if activate is true it activates
@@ -97,6 +98,7 @@ let isRunning = false;
 let toggleDisableOnRun = (activate = true) => {
   gaParams.forEach(gaParam => {
     if (!gaParam.classList.contains('disable-on-run')) return;
+    settings['renderer']['input'][gaParam.id]['disable'] = !activate;
     gaParam.disabled = !activate;
     (<HTMLButtonElement>(
       gaParam.parentElement.nextElementSibling.firstElementChild
@@ -105,6 +107,10 @@ let toggleDisableOnRun = (activate = true) => {
       ? ''
       : 'Disabled when GA is Running';
   });
+
+  // in case ga has finished because of generation reached max_gen while GACP is open
+  // renderer should inform GACP to enable .disable-on-run inputs
+  if (activate && isGACPOpen) ipcRenderer.send('ga-cp', activate);
 };
 
 /**
@@ -365,10 +371,6 @@ let sendParams = () => {
       )).checked
         ? false
         : gaParam.value;
-    // console.log({
-    //   [gaParam.name]: value
-    // });
-
     sendParameter(gaParam.name, value);
   });
 };
@@ -424,6 +426,8 @@ document.addEventListener('DOMContentLoaded', function loaded() {
         treatResponse,
         webFrame
       );
+
+      toggleDisableOnRun(true);
 
       zoomViews();
 
@@ -483,9 +487,11 @@ document.addEventListener('DOMContentLoaded', function loaded() {
     let main = <HTMLDivElement>document.getElementById('main');
 
     gaCPBtn.onclick = () => {
+      isGACPOpen = true;
       ipcRenderer.send('ga-cp', settings);
       main.classList.toggle('blur', true);
       ipcRenderer.once('ga-cp-finished', (_ev, newSettings: object) => {
+        isGACPOpen = false;
         main.classList.toggle('blur', false);
         if (newSettings) {
           settings['renderer']['input'] = newSettings['renderer']['input'];
