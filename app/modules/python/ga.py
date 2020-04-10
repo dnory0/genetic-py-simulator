@@ -67,22 +67,22 @@ class Evolve:
         return parents
 
     @staticmethod
-    def crossover(parents: list, point: int) -> list:
+    def crossover(parents: list, co_point: int) -> list:
         offsprings = []
         for couple in parents:
-            offspring1 = couple[0].genes[: point]
-            offspring1.extend(couple[1].genes[point:])
-            offspring2 = couple[1].genes[: point]
-            offspring2.extend(couple[0].genes[point:])
+            offspring1 = couple[0].genes[: co_point]
+            offspring1.extend(couple[1].genes[co_point:])
+            offspring2 = couple[1].genes[: co_point]
+            offspring2.extend(couple[0].genes[co_point:])
             offsprings.append([offspring1, offspring2])
         return offsprings
 
     @staticmethod
-    def mutate(offsprings: list, genes_num: int, mutation_rate: float) -> list:
+    def mutate(offsprings: list, genes_num: int, mut_rate: float) -> list:
         for couple in offsprings:
             for offspring in couple:
                 for index in range(genes_num):
-                    if randint(0, 999)/1000 < mutation_rate:
+                    if randint(0, 999)/1000 < mut_rate:
                         offspring[index] = 0 if offspring[index] else 1
         return offsprings
 
@@ -99,14 +99,14 @@ class Evolve:
         pop_inds = pop.individuals.copy()
         # list of couples to apply cross over on them
         parents = Evolve.to_couples(pop_inds, pop.pop_size)
-        # defined here to avoid crossover_rate being changed
+        # defined here to avoid co_rate being changed
         # by user on the cross over process.
-        crossover_point = int(g_crossover_rate * pop.genes_num)
+        co_point = int(g_co_rate * pop.genes_num)
         # list of couples of offsprings.
-        offsprings = Evolve.crossover(parents, crossover_point)
-        # list of couples of offsprings, mutation_rate is passed here
+        offsprings = Evolve.crossover(parents, co_point)
+        # list of couples of offsprings, mut_rate is passed here
         # to avoid being changed by user on the mutation process.
-        offsprings = Evolve.mutate(offsprings, pop.genes_num, g_mutation_rate)
+        offsprings = Evolve.mutate(offsprings, pop.genes_num, g_mut_rate)
         # parents and offsprings are sorted
         Evolve.update_population(parents, offsprings)
         # finished generating the next generation
@@ -141,39 +141,34 @@ class GAThread(Thread):
         # started signal to the renderer process
         to_json({
             "started": True,
-            "first-step": self.__pause_now,
             "genesNum": pop.genes_num,
             "fitness": prvFitness,
+            "first-step": self.__pause_now,
         })
-        
+
         # first generated solutions (generation 0)
         to_json({
-            "fitness": prvFitness,
             "generation": pop.generation,
-            "genes": pop.fittest().genes
+            "genes": pop.fittest().genes,
+            "fitness": prvFitness,
         })
-        
         while g_max_gen == False or pop.generation < g_max_gen:
-        # while True:
             Evolve.evolve_population(pop)
-
             # takes the current generation fitness
             curFitness = pop.fittest().fitness()
-
-            # if g_delay_rate is 0 or False than just ignore it
-            if g_delay_rate:
-                sleep(g_delay_rate)
-
+            # if g_del_rate is 0 or False than just ignore it
+            if g_del_rate:
+                sleep(g_del_rate)
             # pause check, moved down to avoid another iteration if stop event
             # was triggered after a pause event
             self.__pause_check()
-
             # stopped event, seperating finished naturally (if there is valid
             # solution) from being forcefully stopped
             if self.__stop_now:
-                to_json({"stopped": True})
+                to_json({
+                    "stopped": True
+                })
                 return
-
             # moved down, so when GA is heavy (slow), user might stop it before the point is added
             # the point must not be added, so ga stops before executing below code
             to_json({
@@ -181,21 +176,14 @@ class GAThread(Thread):
                 "fitness": curFitness,
                 "generation": pop.generation,
                 "genes": pop.fittest().genes,
-                # "deviation": abs(curFitness - prvFitness),
-                # "min": min(prvFitness, curFitness)
             })
-
             # update prvFitness
             prvFitness = curFitness
-            # to_json({
-            #     'g_max_gen': g_max_gen,
-            #     'g_max_gen == False': g_max_gen == False,
-            #     'pop.generation < g_max_gen': pop.generation < g_max_gen,
-            #     'the_cond': g_max_gen == False or pop.generation < g_max_gen
-            # })
 
         # finished event
-        to_json({"finished": True})
+        to_json({
+            "finished": True
+        })
 
 
     def __pause_check(self):
@@ -315,14 +303,14 @@ ga_thread = None
 solution = None
 
 # default values for the global settings, changes every time user passes them
-g_crossover_rate = .5
-g_mutation_rate = .06
+g_co_rate = .5
+g_mut_rate = .06
 
 # initialized every time GA is initialized,
 # if user passes them after GA started it will do nothing
 g_pop_size = int(argv[1]) if len(argv) > 1 else randint(1, 500)
 g_genes_num = int(argv[2]) if len(argv) > 2 else randint(1, 200)
-g_delay_rate = int(argv[3]) if len(argv) > 3 else 0
+g_del_rate = int(argv[3]) if len(argv) > 3 else 0
 g_max_gen = False
 
 def update_parameters(command: dict):
@@ -331,9 +319,9 @@ def update_parameters(command: dict):
     """
     global g_pop_size
     global g_genes_num
-    global g_crossover_rate
-    global g_mutation_rate
-    global g_delay_rate
+    global g_co_rate
+    global g_mut_rate
+    global g_del_rate
     global g_max_gen
 
     if command.get('pop_size'):
@@ -342,18 +330,18 @@ def update_parameters(command: dict):
     if command.get('genes_num'):
         # genes number
         g_genes_num = command.get('genes_num')
-    if command.get('crossover_rate'):
+    if command.get('co_rate'):
         # crossover rate change, it should not be 0
-        g_crossover_rate = command.get('crossover_rate')
-    if type(command.get('mutation_rate')) is not type(None):
+        g_co_rate = command.get('co_rate')
+    if type(command.get('mut_rate')) is not type(None):
         # mutation rate change, can be 0
-        g_mutation_rate = command.get('mutation_rate')
-    if type(command.get('delay_rate')) is not type(None):
+        g_mut_rate = float(command.get('mut_rate'))
+    if type(command.get('del_rate')) is not type(None):
         # sleep in seconds
-        g_delay_rate = command.get('delay_rate')
+        g_del_rate = float(command.get('del_rate'))
     if type(command.get('max_gen')) is not type(None):
         # maximum generations
-        g_max_gen = command.get('max_gen')
+        g_max_gen = float(command.get('max_gen'))
         
     
     # if command.get('ff'):

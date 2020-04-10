@@ -102,28 +102,32 @@ let primeChart = window['createChart']('prime-chart', {
         useHTML: true,
         formatter() {
             return `
-          <div style="text-align: right">
-            Generation: <b>${!`${this.x}`.match(/\.5$/)
+            <span>Generation: <b>${!`${this.x}`.match(/\.5$/)
                 ? this.x
-                : `${this.x - 0.5} - ${this.x + 0.5}`}</b><br>
-            <span style="float: left;">
-            ${!`${this.x}`.match(/\.5$/) ? 'Fitness' : 'Deviation'}:&nbsp;
+                : `${this.x - 0.5} - ${this.x + 0.5}`}</b>
             </span>
+            <span>,&nbsp;
+            ${!`${this.x}`.match(/\.5$/) ? 'Fitness' : 'Deviation'}:&nbsp;
             <b>${!`${this.x}`.match(/\.5$/)
                 ? this.y
                 : Math.abs(this.point.high - this.point.low)}</b>
-          </div>`;
+            </span>
+          `;
         },
         positioner(labelWidth, labelHeight, point) {
-            var x = point.plotX + labelWidth + 80 < this.chart.plotWidth
-                ? point.plotX + 38
-                : point.plotX - (labelWidth - 38);
-            var y = point.plotY + (point.plotY > 30 ? 4 : labelHeight + 25);
+            var x = point.plotX +
+                primeChart.chartWidth -
+                primeChart.plotWidth -
+                (point.plotX + labelWidth + 80 < this.chart.plotWidth
+                    ? 4
+                    : labelWidth + 4);
+            var y = point.plotY + (point.plotY > 30 ? 8 : labelHeight + 50);
             return { x, y };
         },
         shadow: false,
         outside: false,
-        hideDelay: 250
+        hideDelay: 250,
+        borderRadius: 0
     },
     legend: {
         floating: true,

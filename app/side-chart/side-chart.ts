@@ -148,15 +148,15 @@ let sideChart: Chart = window['createChart']('side-chart', {
           this.series.getName() == 'F' ? 'Fittest' : 'Prev Fittest'
         }:</b></span>
         <span>Gene:&nbsp<b>${this.point.x + 1}</b></span>
-        <span>Value:&nbsp<b>${this.point.value}</b></span>
+        <span>,&nbsp;Value:&nbsp<b>${this.point.value}</b></span>
       `;
     },
     positioner(labelWidth, labelHeight, point) {
       var x =
-        point.plotX + labelWidth + 80 < (<Tooltip>this).chart.plotWidth
+        point.plotX + labelWidth + 80 < sideChart.plotWidth
           ? point.plotX + 9
           : point.plotX - (labelWidth - 9);
-      var y = point.plotY + (point.plotY > 30 ? 0 : labelHeight + 58);
+      var y = point.plotY + (point.plotY > 30 ? 8 : labelHeight + 50);
       return { x, y };
       // return { x: point.plotX + 9, y: point.plotY + 5 };
       // return {
@@ -166,7 +166,8 @@ let sideChart: Chart = window['createChart']('side-chart', {
     },
     shadow: false,
     outside: false,
-    hideDelay: 250
+    hideDelay: 250,
+    borderRadius: 0
     // borderWidth: 0,
     // backgroundColor: 'transparent',
     // shadow: false,
