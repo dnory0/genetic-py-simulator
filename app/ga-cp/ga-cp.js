@@ -57,49 +57,49 @@ paramsPath.onkeyup = () => checkPath(paramsPath.value);
         settings = revertSettings;
         affectSettings(revertSettings['renderer']['input'], 'ga-cp');
     };
+    let eventListener = () => (revertBtn.disabled = saveBtn.disabled = isClosable = false);
     Array.from(document.getElementsByTagName('input')).forEach(input => {
-        let eventListener = () => {
-            revertBtn.disabled = false;
-            saveBtn.disabled = false;
-            isClosable = false;
-        };
-        if (input.type == 'checkbox')
+        if (input.type == 'checkbox') {
             input.addEventListener('change', eventListener);
+        }
         else {
             input.addEventListener('keypress', eventListener);
-            if (input.classList.contains('textfieldable'))
+            input.addEventListener('paste', eventListener);
+            if (!input.id.match('params-path'))
+                input.addEventListener('keyup', ev => {
+                    if (['ArrowUp', 'ArrowDown'].includes(ev.key))
+                        eventListener();
+                });
+            if (input.classList.contains('textfieldable')) {
                 input.addEventListener('change', eventListener);
+            }
         }
     });
+    Array.from(document.getElementsByClassName('random-btn')).forEach(randomBtn => randomBtn.addEventListener('click', eventListener));
 })();
 window['altTriggers']();
 window['params']();
 document.getElementById('random-all-btn').onclick = () => {
-    (Array.from(document.getElementsByClassName('random-btn'))).forEach(randomBtn => {
+    Array.from(document.getElementsByClassName('random-btn')).forEach(randomBtn => {
         var param = randomBtn.parentElement.parentElement.parentElement;
-        if (param.previousElementSibling &&
-            !param.previousElementSibling.checked)
+        if (param.previousElementSibling && !param.previousElementSibling.checked)
             return;
         randomBtn.click();
     });
 };
 document.getElementById('force-tf-enabled').addEventListener('change', ev => {
     Array.from(document.getElementsByClassName('textfieldable')).forEach((textfieldable) => {
-        textfieldable.type = ev.target.checked
-            ? 'text'
-            : 'range';
+        textfieldable.type = ev.target.checked ? 'text' : 'range';
     });
 });
 let toggleDisableOnRun = (activate = true) => {
-    ((Array.from(document.getElementsByClassName('param-value'))).map(paramValue => paramValue.firstElementChild)).forEach(gaParam => {
+    (Array.from(document.getElementsByClassName('param-value')).map(paramValue => paramValue.firstElementChild)).forEach(gaParam => {
         if (!gaParam.classList.contains('disable-on-run'))
             return;
         settings['renderer']['input'][gaParam.id]['disable'] = !activate;
         gaParam.disabled = !activate;
-        (gaParam.parentElement.nextElementSibling.firstElementChild).disabled = !activate;
-        gaParam.parentElement.parentElement.title = activate
-            ? ''
-            : 'Disabled when GA is Running';
+        gaParam.parentElement.nextElementSibling.firstElementChild.disabled = !activate;
+        gaParam.parentElement.parentElement.title = activate ? '' : 'Disabled when GA is Running';
     });
 };
 ipcRenderer.once('settings', (_ev, args) => {

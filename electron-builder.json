@@ -9,7 +9,6 @@
     "!.vscode",
     "!.idea",
     "!TODO.txt",
-    "!settings.json",
     "!tsconfig.json",
     "!**/*.ts",
     "!**/*.scss"

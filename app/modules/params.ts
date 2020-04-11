@@ -7,9 +7,7 @@
  *  - random buttons function and give random values for the param value range.
  */
 function params() {
-  let paramValues = <HTMLDivElement[]>(
-    Array.from(document.getElementsByClassName('param-value'))
-  );
+  let paramValues = <HTMLDivElement[]>Array.from(document.getElementsByClassName('param-value'));
 
   paramValues.forEach(paramValue => {
     let input = <HTMLInputElement>paramValue.firstElementChild;
@@ -22,18 +20,10 @@ function params() {
 
         input.value = (
           (parseFloat(input.value) || 0) +
-          (ev.ctrlKey
-            ? parseFloat(input.step) * 100
-            : ev.shiftKey
-            ? parseFloat(input.step) * 10
-            : parseFloat(input.step)) *
+          (ev.ctrlKey ? parseFloat(input.step) * 100 : ev.shiftKey ? parseFloat(input.step) * 10 : parseFloat(input.step)) *
             (ev.key == 'ArrowUp' ? 1 : -1)
         )
-          .toFixed(
-            Number.isSafeInteger(parseFloat(input.step))
-              ? 0
-              : input.step.split('.')[1].length
-          )
+          .toFixed(Number.isSafeInteger(parseFloat(input.step)) ? 0 : input.step.split('.')[1].length)
           .toString();
       }
     };
@@ -45,8 +35,7 @@ function params() {
         (input.min == '' || parseFloat(input.min) <= parseFloat(input.value)) &&
         (input.max == '' || parseFloat(input.value) <= parseFloat(input.max))
       ) {
-        if (!(<unknown>input.classList.replace('invalid', 'valid')))
-          input.classList.add('valid');
+        if (!(<unknown>input.classList.replace('invalid', 'valid'))) input.classList.add('valid');
       } else if (!(<unknown>input.classList.replace('valid', 'invalid'))) {
         input.classList.add('invalid');
       }
@@ -68,9 +57,7 @@ function params() {
       return (Math.random() * (max - min) + min).toFixed(isInt ? 0 : 3);
     }
 
-    let randomBtn = <HTMLButtonElement>(
-      input.parentElement.nextElementSibling.firstElementChild
-    );
+    let randomBtn = <HTMLButtonElement>input.parentElement.nextElementSibling.firstElementChild;
 
     randomBtn.onclick = () => {
       input.value = rangedRandom(
@@ -78,9 +65,8 @@ function params() {
         input.min == '' ? 0 : parseFloat(input.min),
         Number.isSafeInteger(parseFloat(input.step))
       ).toString();
-      if (!(<unknown>input.classList.replace('invalid', 'valid')))
-        input.classList.add('valid');
-      // console.log(input);
+
+      if (!(<unknown>input.classList.replace('invalid', 'valid'))) input.classList.add('valid');
 
       input.dispatchEvent(new Event('keyup'));
     };

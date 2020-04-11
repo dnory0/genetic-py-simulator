@@ -25,8 +25,7 @@ let isClosable = true;
  * @param gaConfigPath GA configuration path to check.
  * @param ext extension name, default is ```.py```.
  */
-let validatePath: (gaConfigPath: string, ext?: string) => number =
-  window['validatePath'];
+let validatePath: (gaConfigPath: string, ext?: string) => number = window['validatePath'];
 
 let checkPath = (path: string) => {
   let checkCode = validatePath(path);
@@ -108,20 +107,27 @@ paramsPath.onkeyup = () => checkPath(paramsPath.value);
    * if any input changed value make the window not closable
    * without confirmation, enable revert and save buttons.
    */
+  let eventListener = () => (revertBtn.disabled = saveBtn.disabled = isClosable = false);
+
   Array.from(document.getElementsByTagName('input')).forEach(input => {
-    let eventListener = () => {
-      revertBtn.disabled = false;
-      saveBtn.disabled = false;
-      isClosable = false;
-    };
-    if (input.type == 'checkbox')
+    if (input.type == 'checkbox') {
       input.addEventListener('change', eventListener);
-    else {
+    } else {
       input.addEventListener('keypress', eventListener);
-      if (input.classList.contains('textfieldable'))
+      input.addEventListener('paste', eventListener);
+      if (!input.id.match('params-path'))
+        input.addEventListener('keyup', ev => {
+          if (['ArrowUp', 'ArrowDown'].includes(ev.key)) eventListener();
+        });
+      if (input.classList.contains('textfieldable')) {
         input.addEventListener('change', eventListener);
+      }
     }
   });
+
+  (<HTMLButtonElement[]>Array.from(document.getElementsByClassName('random-btn'))).forEach(randomBtn =>
+    randomBtn.addEventListener('click', eventListener)
+  );
 })();
 
 /**
@@ -137,16 +143,10 @@ window['params']();
  * random all button
  */
 (<HTMLButtonElement>document.getElementById('random-all-btn')).onclick = () => {
-  (<HTMLButtonElement[]>(
-    Array.from(document.getElementsByClassName('random-btn'))
-  )).forEach(randomBtn => {
+  (<HTMLButtonElement[]>Array.from(document.getElementsByClassName('random-btn'))).forEach(randomBtn => {
     var param = randomBtn.parentElement.parentElement.parentElement;
 
-    if (
-      <HTMLInputElement>param.previousElementSibling &&
-      !(<HTMLInputElement>param.previousElementSibling).checked
-    )
-      return;
+    if (<HTMLInputElement>param.previousElementSibling && !(<HTMLInputElement>param.previousElementSibling).checked) return;
 
     randomBtn.click();
   });
@@ -155,30 +155,20 @@ window['params']();
  * force textfields input that applies to textfieldable inputs
  */
 document.getElementById('force-tf-enabled').addEventListener('change', ev => {
-  Array.from(document.getElementsByClassName('textfieldable')).forEach(
-    (textfieldable: HTMLInputElement) => {
-      textfieldable.type = (<HTMLInputElement>ev.target).checked
-        ? 'text'
-        : 'range';
-    }
-  );
+  Array.from(document.getElementsByClassName('textfieldable')).forEach((textfieldable: HTMLInputElement) => {
+    textfieldable.type = (<HTMLInputElement>ev.target).checked ? 'text' : 'range';
+  });
 });
 
 let toggleDisableOnRun = (activate = true) => {
   (<HTMLInputElement[]>(
-    (<HTMLDivElement[]>(
-      Array.from(document.getElementsByClassName('param-value'))
-    )).map(paramValue => paramValue.firstElementChild)
+    (<HTMLDivElement[]>Array.from(document.getElementsByClassName('param-value'))).map(paramValue => paramValue.firstElementChild)
   )).forEach(gaParam => {
     if (!gaParam.classList.contains('disable-on-run')) return;
     settings['renderer']['input'][gaParam.id]['disable'] = !activate;
     gaParam.disabled = !activate;
-    (<HTMLButtonElement>(
-      gaParam.parentElement.nextElementSibling.firstElementChild
-    )).disabled = !activate;
-    gaParam.parentElement.parentElement.title = activate
-      ? ''
-      : 'Disabled when GA is Running';
+    (<HTMLButtonElement>gaParam.parentElement.nextElementSibling.firstElementChild).disabled = !activate;
+    gaParam.parentElement.parentElement.title = activate ? '' : 'Disabled when GA is Running';
   });
 };
 

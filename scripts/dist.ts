@@ -7,7 +7,7 @@ import { exec } from 'child_process';
 
 const appDir = join(__dirname, '..');
 exec(
-  `dir ${join(appDir, 'main', '*.js')} ${join(appDir, 'main', '**', '*.js')}`,
+  `dir ${join(appDir, 'app', '*.js')} ${join(appDir, 'app', '**', '*.js')}`,
   (_error, output) => {
     // var files = output
     //   .split(/\n\r?/)

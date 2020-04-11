@@ -4,7 +4,7 @@ A Simulator that solves optimization problems using Genetic Algorithms & Quantum
 
 ## Why?
 
-1. This project is going to be my licence graduation project.
+1. This project is going to be my graduation project.
 2. I love Quantum Algorithms 🚀🚀.
 
 ## How to try it?
