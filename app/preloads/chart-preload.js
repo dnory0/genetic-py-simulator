@@ -1,11 +1,18 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const electron_1 = require("electron");
-const highcharts_1 = require("highcharts");
+const Highcharts = require("highcharts");
 const path_1 = require("path");
+const exporting_1 = require("highcharts/modules/exporting");
+const offline_exporting_1 = require("highcharts/modules/offline-exporting");
+const export_data_1 = require("highcharts/modules/export-data");
+exporting_1.default(Highcharts);
+offline_exporting_1.default(Highcharts);
+export_data_1.default(Highcharts);
+const { getGlobal } = electron_1.remote;
 window['ipcRenderer'] = electron_1.ipcRenderer;
 window['createChart'] = require(path_1.join(__dirname, '..', 'modules', 'create-chart'));
-window['enableChartHover'] = (enable, chart) => {
+window['toggleChartHover'] = (chart, enable) => {
     chart.update({
         tooltip: {
             enabled: enable
@@ -16,13 +23,16 @@ window['enableChartHover'] = (enable, chart) => {
         legend: {
             itemStyle: {
                 pointerEvents: enable ? 'all' : 'none'
+            },
+            itemCheckboxStyle: {
+                pointerEvents: enable ? 'all' : 'none'
             }
         },
         plotOptions: {
             series: {
                 marker: {
                     enabled: enable,
-                    radius: enable ? 2 : null
+                    radius: enable ? 1.5 : null
                 },
                 states: {
                     hover: {
@@ -40,9 +50,7 @@ window['clearChart'] = (chart, categories = false) => {
         chart.xAxis[0].setCategories([]);
     chart.series.forEach(serie => serie.setData([], true));
 };
-electron_1.ipcRenderer.once('mode', (_ev, isDev) => {
-    if (!isDev)
-        return;
+if (getGlobal('isDev'))
     window.addEventListener('keyup', (event) => {
         if (event.code == 'Backquote')
             if (event.ctrlKey)
@@ -51,6 +59,26 @@ electron_1.ipcRenderer.once('mode', (_ev, isDev) => {
                 else
                     electron_1.ipcRenderer.sendToHost('devTools', 'prime');
     }, true);
-});
-window.addEventListener('mouseout', () => highcharts_1.charts.forEach(chart => chart.pointer.reset()));
+window['ready'] = (treatResponse) => {
+    delete window['ready'];
+    getGlobal('pyshell').stdout.on('data', (response) => {
+        response
+            .toString()
+            .split(/(?<=\n)/g)
+            .map((data) => JSON.parse(data))
+            .forEach((data) => treatResponse(data));
+    });
+};
+window['toggleZoom'] = (chart, enable) => {
+    if (window['zoomed'])
+        return;
+    chart.update({
+        chart: {
+            zoomType: enable ? 'x' : null,
+            panning: {
+                enabled: enable
+            }
+        }
+    }, true, false, false);
+};
 //# sourceMappingURL=chart-preload.js.map

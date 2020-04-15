@@ -6,23 +6,42 @@
     <title>Genetic Py</title>
     <link rel="stylesheet" href="style/style.css" />
   </head>
-
   <body>
-    <!-- #region Loading-->
-    <div
-      id="loading-bg"
-      style="height: 100%; text-align: center; position: absolute; transition: opacity 0.2s; height: 100%; width: 100%; overflow: hidden;"
-    >
-      <img
-        src="img/loading.svg"
-        alt="Loading..."
-        style="height: 32vh; margin: auto; margin-top: 33vh;"
-      />
-    </div>
-    <!-- #endregion -->
-    <!-- #region Main-->
-    <div id="main">
-      <div class="prime-container">
+    <!-- #region Main -->
+    <div id="main" class="blur">
+      <div class="prime-container fullscreenable">
+        <div class="chart-actions">
+          <button title="Zoom out" class="zoom-out-btn prime">
+            <img src="img/zoom-out.png" />
+          </button>
+          <div class="checkbox-wrapper">
+            <input type="checkbox" name="live_rendering" id="lr-enabled" checked />
+            <label title="Live Rendering" for="lr-enabled">
+              <img src="img/live-rendering.png" />
+            </label>
+          </div>
+          <div class="dropdown">
+            <button class="drop-btn prime" title="Export to a file">
+              <img src="img/save.png" />
+            </button>
+            <div class="dropdown-content hide">
+              <button title="Export JPEG/JPG" id="export-jpeg">
+                JPEG/JPG
+              </button>
+              <button title="Export PNG (chart without background)" id="export-png">
+                PNG (without background)
+              </button>
+              <button title="Export SVG" id="export-svg">
+                SVG
+              </button>
+            </div>
+            <div class="dropdown-pointer hide" title="Export JPEG/JPG"></div>
+          </div>
+          <button title="Toggle Fullscreen" class="fscreen-btn">
+            <img src="img/maximize.png" />
+            <img src="img/minimize.png" />
+          </button>
+        </div>
         <webview
           id="prime-chart"
           src="prime-chart/prime-chart.html"
@@ -30,18 +49,18 @@
           style="height: 100%;"
           allowtransparency
           nodeintegration
-          preload="preloads/chart-preload"
+          preload="preloads/prime-preload"
         ></webview>
-        <div class="resize-cover for-prime"></div>
+        <div class="resize-cover hide for-prime"></div>
       </div>
-      <div class="border hor"></div>
+      <div class="border hor resize"></div>
       <div class="middle-container">
         <div class="controls-container">
           <div class="state-controls-container">
             <div class="state-controls">
               <button title="Play/Pause" id="play-btn">
-                <img class="default play" src="img/play-btn.png" />
-                <img class="pause" src="img/pause-btn.png" />
+                <img class="play" src="img/play-btn.png" />
+                <img class="pause hide" src="img/pause-btn.png" />
               </button>
               <button title="Stop" id="stop-btn" disabled>
                 <img src="img/stop-btn.png" />
@@ -49,153 +68,243 @@
               <button title="Relaunch the Algorithm" id="to-start-btn" disabled>
                 <img src="img/to-start-btn.png" />
               </button>
-              <button title="Previous Generation" id="step-back-btn" disabled>
+              <button title="Previous Generation" id="step-back-btn" class="hide" disabled>
                 <img src="img/step-back-btn.png" />
               </button>
               <button title="Next Generation" id="step-forward-btn">
                 <img src="img/step-forward-btn.png" />
               </button>
             </div>
-            <div class="separator"></div>
-            <div class="chart-settings">
-              <div class="checkbox-wrapper">
-                <input
-                  type="checkbox"
-                  name="live-rendering"
-                  id="live-rendering"
-                  checked
-                />
-                <label title="Live Rendering" for="live-rendering">
-                  <img src="img/live-rendering.png" />
-                </label>
-              </div>
-            </div>
-            <div class="separator"></div>
-            <div class="ga-settings">
-              <button title="Settings" id="settings-btn">
+            <div class="ga-cp">
+              <button title="GA Control Panel" id="ga-cp-btn">
                 <img src="img/settings.png" />
               </button>
             </div>
+            <div class="separator"></div>
+            <div class="pane-hide">
+              <button id="pane-hide-btn" title="Hide Pane">
+                <img src="img/show-hide-pane.png" />
+              </button>
+            </div>
           </div>
-          <div class="parameters-container">
-            <div class="parameters">
-              <div class="parameter">
-                <p>Population size:</p>
-                <input
-                  type="number"
-                  min="1"
-                  step="1"
-                  id="pop-size"
-                  name="pop_size"
-                />
-                <div class="checkbox-wrapper">
-                  <input
-                    type="checkbox"
-                    name="random_pop_size"
-                    id="random-pop-size"
-                  />
-                  <label for="random-pop-size">
-                    <img src="img/random.png" />
-                  </label>
+          <div class="border hor"></div>
+          <div class="params-man scrollbar">
+            <div class="complex-param">
+              <div class="param">
+                <div class="param-name">
+                  <p>Population Size</p>
                 </div>
-              </div>
-              <div class="parameter">
-                <p>Genes number:</p>
-                <input
-                  type="number"
-                  min="1"
-                  step="1"
-                  id="genes-num"
-                  name="genes_num"
-                />
-                <div class="checkbox-wrapper">
-                  <input
-                    type="checkbox"
-                    name="random_genes_num"
-                    id="random-genes-num"
-                  />
-                  <label for="random-genes-num">
-                    <img src="img/random.png" />
-                  </label>
-                </div>
-              </div>
-              <div class="parameter">
-                <p>Crossover rate:</p>
-                <div class="input-wrapper">
-                  <input type="range" min="0.001" max="1" step="0.001" />
-                  <input
-                    type="number"
-                    min="0.001"
-                    max="1"
-                    step="0.001"
-                    id="crossover-rate"
-                    name="crossover_rate"
-                  />
-                </div>
-                <div class="checkbox-wrapper">
-                  <input
-                    type="checkbox"
-                    name="random_crossover_rate"
-                    id="random-crossover-rate"
-                  />
-                  <label for="random-crossover-rate">
-                    <img src="img/random.png"
-                  /></label>
-                </div>
-              </div>
-              <div class="parameter">
-                <p>Mutation rate:</p>
-                <div class="input-wrapper">
-                  <input type="range" min="0" max="1" step="0.001" />
-                  <input
-                    type="number"
-                    min="0"
-                    max="1"
-                    step="0.001"
-                    id="mutation-rate"
-                    name="mutation_rate"
-                  />
-                </div>
-                <div class="checkbox-wrapper">
-                  <input
-                    type="checkbox"
-                    name="random_mutation_rate"
-                    id="random-mutation-rate"
-                  />
-                  <label for="random-mutation-rate">
-                    <img src="img/random.png"
-                  /></label>
-                </div>
-              </div>
-              <div class="parameter">
-                <p>delay rate:</p>
-                <div class="input-wrapper">
-                  <input type="range" min="0" max="5" step="0.05" />
-                  <input
-                    type="number"
-                    min="0"
-                    max="5"
-                    step="0.05"
-                    id="delay-rate"
-                    name="delay_rate"
-                  />
-                </div>
-                <div class="checkbox-wrapper">
-                  <input
-                    type="checkbox"
-                    name="random_delay_rate"
-                    id="random-delay-rate"
-                  />
-                  <label for="random-delay-rate">
-                    <img src="img/random.png" />
-                  </label>
+                <div class="param-settings">
+                  <div class="param-value">
+                    <input
+                      type="text"
+                      min="1"
+                      step="1"
+                      id="pop-size"
+                      name="pop_size"
+                      pattern="^[-+]?\d*\.?0*$"
+                      inputmode="numeric"
+                      class="disable-on-run"
+                      required
+                    />
+                  </div>
+                  <div class="other-settings">
+                    <button class="random-btn">Random</button>
+                    <div class="checkbox-wrapper hide">
+                      <input type="checkbox" name="pop_size_pin" id="pop-size-pin" />
+                      <label for="pop-size-pin">
+                        <img src="img/pin.png" />
+                      </label>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
+            <div class="complex-param">
+              <div class="param">
+                <div class="param-name">
+                  <p>Genes Number</p>
+                </div>
+                <div class="param-settings">
+                  <div class="param-value">
+                    <input
+                      type="text"
+                      min="1"
+                      step="1"
+                      id="genes-num"
+                      name="genes_num"
+                      pattern="^[-+]?\d*\.?0*$"
+                      inputmode="numeric"
+                      class="disable-on-run"
+                      required
+                    />
+                  </div>
+                  <div class="other-settings">
+                    <button class="random-btn">Random</button>
+                    <div class="checkbox-wrapper hide">
+                      <input type="checkbox" name="genes_num_pin" id="genes-num-pin" />
+                      <label for="genes-num-pin">
+                        <img src="img/pin.png" />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="complex-param">
+              <div class="param">
+                <div class="param-name">
+                  <p>Crossover Rate</p>
+                </div>
+                <div class="param-settings">
+                  <div class="param-value">
+                    <input
+                      type="range"
+                      inputmode="numeric"
+                      min="0.001"
+                      max="1"
+                      step="0.001"
+                      id="co-rate"
+                      name="co_rate"
+                      pattern="^[-+]?\d*\.?\d*$"
+                      class="textfieldable"
+                      required
+                    />
+                  </div>
+                  <div class="other-settings">
+                    <button class="random-btn">Random</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="complex-param">
+              <div class="param">
+                <div class="param-name">
+                  <p>Mutation Rate</p>
+                </div>
+                <div class="param-settings">
+                  <div class="param-value">
+                    <input
+                      type="range"
+                      inputmode="numeric"
+                      min="0"
+                      max="1"
+                      step="0.001"
+                      id="mut-rate"
+                      name="mut_rate"
+                      pattern="^[-+]?\d*\.?\d*$"
+                      class="textfieldable"
+                      required
+                    />
+                  </div>
+                  <div class="other-settings">
+                    <button class="random-btn">Random</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="complex-param">
+              <input class="param-enabled hide" type="checkbox" name="del_rate_enabled" id="del-rate-enabled" />
+              <div class="param">
+                <div class="param-name">
+                  <p>Delay Rate</p>
+                </div>
+                <div class="param-settings">
+                  <div class="param-value">
+                    <input
+                      type="range"
+                      inputmode="numeric"
+                      min="0"
+                      max="5"
+                      step="0.05"
+                      id="del-rate"
+                      name="del_rate"
+                      pattern="^[-+]?\d*\.?\d*$"
+                      class="textfieldable is-disable-able"
+                      required
+                    />
+                  </div>
+                  <div class="other-settings">
+                    <button class="random-btn">Random</button>
+                    <div class="checkbox-wrapper hide">
+                      <input type="checkbox" name="del_rate_pin" id="del-rate-pin" />
+                      <label for="del-rate-pin">
+                        <img src="img/pin.png" />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="complex-param">
+              <input class="param-enabled hide" type="checkbox" name="max_gen_enabled" id="max-gen-enabled" />
+              <div class="param">
+                <div class="param-name">
+                  <p>Maximum Generation</p>
+                </div>
+                <div class="param-settings">
+                  <div class="param-value">
+                    <input
+                      type="text"
+                      min="1"
+                      step="1"
+                      id="max-gen"
+                      name="max_gen"
+                      pattern="^[-+]?\d*\.?0*$"
+                      class="is-disable-able disable-on-run"
+                      inputmode="numeric"
+                      required
+                    />
+                  </div>
+                  <div class="other-settings">
+                    <button class="random-btn">Random</button>
+                    <div class="checkbox-wrapper hide">
+                      <input type="checkbox" name="max_gen_pin" id="max-gen-pin" />
+                      <label for="max-gen-pin">
+                        <img src="img/pin.png" />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <input type="checkbox" name="force_textfields" class="force-tf-enabled hide" id="force-tf-enabled" />
           </div>
         </div>
-        <div class="border ver"></div>
-        <div class="side-container">
+        <div class="border ver border-hide"></div>
+        <div class="pane-show hide">
+          <button id="pane-show-btn" title="Show Left Pane">
+            <img src="img/show-hide-pane.png" />
+          </button>
+        </div>
+        <div class="side-container fullscreenable">
+          <div class="chart-actions">
+            <button title="Zoom out" class="zoom-out-btn side">
+              <img src="img/zoom-out.png" />
+            </button>
+            <div class="dropdown">
+              <button class="drop-btn side" title="Export to a file">
+                <img src="img/save.png" />
+              </button>
+              <div class="dropdown-content hide">
+                <button title="Export JPEG/JPG" id="export-jpeg">
+                  JPEG/JPG
+                </button>
+                <button title="Export PNG (chart without background)" id="export-png">
+                  PNG (without background)
+                </button>
+                <button title="Export SVG" id="export-svg">
+                  SVG
+                </button>
+              </div>
+              <div class="dropdown-pointer hide" title="Export JPEG/JPG"></div>
+            </div>
+
+            <button title="Toggle Fullscreen" class="fscreen-btn">
+              <img src="img/maximize.png" />
+              <img src="img/minimize.png" />
+            </button>
+          </div>
           <webview
             id="side-chart"
             src="side-chart/side-chart.html"
@@ -205,10 +314,19 @@
             nodeintegration
             preload="preloads/side-preload"
           ></webview>
-          <div class="resize-cover for-side"></div>
+          <div class="resize-cover hide for-side"></div>
         </div>
       </div>
+      <div class="border hor"></div>
       <div class="bottom-container"></div>
+    </div>
+    <!-- #endregion -->
+    <!-- #region Loading (empty after load) -->
+    <div
+      id="loading-bg"
+      style="position: absolute; transition: opacity 0.2s; top: 34%; left: calc((100vw - 32vh) / 2); height: 32vh;"
+    >
+      <img src="img/loading.svg" alt="Loading..." height="100%" />
     </div>
     <!-- #endregion -->
     <script>

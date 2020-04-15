@@ -2,32 +2,47 @@ import {
   app,
   BrowserWindow,
   BrowserWindowConstructorOptions,
-  Rectangle
+  Rectangle,
+  dialog,
+  OpenDialogOptions,
+  OpenDialogReturnValue
 } from 'electron';
 import { join } from 'path';
 import { writeFile } from 'fs';
+import { ChildProcess } from 'child_process';
 
 /**
  * set to true if app on development, false in production.
  */
 const isDev = process.argv.some(arg => ['--dev', '-D', '-d'].includes(arg));
+global['isDev'] = isDev;
 /**
  * main window
  */
 let mainWindow: BrowserWindow;
 /**
- * settings
+ * GA Configuration Window
  */
-let runSettings: object;
+let gaWindow: BrowserWindow;
 /**
- * loads app settings
- *
- * @param fn callback function to execute after reading settings.json file
+ * python process responsible for executing genetic algorithm.
  */
-require(join(__dirname, 'modules', 'load-settings.js'))(
+const pyshell: ChildProcess = require(join(
+  __dirname,
+  'modules',
+  'create-pyshell.js'
+))(app);
+global['pyshell'] = pyshell;
+/**
+ * load settings
+ */
+let runSettings: object = require(join(
+  __dirname,
+  'modules',
+  'load-settings.js'
+))(
   join(app.getPath('userData'), 'settings.json'),
-  join(__dirname, '..', 'settings.json'),
-  (settings: object) => (runSettings = settings)
+  join(__dirname, '..', 'settings.json')
 );
 
 /**
@@ -59,6 +74,7 @@ const createWindow = (
     maximizable,
     parent,
     frame,
+    modal: true,
     show: false,
     webPreferences: {
       preload,
@@ -77,6 +93,26 @@ const createWindow = (
   return targetWindow;
 };
 
+/**
+ * opens dialog to browse for a specific file
+ *
+ * @param window parent window of the dialog.
+ * @param options dialog options.
+ * @param resolved function to be executed when dialog resolves.
+ * @param rejected function to be executed when dialog rejectes, usually when browse is canceled.
+ */
+const browse = (
+  window: BrowserWindow,
+  options: OpenDialogOptions,
+  resolved: (path: OpenDialogReturnValue) => any,
+  rejected: (reason: any) => any
+) => {
+  dialog
+    .showOpenDialog(window, options)
+    .then(resolved)
+    .catch(rejected);
+};
+
 app.once('ready', () => {
   (<any>process.env['ELECTRON_DISABLE_SECURITY_WARNINGS']) = true;
 
@@ -90,7 +126,6 @@ app.once('ready', () => {
     }
   });
 
-  // enable autohide on menubar on fullscreen
   mainWindow.on('enter-full-screen', () => {
     mainWindow.autoHideMenuBar = true;
     mainWindow.setMenuBarVisibility(false);
@@ -105,13 +140,90 @@ app.once('ready', () => {
   /**
    * sets menu and free module after it's done
    */
-  app.applicationMenu = require(join(__dirname, 'modules', 'menubar.js'))(
-    isDev,
-    mainWindow
+  mainWindow.setMenu(
+    require(join(__dirname, 'modules', 'menubar.js'))(isDev, mainWindow)
   );
 
-  mainWindow.webContents.on('ipc-message', (_ev, channel) => {
-    if (channel == 'mode') mainWindow.webContents.send('mode', isDev);
+  mainWindow.webContents.on('ipc-message', (_ev, channel, args) => {
+    if (channel == 'ga-cp') {
+      if (gaWindow && !gaWindow.isDestroyed()) {
+        gaWindow.webContents.send('update-settings', args);
+        return;
+      }
+      gaWindow = createWindow(join(__dirname, 'ga-cp', 'ga-cp.html'), {
+        minWidth: 680,
+        minHeight: 480,
+        parent: mainWindow,
+        webPreferences: {
+          preload: join(__dirname, 'preloads', 'ga-cp-preload.js')
+        }
+      });
+
+      gaWindow.once('ready-to-show', gaWindow.show);
+
+      if (!isDev) gaWindow.removeMenu();
+
+      gaWindow.webContents.on(
+        'ipc-message',
+        (_ev, gaChannel, gaCPConfig: object) => {
+          if (gaChannel == 'ga-cp-finished') {
+            mainWindow.webContents.send('ga-cp-finished', gaCPConfig);
+            gaWindow.destroy();
+          } else if (gaChannel == 'close-confirm') {
+            (async () => {
+              await (() => {
+                return dialog.showMessageBox(gaWindow, {
+                  type: 'question',
+                  title: 'Are you sure?',
+                  message:
+                    'You have unsaved changes, are you sure you want to close?',
+                  cancelId: 0,
+                  defaultId: 1,
+                  buttons: ['Ca&ncel', '&Confirm'],
+                  normalizeAccessKeys: true
+                });
+              })()
+                .then(result => {
+                  if (result.response) {
+                    mainWindow.webContents.send('ga-cp-finished', gaCPConfig);
+                    gaWindow.destroy();
+                  }
+                })
+                .catch(reason => {
+                  if (reason) throw reason;
+                });
+            })();
+          } else if (gaChannel == 'browse') {
+            browse(
+              gaWindow,
+              {
+                title: 'Open GA Configuration file',
+                // TODO: read from runSettings
+                defaultPath: app.getPath('desktop'),
+                filters: [
+                  {
+                    name: 'Python File (.py)',
+                    extensions: ['py']
+                  }
+                ],
+                properties: ['openFile']
+              },
+              result => gaWindow.webContents.send('browsed-path', result),
+              reason => {
+                gaWindow.webContents.send('browsed-path', { canceled: true });
+                if (reason) throw reason;
+              }
+            );
+          } else if (gaChannel == 'settings') {
+            gaWindow.webContents.send('settings', args);
+          }
+        }
+      );
+      gaWindow.on('close', ev => {
+        ev.preventDefault();
+        gaWindow.webContents.send('close-confirm');
+      });
+    }
   });
 
   (() => {
@@ -145,11 +257,11 @@ app.once('ready', () => {
   })();
 
   mainWindow.on('close', () => {
-    mainWindow.webContents.send('cur-settings');
+    mainWindow.webContents.send('settings');
     mainWindow.webContents.once(
       'ipc-message',
       (_ev, channel, settings: object) => {
-        if (channel != 'cur-settings') return;
+        if (channel != 'settings') return;
         settings['main']['fscreen'] = mainWindow.isFullScreen();
         settings['main']['maximized'] = mainWindow.isMaximized();
         settings['main']['width'] = mainWindow.getSize()[0];
@@ -170,11 +282,4 @@ app.once('ready', () => {
   });
 });
 
-// mkdir(
-//   isDev
-//     ? join(__dirname, '..', 'libs')
-//     : join(__dirname, '..', '..', '..', 'libs'),
-//   (error: NodeJS.ErrnoException) => {
-//     if (error && error.errno != -17) throw error;
-//   }
-// );
+app.once('will-quit', () => pyshell.stdin.write('exit\n'));

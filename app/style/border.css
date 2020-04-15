@@ -7,24 +7,30 @@
 }
 
 .border.hor {
-  cursor: ns-resize;
-  padding: 4px 0;
   height: 1px;
   min-height: 1px;
 }
 
+.border.hor.resize {
+  cursor: ns-resize;
+  padding: 4px 0;
+}
+
 .border.ver {
-  cursor: ew-resize;
-  padding: 0 4px;
   width: 1px;
   min-width: 1px;
   height: 100%;
+}
+
+.border.ver.resize {
+  cursor: ew-resize;
+  padding: 0 4px;
 }
 
 /* Border between content that need to be devided sementically */
 .separator {
   background-color: #cebbbb;
   width: 1px;
-  margin: 3px 6px;
+  margin: 3px;
 }
 /*# sourceMappingURL=border.css.map */

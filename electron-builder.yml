@@ -1,0 +1,24 @@
+appId: com.dnory0.genetic-py
+productName: "GeneticPy"
+artifactName: ${productName}-${arch}.${ext}
+files:
+  - "!scripts"
+  - "!IDEA.txt"
+  - "!.prettierrc.json"
+  - "!README.md"
+  - "!.vscode"
+  - "!.idea"
+  - "!TODO.txt"
+  - "!tsconfig.json"
+linux:
+  target:
+    - AppImage
+    - deb
+    - rpm
+  icon: "build/icon.icns"
+  category: Science
+win:
+  target:
+    - nsis
+    - zip
+  icon: "build/icon.ico"

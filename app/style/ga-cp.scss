@@ -1,0 +1,101 @@
+@import 'basics.scss';
+@import 'scrollbar.scss';
+@import 'browse.scss';
+@import 'border.scss';
+@import 'components.scss';
+@import 'params.scss';
+
+#main {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .configuration {
+    flex: 1;
+    display: flex;
+    height: calc(100% - 45px);
+
+    .params {
+      width: 390px;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      background-color: whitesmoke;
+
+      .sign {
+        display: flex;
+
+        .title {
+          flex: 1;
+          margin: 0;
+          padding: 8px 0;
+          font-size: 17px;
+          font-family: sans-serif;
+        }
+
+        .random-all-btn {
+          width: fit-content;
+          margin: 6px;
+        }
+      }
+
+      .params-file,
+      .params-man {
+        padding: 10px 6px;
+      }
+
+      .params-file {
+        font-family: sans-serif;
+      }
+    }
+
+    .border {
+      cursor: default;
+      padding: 0;
+    }
+
+    .details {
+      background-color: aliceblue;
+      flex: 1;
+    }
+  }
+
+  .bottom {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 8px 8px;
+    background-color: whitesmoke;
+
+    .left {
+      display: flex;
+      align-items: center;
+      flex-direction: row-reverse;
+
+      input[type='checkbox'].force-tf-enabled {
+        margin: 0 5px;
+      }
+
+      label {
+        font-family: sans-serif;
+        font-size: 14px;
+      }
+    }
+
+    .right {
+      #save-btn {
+        background-color: #137cff;
+        color: whitesmoke;
+        border: none;
+
+        &:hover:not(:disabled),
+        &.hover:not(:disabled) {
+          background-color: #0037ec;
+        }
+
+        &:disabled {
+          background-color: #4e9dff;
+        }
+      }
+    }
+  }
+}

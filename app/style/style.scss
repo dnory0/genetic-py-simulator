@@ -1,13 +1,12 @@
 @import 'basics.scss';
-@import 'border.scss';
 @import 'scrollbar.scss';
+@import 'border.scss';
 @import 'resize-cover.scss';
+@import 'components.scss';
+@import 'params.scss';
 
 #main {
-  pointer-events: none;
   height: 100%;
-  opacity: 0;
-  transition: opacity 0.4s;
   display: flex;
   flex-direction: column;
 
@@ -16,240 +15,50 @@
     min-height: 280px;
     height: calc(70% + 13px);
     margin-bottom: -4px;
+    background-color: white;
+    flex: 1;
   }
 
   .middle-container {
-    min-height: 140px;
+    position: relative;
+    min-height: 165px;
     display: flex;
     height: calc(30% - 37px);
     margin-top: -4px;
     overflow: hidden;
-    flex: 1;
 
     .controls-container {
-      min-width: 350px;
       display: flex;
       flex-flow: column;
-      width: 35%;
-      text-align: center;
-      margin-right: -4px;
+      width: 324px;
       overflow: hidden;
 
       .state-controls-container {
         display: flex;
         justify-content: center;
-        padding: 4px 4px 3px;
+        padding: 4px;
         position: sticky;
-        border-bottom: 1px solid #cebbbb;
 
-        .state-controls > button {
-          padding: 5px 4px 5px 5px;
-          border: none;
-          border-radius: 4px;
-          width: 28px;
-          height: 28px;
-          background-color: white;
-
-          &:hover:not(:disabled) {
-            background-color: #c4c4c4;
-          }
-
-          img {
-            width: 18px;
-            float: left;
-          }
-
-          &:disabled {
-            opacity: 0.6;
-          }
-
-          &#play-btn {
-            img {
-              display: none;
-
-              &.default {
-                display: block;
-              }
-            }
-          }
+        .ga-cp {
+          flex: 1;
+          justify-content: flex-end;
         }
 
-        .ga-settings {
-          button {
-            padding: 5px 4px 5px 5px;
-            border: none;
-            border-radius: 4px;
-            width: 28px;
-            height: 28px;
-            background-color: white;
-
-            &:hover:not(:disabled) {
-              background-color: #c4c4c4;
-            }
-
-            img {
-              width: 18px;
-              float: left;
-            }
+        .pane-hide {
+          button > img {
+            transform: rotate(180deg);
           }
         }
       }
 
-      .parameters-container {
-        height: 100%;
-        overflow-x: hidden;
-        overflow-y: auto;
-
-        .parameters {
-          margin-top: -5px;
-          margin-right: -14px;
-
-          .parameter {
-            margin: 5px 0;
-            display: flex;
-
-            &:last-child {
-              margin-bottom: 0;
-            }
-
-            p {
-              font-size: 13px;
-              padding: 9px 5px;
-              float: left;
-              margin: 0;
-              font-family: sans-serif;
-              text-align: left;
-              min-width: 100px;
-              flex: 1;
-            }
-
-            input[type='number'] {
-              padding-top: 2px;
-              padding-left: 2px;
-              height: 19px;
-              font-size: 17px;
-              flex: 2;
-              margin: 6px;
-              border: 1px solid rgb(123, 123, 123);
-              border-radius: 2px;
-              min-width: 100px;
-
-              &:focus {
-                box-shadow: 0 0 0 1px #df9a00, 0 0 0 4px rgba(223, 165, 0, 0.3);
-              }
-
-              &::-webkit-inner-spin-button {
-                -webkit-appearance: none;
-              }
-            }
-            .input-wrapper {
-              margin: 0 6px;
-              padding: 0 0 0 4px;
-              flex: 2;
-              min-width: 100px;
-              display: flex;
-
-              input[type='range'] {
-                -webkit-appearance: none;
-                flex: 1;
-                height: 13px;
-                padding: 12px 0;
-                margin-left: -4px;
-
-                &:not(:disabled) {
-                  cursor: pointer;
-                }
-
-                &:disabled {
-                  opacity: 0.6;
-                }
-
-                &::-webkit-slider-runnable-track {
-                  width: 100%;
-                  height: 5px;
-                  background: #555555;
-                  border-radius: 3px;
-                  transition: background 0.15s;
-                }
-
-                &::-webkit-slider-thumb {
-                  border: 1px solid #000000;
-                  height: 14px;
-                  width: 14px;
-                  border-radius: 7px;
-                  background: #272727;
-                  -webkit-appearance: none;
-                  margin-top: -5px;
-                  transition: background 0.15s;
-                }
-
-                &:not(:disabled):hover::-webkit-slider-thumb {
-                  background: #6b6b6b;
-                }
-
-                &:not(:disabled):hover::-webkit-slider-runnable-track {
-                  background: #272727;
-                }
-              }
-
-              input[type='number'] {
-                margin-right: 0;
-                min-width: 46px;
-                max-width: 46px;
-              }
-            }
-
-            .checkbox-wrapper {
-              position: relative;
-              min-width: 40px;
-              flex: 0.5;
-              padding: 4px 3px 3px 5px;
-            }
-          }
-        }
+      .params-man {
+        padding: 0 0 0 6px;
       }
     }
-    .checkbox-wrapper {
-      width: 28px;
-      height: 28px;
-      position: relative;
 
-      input[type='checkbox'] {
-        opacity: 0;
-        border-radius: 4px;
-        height: 28px;
-        width: 28px;
-        position: absolute;
-        top: 0;
-        left: 0;
-        border-radius: 4px;
-
-        & + label {
-          height: 28px;
-          width: 28px;
-          padding: 5px 0;
-          box-sizing: border-box;
-          position: absolute;
-          left: 0;
-          border-radius: 4px;
-
-          > img {
-            opacity: 0.5;
-          }
-        }
-
-        &:not(:disabled) + label:hover {
-          background-color: #c4c4c4;
-        }
-
-        &:checked + label > img {
-          opacity: 1;
-        }
-      }
-    }
     .side-container {
       position: relative;
-      margin-left: -4px;
+      background-color: white;
       flex: 1;
       height: 100%;
       overflow: hidden;
@@ -258,7 +67,6 @@
   }
 
   .bottom-container {
-    border-top: 1px solid #cebbbb;
     height: 24px;
     min-height: 24px;
     bottom: 0;
@@ -267,4 +75,123 @@
     padding: 0 6px;
     box-sizing: border-box;
   }
+
+  .state-controls-container > div:not(.separator),
+  .pane-show,
+  .chart-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    > *,
+    .drop-btn {
+      border: none;
+      width: 24px;
+      height: 24px;
+
+      &:not(div) {
+        padding-left: 3px;
+      }
+
+      &:not(:first-child) {
+        margin-left: 5px;
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        background-color: white;
+      }
+
+      img {
+        width: 18px;
+        float: left;
+      }
+    }
+
+    .dropdown-content {
+      position: relative;
+      right: 145px;
+      width: 180px;
+      z-index: 10000;
+      border: 1px solid #cebbbb;
+      box-shadow: #cebbbb 3px 3px 8px;
+
+      button {
+        width: -webkit-fill-available;
+        height: 28px;
+        border: none;
+        border-radius: 0;
+        text-align: left;
+      }
+    }
+  }
+
+  .pane-show {
+    z-index: 1;
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 4px;
+
+    > button:not(:hover) {
+      background-color: transparent;
+    }
+  }
+
+  .chart-actions {
+    z-index: 1;
+    position: absolute;
+    top: 3px;
+    right: 3px;
+
+    .dropdown-pointer {
+      transform: rotate(45deg);
+      border: 1px solid #cebbbb;
+      border-right: 0;
+      border-bottom: 0;
+      height: 6px;
+      width: 6px;
+      position: absolute;
+      top: 24px;
+      right: 37px;
+      background-color: white;
+      z-index: 10000;
+    }
+
+    > *:not(:hover),
+    .drop-btn:not(:hover) {
+      background-color: transparent;
+    }
+
+    .dropdown-content > button {
+      z-index: 10001;
+    }
+  }
+
+  .fullscreenable {
+    > .chart-actions > button.fscreen-btn > img {
+      &:last-child {
+        display: none;
+      }
+    }
+
+    &:fullscreen > .chart-actions > button.fscreen-btn > img {
+      &:first-child {
+        display: none;
+      }
+
+      &:last-child {
+        display: block;
+      }
+    }
+  }
+}
+
+.blur {
+  pointer-events: none;
+  filter: blur(1px);
+}
+
+.hide {
+  display: none !important;
 }

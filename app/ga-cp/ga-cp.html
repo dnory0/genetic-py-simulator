@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GA Control Panel</title>
+    <link rel="stylesheet" href="../style/ga-cp.css" />
+  </head>
+  <body>
+    <div id="main">
+      <div class="configuration">
+        <div class="params">
+          <div class="params-file">
+            <p class="title">GA Configuration File:</p>
+            <div class="browse">
+              <input type="text" id="params-path" />
+              <button id="browse-btn">
+                <img src="../img/browse.png" />
+              </button>
+            </div>
+          </div>
+          <div class="border hor"></div>
+          <div class="params-man scrollbar">
+            <div class="sign">
+              <p class="title pad">GA Configuration Manually:</p>
+              <button id="random-all-btn" class="random-all-btn">
+                R<span class="alt-trigger">a</span>ndom All
+              </button>
+            </div>
+
+            <div class="complex-param">
+              <div class="param">
+                <div class="param-name">
+                  <p>Population Size</p>
+                </div>
+                <div class="param-settings">
+                  <div class="param-value">
+                    <input
+                      type="text"
+                      min="1"
+                      step="1"
+                      id="pop-size"
+                      name="pop_size"
+                      pattern="^[-+]?\d*\.?0*$"
+                      inputmode="numeric"
+                      class="disable-on-run"
+                      required
+                    />
+                  </div>
+                  <div class="other-settings">
+                    <button class="random-btn">Random</button>
+                    <div class="checkbox-wrapper" title="Pin to Main Window">
+                      <input
+                        type="checkbox"
+                        name="pop_size_pin"
+                        id="pop-size-pin"
+                      />
+                      <label for="pop-size-pin">
+                        <img src="../img/pin.png" />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="complex-param">
+              <div class="param">
+                <div class="param-name">
+                  <p>Genes Number</p>
+                </div>
+                <div class="param-settings">
+                  <div class="param-value">
+                    <input
+                      type="text"
+                      min="1"
+                      step="1"
+                      id="genes-num"
+                      name="genes_num"
+                      pattern="^[-+]?\d*\.?0*$"
+                      inputmode="numeric"
+                      class="disable-on-run"
+                      required
+                    />
+                  </div>
+                  <div class="other-settings">
+                    <button class="random-btn">Random</button>
+                    <div class="checkbox-wrapper" title="Pin to Main Window">
+                      <input
+                        type="checkbox"
+                        name="genes_num_pin"
+                        id="genes-num-pin"
+                      />
+                      <label for="genes-num-pin">
+                        <img src="../img/pin.png" />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="complex-param">
+              <div class="param">
+                <div class="param-name">
+                  <p>Crossover Rate</p>
+                </div>
+                <div class="param-settings">
+                  <div class="param-value">
+                    <input
+                      type="range"
+                      inputmode="numeric"
+                      min="0.001"
+                      max="1"
+                      step="0.001"
+                      id="co-rate"
+                      name="co_rate"
+                      pattern="^[-+]?\d*\.?\d*$"
+                      class="textfieldable"
+                      required
+                    />
+                  </div>
+                  <div class="other-settings">
+                    <button class="random-btn">Random</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="complex-param">
+              <div class="param">
+                <div class="param-name">
+                  <p>Mutation Rate</p>
+                </div>
+                <div class="param-settings">
+                  <div class="param-value">
+                    <input
+                      type="range"
+                      inputmode="numeric"
+                      min="0"
+                      max="1"
+                      step="0.001"
+                      id="mut-rate"
+                      name="mut_rate"
+                      pattern="^[-+]?\d*\.?\d*$"
+                      class="textfieldable"
+                      required
+                    />
+                  </div>
+                  <div class="other-settings">
+                    <button class="random-btn">Random</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="complex-param">
+              <input
+                class="param-enabled"
+                type="checkbox"
+                name="del_rate_enabled"
+                id="del-rate-enabled"
+              />
+              <div class="param">
+                <div class="param-name">
+                  <p>Delay Rate</p>
+                </div>
+                <div class="param-settings">
+                  <div class="param-value">
+                    <input
+                      type="range"
+                      inputmode="numeric"
+                      min="0"
+                      max="5"
+                      step="0.05"
+                      id="del-rate"
+                      name="del_rate"
+                      pattern="^[-+]?\d*\.?\d*$"
+                      class="textfieldable is-disable-able"
+                      required
+                    />
+                  </div>
+                  <div class="other-settings">
+                    <button class="random-btn">Random</button>
+                    <div class="checkbox-wrapper" title="Pin to Main Window">
+                      <input
+                        type="checkbox"
+                        name="del_rate_pin"
+                        id="del-rate-pin"
+                      />
+                      <label for="del-rate-pin">
+                        <img src="../img/pin.png" />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="complex-param">
+              <input
+                class="param-enabled"
+                type="checkbox"
+                name="max_gen_enabled"
+                id="max-gen-enabled"
+              />
+              <div class="param">
+                <div class="param-name">
+                  <p>Maximum Generation</p>
+                </div>
+                <div class="param-settings">
+                  <div class="param-value">
+                    <input
+                      type="text"
+                      min="1"
+                      step="1"
+                      id="max-gen"
+                      name="max_gen"
+                      pattern="^[-+]?\d*\.?0*$"
+                      class="is-disable-able disable-on-run"
+                      inputmode="numeric"
+                      required
+                    />
+                  </div>
+                  <div class="other-settings">
+                    <button class="random-btn">Random</button>
+                    <div class="checkbox-wrapper" title="Pin to Main Window">
+                      <input
+                        type="checkbox"
+                        name="max_gen_pin"
+                        id="max-gen-pin"
+                      />
+                      <label for="max-gen-pin">
+                        <img src="../img/pin.png" />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="border ver"></div>
+        <div class="details"></div>
+      </div>
+      <div class="border hor"></div>
+      <div class="bottom">
+        <div class="left">
+          <label for="force-tf-enabled">
+            <span class="alt-trigger">F</span>orce Using TextFields
+          </label>
+          <input
+            type="checkbox"
+            name="force_textfields"
+            class="force-tf-enabled"
+            id="force-tf-enabled"
+          />
+        </div>
+        <div class="right">
+          <button id="save-btn" title="Save & Exit" disabled>
+            <span class="alt-trigger">S</span>ave
+          </button>
+          <button id="close-btn" title="Close">
+            <span class="alt-trigger">C</span>lose
+          </button>
+          <button id="revert-btn" title="Revert Changes" disabled>
+            <span class="alt-trigger">R</span>evert
+          </button>
+        </div>
+      </div>
+    </div>
+    <script>
+      let exports = {};
+    </script>
+    <script src="ga-cp.js"></script>
+  </body>
+</html>

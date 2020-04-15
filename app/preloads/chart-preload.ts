@@ -1,7 +1,18 @@
-import { ipcRenderer } from 'electron';
-import { Chart, charts } from 'highcharts';
+import { ipcRenderer, remote } from 'electron';
+import * as Highcharts from 'highcharts';
+import { Chart } from 'highcharts';
 import { join } from 'path';
+import { ChildProcess } from 'child_process';
 
+import exporting from 'highcharts/modules/exporting';
+import offlineExporting from 'highcharts/modules/offline-exporting';
+import exportData from 'highcharts/modules/export-data';
+
+exporting(Highcharts);
+offlineExporting(Highcharts);
+exportData(Highcharts);
+
+const { getGlobal } = remote;
 /**
  * allows communication between this webview & renderer process
  */
@@ -22,10 +33,10 @@ window['createChart'] = require(join(
 ));
 /**
  * enables or disable the hover settings for the passed chart
- * @param enable decides if to disable hover settings or enable them.
  * @param chart chart to apply hover settings on
+ * @param enable decides if to disable hover settings or enable them.
  */
-window['enableChartHover'] = (enable: boolean, chart: Chart) => {
+window['toggleChartHover'] = (chart: Chart, enable: boolean) => {
   chart.update(
     {
       tooltip: {
@@ -37,13 +48,16 @@ window['enableChartHover'] = (enable: boolean, chart: Chart) => {
       legend: {
         itemStyle: {
           pointerEvents: enable ? 'all' : 'none'
+        },
+        itemCheckboxStyle: {
+          pointerEvents: enable ? 'all' : 'none'
         }
       },
       plotOptions: {
         series: {
           marker: {
             enabled: enable,
-            radius: enable ? 2 : null
+            radius: enable ? 1.5 : null
           },
           states: {
             hover: {
@@ -72,8 +86,7 @@ window['clearChart'] = (chart: Chart, categories: boolean = false) => {
   chart.series.forEach(serie => serie.setData([], true));
 };
 
-ipcRenderer.once('mode', (_ev, isDev) => {
-  if (!isDev) return;
+if (getGlobal('isDev'))
   window.addEventListener(
     'keyup',
     (event: KeyboardEvent) => {
@@ -84,8 +97,36 @@ ipcRenderer.once('mode', (_ev, isDev) => {
     },
     true
   );
-});
 
-window.addEventListener('mouseout', () =>
-  charts.forEach(chart => chart.pointer.reset())
-);
+window['ready'] = (treatResponse: (response: object) => void) => {
+  delete window['ready'];
+  (<ChildProcess>getGlobal('pyshell')).stdout.on('data', (response: Buffer) => {
+    response
+      .toString()
+      .split(/(?<=\n)/g)
+      .map((data: string) => JSON.parse(data))
+      .forEach((data: object) => treatResponse(data));
+  });
+};
+
+/**
+ * enables and disables the zoom functionality for the passed chart
+ * @param chart chart to toggle its zoom functionality
+ * @param enable if true, enables zooming, else disables it
+ */
+window['toggleZoom'] = (chart: Chart, enable: boolean) => {
+  if (window['zoomed']) return;
+  chart.update(
+    {
+      chart: {
+        zoomType: enable ? 'x' : null,
+        panning: {
+          enabled: enable
+        }
+      }
+    },
+    true,
+    false,
+    false
+  );
+};

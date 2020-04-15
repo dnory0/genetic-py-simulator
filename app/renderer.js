@@ -10,34 +10,42 @@ let playBtn = document.getElementById('play-btn');
 let stopBtn = document.getElementById('stop-btn');
 let toStartBtn = document.getElementById('to-start-btn');
 let stepFBtn = document.getElementById('step-forward-btn');
-let lRSwitch = document.getElementById('live-rendering');
-let popSize = document.getElementById('pop-size');
-let pSRandom = document.getElementById('random-pop-size');
-let genesNum = document.getElementById('genes-num');
-let gNRandom = document.getElementById('random-genes-num');
-let crossover = document.getElementById('crossover-rate');
-let coRandom = (document.getElementById('random-crossover-rate'));
-let mutation = document.getElementById('mutation-rate');
-let mutRandom = (document.getElementById('random-mutation-rate'));
-let delay = document.getElementById('delay-rate');
-let delayRandom = (document.getElementById('random-delay-rate'));
+let lRSwitch = document.getElementById('lr-enabled');
+let gaCPBtn = document.getElementById('ga-cp-btn');
+let gaParams = ((Array.from(document.getElementsByClassName('param-value'))).map(paramValue => paramValue.firstElementChild));
+let settings = window['settings'];
 let isRunning = false;
+let isGACPOpen = false;
+let toggleDisableOnRun = (activate = true) => {
+    gaParams.forEach(gaParam => {
+        if (!gaParam.classList.contains('disable-on-run'))
+            return;
+        settings['renderer']['input'][gaParam.id]['disable'] = !activate;
+        gaParam.disabled = !activate;
+        (gaParam.parentElement.nextElementSibling.firstElementChild).disabled = !activate;
+        gaParam.parentElement.parentElement.title = activate
+            ? ''
+            : 'Disabled when GA is Running';
+    });
+    if (activate && isGACPOpen)
+        ipcRenderer.send('ga-cp', activate);
+};
 const treatResponse = (response) => {
     if (response['started']) {
+        toggleDisableOnRun(false);
         setClickable();
     }
     else if (response['finished']) {
-        setClickable(false);
+        isRunning = false;
+        setClickable(isRunning);
         blinkPlayBtn();
+        toggleDisableOnRun(true);
+        switchPlayBtn();
     }
 };
 const switchPlayBtn = () => {
-    playBtn.querySelector('.play').style.display = isRunning
-        ? 'none'
-        : 'block';
-    playBtn.querySelector('.pause').style.display = isRunning
-        ? 'block'
-        : 'none';
+    playBtn.querySelector('.play').classList.toggle('hide', isRunning);
+    playBtn.querySelector('.pause').classList.toggle('hide', !isRunning);
 };
 const setClickable = (clickable = true) => {
     Array.from(document.querySelector('.state-controls').children).forEach((element, index) => {
@@ -64,8 +72,10 @@ const ctrlClicked = (signal, goingToRun) => {
         prime.send('step-forward');
     if (signal == 'replay')
         prime.send('replay');
-    if (signal == 'stop')
-        setClickable(false);
+    if (signal == 'stop') {
+        setClickable(goingToRun);
+        toggleDisableOnRun(true);
+    }
     window['sendSig'](signal);
     isRunning = goingToRun;
     switchPlayBtn();
@@ -74,58 +84,140 @@ playBtn.onclick = () => ctrlClicked(isRunning ? 'pause' : 'play', !isRunning);
 stopBtn.onclick = () => ctrlClicked('stop', false);
 toStartBtn.onclick = () => ctrlClicked('replay', true);
 stepFBtn.onclick = () => ctrlClicked('step_f', false);
-const sendParameter = (numInput, checkInput) => {
-    numInput.style.backgroundColor = '#fff';
+(() => {
+    function toggleFullscreen(fscreenBtn) {
+        if (document.fullscreenElement)
+            document.exitFullscreen();
+        else
+            fscreenBtn.parentElement.parentElement.requestFullscreen();
+    }
+    Array.from(document.getElementsByClassName('fscreen-btn')).forEach((fscreenBtn) => {
+        fscreenBtn.onclick = () => toggleFullscreen(fscreenBtn);
+    });
+    let clean = (eventListener) => {
+        Array.from(document.getElementsByClassName('resize-cover')).forEach((resizeCover) => {
+            resizeCover.classList.add('hide');
+        });
+        window.removeEventListener('click', eventListener);
+    };
+    Array.from(document.getElementsByClassName('drop-btn')).forEach((exportBtn) => {
+        let dropdownContent = exportBtn.nextElementSibling;
+        let dropdownPointer = dropdownContent.nextElementSibling;
+        let exportTypes = Array.from(dropdownContent.children);
+        let eventListener = () => {
+            dropdownPointer.classList.toggle('hide', true);
+            dropdownContent.classList.toggle('hide', true);
+            clean(eventListener);
+        };
+        exportBtn.addEventListener('click', () => {
+            dropdownPointer.classList.toggle('hide');
+            dropdownContent.classList.toggle('hide');
+            Array.from(document.getElementsByClassName('resize-cover')).forEach((resizeCover) => {
+                resizeCover.classList.remove('hide');
+            });
+            if (dropdownContent.classList.contains('hide'))
+                clean(eventListener);
+            else {
+                setTimeout(() => {
+                    window.addEventListener('click', eventListener);
+                }, 0);
+            }
+        });
+        exportTypes.forEach((exportType, index) => {
+            if (index == 0) {
+                let mouseoverEventListener = () => {
+                    exportType.style.backgroundColor = '#d9d9d9';
+                    dropdownPointer.style.backgroundColor = '#d9d9d9';
+                };
+                let mouseleaveEventListener = () => {
+                    exportType.style.backgroundColor = 'white';
+                    dropdownPointer.style.backgroundColor = 'white';
+                };
+                exportType.addEventListener('mouseover', mouseoverEventListener);
+                exportType.addEventListener('mouseleave', mouseleaveEventListener);
+                dropdownPointer.addEventListener('mouseover', mouseoverEventListener);
+                dropdownPointer.addEventListener('mouseleave', mouseleaveEventListener);
+                dropdownPointer.addEventListener('click', () => exportType.click());
+            }
+            exportType.addEventListener('click', () => {
+                clean(eventListener);
+                if (exportBtn.classList.contains('prime'))
+                    prime.send('export', exportType.id.replace('export-', ''));
+                else
+                    side.send('export', exportType.id.replace('export-', ''));
+                exportBtn.click();
+            });
+        });
+    });
+    (Array.from(document.getElementsByClassName('zoom-out-btn'))).forEach(zoomOutBtn => {
+        zoomOutBtn.addEventListener('click', () => {
+            if (zoomOutBtn.classList.contains('prime'))
+                prime.send('zoom-out');
+            else
+                side.send('zoom-out');
+        });
+    });
+})();
+(() => {
+    let contCont = document.querySelector('.controls-container');
+    let borderHide = document.querySelector('.border-hide');
+    let hidePane = document.getElementById('pane-hide-btn');
+    let showPane = document.getElementById('pane-show-btn');
+    hidePane.onclick = () => {
+        showPane.parentElement.classList.toggle('hide', false);
+        contCont.classList.toggle('hide', true);
+        borderHide.classList.toggle('hide', true);
+    };
+    showPane.onclick = () => {
+        showPane.parentElement.classList.toggle('hide', true);
+        contCont.classList.toggle('hide', false);
+        borderHide.classList.toggle('hide', false);
+    };
+})();
+const sendParameter = (key, value) => {
     window['sendSig'](JSON.stringify({
-        [numInput.name]: parseFloat(numInput.value),
-        [checkInput.name]: checkInput.checked
+        [key]: parseFloat(value) || value
     }));
+};
+let sendParams = () => {
+    gaParams.forEach(gaParam => {
+        let value;
+        value =
+            gaParam.classList.contains('is-disable-able') &&
+                !(gaParam.parentElement.parentElement.parentElement.previousElementSibling).checked
+                ? false
+                : gaParam.value;
+        sendParameter(gaParam.name, value);
+    });
 };
 document.addEventListener('DOMContentLoaded', function loaded() {
     document.removeEventListener('DOMContentLoaded', loaded);
     (() => {
         let ready = () => {
             ready = () => {
-                prime.send('mode', window['isDev']);
-                side.send('mode', window['isDev']);
-                let settings = window['settings'];
-                popSize.value =
-                    settings['renderer']['parameters']['population']['size'];
-                pSRandom.checked =
-                    settings['renderer']['parameters']['population']['random'];
-                genesNum.value = settings['renderer']['parameters']['genes']['number'];
-                gNRandom.checked =
-                    settings['renderer']['parameters']['genes']['random'];
-                crossover.value =
-                    settings['renderer']['parameters']['crossover']['rate'];
-                crossover.parentElement.firstElementChild.value =
-                    settings['renderer']['parameters']['crossover']['rate'];
-                coRandom.checked =
-                    settings['renderer']['parameters']['crossover']['random'];
-                mutation.value = settings['renderer']['parameters']['mutation']['rate'];
-                mutation.parentElement.firstElementChild.value =
-                    settings['renderer']['parameters']['mutation']['rate'];
-                mutRandom.checked =
-                    settings['renderer']['parameters']['mutation']['random'];
-                delay.value = settings['renderer']['parameters']['delay']['rate'];
-                delay.parentElement.firstElementChild.value =
-                    settings['renderer']['parameters']['delay']['rate'];
-                delayRandom.checked =
-                    settings['renderer']['parameters']['delay']['random'];
-                sendParameter(popSize, pSRandom);
-                sendParameter(genesNum, gNRandom);
-                sendParameter(crossover, coRandom);
-                sendParameter(mutation, mutRandom);
-                sendParameter(delay, delayRandom);
-                lRSwitch.checked = settings['renderer']['controls']['live-rendering'];
-                lRSwitch.onchange = () => prime.send('live-rendering', lRSwitch.checked);
-                prime.send('live-rendering', lRSwitch.checked);
-                prime.parentElement.style.height =
-                    settings['renderer']['ui']['horizontal'];
+                window['affectSettings'](settings['renderer']['input'], 'main');
+                sendParams();
+                (() => {
+                    let eventListener = (ev) => {
+                        let gaParam = ev.target;
+                        sendParameter(gaParam.name, gaParam.value);
+                    };
+                    gaParams.forEach(gaParam => {
+                        gaParam.addEventListener('keyup', eventListener);
+                        if (gaParam.classList.contains('textfieldable'))
+                            gaParam.addEventListener('change', eventListener);
+                    });
+                    let lRSwitchUpdater = () => {
+                        prime.send('live-rendering', lRSwitch.checked);
+                    };
+                    lRSwitch.addEventListener('change', lRSwitchUpdater);
+                    lRSwitchUpdater();
+                })();
                 delete window['isDev'];
                 delete window['settings'];
             };
             zoomViews = window['ready'](window['pyshell'], prime, side, treatResponse, webFrame);
+            toggleDisableOnRun(true);
             zoomViews();
             window['loaded']();
             delete window['ready'];
@@ -135,78 +227,8 @@ document.addEventListener('DOMContentLoaded', function loaded() {
         prime.addEventListener('dom-ready', () => ready());
         side.addEventListener('dom-ready', () => ready());
     })();
-    const rangeChange = (rangeInput, numberInput, checkbox) => {
-        setTimeout(() => {
-            numberInput.value = rangeInput.value;
-            sendParameter(numberInput, checkbox);
-        }, 0);
-    };
-    const numberChange = (rangeInput, numberInput) => {
-        setTimeout(() => {
-            rangeInput.value = numberInput.value;
-        }, 0);
-    };
-    Array.from(document.getElementsByClassName('input-wrapper')).forEach((wrapper) => {
-        const first = wrapper.firstElementChild;
-        const last = wrapper.lastElementChild;
-        const checkbox = (wrapper.nextElementSibling.firstElementChild);
-        first.onmousedown = () => {
-            first.onmousemove = () => rangeChange(first, last, checkbox);
-            rangeChange(first, last, checkbox);
-            first.onmouseup = () => (first.onmouseup = first.onmousemove = null);
-        };
-    });
-    const parameterChanged = (numInput, checkInput, mustBeInt, event) => {
-        setTimeout(() => {
-            if (isNaN(numInput.value) ||
-                [
-                    'Control',
-                    'Shift',
-                    'Alt',
-                    'CapsLock',
-                    'AltGraph',
-                    'Tab',
-                    'Enter',
-                    'ArrowLeft',
-                    'ArrowRight',
-                    'Home',
-                    'End'
-                ].includes(event.key))
-                return;
-            if (mustBeInt &&
-                !isNaN(parseInt(numInput.value)) &&
-                parseInt(numInput.value) == numInput.value) {
-                numInput.value = `${parseInt(numInput.value) + 1}`;
-                numInput.value = `${parseInt(numInput.value) - 1}`;
-            }
-            if (((mustBeInt && !numInput.value.includes('.')) || !mustBeInt) &&
-                (isNaN(parseFloat(numInput.min)) ||
-                    parseFloat(numInput.value) >= parseFloat(numInput.min)) &&
-                (isNaN(parseFloat(numInput.max)) ||
-                    parseFloat(numInput.value) <= parseFloat(numInput.max))) {
-                sendParameter(numInput, checkInput);
-                if (!mustBeInt)
-                    numberChange(numInput.previousElementSibling, numInput);
-            }
-            else
-                numInput.style.backgroundColor = '#ff4343b8';
-        }, 0);
-    };
-    popSize.onkeyup = pSRandom.onchange = (event) => {
-        parameterChanged(popSize, pSRandom, true, event);
-    };
-    genesNum.onkeyup = gNRandom.onchange = (event) => {
-        parameterChanged(genesNum, gNRandom, true, event);
-    };
-    crossover.onkeyup = coRandom.onchange = (event) => {
-        parameterChanged(crossover, coRandom, false, event);
-    };
-    mutation.onkeyup = mutRandom.onchange = (event) => {
-        parameterChanged(mutation, mutRandom, false, event);
-    };
-    delay.onkeyup = delayRandom.onchange = (event) => {
-        parameterChanged(delay, delayRandom, false, event);
-    };
+    window['params']();
+    window['saveSettings'](settings['renderer']['input']);
     ipcRenderer.on('zoom', (_event, type) => {
         if (type == 'in') {
             if (webFrame.getZoomFactor() < 1.8)
@@ -235,57 +257,33 @@ document.addEventListener('DOMContentLoaded', function loaded() {
     });
     window['border']();
     delete window['border'];
-    window.addEventListener('beforeunload', () => {
-        document.getElementById('main').style.display = 'none';
-        window['sendSig']('exit');
-    });
-});
-ipcRenderer.send('mode');
-ipcRenderer.once('mode', (_ev, isDev) => {
-    if (isDev) {
-        window['k-shorts'](prime, side, ipcRenderer);
-        delete window['k-shorts'];
-    }
-    window['isDev'] = isDev;
-});
-ipcRenderer.on('cur-settings', () => {
-    ipcRenderer.send('cur-settings', {
-        main: {},
-        renderer: {
-            ui: {
-                horizontal: {
-                    height: prime.parentElement.offsetHeight
-                },
-                vertical: {
-                    width: 440
+    (() => {
+        let main = document.getElementById('main');
+        gaCPBtn.onclick = () => {
+            isGACPOpen = true;
+            ipcRenderer.send('ga-cp', settings);
+            main.classList.toggle('blur', true);
+            ipcRenderer.once('ga-cp-finished', (_ev, newSettings) => {
+                isGACPOpen = false;
+                main.classList.toggle('blur', false);
+                if (newSettings) {
+                    settings['renderer']['input'] = newSettings['renderer']['input'];
+                    saveSettings(settings['renderer']['input']);
+                    affectSettings(settings['renderer']['input'], 'main');
+                    sendParams();
                 }
-            },
-            controls: {
-                'live-rendering': lRSwitch.checked
-            },
-            parameters: {
-                population: {
-                    size: parseInt(popSize.value),
-                    random: pSRandom.checked
-                },
-                genes: {
-                    number: parseInt(genesNum.value),
-                    random: gNRandom.checked
-                },
-                crossover: {
-                    rate: parseFloat(crossover.value),
-                    random: coRandom.checked
-                },
-                mutation: {
-                    rate: parseFloat(mutation.value),
-                    random: mutRandom.checked
-                },
-                delay: {
-                    rate: parseFloat(delay.value),
-                    random: delayRandom.checked
-                }
-            }
-        }
-    });
+            });
+        };
+        window.addEventListener('beforeunload', () => {
+            ipcRenderer.send('close-ga-cp');
+            main.classList.add('hide');
+            window['sendSig']('stop');
+        });
+    })();
 });
+if (window['isDev']) {
+    window['k-shorts'](prime, side, ipcRenderer);
+    delete window['k-shorts'];
+}
+ipcRenderer.on('settings', () => ipcRenderer.send('settings', settings));
 //# sourceMappingURL=renderer.js.map

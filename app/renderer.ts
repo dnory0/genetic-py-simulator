@@ -58,60 +58,27 @@ let stepFBtn = <HTMLButtonElement>document.getElementById('step-forward-btn');
  * if disabled chart update when the GA is paused or stopped,
  * default is enabled
  */
-let lRSwitch = <HTMLInputElement>document.getElementById('live-rendering');
+let lRSwitch = <HTMLInputElement>document.getElementById('lr-enabled');
+
+/**
+ * opens GA configuration panel to configure next run of the GA.
+ */
+let gaCPBtn = <HTMLInputElement>document.getElementById('ga-cp-btn');
 
 /***************************** Parameters inputs *****************************/
+/**
+ * ga input parameters.
+ */
+let gaParams = <HTMLInputElement[]>(
+  (<HTMLDivElement[]>(
+    Array.from(document.getElementsByClassName('param-value'))
+  )).map(paramValue => paramValue.firstElementChild)
+);
 
 /**
- * number of individuals in a population, needs to be more than 1
+ * running settings
  */
-let popSize = <HTMLInputElement>document.getElementById('pop-size');
-/**
- * by Default is set false, if set true the true population size is going to be
- * randomized between 1 and popSize passed to GA.
- */
-let pSRandom = <HTMLInputElement>document.getElementById('random-pop-size');
-/**
- * number of genes per individual, at least needs to be set to 1.
- */
-let genesNum = <HTMLInputElement>document.getElementById('genes-num');
-/**
- * by Default is set false, if set true the true genes number is going to be
- * randomized between 1 and genesNum passed to GA.
- */
-let gNRandom = <HTMLInputElement>document.getElementById('random-genes-num');
-/**
- * crossover rate, it's in ]0,1] range.
- */
-let crossover = <HTMLInputElement>document.getElementById('crossover-rate');
-/**
- * by Default is set false, if set true the true crossover rate is going to be
- * randomized between 0.001 and crossover passed to GA.
- */
-let coRandom = <HTMLInputElement>(
-  document.getElementById('random-crossover-rate')
-);
-/**
- * mutation rate, range of values is [0,1].
- */
-let mutation = <HTMLInputElement>document.getElementById('mutation-rate');
-/**
- * by Default is set false, if set true the true mutation rate is going to be
- * randomized between 0 and mutation passed to GA.
- */
-let mutRandom = <HTMLInputElement>(
-  document.getElementById('random-mutation-rate')
-);
-/**
- * delay rate, range of [0,1]
- */
-let delay = <HTMLInputElement>document.getElementById('delay-rate');
-/**
- * by Default set to false
- */
-let delayRandom = <HTMLInputElement>(
-  document.getElementById('random-delay-rate')
-);
+let settings: object = window['settings'];
 
 /****************************** Python Part ******************************/
 
@@ -120,17 +87,47 @@ let delayRandom = <HTMLInputElement>(
  */
 let isRunning = false;
 
+let isGACPOpen = false;
+
+/**
+ * toggles ```disable-on-run```, if activate is true it activates
+ * inputs with their random buttons, else it disactivates them.
+ *
+ * @param activate default is true
+ */
+let toggleDisableOnRun = (activate = true) => {
+  gaParams.forEach(gaParam => {
+    if (!gaParam.classList.contains('disable-on-run')) return;
+    settings['renderer']['input'][gaParam.id]['disable'] = !activate;
+    gaParam.disabled = !activate;
+    (<HTMLButtonElement>(
+      gaParam.parentElement.nextElementSibling.firstElementChild
+    )).disabled = !activate;
+    gaParam.parentElement.parentElement.title = activate
+      ? ''
+      : 'Disabled when GA is Running';
+  });
+
+  // in case ga has finished because of generation reached max_gen while GACP is open
+  // renderer should inform GACP to enable .disable-on-run inputs
+  if (activate && isGACPOpen) ipcRenderer.send('ga-cp', activate);
+};
+
 /**
  * figure out what response stands for and act uppon it
  * @param response response of pyshell
  */
 const treatResponse = (response: object) => {
   if (response['started']) {
+    toggleDisableOnRun(false);
     // to be able to change in ga state
     setClickable();
   } else if (response['finished']) {
-    setClickable(false);
+    isRunning = false;
+    setClickable(isRunning);
     blinkPlayBtn();
+    toggleDisableOnRun(true);
+    switchPlayBtn();
   }
 };
 
@@ -141,12 +138,14 @@ const treatResponse = (response: object) => {
  * switch the play/pause button image depending on isRunning state.
  */
 const switchPlayBtn = () => {
-  (<HTMLImageElement>playBtn.querySelector('.play')).style.display = isRunning
-    ? 'none'
-    : 'block';
-  (<HTMLImageElement>playBtn.querySelector('.pause')).style.display = isRunning
-    ? 'block'
-    : 'none';
+  (<HTMLImageElement>playBtn.querySelector('.play')).classList.toggle(
+    'hide',
+    isRunning
+  );
+  (<HTMLImageElement>playBtn.querySelector('.pause')).classList.toggle(
+    'hide',
+    !isRunning
+  );
 };
 
 /**
@@ -212,7 +211,10 @@ const ctrlClicked = (signal: string, goingToRun: boolean) => {
    * in heavy GA (GA that takes considerable amount of time to generate 1 generation)
    * buttons should be stopped on click instead of waiting GA stopped event.
    */
-  if (signal == 'stop') setClickable(false);
+  if (signal == 'stop') {
+    setClickable(goingToRun);
+    toggleDisableOnRun(true);
+  }
 
   window['sendSig'](signal);
   isRunning = goingToRun;
@@ -229,6 +231,118 @@ toStartBtn.onclick = () => ctrlClicked('replay', true);
 
 stepFBtn.onclick = () => ctrlClicked('step_f', false);
 
+// chart actions functionality
+(() => {
+  function toggleFullscreen(fscreenBtn: HTMLButtonElement) {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else fscreenBtn.parentElement.parentElement.requestFullscreen();
+  }
+  // full screen
+  Array.from(document.getElementsByClassName('fscreen-btn')).forEach(
+    (fscreenBtn: HTMLButtonElement) => {
+      fscreenBtn.onclick = () => toggleFullscreen(fscreenBtn);
+    }
+  );
+
+  let clean = (eventListener: EventListener) => {
+    Array.from(document.getElementsByClassName('resize-cover')).forEach(
+      (resizeCover: HTMLDivElement) => {
+        resizeCover.classList.add('hide');
+      }
+    );
+    window.removeEventListener('click', eventListener);
+  };
+
+  // export to file functionality
+  Array.from(document.getElementsByClassName('drop-btn')).forEach(
+    (exportBtn: HTMLButtonElement) => {
+      let dropdownContent = <HTMLDivElement>exportBtn.nextElementSibling;
+      let dropdownPointer = <HTMLDivElement>dropdownContent.nextElementSibling;
+      let exportTypes = Array.from(dropdownContent.children);
+      let eventListener = () => {
+        dropdownPointer.classList.toggle('hide', true);
+        dropdownContent.classList.toggle('hide', true);
+        clean(eventListener);
+      };
+
+      exportBtn.addEventListener('click', () => {
+        dropdownPointer.classList.toggle('hide');
+        dropdownContent.classList.toggle('hide');
+        Array.from(document.getElementsByClassName('resize-cover')).forEach(
+          (resizeCover: HTMLDivElement) => {
+            resizeCover.classList.remove('hide');
+          }
+        );
+
+        if (dropdownContent.classList.contains('hide')) clean(eventListener);
+        else {
+          setTimeout(() => {
+            window.addEventListener('click', eventListener);
+          }, 0);
+        }
+      });
+
+      exportTypes.forEach((exportType: HTMLButtonElement, index) => {
+        if (index == 0) {
+          let mouseoverEventListener = () => {
+            exportType.style.backgroundColor = '#d9d9d9';
+
+            dropdownPointer.style.backgroundColor = '#d9d9d9';
+          };
+          let mouseleaveEventListener = () => {
+            exportType.style.backgroundColor = 'white';
+            dropdownPointer.style.backgroundColor = 'white';
+          };
+          exportType.addEventListener('mouseover', mouseoverEventListener);
+          exportType.addEventListener('mouseleave', mouseleaveEventListener);
+          dropdownPointer.addEventListener('mouseover', mouseoverEventListener);
+          dropdownPointer.addEventListener(
+            'mouseleave',
+            mouseleaveEventListener
+          );
+
+          dropdownPointer.addEventListener('click', () => exportType.click());
+        }
+        exportType.addEventListener('click', () => {
+          clean(eventListener);
+          if (exportBtn.classList.contains('prime'))
+            prime.send('export', exportType.id.replace('export-', ''));
+          else side.send('export', exportType.id.replace('export-', ''));
+          exportBtn.click();
+        });
+      });
+    }
+  );
+
+  (<HTMLButtonElement[]>(
+    Array.from(document.getElementsByClassName('zoom-out-btn'))
+  )).forEach(zoomOutBtn => {
+    zoomOutBtn.addEventListener('click', () => {
+      if (zoomOutBtn.classList.contains('prime')) prime.send('zoom-out');
+      else side.send('zoom-out');
+    });
+  });
+})();
+
+// controls pane hide and show functionality
+(() => {
+  let contCont = <HTMLDivElement>document.querySelector('.controls-container');
+  let borderHide = <HTMLDivElement>document.querySelector('.border-hide');
+  let hidePane = <HTMLButtonElement>document.getElementById('pane-hide-btn');
+  let showPane = <HTMLButtonElement>document.getElementById('pane-show-btn');
+
+  hidePane.onclick = () => {
+    showPane.parentElement.classList.toggle('hide', false);
+    contCont.classList.toggle('hide', true);
+    borderHide.classList.toggle('hide', true);
+  };
+
+  showPane.onclick = () => {
+    showPane.parentElement.classList.toggle('hide', true);
+    contCont.classList.toggle('hide', false);
+    borderHide.classList.toggle('hide', false);
+  };
+})();
 /******** Declared Glabally to be when default settings are recieved ********/
 
 /**
@@ -236,17 +350,29 @@ stepFBtn.onclick = () => ctrlClicked('step_f', false);
  * number input background to white if needed, note that this method should only
  * be called when number input has valide value, else it might stop the GA.
  */
-const sendParameter = (
-  numInput: HTMLInputElement,
-  checkInput: HTMLInputElement
-) => {
-  numInput.style.backgroundColor = '#fff';
+const sendParameter = (key: string, value: any) => {
   window['sendSig'](
     JSON.stringify({
-      [numInput.name]: parseFloat(numInput.value),
-      [checkInput.name]: checkInput.checked
+      [key]: parseFloat(value) || value
     })
   );
+};
+
+/**
+ * sends updates to ga after affecting settings to gaParams
+ */
+let sendParams = () => {
+  gaParams.forEach(gaParam => {
+    let value: any;
+    value =
+      gaParam.classList.contains('is-disable-able') &&
+      !(<HTMLInputElement>(
+        gaParam.parentElement.parentElement.parentElement.previousElementSibling
+      )).checked
+        ? false
+        : gaParam.value;
+    sendParameter(gaParam.name, value);
+  });
 };
 
 /********************************* Views Setup *********************************/
@@ -262,54 +388,32 @@ document.addEventListener('DOMContentLoaded', function loaded() {
        * triggered after both webviews finish loading.
        */
       ready = () => {
-        prime.send('mode', window['isDev']);
-        side.send('mode', window['isDev']);
-
-        let settings = window['settings'];
-
-        // apply on inputs && their random checkboxs, on ranges if present on a parameter
-        popSize.value =
-          settings['renderer']['parameters']['population']['size'];
-        pSRandom.checked =
-          settings['renderer']['parameters']['population']['random'];
-        genesNum.value = settings['renderer']['parameters']['genes']['number'];
-        gNRandom.checked =
-          settings['renderer']['parameters']['genes']['random'];
-        crossover.value =
-          settings['renderer']['parameters']['crossover']['rate'];
-        (<HTMLInputElement>crossover.parentElement.firstElementChild).value =
-          settings['renderer']['parameters']['crossover']['rate'];
-        coRandom.checked =
-          settings['renderer']['parameters']['crossover']['random'];
-        mutation.value = settings['renderer']['parameters']['mutation']['rate'];
-        (<HTMLInputElement>mutation.parentElement.firstElementChild).value =
-          settings['renderer']['parameters']['mutation']['rate'];
-        mutRandom.checked =
-          settings['renderer']['parameters']['mutation']['random'];
-        delay.value = settings['renderer']['parameters']['delay']['rate'];
-        (<HTMLInputElement>delay.parentElement.firstElementChild).value =
-          settings['renderer']['parameters']['delay']['rate'];
-        delayRandom.checked =
-          settings['renderer']['parameters']['delay']['random'];
+        window['affectSettings'](settings['renderer']['input'], 'main');
 
         // send startup settings to pyshell
-        sendParameter(popSize, pSRandom);
-        sendParameter(genesNum, gNRandom);
-        sendParameter(crossover, coRandom);
-        sendParameter(mutation, mutRandom);
-        sendParameter(delay, delayRandom);
+        sendParams();
 
-        // apply on live-rendering switch
-        lRSwitch.checked = settings['renderer']['controls']['live-rendering'];
+        (() => {
+          let eventListener = (ev: Event) => {
+            let gaParam = <HTMLInputElement>ev.target;
+            sendParameter(gaParam.name, gaParam.value);
+          };
+          /**
+           * update ga when parameters change values
+           */
+          gaParams.forEach(gaParam => {
+            gaParam.addEventListener('keyup', eventListener);
+            if (gaParam.classList.contains('textfieldable'))
+              gaParam.addEventListener('change', eventListener);
+          });
 
-        lRSwitch.onchange = () =>
-          prime.send('live-rendering', lRSwitch.checked);
+          let lRSwitchUpdater = () => {
+            prime.send('live-rendering', lRSwitch.checked);
+          };
 
-        prime.send('live-rendering', lRSwitch.checked);
-
-        // resize the prime chart container
-        prime.parentElement.style.height =
-          settings['renderer']['ui']['horizontal'];
+          lRSwitch.addEventListener('change', lRSwitchUpdater);
+          lRSwitchUpdater();
+        })();
 
         delete window['isDev'];
         delete window['settings'];
@@ -322,6 +426,8 @@ document.addEventListener('DOMContentLoaded', function loaded() {
         treatResponse,
         webFrame
       );
+
+      toggleDisableOnRun(true);
 
       zoomViews();
 
@@ -338,152 +444,17 @@ document.addEventListener('DOMContentLoaded', function loaded() {
     prime.addEventListener('dom-ready', () => ready());
     side.addEventListener('dom-ready', () => ready());
   })();
-  /**************************** Ranges change handling ****************************/
-
-  /**
-   * called when range inputs change value, to update accompanying number input & pass
-   * the new value to GA.
-   */
-  const rangeChange = (
-    rangeInput: HTMLInputElement,
-    numberInput: HTMLInputElement,
-    checkbox: HTMLInputElement
-  ) => {
-    setTimeout(() => {
-      numberInput.value = rangeInput.value;
-      sendParameter(numberInput, checkbox);
-    }, 0);
-  };
-
-  /**
-   * called when number input change, consequently its either crossover, mutation or
-   * delay input to update the accompanying range input with its value.
-   */
-  const numberChange = (
-    rangeInput: HTMLInputElement,
-    numberInput: HTMLInputElement
-  ) => {
-    setTimeout(() => {
-      rangeInput.value = numberInput.value;
-    }, 0);
-  };
-
-  Array.from(document.getElementsByClassName('input-wrapper')).forEach(
-    (wrapper: HTMLDivElement) => {
-      const first = <HTMLInputElement>wrapper.firstElementChild;
-      const last = <HTMLInputElement>wrapper.lastElementChild;
-      const checkbox = <HTMLInputElement>(
-        wrapper.nextElementSibling.firstElementChild
-      );
-      first.onmousedown = () => {
-        first.onmousemove = () => rangeChange(first, last, checkbox);
-        // user could just click without move after click
-        rangeChange(first, last, checkbox);
-        // clean events on mouse up
-        first.onmouseup = () => (first.onmouseup = first.onmousemove = null);
-      };
-    }
-  );
 
   /**************************** Inputs Event handling ****************************/
+
   /**
-   * checks if the changed input has a valid value, if true pass it to pyshell, else
-   * highlight the input in red to indicate invalide value.
-   * @param numInput    input of type number
-   * @param checkInput  input of type checkbox
-   * @param mustBeInt   must be integer flag, if triggered value should not contain dot '.'
-   * @param event       keyboard key pressed
+   * setup params
    */
-  const parameterChanged = (
-    numInput: HTMLInputElement,
-    checkInput: HTMLInputElement,
-    mustBeInt: boolean,
-    event: Event
-  ) => {
-    setTimeout(() => {
-      if (
-        isNaN(<any>numInput.value) ||
-        [
-          'Control',
-          'Shift',
-          'Alt',
-          'CapsLock',
-          'AltGraph',
-          'Tab',
-          'Enter',
-          'ArrowLeft',
-          'ArrowRight',
-          'Home',
-          'End'
-        ].includes((<KeyboardEvent>event).key)
-      )
-        return;
-
-      /**
-       * if mustBeInt than:
-       *    - if parsing int is not NaN && the fractional part is equal to zero, than it's
-       *      safe to delete it with its period.
-       */
-      if (
-        mustBeInt &&
-        !isNaN(parseInt(numInput.value)) &&
-        parseInt(numInput.value) == <any>numInput.value
-      ) {
-        // this removes the last period
-        numInput.value = `${parseInt(numInput.value) + 1}`;
-        numInput.value = `${parseInt(numInput.value) - 1}`;
-      }
-
-      /**
-       * if mustBeInt is true than:
-       *    - last entered key must not be a period '.'.
-       *    - the numInput itself shoold not have the period too.
-       *    Note: those two conditions above are necessary since input type number behavior is
-       *      a little unexpected and if input ends with period it is not going to show it when
-       *      trying to access input value so in that case we need to compte on event.key to
-       *      not be a period.
-       * else these conditions are not necessary.
-       * all inputs type number needs to be greater than or equal to mox and less than or equal
-       * to the min.
-       */
-      if (
-        ((mustBeInt && !numInput.value.includes('.')) || !mustBeInt) &&
-        (isNaN(parseFloat(numInput.min)) ||
-          parseFloat(numInput.value) >= parseFloat(numInput.min)) &&
-        (isNaN(parseFloat(numInput.max)) ||
-          parseFloat(numInput.value) <= parseFloat(numInput.max))
-      ) {
-        sendParameter(numInput, checkInput);
-        // should be called only on number inputs with range inputs beside them
-        if (!mustBeInt)
-          numberChange(
-            <HTMLInputElement>numInput.previousElementSibling,
-            numInput
-          );
-      } else numInput.style.backgroundColor = '#ff4343b8';
-    }, 0);
-  };
+  window['params']();
   /**
-   * listen to parameters inputs change & keonkeyup events
+   * add functionality to update settings onchange event for inputs
    */
-  popSize.onkeyup = pSRandom.onchange = (event: Event) => {
-    parameterChanged(popSize, pSRandom, true, event);
-  };
-  genesNum.onkeyup = gNRandom.onchange = (event: Event) => {
-    parameterChanged(genesNum, gNRandom, true, event);
-  };
-
-  crossover.onkeyup = coRandom.onchange = (event: Event) => {
-    parameterChanged(crossover, coRandom, false, event);
-  };
-
-  mutation.onkeyup = mutRandom.onchange = (event: Event) => {
-    parameterChanged(mutation, mutRandom, false, event);
-  };
-
-  delay.onkeyup = delayRandom.onchange = (event: Event) => {
-    parameterChanged(delay, delayRandom, false, event);
-  };
+  window['saveSettings'](settings['renderer']['input']);
 
   ipcRenderer.on('zoom', (_event: IpcRendererEvent, type: string) => {
     if (type == 'in') {
@@ -512,66 +483,42 @@ document.addEventListener('DOMContentLoaded', function loaded() {
   window['border']();
   delete window['border'];
 
-  /**
-   * terminate pyshell process with its threads on close or reload
-   */
-  window.addEventListener('beforeunload', () => {
-    document.getElementById('main').style.display = 'none';
-    window['sendSig']('exit');
-  });
-});
+  (() => {
+    let main = <HTMLDivElement>document.getElementById('main');
 
-// request mode
-ipcRenderer.send('mode');
+    gaCPBtn.onclick = () => {
+      isGACPOpen = true;
+      ipcRenderer.send('ga-cp', settings);
+      main.classList.toggle('blur', true);
+      ipcRenderer.once('ga-cp-finished', (_ev, newSettings: object) => {
+        isGACPOpen = false;
+        main.classList.toggle('blur', false);
+        if (newSettings) {
+          settings['renderer']['input'] = newSettings['renderer']['input'];
+          saveSettings(settings['renderer']['input']);
+          affectSettings(settings['renderer']['input'], 'main');
+          sendParams();
+        }
+      });
+    };
+
+    /**
+     * terminate pyshell process with its threads on close or reload (deprecated)
+     */
+    window.addEventListener('beforeunload', () => {
+      ipcRenderer.send('close-ga-cp');
+      main.classList.add('hide');
+      window['sendSig']('stop');
+    });
+  })();
+});
 
 /**
  * launches once when the main process returns if the app is in development mode or production mode
  */
-ipcRenderer.once('mode', (_ev, isDev: boolean) => {
-  if (isDev) {
-    window['k-shorts'](prime, side, ipcRenderer);
-    delete window['k-shorts'];
-  }
-  window['isDev'] = isDev;
-});
+if (window['isDev']) {
+  window['k-shorts'](prime, side, ipcRenderer);
+  delete window['k-shorts'];
+}
 
-ipcRenderer.on('cur-settings', () => {
-  ipcRenderer.send('cur-settings', {
-    main: {},
-    renderer: {
-      ui: {
-        horizontal: {
-          height: prime.parentElement.offsetHeight
-        },
-        vertical: {
-          width: 440
-        }
-      },
-      controls: {
-        'live-rendering': lRSwitch.checked
-      },
-      parameters: {
-        population: {
-          size: parseInt(popSize.value),
-          random: pSRandom.checked
-        },
-        genes: {
-          number: parseInt(genesNum.value),
-          random: gNRandom.checked
-        },
-        crossover: {
-          rate: parseFloat(crossover.value),
-          random: coRandom.checked
-        },
-        mutation: {
-          rate: parseFloat(mutation.value),
-          random: mutRandom.checked
-        },
-        delay: {
-          rate: parseFloat(delay.value),
-          random: delayRandom.checked
-        }
-      }
-    }
-  });
-});
+ipcRenderer.on('settings', () => ipcRenderer.send('settings', settings));

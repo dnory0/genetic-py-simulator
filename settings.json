@@ -15,29 +15,42 @@
         "width": 440
       }
     },
-    "controls": {
-      "live-rendering": true
-    },
-    "parameters": {
-      "population": {
-        "size": 100,
-        "random": false
+    "input": {
+      "lr": {
+        "enabled": true
       },
-      "genes": {
-        "number": 80,
-        "random": false
+      "params-path": {
+        "value": ""
       },
-      "crossover": {
-        "rate": 0.15,
-        "random": false
+      "pop-size": {
+        "value": 100,
+        "pin": true,
+        "disable": false
       },
-      "mutation": {
-        "rate": 0.013,
-        "random": false
+      "genes-num": {
+        "value": 80,
+        "pin": true,
+        "disable": false
       },
-      "delay": {
-        "rate": 0,
-        "random": false
+      "co-rate": {
+        "value": 0.15
+      },
+      "mut-rate": {
+        "value": 0.013
+      },
+      "del-rate": {
+        "value": 0,
+        "pin": true,
+        "enabled": true
+      },
+      "max-gen": {
+        "value": 1,
+        "pin": false,
+        "enabled": false,
+        "disable": false
+      },
+      "force-tf": {
+        "enabled": false
       }
     }
   }

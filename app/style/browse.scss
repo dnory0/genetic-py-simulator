@@ -1,0 +1,41 @@
+.browse {
+  display: flex;
+
+  > input[type='text'] {
+    flex: 1;
+    height: 24px;
+    outline: none;
+    padding: 1px 5px;
+    border: 1px #a2a2a2 solid;
+    font-size: 14px;
+  }
+
+  > button {
+    background-color: #e8e8e8;
+    font-weight: bold;
+    height: 28px;
+    width: 36px;
+    outline: none;
+    user-select: none;
+    margin-left: -1px;
+    border: 1px #a2a2a2 solid;
+    border-radius: 0;
+
+    &:hover {
+      background-color: #d2d2d2;
+    }
+
+    img {
+      position: relative;
+      top: 2px;
+      width: 20px;
+      height: 20px;
+    }
+
+    &.browse-txt::after {
+      content: 'browse...';
+      position: relative;
+      top: -4px;
+    }
+  }
+}

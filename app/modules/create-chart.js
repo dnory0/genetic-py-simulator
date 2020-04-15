@@ -1,24 +1,30 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const highcharts_1 = require("highcharts");
-const Highcharts = require("highcharts");
-const highcharts_more_1 = require("highcharts/highcharts-more");
-highcharts_more_1.default(Highcharts);
 module.exports = (containerId, options) => {
-    delete require.cache[require.resolve('./create-pyshell')];
+    delete require.cache[require.resolve('./create-chart')];
     return highcharts_1.chart(containerId, {
         chart: {
-            spacingBottom: 3
+            resetZoomButton: {
+                theme: {
+                    style: {
+                        pointerEvents: 'none',
+                        opacity: 0
+                    }
+                }
+            },
+            spacingBottom: 3,
+            marginRight: 3,
+            backgroundColor: 'white',
+            events: options.chart.events,
+            panning: {
+                enabled: true
+            },
+            panKey: 'ctrl'
         },
-        tooltip: {
-            useHTML: true,
-            formatter: options.tooltip.formatter
-        },
+        tooltip: options.tooltip,
         title: {
-            text: options.title.text,
-            style: {
-                padding: '80px'
-            }
+            text: options.title.text
         },
         xAxis: {
             crosshair: {
@@ -30,32 +36,33 @@ module.exports = (containerId, options) => {
             },
             tickInterval: 1,
             min: options.xAxis.min,
-            labels: options.xAxis.labels
+            labels: options.xAxis.labels,
+            minRange: options.xAxis.minRange
         },
         colorAxis: {
-            minColor: Highcharts.getOptions().colors[2],
-            maxColor: Highcharts.getOptions().colors[8]
+            minColor: highcharts_1.getOptions().colors[2],
+            maxColor: highcharts_1.getOptions().colors[8]
         },
         yAxis: {
             title: null,
             tickInterval: 1,
-            endOnTick: false,
             labels: options.yAxis.labels,
             gridLineWidth: options.yAxis.gridLineWidth
         },
+        exporting: {
+            enabled: false
+        },
         series: options.series,
         plotOptions: {
-            line: {
-                lineWidth: 1.5
-            },
             series: {
-                clip: false,
+                lineWidth: options.plotOptions.series.lineWidth,
                 animation: false,
                 states: {
                     hover: {
                         halo: {
                             opacity: 0
-                        }
+                        },
+                        lineWidth: 1
                     }
                 }
             }

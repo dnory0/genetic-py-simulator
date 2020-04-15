@@ -1,0 +1,49 @@
+.browse {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.browse > input[type='text'] {
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  height: 24px;
+  outline: none;
+  padding: 1px 5px;
+  border: 1px #a2a2a2 solid;
+  font-size: 14px;
+}
+
+.browse > button {
+  background-color: #e8e8e8;
+  font-weight: bold;
+  height: 28px;
+  width: 36px;
+  outline: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  margin-left: -1px;
+  border: 1px #a2a2a2 solid;
+  border-radius: 0;
+}
+
+.browse > button:hover {
+  background-color: #d2d2d2;
+}
+
+.browse > button img {
+  position: relative;
+  top: 2px;
+  width: 20px;
+  height: 20px;
+}
+
+.browse > button.browse-txt::after {
+  content: 'browse...';
+  position: relative;
+  top: -4px;
+}
+/*# sourceMappingURL=browse.css.map */
