@@ -13,8 +13,8 @@ const treatResponse = (response) => {
             mostFittest['individuals'] = [
                 {
                     generation: response['generation'],
-                    genes: response['genes']
-                }
+                    genes: response['genes'],
+                },
             ];
             sideChart.series[0].setData(sideChart.series[1].data.map(aData => [aData.x, 0.5, aData.value]), true, false);
             sideChart.series[1].setData(response['genes'].map((gene, i) => [i, 2.5, gene]), true, false);
@@ -22,7 +22,7 @@ const treatResponse = (response) => {
         else if (mostFittest['fitness'] == response['fitness']) {
             mostFittest['individuals'].push({
                 generation: response['generation'],
-                genes: response['genes']
+                genes: response['genes'],
             });
         }
     }
@@ -34,9 +34,7 @@ const treatResponse = (response) => {
         toggleChartHover(sideChart, response['first-step']);
         toggleZoom(sideChart, response['first-step']);
     }
-    else if (response['paused'] ||
-        response['stopped'] ||
-        response['finished']) {
+    else if (response['paused'] || response['stopped'] || response['finished']) {
         toggleChartHover(sideChart, true);
         toggleZoom(sideChart, true);
     }
@@ -48,32 +46,32 @@ const treatResponse = (response) => {
 };
 let sideChart = window['createChart']('side-chart', {
     chart: {
-        events: {}
+        events: {},
     },
     title: {
-        text: 'Genes'
+        text: 'Genes',
     },
     xAxis: {
         title: {
-            text: 'Gene'
+            text: 'Gene',
         },
         min: 0,
         labels: {
             formatter() {
                 return (this.value + 1).toString();
-            }
+            },
         },
-        minRange: 4
+        minRange: 4,
     },
     yAxis: {
         title: {
-            text: 'Value'
+            text: 'Value',
         },
         tickInterval: 1,
         labels: {
-            enabled: false
+            enabled: false,
         },
-        gridLineWidth: 0
+        gridLineWidth: 0,
     },
     tooltip: {
         useHTML: true,
@@ -85,37 +83,35 @@ let sideChart = window['createChart']('side-chart', {
       `;
         },
         positioner(labelWidth, labelHeight, point) {
-            var x = point.plotX + labelWidth + 80 < sideChart.plotWidth
-                ? point.plotX + 9
-                : point.plotX - (labelWidth - 9);
+            var x = point.plotX + labelWidth + 80 < sideChart.plotWidth ? point.plotX + 9 : point.plotX - (labelWidth - 9);
             var y = point.plotY + (point.plotY > 30 ? 8 : labelHeight + 50);
             return { x, y };
         },
         shadow: false,
         outside: false,
         hideDelay: 250,
-        borderRadius: 0
+        borderRadius: 0,
     },
     legend: {
-        enabled: false
+        enabled: false,
     },
     series: [
         {
             name: 'PF',
             type: 'heatmap',
-            data: []
+            data: [],
         },
         {
             name: 'F',
             type: 'heatmap',
-            data: []
-        }
+            data: [],
+        },
     ],
     plotOptions: {
         series: {
-            lineWidth: 0
-        }
-    }
+            lineWidth: 0,
+        },
+    },
 });
 delete window['createChart'];
 window['ready'](treatResponse);
@@ -126,12 +122,12 @@ ipcRenderer.on('export', (_ev, actionType) => {
             break;
         case 'jpeg':
             sideChart.exportChartLocal({
-                type: 'image/jpeg'
+                type: 'image/jpeg',
             });
             break;
         case 'svg':
             sideChart.exportChartLocal({
-                type: 'image/svg+xml'
+                type: 'image/svg+xml',
             });
             break;
     }

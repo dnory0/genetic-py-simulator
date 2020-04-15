@@ -6,20 +6,7 @@
     <title>Genetic Py</title>
     <link rel="stylesheet" href="style/style.css" />
   </head>
-
   <body>
-    <!-- #region Loading (empty after load) -->
-    <div
-      id="loading-bg"
-      style="height: 100%; text-align: center; position: absolute; transition: opacity 0.2s; height: 100%; width: 100%; overflow: hidden;"
-    >
-      <img
-        src="img/loading.svg"
-        alt="Loading..."
-        style="height: 32vh; margin: auto; margin-top: 33vh;"
-      />
-    </div>
-    <!-- #endregion -->
     <!-- #region Main -->
     <div id="main" class="blur">
       <div class="prime-container fullscreenable">
@@ -28,12 +15,7 @@
             <img src="img/zoom-out.png" />
           </button>
           <div class="checkbox-wrapper">
-            <input
-              type="checkbox"
-              name="live_rendering"
-              id="lr-enabled"
-              checked
-            />
+            <input type="checkbox" name="live_rendering" id="lr-enabled" checked />
             <label title="Live Rendering" for="lr-enabled">
               <img src="img/live-rendering.png" />
             </label>
@@ -46,10 +28,7 @@
               <button title="Export JPEG/JPG" id="export-jpeg">
                 JPEG/JPG
               </button>
-              <button
-                title="Export PNG (chart without background)"
-                id="export-png"
-              >
+              <button title="Export PNG (chart without background)" id="export-png">
                 PNG (without background)
               </button>
               <button title="Export SVG" id="export-svg">
@@ -89,12 +68,7 @@
               <button title="Relaunch the Algorithm" id="to-start-btn" disabled>
                 <img src="img/to-start-btn.png" />
               </button>
-              <button
-                title="Previous Generation"
-                id="step-back-btn"
-                class="hide"
-                disabled
-              >
+              <button title="Previous Generation" id="step-back-btn" class="hide" disabled>
                 <img src="img/step-back-btn.png" />
               </button>
               <button title="Next Generation" id="step-forward-btn">
@@ -137,11 +111,7 @@
                   <div class="other-settings">
                     <button class="random-btn">Random</button>
                     <div class="checkbox-wrapper hide">
-                      <input
-                        type="checkbox"
-                        name="pop_size_pin"
-                        id="pop-size-pin"
-                      />
+                      <input type="checkbox" name="pop_size_pin" id="pop-size-pin" />
                       <label for="pop-size-pin">
                         <img src="img/pin.png" />
                       </label>
@@ -172,11 +142,7 @@
                   <div class="other-settings">
                     <button class="random-btn">Random</button>
                     <div class="checkbox-wrapper hide">
-                      <input
-                        type="checkbox"
-                        name="genes_num_pin"
-                        id="genes-num-pin"
-                      />
+                      <input type="checkbox" name="genes_num_pin" id="genes-num-pin" />
                       <label for="genes-num-pin">
                         <img src="img/pin.png" />
                       </label>
@@ -238,12 +204,7 @@
               </div>
             </div>
             <div class="complex-param">
-              <input
-                class="param-enabled hide"
-                type="checkbox"
-                name="del_rate_enabled"
-                id="del-rate-enabled"
-              />
+              <input class="param-enabled hide" type="checkbox" name="del_rate_enabled" id="del-rate-enabled" />
               <div class="param">
                 <div class="param-name">
                   <p>Delay Rate</p>
@@ -266,11 +227,7 @@
                   <div class="other-settings">
                     <button class="random-btn">Random</button>
                     <div class="checkbox-wrapper hide">
-                      <input
-                        type="checkbox"
-                        name="del_rate_pin"
-                        id="del-rate-pin"
-                      />
+                      <input type="checkbox" name="del_rate_pin" id="del-rate-pin" />
                       <label for="del-rate-pin">
                         <img src="img/pin.png" />
                       </label>
@@ -280,12 +237,7 @@
               </div>
             </div>
             <div class="complex-param">
-              <input
-                class="param-enabled hide"
-                type="checkbox"
-                name="max_gen_enabled"
-                id="max-gen-enabled"
-              />
+              <input class="param-enabled hide" type="checkbox" name="max_gen_enabled" id="max-gen-enabled" />
               <div class="param">
                 <div class="param-name">
                   <p>Maximum Generation</p>
@@ -307,11 +259,7 @@
                   <div class="other-settings">
                     <button class="random-btn">Random</button>
                     <div class="checkbox-wrapper hide">
-                      <input
-                        type="checkbox"
-                        name="max_gen_pin"
-                        id="max-gen-pin"
-                      />
+                      <input type="checkbox" name="max_gen_pin" id="max-gen-pin" />
                       <label for="max-gen-pin">
                         <img src="img/pin.png" />
                       </label>
@@ -320,12 +268,7 @@
                 </div>
               </div>
             </div>
-            <input
-              type="checkbox"
-              name="force_textfields"
-              class="force-tf-enabled hide"
-              id="force-tf-enabled"
-            />
+            <input type="checkbox" name="force_textfields" class="force-tf-enabled hide" id="force-tf-enabled" />
           </div>
         </div>
         <div class="border ver border-hide"></div>
@@ -347,10 +290,7 @@
                 <button title="Export JPEG/JPG" id="export-jpeg">
                   JPEG/JPG
                 </button>
-                <button
-                  title="Export PNG (chart without background)"
-                  id="export-png"
-                >
+                <button title="Export PNG (chart without background)" id="export-png">
                   PNG (without background)
                 </button>
                 <button title="Export SVG" id="export-svg">
@@ -379,6 +319,14 @@
       </div>
       <div class="border hor"></div>
       <div class="bottom-container"></div>
+    </div>
+    <!-- #endregion -->
+    <!-- #region Loading (empty after load) -->
+    <div
+      id="loading-bg"
+      style="position: absolute; transition: opacity 0.2s; top: 34%; left: calc((100vw - 32vh) / 2); height: 32vh;"
+    >
+      <img src="img/loading.svg" alt="Loading..." height="100%" />
     </div>
     <!-- #endregion -->
     <script>

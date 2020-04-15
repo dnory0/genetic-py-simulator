@@ -18,8 +18,7 @@ let updateExtremes = (newValue) => {
 treatResponse = (response) => {
     if (response['generation'] !== undefined) {
         updateExtremes(response['fitness']);
-        if ((liveRendering.isLive || liveRendering.stepForward) &&
-            !window['zoomed']) {
+        if ((liveRendering.isLive || liveRendering.stepForward) && !window['zoomed']) {
             primeChart.yAxis[0].setExtremes(min, max, false);
         }
         primeChart.series[0].addPoint(parseInt(response['fitness']), liveRendering.isLive || liveRendering.stepForward, false, false);
@@ -27,7 +26,7 @@ treatResponse = (response) => {
             primeChart.series[1].addPoint([
                 response['generation'] - 0.5,
                 Math.min(response['prv-fitness'], response['fitness']),
-                Math.max(response['prv-fitness'], response['fitness'])
+                Math.max(response['prv-fitness'], response['fitness']),
             ], liveRendering.isLive || liveRendering.stepForward, false, false);
         if (liveRendering.stepForward)
             liveRendering.stepForward = false;
@@ -41,9 +40,7 @@ treatResponse = (response) => {
         toggleChartHover(primeChart, response['first-step']);
         toggleZoom(primeChart, response['first-step']);
     }
-    else if (response['paused'] ||
-        response['stopped'] ||
-        response['finished']) {
+    else if (response['paused'] || response['stopped'] || response['finished']) {
         isRunning = false;
         if (liveRendering.replay)
             liveRendering.replay = false;
@@ -72,45 +69,41 @@ let primeChart = window['createChart']('prime-chart', {
                 window['zoomed'] = true;
                 this.yAxis[0].setExtremes(null, null, false);
                 return null;
-            }
-        }
+            },
+        },
     },
     title: {
-        text: 'Fittest per Generation'
+        text: 'Fittest per Generation',
     },
     xAxis: {
         title: {
-            text: 'Generation'
+            text: 'Generation',
         },
         min: 0,
         labels: {
-            enabled: true
+            enabled: true,
         },
-        minRange: 4
+        minRange: 4,
     },
     yAxis: {
         title: {
-            text: 'Fitness/Deviation'
+            text: 'Fitness/Deviation',
         },
         tickInterval: 1,
         labels: {
-            enabled: true
+            enabled: true,
         },
-        gridLineWidth: 1
+        gridLineWidth: 1,
     },
     tooltip: {
         useHTML: true,
         formatter() {
             return `
-            <span>Generation: <b>${!`${this.x}`.match(/\.5$/)
-                ? this.x
-                : `${this.x - 0.5} - ${this.x + 0.5}`}</b>
+            <span>Generation: <b>${!`${this.x}`.match(/\.5$/) ? this.x : `${this.x - 0.5} - ${this.x + 0.5}`}</b>
             </span>
             <span>,&nbsp;
             ${!`${this.x}`.match(/\.5$/) ? 'Fitness' : 'Deviation'}:&nbsp;
-            <b>${!`${this.x}`.match(/\.5$/)
-                ? this.y
-                : Math.abs(this.point.high - this.point.low)}</b>
+            <b>${!`${this.x}`.match(/\.5$/) ? this.y : Math.abs(this.point.high - this.point.low)}</b>
             </span>
           `;
         },
@@ -118,45 +111,43 @@ let primeChart = window['createChart']('prime-chart', {
             var x = point.plotX +
                 primeChart.chartWidth -
                 primeChart.plotWidth -
-                (point.plotX + labelWidth + 80 < this.chart.plotWidth
-                    ? 4
-                    : labelWidth + 4);
+                (point.plotX + labelWidth + 80 < this.chart.plotWidth ? 4 : labelWidth + 4);
             var y = point.plotY + (point.plotY > 30 ? 8 : labelHeight + 50);
             return { x, y };
         },
         shadow: false,
         outside: false,
         hideDelay: 250,
-        borderRadius: 0
+        borderRadius: 0,
     },
     legend: {
         floating: true,
         itemMarginBottom: -5,
         itemDistance: 10,
-        symbolPadding: 2
+        symbolPadding: 2,
     },
     series: [
         {
             type: 'line',
             name: 'CGA',
-            data: []
+            data: [],
         },
         {
             type: 'columnrange',
             name: 'Deviation',
-            data: []
+            data: [],
         },
         {
             type: 'line',
             name: 'QGA',
-            data: []
-        }
+            data: [],
+        },
     ],
     plotOptions: {
         series: {
-            lineWidth: 1
-        }
-    }
+            lineWidth: 1,
+        },
+    },
 });
 delete window['createChart'];
 window['ready'](treatResponse);
@@ -170,12 +161,12 @@ ipcRenderer.on('export', (_ev, actionType) => {
             break;
         case 'jpeg':
             primeChart.exportChartLocal({
-                type: 'image/jpeg'
+                type: 'image/jpeg',
             });
             break;
         case 'svg':
             primeChart.exportChartLocal({
-                type: 'image/svg+xml'
+                type: 'image/svg+xml',
             });
             break;
     }
