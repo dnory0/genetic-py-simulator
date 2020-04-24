@@ -9,9 +9,7 @@ A Simulator that solves optimization problems using Genetic Algorithms & Quantum
 1. This project is going to be my graduation project.
 2. I love Quantum Algorithms 🚀🚀.
 
-## Download
-
-> **Note:** On **windows** you have to install python 3.6 or above, you can <a href="https://www.python.org/downloads/windows/" >download from here</a>
+## Download 
 
 <table>
     <thead>
