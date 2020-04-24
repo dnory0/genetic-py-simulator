@@ -97,7 +97,6 @@ body {
 
 /* Borders used between 2 resizable DIVs */
 .border {
-  background-clip: content-box;
   background-color: #cebbbb;
   position: relative;
   z-index: 1;
@@ -122,6 +121,10 @@ body {
 .border.ver.resize {
   cursor: ew-resize;
   padding: 0 4px;
+}
+
+.border.resize {
+  background-clip: content-box;
 }
 
 /* Border between content that need to be devided sementically */

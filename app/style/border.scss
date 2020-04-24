@@ -1,6 +1,5 @@
 /* Borders used between 2 resizable DIVs */
 .border {
-  background-clip: content-box;
   background-color: #cebbbb;
   position: relative;
   z-index: 1;
@@ -24,6 +23,10 @@
       cursor: ew-resize;
       padding: 0 4px;
     }
+  }
+
+  &.resize {
+    background-clip: content-box;
   }
 }
 
