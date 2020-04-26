@@ -10,6 +10,7 @@ module.exports = function() {
 
   Array.from(document.getElementsByClassName('border')).forEach(
     (border: HTMLDivElement) => {
+      border.appendChild(document.createElement('div'));
       if (!border.classList.contains('resize')) return;
       var prevSib = <HTMLDivElement>border.previousElementSibling,
         nextSib = <HTMLDivElement>border.nextElementSibling;

@@ -1,4 +1,4 @@
-import { Chart, Options, Tooltip } from 'highcharts';
+import { Chart, Options } from 'highcharts';
 import { IpcRenderer } from 'electron';
 
 /****************************** passed by preload ******************************

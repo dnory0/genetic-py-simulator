@@ -9,7 +9,7 @@ A Simulator that solves optimization problems using Genetic Algorithms & Quantum
 1. This project is going to be my graduation project.
 2. I love Quantum Algorithms 🚀🚀.
 
-## Download 
+## Download
 
 <table>
     <thead>
@@ -58,27 +58,27 @@ A Simulator that solves optimization problems using Genetic Algorithms & Quantum
    - Yarn (optional, but recommended).
 2. Execute the following on your terminal (or cmd on Windows):
 
-```sh
-git clone https://github.com/dnory0/genetic-py.git
-cd genetic-py
-yarn # or npm install
-```
+    ```sh
+    git clone https://github.com/dnory0/genetic-py.git
+    cd genetic-py
+    yarn # or npm install
+    ```
 
 3. Run the application:
 
-   - as development mode (to be able to open devTools):
+   - on development mode (to be able to open devTools):
 
    ```sh
    yarn dev # or npm run dev
    ```
 
-   - as production mode:
+   - on production mode:
 
    ```sh
    yarn start # or npm run start
    ```
 
-   > note that production is different from packaged, to get the packaged version you need to build it.
+   > note that production is different from packaged, production mode means the application is run using `run start` or without any of the flags `-d` `-D` `--dev`, packaged means the app is packaged in an `app.asar` file, the app can be packaged and run in development mode using the dev flags mentioned before, the only way to get the application packaged is to build it.
 
 ## Licence
 

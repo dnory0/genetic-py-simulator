@@ -18,7 +18,8 @@ let mainWindow;
 let gaWindow;
 const pyshell = require(path_1.join(__dirname, 'modules', 'create-pyshell.js'))(electron_1.app);
 global['pyshell'] = pyshell;
-let runSettings = require(path_1.join(__dirname, 'modules', 'load-settings.js'))(path_1.join(electron_1.app.getPath('userData'), 'settings.json'), path_1.join(__dirname, '..', 'settings.json'));
+let settings = require(path_1.join(__dirname, 'modules', 'load-settings.js'))(electron_1.app);
+global['settings'] = settings;
 const createWindow = (filePath, { minWidth, minHeight, width, height, resizable, minimizable, maximizable, parent, frame, webPreferences: { preload, webviewTag } } = {}) => {
     let targetWindow = new electron_1.BrowserWindow({
         minWidth,
@@ -28,6 +29,7 @@ const createWindow = (filePath, { minWidth, minHeight, width, height, resizable,
         resizable,
         minimizable,
         maximizable,
+        icon: path_1.join(electron_1.app.getAppPath(), '..', 'build', 'icons', process.platform == 'win32' ? 'icon.ico' : 'icon.icns'),
         parent,
         frame,
         modal: true,
@@ -77,6 +79,8 @@ electron_1.app.once('ready', () => {
             gaWindow = createWindow(path_1.join(__dirname, 'ga-cp', 'ga-cp.html'), {
                 minWidth: 680,
                 minHeight: 480,
+                maximizable: false,
+                minimizable: false,
                 parent: mainWindow,
                 webPreferences: {
                     preload: path_1.join(__dirname, 'preloads', 'ga-cp-preload.js')
@@ -85,9 +89,9 @@ electron_1.app.once('ready', () => {
             gaWindow.once('ready-to-show', gaWindow.show);
             if (!isDev)
                 gaWindow.removeMenu();
-            gaWindow.webContents.on('ipc-message', (_ev, gaChannel, gaCPConfig) => {
+            gaWindow.webContents.on('ipc-message', (_ev, gaChannel, updatedSettings) => {
                 if (gaChannel == 'ga-cp-finished') {
-                    mainWindow.webContents.send('ga-cp-finished', gaCPConfig);
+                    mainWindow.webContents.send('ga-cp-finished', updatedSettings);
                     gaWindow.destroy();
                 }
                 else if (gaChannel == 'close-confirm') {
@@ -104,10 +108,10 @@ electron_1.app.once('ready', () => {
                             });
                         })()
                             .then(result => {
-                            if (result.response) {
-                                mainWindow.webContents.send('ga-cp-finished', gaCPConfig);
-                                gaWindow.destroy();
-                            }
+                            if (!result.response)
+                                return;
+                            mainWindow.webContents.send('ga-cp-finished', updatedSettings);
+                            gaWindow.destroy();
                         })
                             .catch(reason => {
                             if (reason)
@@ -132,9 +136,6 @@ electron_1.app.once('ready', () => {
                             throw reason;
                     });
                 }
-                else if (gaChannel == 'settings') {
-                    gaWindow.webContents.send('settings', args);
-                }
             });
             gaWindow.on('close', ev => {
                 ev.preventDefault();
@@ -142,50 +143,29 @@ electron_1.app.once('ready', () => {
             });
         }
     });
-    (() => {
-        let readyToShow = () => {
-            mainWindow.setSize(runSettings['main']['width'] ? runSettings['main']['width'] : 720, runSettings['main']['height'] ? runSettings['main']['height'] : 500);
-            if (runSettings['main']['x'] && runSettings['main']['y'])
-                mainWindow.setBounds({
-                    x: runSettings['main']['x'] ? runSettings['main']['x'] : -200,
-                    y: runSettings['main']['y'] ? runSettings['main']['y'] : -200
-                });
-            mainWindow.setFullScreen(runSettings['main']['fscreen'] ? true : false);
-            if (runSettings['main']['maximized'])
-                mainWindow.maximize();
-            mainWindow.show();
-        };
-        mainWindow.once('ready-to-show', () => {
-            if (runSettings)
-                readyToShow();
-            else {
-                let settingsTimer = setInterval(() => {
-                    if (!runSettings)
-                        return;
-                    clearInterval(settingsTimer);
-                    readyToShow();
-                }, 100);
-            }
-        });
-    })();
-    mainWindow.on('close', () => {
-        mainWindow.webContents.send('settings');
-        mainWindow.webContents.once('ipc-message', (_ev, channel, settings) => {
-            if (channel != 'settings')
-                return;
-            settings['main']['fscreen'] = mainWindow.isFullScreen();
-            settings['main']['maximized'] = mainWindow.isMaximized();
-            settings['main']['width'] = mainWindow.getSize()[0];
-            settings['main']['height'] = mainWindow.getSize()[1];
-            if (mainWindow.getBounds().x && mainWindow.getBounds().y) {
-                settings['main']['x'] = mainWindow.getBounds().x;
-                settings['main']['y'] = mainWindow.getBounds().y;
-            }
-            fs_1.writeFile(path_1.join(electron_1.app.getPath('userData'), 'settings.json'), JSON.stringify(settings), err => {
-                if (err)
-                    throw err;
+    mainWindow.once('ready-to-show', () => {
+        mainWindow.setSize(settings['main']['width'], settings['main']['height']);
+        if (settings['main']['x'] && settings['main']['y']) {
+            mainWindow.setBounds({
+                x: settings['main']['x'],
+                y: settings['main']['y']
             });
-        });
+        }
+        if (settings['main']['maximized'])
+            mainWindow.maximize();
+        mainWindow.setFullScreen(settings['main']['fscreen'] ? true : false);
+        mainWindow.show();
+    });
+    mainWindow.on('close', () => {
+        settings['main']['fscreen'] = mainWindow.isFullScreen();
+        settings['main']['maximized'] = mainWindow.isMaximized();
+        if (mainWindow.getNormalBounds().x > 0 && mainWindow.getNormalBounds().y > 0) {
+            settings['main']['width'] = mainWindow.getNormalBounds().width;
+            settings['main']['height'] = mainWindow.getNormalBounds().height;
+            settings['main']['x'] = mainWindow.getNormalBounds().x;
+            settings['main']['y'] = mainWindow.getNormalBounds().y;
+        }
+        fs_1.writeFileSync(path_1.join(electron_1.app.getAppPath(), '..', electron_1.app.isPackaged ? '..' : '.', 'settings.json'), JSON.stringify(settings));
     });
 });
 electron_1.app.once('will-quit', () => pyshell.stdin.write('exit\n'));

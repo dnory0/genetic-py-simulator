@@ -1,4 +1,4 @@
-import { Chart, SeriesLineOptions, Options, TooltipPositionerPointObject, Tooltip } from 'highcharts';
+import { Chart, SeriesLineOptions, Options, Tooltip } from 'highcharts';
 import { IpcRenderer } from 'electron';
 
 /**

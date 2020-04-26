@@ -2,13 +2,15 @@ import { IpcRenderer, OpenDialogReturnValue } from 'electron';
 
 let ipcRenderer: IpcRenderer = window['ipcRenderer'];
 /**
- * revert settings, not updated when inputs change value, used for the revert button
+ * revert settings, not updated when inputs change value
  */
-let revertSettings: object;
+let revertSettings: object = window['settings'];
 /**
- * current settings
+ * current/temp settings, updated when inputs change value, and saves to
+ * revertSettings only when user presses save button.
  */
-let settings: object;
+let curSettings: object = JSON.parse(JSON.stringify(window['settings']));
+delete window['settings'];
 /**
  *
  */
@@ -87,7 +89,8 @@ paramsPath.onkeyup = () => checkPath(paramsPath.value);
    * bottom-right buttons setup
    */
   saveBtn.onclick = () => {
-    ipcRenderer.send('ga-cp-finished', settings);
+    revertSettings['renderer']['input'] = curSettings['renderer']['input'];
+    ipcRenderer.send('ga-cp-finished', curSettings);
   };
 
   closeBtn.onclick = () => {
@@ -99,7 +102,7 @@ paramsPath.onkeyup = () => checkPath(paramsPath.value);
     revertBtn.disabled = true;
     saveBtn.disabled = true;
     isClosable = true;
-    settings = revertSettings;
+    curSettings = revertSettings;
     affectSettings(revertSettings['renderer']['input'], 'ga-cp');
   };
 
@@ -160,37 +163,20 @@ document.getElementById('force-tf-enabled').addEventListener('change', ev => {
   });
 });
 
-let toggleDisableOnRun = (activate = true) => {
+let toggleDisableOnRun = (disable: boolean) => {
   (<HTMLInputElement[]>(
     (<HTMLDivElement[]>Array.from(document.getElementsByClassName('param-value'))).map(paramValue => paramValue.firstElementChild)
   )).forEach(gaParam => {
     if (!gaParam.classList.contains('disable-on-run')) return;
-    settings['renderer']['input'][gaParam.id]['disable'] = !activate;
-    gaParam.disabled = !activate;
-    (<HTMLButtonElement>gaParam.parentElement.nextElementSibling.firstElementChild).disabled = !activate;
-    gaParam.parentElement.parentElement.title = activate ? '' : 'Disabled when GA is Running';
+    curSettings['renderer']['input'][gaParam.id]['disable'] = disable;
+    gaParam.disabled = disable;
+    (<HTMLButtonElement>gaParam.parentElement.nextElementSibling.firstElementChild).disabled = disable;
+    gaParam.parentElement.parentElement.title = !disable ? '' : 'Disabled when GA is Running';
   });
 };
 
-ipcRenderer.once('settings', (_ev, args: object) => {
-  settings = args;
-  // creates a copy.
-  revertSettings = JSON.parse(JSON.stringify(args));
-
-  window['affectSettings'](settings['renderer']['input'], 'ga-cp');
-  /**
-   * add functionality to update settings onchange event for inputs
-   */
-  window['saveSettings'](settings['renderer']['input']);
-  // apply one of the .disable-on-run to be
-  toggleDisableOnRun(!settings['renderer']['input']['pop-size']['disable']);
-});
-
-// request settings
-ipcRenderer.send('settings');
-
 ipcRenderer.on('update-settings', (_ev, activate: boolean) => {
-  toggleDisableOnRun(activate);
+  toggleDisableOnRun(!activate);
 });
 /**
  * if user tries to close window using the top bar close button, window has to
@@ -201,3 +187,16 @@ ipcRenderer.on('close-confirm', () => {
   if (isClosable) ipcRenderer.send('ga-cp-finished');
   else ipcRenderer.send('close-confirm');
 });
+
+/**
+ * affects settings to inputs
+ */
+window['affectSettings'](curSettings['renderer']['input'], 'ga-cp');
+/**
+ * add functionality to update settings onchange event for inputs
+ */
+window['saveSettings'](curSettings['renderer']['input']);
+// apply one of the .disable-on-run to be
+toggleDisableOnRun(curSettings['renderer']['input']['pop-size']['disable']);
+
+window['border']();

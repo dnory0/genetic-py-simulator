@@ -1,9 +1,9 @@
 @import 'basics.scss';
 @import 'scrollbar.scss';
-@import 'browse.scss';
 @import 'border.scss';
 @import 'components.scss';
 @import 'params.scss';
+@import 'browse.scss';
 
 #main {
   height: 100%;
@@ -16,7 +16,7 @@
     height: calc(100% - 45px);
 
     .params {
-      width: 390px;
+      width: 396px;
       display: flex;
       flex-direction: column;
       overflow-y: auto;
@@ -37,11 +37,6 @@
           width: fit-content;
           margin: 6px;
         }
-      }
-
-      .params-file,
-      .params-man {
-        padding: 10px 6px;
       }
 
       .params-file {
