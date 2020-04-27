@@ -241,18 +241,6 @@ document.addEventListener('DOMContentLoaded', function loaded() {
         else {
             webFrame.setZoomFactor(1);
         }
-        Array.from(document.getElementsByClassName('border'))
-            .concat(Array.from(document.getElementsByClassName('separator')))
-            .forEach((border) => {
-            let scale;
-            if (border.classList.contains('hor'))
-                scale = 'scaleY';
-            else
-                scale = 'scaleX';
-            border.style['transform'] = `${scale}(${(webFrame.getZoomFactor() < 1.5
-                ? 1
-                : 2) / webFrame.getZoomFactor()})`;
-        });
         zoomViews();
     });
     window['border']();
@@ -263,15 +251,14 @@ document.addEventListener('DOMContentLoaded', function loaded() {
             isGACPOpen = true;
             ipcRenderer.send('ga-cp', settings);
             main.classList.toggle('blur', true);
-            ipcRenderer.once('ga-cp-finished', (_ev, newSettings) => {
+            ipcRenderer.once('ga-cp-finished', (_ev, updatedSettings) => {
                 isGACPOpen = false;
                 main.classList.toggle('blur', false);
-                if (newSettings) {
-                    settings['renderer']['input'] = newSettings['renderer']['input'];
-                    saveSettings(settings['renderer']['input']);
-                    affectSettings(settings['renderer']['input'], 'main');
-                    sendParams();
-                }
+                if (!updatedSettings)
+                    return;
+                saveSettings(settings['renderer']['input']);
+                affectSettings(settings['renderer']['input'], 'main');
+                sendParams();
             });
         };
         window.addEventListener('beforeunload', () => {
@@ -285,5 +272,4 @@ if (window['isDev']) {
     window['k-shorts'](prime, side, ipcRenderer);
     delete window['k-shorts'];
 }
-ipcRenderer.on('settings', () => ipcRenderer.send('settings', settings));
 //# sourceMappingURL=renderer.js.map

@@ -1,8 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 let ipcRenderer = window['ipcRenderer'];
-let revertSettings;
-let settings;
+let revertSettings = window['settings'];
+let curSettings = JSON.parse(JSON.stringify(window['settings']));
+delete window['settings'];
 let isClosable = true;
 let validatePath = window['validatePath'];
 let checkPath = (path) => {
@@ -42,7 +43,8 @@ browseBtn.onclick = () => {
 paramsPath.onkeyup = () => checkPath(paramsPath.value);
 (() => {
     saveBtn.onclick = () => {
-        ipcRenderer.send('ga-cp-finished', settings);
+        revertSettings['renderer']['input'] = curSettings['renderer']['input'];
+        ipcRenderer.send('ga-cp-finished', curSettings);
     };
     closeBtn.onclick = () => {
         if (isClosable)
@@ -54,7 +56,7 @@ paramsPath.onkeyup = () => checkPath(paramsPath.value);
         revertBtn.disabled = true;
         saveBtn.disabled = true;
         isClosable = true;
-        settings = revertSettings;
+        curSettings = revertSettings;
         affectSettings(revertSettings['renderer']['input'], 'ga-cp');
     };
     let eventListener = () => (revertBtn.disabled = saveBtn.disabled = isClosable = false);
@@ -92,26 +94,18 @@ document.getElementById('force-tf-enabled').addEventListener('change', ev => {
         textfieldable.type = ev.target.checked ? 'text' : 'range';
     });
 });
-let toggleDisableOnRun = (activate = true) => {
+let toggleDisableOnRun = (disable) => {
     (Array.from(document.getElementsByClassName('param-value')).map(paramValue => paramValue.firstElementChild)).forEach(gaParam => {
         if (!gaParam.classList.contains('disable-on-run'))
             return;
-        settings['renderer']['input'][gaParam.id]['disable'] = !activate;
-        gaParam.disabled = !activate;
-        gaParam.parentElement.nextElementSibling.firstElementChild.disabled = !activate;
-        gaParam.parentElement.parentElement.title = activate ? '' : 'Disabled when GA is Running';
+        curSettings['renderer']['input'][gaParam.id]['disable'] = disable;
+        gaParam.disabled = disable;
+        gaParam.parentElement.nextElementSibling.firstElementChild.disabled = disable;
+        gaParam.parentElement.parentElement.title = !disable ? '' : 'Disabled when GA is Running';
     });
 };
-ipcRenderer.once('settings', (_ev, args) => {
-    settings = args;
-    revertSettings = JSON.parse(JSON.stringify(args));
-    window['affectSettings'](settings['renderer']['input'], 'ga-cp');
-    window['saveSettings'](settings['renderer']['input']);
-    toggleDisableOnRun(!settings['renderer']['input']['pop-size']['disable']);
-});
-ipcRenderer.send('settings');
 ipcRenderer.on('update-settings', (_ev, activate) => {
-    toggleDisableOnRun(activate);
+    toggleDisableOnRun(!activate);
 });
 ipcRenderer.on('close-confirm', () => {
     if (isClosable)
@@ -119,4 +113,8 @@ ipcRenderer.on('close-confirm', () => {
     else
         ipcRenderer.send('close-confirm');
 });
+window['affectSettings'](curSettings['renderer']['input'], 'ga-cp');
+window['saveSettings'](curSettings['renderer']['input']);
+toggleDisableOnRun(curSettings['renderer']['input']['pop-size']['disable']);
+window['border']();
 //# sourceMappingURL=ga-cp.js.map

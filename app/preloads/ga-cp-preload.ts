@@ -10,8 +10,12 @@ window['affectSettings'] = require('../modules/affect-settings');
 
 window['saveSettings'] = require('../modules/save-settings');
 
+window['border'] = require('../modules/border');
+
 window['params'] = require('../modules/params');
 
 window['validatePath'] = require('../modules/validate-path');
+
+window['settings'] = getGlobal('settings');
 
 window['pyshell'] = getGlobal('pyshell');

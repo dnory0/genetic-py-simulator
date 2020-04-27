@@ -22,7 +22,7 @@ function altTriggers() {
         if (!altTriggered.length)
             return;
         let button = altTriggered[0].parentElement;
-        if (button.disabled)
+        if (button.disabled || !button.classList.contains('alt-pressed'))
             return;
         button.classList.remove('alt-pressed');
         button.click();
@@ -31,7 +31,7 @@ function altTriggers() {
     window.onkeyup = (ev) => {
         if (ev.key == 'Alt')
             rmAllUnderLines();
-        else if (ev.altKey)
+        else
             altTriggerAction(ev.key);
     };
     window.addEventListener('blur', rmAllUnderLines);

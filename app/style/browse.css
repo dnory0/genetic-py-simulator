@@ -11,7 +11,7 @@
   height: 24px;
   outline: none;
   padding: 1px 5px;
-  border: 1px #a2a2a2 solid;
+  border: thin #a2a2a2 solid;
   font-size: 14px;
 }
 
@@ -26,7 +26,7 @@
       -ms-user-select: none;
           user-select: none;
   margin-left: -1px;
-  border: 1px #a2a2a2 solid;
+  border: thin #a2a2a2 solid;
   border-radius: 0;
 }
 

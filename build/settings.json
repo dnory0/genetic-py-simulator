@@ -1,5 +1,7 @@
 {
   "main": {
+    "x": null,
+    "y": null,
     "width": 720,
     "height": 500,
     "fscreen": false,

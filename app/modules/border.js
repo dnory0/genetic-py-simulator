@@ -2,6 +2,7 @@ module.exports = function () {
     delete require.cache[require.resolve('./border')];
     const pxSlicer = (element, minRes) => window.getComputedStyle(element)[minRes].slice(0, -2);
     Array.from(document.getElementsByClassName('border')).forEach((border) => {
+        border.appendChild(document.createElement('div'));
         if (!border.classList.contains('resize'))
             return;
         var prevSib = border.previousElementSibling, nextSib = border.nextElementSibling;

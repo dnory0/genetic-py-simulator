@@ -1,39 +1,25 @@
 import { spawn } from 'child_process';
 import { join } from 'path';
-import { copyFileSync } from 'fs';
 import { App } from 'electron';
 
 /**
- * initialize pyshell depending on the mode (development/production) and
- * platform (win32/linux)
+ * initializes pyshell
  */
 function createPyshell(app: App) {
   delete require.cache[require.resolve('./create-pyshell')];
   /**
-   * the spawning of the ga.py can't be done if app is packaged.
-   * It's blocked because it can't access the file content inside the asar file,
-   * best solution is to copy the ga.py file to the tmp directory.
+   * embedded python path in case of windows else calls python3 from terminal
    */
-  const isPackaged = app.getAppPath().indexOf('asar') != -1;
-  if (!isPackaged)
-    return spawn(`${process.platform == 'win32' ? 'python' : 'python3'}`, [
-      join(__dirname, 'python', 'ga.py')
-    ]);
-
+  let pyExecPath = 
+    process.platform == 'win32' ?
+      join(app.getAppPath(), '..', 'build', 'python', 'win', `python-${process.arch}`, 'python.exe')
+      : 'python3';
   /**
-   * original path of the python script
+   * ga.py path, shipped with the build directory
    */
-  let copyFrom: string = join(__dirname, 'python', 'ga.py');
-  /**
-   * temp directory of the python script, the path it is going to be ```*copied*``` to
-   */
-  let copyTo: string = join(app.getPath('temp'), 'ga.py');
-
-  copyFileSync(copyFrom, copyTo);
-
-  return spawn(`${process.platform == 'win32' ? 'python' : 'python3'}`, [
-    copyTo
-  ]);
+  let gaPath = join(app.getAppPath(), '..', 'build', 'python', 'ga.py');
+  
+  return spawn(pyExecPath, [gaPath]);
 }
 
 module.exports = createPyshell;

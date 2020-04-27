@@ -91,16 +91,6 @@ typings/
 dist
 .idea
 .vscode
-genetic_algorithm.py
-side-process.*
-index.ts
-index.js.map
-index.js
-SOURCES.md
 TODO.*
 IDEA.*
-import*
-lib*
-scripts/dist-python.*
-scripts/pyinstaller-install.*
-**/temp.*
+/settings.json

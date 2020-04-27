@@ -1,7 +1,7 @@
 import { ChildProcess } from 'child_process';
 import { ipcRenderer, webFrame, remote } from 'electron';
 import { join } from 'path';
-const { app, getGlobal } = remote;
+const { getGlobal } = remote;
 
 /**
  * preloaded globally
@@ -44,15 +44,7 @@ window['saveSettings'] = require('../modules/save-settings');
 /**
  * loads app settings
  */
-window['settings'] = require(join(
-  __dirname,
-  '..',
-  'modules',
-  'load-settings.js'
-))(
-  join(app.getPath('userData'), 'settings.json'),
-  join(__dirname, '..', '..', 'settings.json')
-);
+window['settings'] = getGlobal('settings');
 
 /**
  * some keyboard shortcuts can't be implemented in the main process so they

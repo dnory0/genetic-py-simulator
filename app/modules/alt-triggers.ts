@@ -36,10 +36,14 @@ function altTriggers() {
    * @param key pressed keyboard key that should match on of the altTriggers.
    */
   function altTriggerAction(key: string) {
+
     let altTriggered = altTriggerers.filter(altTrigger => altTrigger.innerText.toLowerCase() == key);
+
     if (!altTriggered.length) return;
+
     let button: HTMLButtonElement = <HTMLButtonElement>altTriggered[0].parentElement;
-    if (button.disabled) return;
+
+    if (button.disabled || !button.classList.contains('alt-pressed')) return;
     button.classList.remove('alt-pressed');
     button.click();
   }
@@ -51,7 +55,7 @@ function altTriggers() {
 
   window.onkeyup = (ev: KeyboardEvent) => {
     if (ev.key == 'Alt') rmAllUnderLines();
-    else if (ev.altKey) altTriggerAction(ev.key);
+    else altTriggerAction(ev.key);
   };
 
   window.addEventListener('blur', rmAllUnderLines);

@@ -1,35 +1,38 @@
+
 /* Borders used between 2 resizable DIVs */
 .border {
-  background-clip: content-box;
-  background-color: #cebbbb;
   position: relative;
   z-index: 1;
 
   &.hor {
-    height: 1px;
-    min-height: 1px;
-
     &.resize {
       cursor: ns-resize;
       padding: 4px 0;
     }
+
+    > div {
+      border-top: thin solid #cebbbb;
+    }
+    
   }
 
   &.ver {
-    width: 1px;
-    min-width: 1px;
-    height: 100%;
-
+    
     &.resize {
       cursor: ew-resize;
       padding: 0 4px;
+    }
+    
+    
+    > div {
+      height: 100%;
+      border-left: thin solid #cebbbb;
     }
   }
 }
 
 /* Border between content that need to be devided sementically */
 .separator {
-  background-color: #cebbbb;
-  width: 1px;
+  border-left: thin solid #cebbbb;
   margin: 3px;
 }
