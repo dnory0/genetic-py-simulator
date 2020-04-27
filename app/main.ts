@@ -253,7 +253,7 @@ app.once('ready', () => {
     }
 
     writeFileSync(
-      join(app.getAppPath(), '..', app.isPackaged? '..': '.', 'settings.json'),
+      join(app.isPackaged? app.getPath('userData'): join(app.getAppPath(), '..'), 'settings.json'),
       JSON.stringify(settings)
     );
   });

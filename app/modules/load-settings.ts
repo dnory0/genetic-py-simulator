@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'fs';
+import { existsSync, readFileSync, copyFile, constants } from 'fs';
 import { join } from 'path';
 import { App } from 'electron';
 
@@ -8,14 +8,14 @@ import { App } from 'electron';
  */
 function loadSettings(app: App) {
   delete require.cache['./load-settings'];
-  let settingsPath = join(app.getAppPath(), '..', app.isPackaged? '..': '.', 'settings.json');
+  let settingsPath = join(app.isPackaged? app.getPath('userData'): join(app.getAppPath(), '..'), 'settings.json');
   if (existsSync(settingsPath)) {
     try {
       return JSON.parse(readFileSync(settingsPath, { encoding: 'utf8' }));
     } catch (error) {}
   }
   // on a fresh installation or when settings file is deleted or corrupted, default settings are loaded
-  let defaultSettingsPath = join(app.getAppPath(), '..', 'build', 'settings.json')
+  let defaultSettingsPath = join(app.getAppPath(), '..', 'build', 'settings.json');
   return JSON.parse(readFileSync(defaultSettingsPath, { encoding: 'utf8' }));
 }
 

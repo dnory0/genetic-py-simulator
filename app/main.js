@@ -165,7 +165,7 @@ electron_1.app.once('ready', () => {
             settings['main']['x'] = mainWindow.getNormalBounds().x;
             settings['main']['y'] = mainWindow.getNormalBounds().y;
         }
-        fs_1.writeFileSync(path_1.join(electron_1.app.getAppPath(), '..', electron_1.app.isPackaged ? '..' : '.', 'settings.json'), JSON.stringify(settings));
+        fs_1.writeFileSync(path_1.join(electron_1.app.isPackaged ? electron_1.app.getPath('userData') : path_1.join(electron_1.app.getAppPath(), '..'), 'settings.json'), JSON.stringify(settings));
     });
 });
 electron_1.app.once('will-quit', () => pyshell.stdin.write('exit\n'));
