@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, copyFile, constants } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
 import { App } from 'electron';
 
@@ -8,7 +8,7 @@ import { App } from 'electron';
  */
 function loadSettings(app: App) {
   delete require.cache['./load-settings'];
-  let settingsPath = join(app.isPackaged? app.getPath('userData'): join(app.getAppPath(), '..'), 'settings.json');
+  let settingsPath = join(app.isPackaged ? app.getPath('userData') : join(app.getAppPath(), '..'), 'settings.json');
   if (existsSync(settingsPath)) {
     try {
       return JSON.parse(readFileSync(settingsPath, { encoding: 'utf8' }));

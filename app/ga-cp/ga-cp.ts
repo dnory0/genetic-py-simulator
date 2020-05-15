@@ -21,16 +21,16 @@ let isClosable = true;
  * - ```-1``` if path does not exist.
  * - ```-2``` if path is not an absolute path.
  * - ```-3``` if path does not point to a file.
- * - ```-4``` if the file extention is not equal to the given ```ext```.
+ * - ```-4``` if the file extention is not equal to any of the given ```ext```.
  * - ```0``` if path matchs all conditions.
  *
  * @param gaConfigPath GA configuration path to check.
- * @param ext extension name, default is ```.py```.
+ * @param ext extensions array.
  */
-let validatePath: (gaConfigPath: string, ext?: string) => number = window['validatePath'];
+let validatePath: (gaConfigPath: string, ...ext: string[]) => number = window['validatePath'];
 
 let checkPath = (path: string) => {
-  let checkCode = validatePath(path);
+  let checkCode = validatePath(path, '.json', '.jsonc', '.js');
   switch (checkCode) {
     case -1:
       console.log("path doesn't exist.");
@@ -42,7 +42,7 @@ let checkPath = (path: string) => {
       console.log("the path doesn't point to a file.");
       break;
     case -4:
-      console.log('path should point to a python file (ends with .py).');
+      console.log('path should point to a JSON file (ends with .json/.jsonc/.js).');
       break;
     default:
       console.log('possible.');
@@ -54,12 +54,14 @@ let checkPath = (path: string) => {
  * browse button
  */
 let browseBtn = <HTMLButtonElement>document.getElementById('browse-btn');
-
+/**
+ * apply button
+ */
+let applyBtn = <HTMLButtonElement>document.getElementById('apply-btn');
 /**
  * input that takes the path to ga configuration
  */
 let paramsPath = <HTMLInputElement>document.getElementById('params-path');
-
 /**
  * save button
  */
@@ -77,12 +79,11 @@ browseBtn.onclick = () => {
   ipcRenderer.once('browsed-path', (_ev, result: OpenDialogReturnValue) => {
     if (result.canceled) return;
     paramsPath.value = result.filePaths[0];
-    checkPath(result.filePaths[0]);
   });
   ipcRenderer.send('browse');
 };
 
-paramsPath.onkeyup = () => checkPath(paramsPath.value);
+applyBtn.onclick = () => checkPath(paramsPath.value);
 
 (() => {
   /**
@@ -114,6 +115,8 @@ paramsPath.onkeyup = () => checkPath(paramsPath.value);
 
   Array.from(document.getElementsByTagName('input')).forEach(input => {
     if (input.type == 'checkbox') {
+      input.addEventListener('change', eventListener);
+    } else if (input.type == 'radio') {
       input.addEventListener('change', eventListener);
     } else {
       input.addEventListener('keypress', eventListener);
@@ -172,6 +175,16 @@ let toggleDisableOnRun = (disable: boolean) => {
     gaParam.disabled = disable;
     (<HTMLButtonElement>gaParam.parentElement.nextElementSibling.firstElementChild).disabled = disable;
     gaParam.parentElement.parentElement.title = !disable ? '' : 'Disabled when GA is Running';
+  });
+
+  let gaTypes = (<HTMLDivElement[]>Array.from(document.getElementsByClassName('type-value')))
+    .reduce((accum: Element[], typeValue) => accum.concat(...Array.from(typeValue.children)), [])
+    .map((label: HTMLLabelElement) => <HTMLInputElement>label.firstElementChild)
+    .filter(radioInput => radioInput.name != 'update_pop');
+  curSettings['renderer']['input'][gaTypes[0].name.replace('_', '-')]['disable'] = disable;
+  gaTypes.forEach(gaType => {
+    gaType.disabled = disable;
+    gaType.parentElement.parentElement.title = disable ? 'Disabled when GA is Running' : '';
   });
 };
 

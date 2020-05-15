@@ -20,7 +20,7 @@ const pyshell = require(path_1.join(__dirname, 'modules', 'create-pyshell.js'))(
 global['pyshell'] = pyshell;
 let settings = require(path_1.join(__dirname, 'modules', 'load-settings.js'))(electron_1.app);
 global['settings'] = settings;
-const createWindow = (filePath, { minWidth, minHeight, width, height, resizable, minimizable, maximizable, parent, frame, webPreferences: { preload, webviewTag } } = {}) => {
+const createWindow = (filePath, { minWidth, minHeight, width, height, resizable, minimizable, maximizable, parent, frame, webPreferences: { preload, webviewTag }, } = {}) => {
     let targetWindow = new electron_1.BrowserWindow({
         minWidth,
         minHeight,
@@ -36,8 +36,8 @@ const createWindow = (filePath, { minWidth, minHeight, width, height, resizable,
         show: false,
         webPreferences: {
             preload,
-            webviewTag
-        }
+            webviewTag,
+        },
     });
     targetWindow.loadFile(filePath);
     targetWindow.once('closed', () => {
@@ -46,10 +46,7 @@ const createWindow = (filePath, { minWidth, minHeight, width, height, resizable,
     return targetWindow;
 };
 const browse = (window, options, resolved, rejected) => {
-    electron_1.dialog
-        .showOpenDialog(window, options)
-        .then(resolved)
-        .catch(rejected);
+    electron_1.dialog.showOpenDialog(window, options).then(resolved).catch(rejected);
 };
 electron_1.app.once('ready', () => {
     process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true;
@@ -58,8 +55,8 @@ electron_1.app.once('ready', () => {
         minHeight: 500,
         webPreferences: {
             preload: path_1.join(__dirname, 'preloads', 'preload.js'),
-            webviewTag: true
-        }
+            webviewTag: true,
+        },
     });
     mainWindow.on('enter-full-screen', () => {
         mainWindow.autoHideMenuBar = true;
@@ -83,8 +80,8 @@ electron_1.app.once('ready', () => {
                 minimizable: false,
                 parent: mainWindow,
                 webPreferences: {
-                    preload: path_1.join(__dirname, 'preloads', 'ga-cp-preload.js')
-                }
+                    preload: path_1.join(__dirname, 'preloads', 'ga-cp-preload.js'),
+                },
             });
             gaWindow.once('ready-to-show', gaWindow.show);
             if (!isDev)
@@ -98,13 +95,13 @@ electron_1.app.once('ready', () => {
                     (() => __awaiter(void 0, void 0, void 0, function* () {
                         yield (() => {
                             return electron_1.dialog.showMessageBox(gaWindow, {
-                                type: 'question',
+                                type: 'warning',
                                 title: 'Are you sure?',
                                 message: 'You have unsaved changes, are you sure you want to close?',
                                 cancelId: 0,
                                 defaultId: 1,
                                 buttons: ['Ca&ncel', '&Confirm'],
-                                normalizeAccessKeys: true
+                                normalizeAccessKeys: true,
                             });
                         })()
                             .then(result => {
@@ -125,11 +122,11 @@ electron_1.app.once('ready', () => {
                         defaultPath: electron_1.app.getPath('desktop'),
                         filters: [
                             {
-                                name: 'Python File (.py)',
-                                extensions: ['py']
-                            }
+                                name: 'JSON File (.json)',
+                                extensions: ['json', 'jsonc', 'js'],
+                            },
                         ],
-                        properties: ['openFile']
+                        properties: ['openFile'],
                     }, result => gaWindow.webContents.send('browsed-path', result), reason => {
                         gaWindow.webContents.send('browsed-path', { canceled: true });
                         if (reason)
@@ -148,7 +145,7 @@ electron_1.app.once('ready', () => {
         if (settings['main']['x'] && settings['main']['y']) {
             mainWindow.setBounds({
                 x: settings['main']['x'],
-                y: settings['main']['y']
+                y: settings['main']['y'],
             });
         }
         if (settings['main']['maximized'])

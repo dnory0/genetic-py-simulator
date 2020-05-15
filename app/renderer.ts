@@ -70,11 +70,15 @@ let gaCPBtn = <HTMLInputElement>document.getElementById('ga-cp-btn');
  * ga input parameters.
  */
 let gaParams = <HTMLInputElement[]>(
-  (<HTMLDivElement[]>(
-    Array.from(document.getElementsByClassName('param-value'))
-  )).map(paramValue => paramValue.firstElementChild)
+  (<HTMLDivElement[]>Array.from(document.getElementsByClassName('param-value'))).map(paramValue => paramValue.firstElementChild)
 );
-
+/**
+ * radio buttons for crossover/mutation types
+ */
+let gaTypes = (<HTMLDivElement[]>Array.from(document.getElementsByClassName('type-value')))
+  .reduce((accum: Element[], typeValue) => accum.concat(...Array.from(typeValue.children)), [])
+  .map((label: HTMLLabelElement) => <HTMLInputElement>label.firstElementChild)
+  .concat(...(<HTMLInputElement[]>Array.from(document.getElementsByName('update_pop'))));
 /**
  * running settings
  */
@@ -100,12 +104,15 @@ let toggleDisableOnRun = (activate = true) => {
     if (!gaParam.classList.contains('disable-on-run')) return;
     settings['renderer']['input'][gaParam.id]['disable'] = !activate;
     gaParam.disabled = !activate;
-    (<HTMLButtonElement>(
-      gaParam.parentElement.nextElementSibling.firstElementChild
-    )).disabled = !activate;
-    gaParam.parentElement.parentElement.title = activate
-      ? ''
-      : 'Disabled when GA is Running';
+    (<HTMLButtonElement>gaParam.parentElement.nextElementSibling.firstElementChild).disabled = !activate;
+    gaParam.parentElement.parentElement.title = activate ? '' : 'Disabled when GA is Running';
+  });
+
+  settings['renderer']['input'][gaTypes[0].name.replace('_', '-')]['disable'] = !activate;
+  gaTypes.forEach(gaType => {
+    if (gaType.name == 'update_pop') return;
+    gaType.disabled = !activate;
+    gaType.parentElement.parentElement.title = activate ? '' : 'Disabled when GA is Running';
   });
 
   // in case ga has finished because of generation reached max_gen while GACP is open
@@ -128,6 +135,10 @@ const treatResponse = (response: object) => {
     blinkPlayBtn();
     toggleDisableOnRun(true);
     switchPlayBtn();
+  } else if (response['forced-pause']) {
+    // if paused by pause generation parameter
+    isRunning = false;
+    switchPlayBtn();
   }
 };
 
@@ -138,14 +149,8 @@ const treatResponse = (response: object) => {
  * switch the play/pause button image depending on isRunning state.
  */
 const switchPlayBtn = () => {
-  (<HTMLImageElement>playBtn.querySelector('.play')).classList.toggle(
-    'hide',
-    isRunning
-  );
-  (<HTMLImageElement>playBtn.querySelector('.pause')).classList.toggle(
-    'hide',
-    !isRunning
-  );
+  (<HTMLImageElement>playBtn.querySelector('.play')).classList.toggle('hide', isRunning);
+  (<HTMLImageElement>playBtn.querySelector('.pause')).classList.toggle('hide', !isRunning);
 };
 
 /**
@@ -155,17 +160,14 @@ const switchPlayBtn = () => {
  * that they are always enabled
  */
 const setClickable = (clickable = true) => {
-  Array.from(document.querySelector('.state-controls').children).forEach(
-    (element, index) => {
-      // to not effect play/pause and step forward button.
-      if ([0, 4].includes(index)) return;
-      // disabled-btn class sets opacity to 0.6.
-      if (clickable)
-        (<HTMLButtonElement>element).classList.remove('disabled-btn');
-      else (<HTMLButtonElement>element).classList.add('disabled-btn');
-      (<HTMLButtonElement>element).disabled = !clickable;
-    }
-  );
+  Array.from(document.querySelector('.state-controls').children).forEach((element, index) => {
+    // to not effect play/pause and step forward button.
+    if ([0, 4].includes(index)) return;
+    // disabled-btn class sets opacity to 0.6.
+    if (clickable) (<HTMLButtonElement>element).classList.remove('disabled-btn');
+    else (<HTMLButtonElement>element).classList.add('disabled-btn');
+    (<HTMLButtonElement>element).disabled = !clickable;
+  });
 };
 
 /**
@@ -238,85 +240,71 @@ stepFBtn.onclick = () => ctrlClicked('step_f', false);
     else fscreenBtn.parentElement.parentElement.requestFullscreen();
   }
   // full screen
-  Array.from(document.getElementsByClassName('fscreen-btn')).forEach(
-    (fscreenBtn: HTMLButtonElement) => {
-      fscreenBtn.onclick = () => toggleFullscreen(fscreenBtn);
-    }
-  );
+  Array.from(document.getElementsByClassName('fscreen-btn')).forEach((fscreenBtn: HTMLButtonElement) => {
+    fscreenBtn.onclick = () => toggleFullscreen(fscreenBtn);
+  });
 
   let clean = (eventListener: EventListener) => {
-    Array.from(document.getElementsByClassName('resize-cover')).forEach(
-      (resizeCover: HTMLDivElement) => {
-        resizeCover.classList.add('hide');
-      }
-    );
+    Array.from(document.getElementsByClassName('resize-cover')).forEach((resizeCover: HTMLDivElement) => {
+      resizeCover.classList.add('hide');
+    });
     window.removeEventListener('click', eventListener);
   };
 
   // export to file functionality
-  Array.from(document.getElementsByClassName('drop-btn')).forEach(
-    (exportBtn: HTMLButtonElement) => {
-      let dropdownContent = <HTMLDivElement>exportBtn.nextElementSibling;
-      let dropdownPointer = <HTMLDivElement>dropdownContent.nextElementSibling;
-      let exportTypes = Array.from(dropdownContent.children);
-      let eventListener = () => {
-        dropdownPointer.classList.toggle('hide', true);
-        dropdownContent.classList.toggle('hide', true);
+  Array.from(document.getElementsByClassName('drop-btn')).forEach((exportBtn: HTMLButtonElement) => {
+    let dropdownContent = <HTMLDivElement>exportBtn.nextElementSibling;
+    let dropdownPointer = <HTMLDivElement>dropdownContent.nextElementSibling;
+    let exportTypes = Array.from(dropdownContent.children);
+    let eventListener = () => {
+      dropdownPointer.classList.toggle('hide', true);
+      dropdownContent.classList.toggle('hide', true);
+      clean(eventListener);
+    };
+
+    exportBtn.addEventListener('click', () => {
+      dropdownPointer.classList.toggle('hide');
+      dropdownContent.classList.toggle('hide');
+      Array.from(document.getElementsByClassName('resize-cover')).forEach((resizeCover: HTMLDivElement) => {
+        resizeCover.classList.remove('hide');
+      });
+
+      if (dropdownContent.classList.contains('hide')) clean(eventListener);
+      else {
+        setTimeout(() => {
+          window.addEventListener('click', eventListener);
+        }, 0);
+      }
+    });
+
+    exportTypes.forEach((exportType: HTMLButtonElement, index) => {
+      if (index == 0) {
+        let mouseoverEventListener = () => {
+          exportType.style.backgroundColor = '#d9d9d9';
+
+          dropdownPointer.style.backgroundColor = '#d9d9d9';
+        };
+        let mouseleaveEventListener = () => {
+          exportType.style.backgroundColor = 'white';
+          dropdownPointer.style.backgroundColor = 'white';
+        };
+        exportType.addEventListener('mouseover', mouseoverEventListener);
+        exportType.addEventListener('mouseleave', mouseleaveEventListener);
+        dropdownPointer.addEventListener('mouseover', mouseoverEventListener);
+        dropdownPointer.addEventListener('mouseleave', mouseleaveEventListener);
+
+        dropdownPointer.addEventListener('click', () => exportType.click());
+      }
+      exportType.addEventListener('click', () => {
         clean(eventListener);
-      };
-
-      exportBtn.addEventListener('click', () => {
-        dropdownPointer.classList.toggle('hide');
-        dropdownContent.classList.toggle('hide');
-        Array.from(document.getElementsByClassName('resize-cover')).forEach(
-          (resizeCover: HTMLDivElement) => {
-            resizeCover.classList.remove('hide');
-          }
-        );
-
-        if (dropdownContent.classList.contains('hide')) clean(eventListener);
-        else {
-          setTimeout(() => {
-            window.addEventListener('click', eventListener);
-          }, 0);
-        }
+        if (exportBtn.classList.contains('prime')) prime.send('export', exportType.id.replace('export-', ''));
+        else side.send('export', exportType.id.replace('export-', ''));
+        exportBtn.click();
       });
+    });
+  });
 
-      exportTypes.forEach((exportType: HTMLButtonElement, index) => {
-        if (index == 0) {
-          let mouseoverEventListener = () => {
-            exportType.style.backgroundColor = '#d9d9d9';
-
-            dropdownPointer.style.backgroundColor = '#d9d9d9';
-          };
-          let mouseleaveEventListener = () => {
-            exportType.style.backgroundColor = 'white';
-            dropdownPointer.style.backgroundColor = 'white';
-          };
-          exportType.addEventListener('mouseover', mouseoverEventListener);
-          exportType.addEventListener('mouseleave', mouseleaveEventListener);
-          dropdownPointer.addEventListener('mouseover', mouseoverEventListener);
-          dropdownPointer.addEventListener(
-            'mouseleave',
-            mouseleaveEventListener
-          );
-
-          dropdownPointer.addEventListener('click', () => exportType.click());
-        }
-        exportType.addEventListener('click', () => {
-          clean(eventListener);
-          if (exportBtn.classList.contains('prime'))
-            prime.send('export', exportType.id.replace('export-', ''));
-          else side.send('export', exportType.id.replace('export-', ''));
-          exportBtn.click();
-        });
-      });
-    }
-  );
-
-  (<HTMLButtonElement[]>(
-    Array.from(document.getElementsByClassName('zoom-out-btn'))
-  )).forEach(zoomOutBtn => {
+  (<HTMLButtonElement[]>Array.from(document.getElementsByClassName('zoom-out-btn'))).forEach(zoomOutBtn => {
     zoomOutBtn.addEventListener('click', () => {
       if (zoomOutBtn.classList.contains('prime')) prime.send('zoom-out');
       else side.send('zoom-out');
@@ -353,7 +341,7 @@ stepFBtn.onclick = () => ctrlClicked('step_f', false);
 const sendParameter = (key: string, value: any) => {
   window['sendSig'](
     JSON.stringify({
-      [key]: parseFloat(value) || value
+      [key]: parseFloat(value) || value,
     })
   );
 };
@@ -366,13 +354,13 @@ let sendParams = () => {
     let value: any;
     value =
       gaParam.classList.contains('is-disable-able') &&
-      !(<HTMLInputElement>(
-        gaParam.parentElement.parentElement.parentElement.previousElementSibling
-      )).checked
+      !(<HTMLInputElement>gaParam.parentElement.parentElement.parentElement.previousElementSibling).checked
         ? false
         : gaParam.value;
     sendParameter(gaParam.name, value);
   });
+
+  gaTypes.filter(gaType => gaType.checked).forEach(gaType => sendParameter(gaType.name, gaType.value));
 };
 
 /********************************* Views Setup *********************************/
@@ -403,8 +391,11 @@ document.addEventListener('DOMContentLoaded', function loaded() {
            */
           gaParams.forEach(gaParam => {
             gaParam.addEventListener('keyup', eventListener);
-            if (gaParam.classList.contains('textfieldable'))
-              gaParam.addEventListener('change', eventListener);
+            if (gaParam.classList.contains('textfieldable')) gaParam.addEventListener('change', eventListener);
+          });
+
+          gaTypes.forEach(gaType => {
+            if (gaType.name == 'update_pop') gaType.addEventListener('change', eventListener);
           });
 
           let lRSwitchUpdater = () => {
@@ -419,13 +410,7 @@ document.addEventListener('DOMContentLoaded', function loaded() {
         delete window['settings'];
       };
 
-      zoomViews = window['ready'](
-        window['pyshell'],
-        prime,
-        side,
-        treatResponse,
-        webFrame
-      );
+      zoomViews = window['ready'](window['pyshell'], prime, side, treatResponse, webFrame);
 
       toggleDisableOnRun(true);
 
@@ -458,11 +443,9 @@ document.addEventListener('DOMContentLoaded', function loaded() {
 
   ipcRenderer.on('zoom', (_event: IpcRendererEvent, type: string) => {
     if (type == 'in') {
-      if (webFrame.getZoomFactor() < 1.8)
-        webFrame.setZoomFactor(webFrame.getZoomFactor() + 0.1);
+      if (webFrame.getZoomFactor() < 1.8) webFrame.setZoomFactor(webFrame.getZoomFactor() + 0.1);
     } else if (type == 'out') {
-      if (webFrame.getZoomFactor() > 0.6)
-        webFrame.setZoomFactor(webFrame.getZoomFactor() - 0.1);
+      if (webFrame.getZoomFactor() > 0.6) webFrame.setZoomFactor(webFrame.getZoomFactor() - 0.1);
     } else {
       webFrame.setZoomFactor(1);
     }

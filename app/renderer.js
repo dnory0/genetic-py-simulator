@@ -12,7 +12,11 @@ let toStartBtn = document.getElementById('to-start-btn');
 let stepFBtn = document.getElementById('step-forward-btn');
 let lRSwitch = document.getElementById('lr-enabled');
 let gaCPBtn = document.getElementById('ga-cp-btn');
-let gaParams = ((Array.from(document.getElementsByClassName('param-value'))).map(paramValue => paramValue.firstElementChild));
+let gaParams = (Array.from(document.getElementsByClassName('param-value')).map(paramValue => paramValue.firstElementChild));
+let gaTypes = Array.from(document.getElementsByClassName('type-value'))
+    .reduce((accum, typeValue) => accum.concat(...Array.from(typeValue.children)), [])
+    .map((label) => label.firstElementChild)
+    .concat(...Array.from(document.getElementsByName('update_pop')));
 let settings = window['settings'];
 let isRunning = false;
 let isGACPOpen = false;
@@ -22,10 +26,15 @@ let toggleDisableOnRun = (activate = true) => {
             return;
         settings['renderer']['input'][gaParam.id]['disable'] = !activate;
         gaParam.disabled = !activate;
-        (gaParam.parentElement.nextElementSibling.firstElementChild).disabled = !activate;
-        gaParam.parentElement.parentElement.title = activate
-            ? ''
-            : 'Disabled when GA is Running';
+        gaParam.parentElement.nextElementSibling.firstElementChild.disabled = !activate;
+        gaParam.parentElement.parentElement.title = activate ? '' : 'Disabled when GA is Running';
+    });
+    settings['renderer']['input'][gaTypes[0].name.replace('_', '-')]['disable'] = !activate;
+    gaTypes.forEach(gaType => {
+        if (gaType.name == 'update_pop')
+            return;
+        gaType.disabled = !activate;
+        gaType.parentElement.parentElement.title = activate ? '' : 'Disabled when GA is Running';
     });
     if (activate && isGACPOpen)
         ipcRenderer.send('ga-cp', activate);
@@ -40,6 +49,10 @@ const treatResponse = (response) => {
         setClickable(isRunning);
         blinkPlayBtn();
         toggleDisableOnRun(true);
+        switchPlayBtn();
+    }
+    else if (response['forced-pause']) {
+        isRunning = false;
         switchPlayBtn();
     }
 };
@@ -149,7 +162,7 @@ stepFBtn.onclick = () => ctrlClicked('step_f', false);
             });
         });
     });
-    (Array.from(document.getElementsByClassName('zoom-out-btn'))).forEach(zoomOutBtn => {
+    Array.from(document.getElementsByClassName('zoom-out-btn')).forEach(zoomOutBtn => {
         zoomOutBtn.addEventListener('click', () => {
             if (zoomOutBtn.classList.contains('prime'))
                 prime.send('zoom-out');
@@ -176,7 +189,7 @@ stepFBtn.onclick = () => ctrlClicked('step_f', false);
 })();
 const sendParameter = (key, value) => {
     window['sendSig'](JSON.stringify({
-        [key]: parseFloat(value) || value
+        [key]: parseFloat(value) || value,
     }));
 };
 let sendParams = () => {
@@ -184,11 +197,12 @@ let sendParams = () => {
         let value;
         value =
             gaParam.classList.contains('is-disable-able') &&
-                !(gaParam.parentElement.parentElement.parentElement.previousElementSibling).checked
+                !gaParam.parentElement.parentElement.parentElement.previousElementSibling.checked
                 ? false
                 : gaParam.value;
         sendParameter(gaParam.name, value);
     });
+    gaTypes.filter(gaType => gaType.checked).forEach(gaType => sendParameter(gaType.name, gaType.value));
 };
 document.addEventListener('DOMContentLoaded', function loaded() {
     document.removeEventListener('DOMContentLoaded', loaded);
@@ -206,6 +220,10 @@ document.addEventListener('DOMContentLoaded', function loaded() {
                         gaParam.addEventListener('keyup', eventListener);
                         if (gaParam.classList.contains('textfieldable'))
                             gaParam.addEventListener('change', eventListener);
+                    });
+                    gaTypes.forEach(gaType => {
+                        if (gaType.name == 'update_pop')
+                            gaType.addEventListener('change', eventListener);
                     });
                     let lRSwitchUpdater = () => {
                         prime.send('live-rendering', lRSwitch.checked);

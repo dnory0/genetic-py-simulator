@@ -37,19 +37,35 @@
       "co-rate": {
         "value": 0.15
       },
+      "co-type": {
+        "value": 0,
+        "disable": false
+      },
       "mut-rate": {
         "value": 0.013
+      },
+      "mut-type": {
+        "value": 0,
+        "disable": false
       },
       "del-rate": {
         "value": 0,
         "pin": true,
         "enabled": true
       },
-      "max-gen": {
-        "value": 1,
+      "pause-gen": {
+        "value": 10,
         "pin": false,
-        "enabled": false,
-        "disable": false
+        "enabled": false
+      },
+      "max-gen": {
+        "value": 10,
+        "pin": false,
+        "enabled": false
+      },
+      "update-pop": {
+        "value": 0,
+        "pin": false
       },
       "force-tf": {
         "enabled": false

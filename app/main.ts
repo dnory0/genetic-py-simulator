@@ -5,7 +5,7 @@ import {
   Rectangle,
   dialog,
   OpenDialogOptions,
-  OpenDialogReturnValue
+  OpenDialogReturnValue,
 } from 'electron';
 import { join } from 'path';
 import { writeFileSync } from 'fs';
@@ -27,20 +27,12 @@ let gaWindow: BrowserWindow;
 /**
  * python process responsible for executing genetic algorithm.
  */
-const pyshell: ChildProcess = require(join(
-  __dirname,
-  'modules',
-  'create-pyshell.js'
-))(app);
+const pyshell: ChildProcess = require(join(__dirname, 'modules', 'create-pyshell.js'))(app);
 global['pyshell'] = pyshell;
 /**
  * load settings
  */
-let settings: object = require(join(
-  __dirname,
-  'modules',
-  'load-settings.js'
-))(app);
+let settings: object = require(join(__dirname, 'modules', 'load-settings.js'))(app);
 global['settings'] = settings;
 
 /**
@@ -59,7 +51,7 @@ const createWindow = (
     maximizable,
     parent,
     frame,
-    webPreferences: { preload, webviewTag }
+    webPreferences: { preload, webviewTag },
   }: BrowserWindowConstructorOptions = {}
 ): BrowserWindow => {
   let targetWindow = new BrowserWindow({
@@ -70,15 +62,15 @@ const createWindow = (
     resizable,
     minimizable,
     maximizable,
-    icon: join(app.getAppPath(), '..', 'build', 'icons', process.platform == 'win32'? 'icon.ico': 'icon.icns'),
+    icon: join(app.getAppPath(), '..', 'build', 'icons', process.platform == 'win32' ? 'icon.ico' : 'icon.icns'),
     parent,
     frame,
     modal: true,
     show: false,
     webPreferences: {
       preload,
-      webviewTag
-    }
+      webviewTag,
+    },
   });
 
   targetWindow.loadFile(filePath);
@@ -106,10 +98,7 @@ const browse = (
   resolved: (path: OpenDialogReturnValue) => any,
   rejected: (reason: any) => any
 ) => {
-  dialog
-    .showOpenDialog(window, options)
-    .then(resolved)
-    .catch(rejected);
+  dialog.showOpenDialog(window, options).then(resolved).catch(rejected);
 };
 
 app.once('ready', () => {
@@ -121,8 +110,8 @@ app.once('ready', () => {
     minHeight: 500,
     webPreferences: {
       preload: join(__dirname, 'preloads', 'preload.js'),
-      webviewTag: true
-    }
+      webviewTag: true,
+    },
   });
 
   mainWindow.on('enter-full-screen', () => {
@@ -139,9 +128,7 @@ app.once('ready', () => {
   /**
    * sets menu and free module after it's done
    */
-  mainWindow.setMenu(
-    require(join(__dirname, 'modules', 'menubar.js'))(isDev, mainWindow)
-  );
+  mainWindow.setMenu(require(join(__dirname, 'modules', 'menubar.js'))(isDev, mainWindow));
 
   mainWindow.webContents.on('ipc-message', (_ev, channel, args) => {
     if (channel == 'ga-cp') {
@@ -156,67 +143,63 @@ app.once('ready', () => {
         minimizable: false,
         parent: mainWindow,
         webPreferences: {
-          preload: join(__dirname, 'preloads', 'ga-cp-preload.js')
-        }
+          preload: join(__dirname, 'preloads', 'ga-cp-preload.js'),
+        },
       });
 
       gaWindow.once('ready-to-show', gaWindow.show);
 
       if (!isDev) gaWindow.removeMenu();
 
-      gaWindow.webContents.on(
-        'ipc-message',
-        (_ev, gaChannel, updatedSettings: boolean) => {
-          if (gaChannel == 'ga-cp-finished') {
-            mainWindow.webContents.send('ga-cp-finished', updatedSettings);
-            gaWindow.destroy();
-          } else if (gaChannel == 'close-confirm') {
-            (async () => {
-              await (() => {
-                return dialog.showMessageBox(gaWindow, {
-                  type: 'question',
-                  title: 'Are you sure?',
-                  message:
-                    'You have unsaved changes, are you sure you want to close?',
-                  cancelId: 0,
-                  defaultId: 1,
-                  buttons: ['Ca&ncel', '&Confirm'],
-                  normalizeAccessKeys: true
-                });
-              })()
-                .then(result => {
-                  if (!result.response) return;
-                  mainWindow.webContents.send('ga-cp-finished', updatedSettings);
-                  gaWindow.destroy();
-                })
-                .catch(reason => {
-                  if (reason) throw reason;
-                });
-            })();
-          } else if (gaChannel == 'browse') {
-            browse(
-              gaWindow,
-              {
-                title: 'Open GA Configuration file',
-                // TODO: read from runSettings
-                defaultPath: app.getPath('desktop'),
-                filters: [
-                  {
-                    name: 'Python File (.py)',
-                    extensions: ['py']
-                  }
-                ],
-                properties: ['openFile']
-              },
-              result => gaWindow.webContents.send('browsed-path', result),
-              reason => {
-                gaWindow.webContents.send('browsed-path', { canceled: true });
+      gaWindow.webContents.on('ipc-message', (_ev, gaChannel, updatedSettings: boolean) => {
+        if (gaChannel == 'ga-cp-finished') {
+          mainWindow.webContents.send('ga-cp-finished', updatedSettings);
+          gaWindow.destroy();
+        } else if (gaChannel == 'close-confirm') {
+          (async () => {
+            await (() => {
+              return dialog.showMessageBox(gaWindow, {
+                type: 'warning',
+                title: 'Are you sure?',
+                message: 'You have unsaved changes, are you sure you want to close?',
+                cancelId: 0,
+                defaultId: 1,
+                buttons: ['Ca&ncel', '&Confirm'],
+                normalizeAccessKeys: true,
+              });
+            })()
+              .then(result => {
+                if (!result.response) return;
+                mainWindow.webContents.send('ga-cp-finished', updatedSettings);
+                gaWindow.destroy();
+              })
+              .catch(reason => {
                 if (reason) throw reason;
-              }
-            );
-          }
+              });
+          })();
+        } else if (gaChannel == 'browse') {
+          browse(
+            gaWindow,
+            {
+              title: 'Open GA Configuration file',
+              // TODO: read from runSettings
+              defaultPath: app.getPath('desktop'),
+              filters: [
+                {
+                  name: 'JSON File (.json)',
+                  extensions: ['json', 'jsonc', 'js'],
+                },
+              ],
+              properties: ['openFile'],
+            },
+            result => gaWindow.webContents.send('browsed-path', result),
+            reason => {
+              gaWindow.webContents.send('browsed-path', { canceled: true });
+              if (reason) throw reason;
+            }
+          );
         }
-      );
+      });
       gaWindow.on('close', ev => {
         ev.preventDefault();
         gaWindow.webContents.send('close-confirm');
@@ -230,10 +213,10 @@ app.once('ready', () => {
     if (settings['main']['x'] && settings['main']['y']) {
       mainWindow.setBounds({
         x: settings['main']['x'],
-        y: settings['main']['y']
+        y: settings['main']['y'],
       } as Rectangle);
     }
-      
+
     if (settings['main']['maximized']) mainWindow.maximize();
 
     mainWindow.setFullScreen(settings['main']['fscreen'] ? true : false);
@@ -253,7 +236,7 @@ app.once('ready', () => {
     }
 
     writeFileSync(
-      join(app.isPackaged? app.getPath('userData'): join(app.getAppPath(), '..'), 'settings.json'),
+      join(app.isPackaged ? app.getPath('userData') : join(app.getAppPath(), '..'), 'settings.json'),
       JSON.stringify(settings)
     );
   });

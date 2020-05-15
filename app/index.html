@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Genetic Py</title>
     <link rel="stylesheet" href="style/style.css" />
   </head>
+
   <body>
     <!-- #region Main -->
     <div id="main" class="blur">
@@ -42,15 +44,8 @@
             <img src="img/minimize.png" />
           </button>
         </div>
-        <webview
-          id="prime-chart"
-          src="prime-chart/prime-chart.html"
-          autosize="on"
-          style="height: 100%;"
-          allowtransparency
-          nodeintegration
-          preload="preloads/prime-preload"
-        ></webview>
+        <webview id="prime-chart" src="prime-chart/prime-chart.html" autosize="on" style="height: 100%;"
+          allowtransparency nodeintegration preload="preloads/prime-preload"></webview>
         <div class="resize-cover hide for-prime"></div>
       </div>
       <div class="border hor resize"></div>
@@ -96,17 +91,8 @@
                 </div>
                 <div class="param-settings">
                   <div class="param-value">
-                    <input
-                      type="text"
-                      min="1"
-                      step="1"
-                      id="pop-size"
-                      name="pop_size"
-                      pattern="^[-+]?\d*\.?0*$"
-                      inputmode="numeric"
-                      class="disable-on-run"
-                      required
-                    />
+                    <input type="text" min="1" step="1" id="pop-size" name="pop_size" pattern="^[-+]?\d*\.?0*$"
+                      inputmode="numeric" class="disable-on-run" required />
                   </div>
                   <div class="other-settings">
                     <button class="random-btn">Random</button>
@@ -127,17 +113,8 @@
                 </div>
                 <div class="param-settings">
                   <div class="param-value">
-                    <input
-                      type="text"
-                      min="1"
-                      step="1"
-                      id="genes-num"
-                      name="genes_num"
-                      pattern="^[-+]?\d*\.?0*$"
-                      inputmode="numeric"
-                      class="disable-on-run"
-                      required
-                    />
+                    <input type="text" min="1" step="1" id="genes-num" name="genes_num" pattern="^[-+]?\d*\.?0*$"
+                      inputmode="numeric" class="disable-on-run" required />
                   </div>
                   <div class="other-settings">
                     <button class="random-btn">Random</button>
@@ -158,21 +135,34 @@
                 </div>
                 <div class="param-settings">
                   <div class="param-value">
-                    <input
-                      type="range"
-                      inputmode="numeric"
-                      min="0.001"
-                      max="1"
-                      step="0.001"
-                      id="co-rate"
-                      name="co_rate"
-                      pattern="^[-+]?\d*\.?\d*$"
-                      class="textfieldable"
-                      required
-                    />
+                    <input type="range" inputmode="numeric" min="0.001" max="1" step="0.001" id="co-rate" name="co_rate"
+                      pattern="^[-+]?\d*\.?\d*$" class="textfieldable" required />
                   </div>
                   <div class="other-settings">
                     <button class="random-btn">Random</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="type-container hide">
+              <div class="type">
+                <div class="type-name">
+                  <p>Type :</p>
+                </div>
+                <div class="type-settings">
+                  <div class="type-value">
+                    <label>
+                      <input type="radio" name="co_type" value="0" checked />
+                      Single-point
+                    </label>
+                    <label>
+                      <input type="radio" name="co_type" value="1" />
+                      Two-point and k-point
+                    </label>
+                    <label>
+                      <input type="radio" name="co_type" value="2" />
+                      Uniform
+                    </label>
                   </div>
                 </div>
               </div>
@@ -184,21 +174,30 @@
                 </div>
                 <div class="param-settings">
                   <div class="param-value">
-                    <input
-                      type="range"
-                      inputmode="numeric"
-                      min="0"
-                      max="1"
-                      step="0.001"
-                      id="mut-rate"
-                      name="mut_rate"
-                      pattern="^[-+]?\d*\.?\d*$"
-                      class="textfieldable"
-                      required
-                    />
+                    <input type="range" inputmode="numeric" min="0" max="1" step="0.001" id="mut-rate" name="mut_rate"
+                      pattern="^[-+]?\d*\.?\d*$" class="textfieldable" required />
                   </div>
                   <div class="other-settings">
                     <button class="random-btn">Random</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="type-container hide">
+              <div class="type">
+                <div class="type-name">
+                  <p>Type :</p>
+                </div>
+                <div class="type-settings">
+                  <div class="type-value">
+                    <label>
+                      <input type="radio" name="mut_type" value="0" checked />
+                      Bit string mutation
+                    </label>
+                    <label>
+                      <input type="radio" name="mut_type" value="1" />
+                      Flip Bit
+                    </label>
                   </div>
                 </div>
               </div>
@@ -211,24 +210,37 @@
                 </div>
                 <div class="param-settings">
                   <div class="param-value">
-                    <input
-                      type="range"
-                      inputmode="numeric"
-                      min="0"
-                      max="5"
-                      step="0.05"
-                      id="del-rate"
-                      name="del_rate"
-                      pattern="^[-+]?\d*\.?\d*$"
-                      class="textfieldable is-disable-able"
-                      required
-                    />
+                    <input type="range" inputmode="numeric" min="0" max="5" step="0.05" id="del-rate" name="del_rate"
+                      pattern="^[-+]?\d*\.?\d*$" class="textfieldable is-disable-able" required />
                   </div>
                   <div class="other-settings">
                     <button class="random-btn">Random</button>
                     <div class="checkbox-wrapper hide">
                       <input type="checkbox" name="del_rate_pin" id="del-rate-pin" />
                       <label for="del-rate-pin">
+                        <img src="img/pin.png" />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="complex-param">
+              <input class="param-enabled hide" type="checkbox" name="pause_gen_enabled" id="pause-gen-enabled" />
+              <div class="param">
+                <div class="param-name">
+                  <p>Pause Generation</p>
+                </div>
+                <div class="param-settings">
+                  <div class="param-value">
+                    <input type="text" min="1" step="1" id="pause-gen" name="pause_gen" pattern="^[-+]?\d*\.?0*$"
+                      class="is-disable-able" inputmode="numeric" required />
+                  </div>
+                  <div class="other-settings">
+                    <button class="random-btn">Random</button>
+                    <div class="checkbox-wrapper hide" title="Pin to Main Window">
+                      <input type="checkbox" name="pause_gen_pin" id="pause-gen-pin" />
+                      <label for="pause-gen-pin">
                         <img src="img/pin.png" />
                       </label>
                     </div>
@@ -244,17 +256,8 @@
                 </div>
                 <div class="param-settings">
                   <div class="param-value">
-                    <input
-                      type="text"
-                      min="1"
-                      step="1"
-                      id="max-gen"
-                      name="max_gen"
-                      pattern="^[-+]?\d*\.?0*$"
-                      class="is-disable-able disable-on-run"
-                      inputmode="numeric"
-                      required
-                    />
+                    <input type="text" min="1" step="1" id="max-gen" name="max_gen" pattern="^[-+]?\d*\.?0*$"
+                      class="is-disable-able" inputmode="numeric" required />
                   </div>
                   <div class="other-settings">
                     <button class="random-btn">Random</button>
@@ -262,6 +265,33 @@
                       <input type="checkbox" name="max_gen_pin" id="max-gen-pin" />
                       <label for="max-gen-pin">
                         <img src="img/pin.png" />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="radio complex-param">
+              <div class="param">
+                <div class="param-name">
+                  <p>Update Population</p>
+                </div>
+                <div class="param-settings">
+                  <div class="param-value">
+                    <label>
+                      <input type="radio" name="update_pop" value="0" />
+                      Only if offspring fitness is better than parent
+                    </label>
+                    <label>
+                      <input type="radio" name="update_pop" value="1" />
+                      Always replace parent with offspring
+                    </label>
+                  </div>
+                  <div class="other-settings hide">
+                    <div class="checkbox-wrapper" title="Pin to Main Window">
+                      <input type="checkbox" name="update_pop_pin" id="update-pop-pin">
+                      <label for="update-pop-pin">
+                        <img src="img/pin.png">
                       </label>
                     </div>
                   </div>
@@ -305,33 +335,25 @@
               <img src="img/minimize.png" />
             </button>
           </div>
-          <webview
-            id="side-chart"
-            src="side-chart/side-chart.html"
-            autosize="on"
-            style="height: 100%;"
-            allowtransparency
-            nodeintegration
-            preload="preloads/side-preload"
-          ></webview>
+          <webview id="side-chart" src="side-chart/side-chart.html" autosize="on" style="height: 100%;"
+            allowtransparency nodeintegration preload="preloads/side-preload"></webview>
           <div class="resize-cover hide for-side"></div>
         </div>
       </div>
       <div class="border hor"></div>
-      <div class="bottom-container"></div>
     </div>
     <!-- #endregion -->
     <!-- #region Loading (empty after load) -->
-    <div
-      id="loading-bg"
-      style="position: absolute; transition: opacity 0.2s; top: 34%; left: calc((100vw - 32vh) / 2); height: 32vh;"
-    >
+    <div id="loading-bg"
+      style="position: absolute; transition: opacity 0.2s; top: 34%; left: calc((100vw - 32vh) / 2); height: 32vh;">
       <img src="img/loading.svg" alt="Loading..." height="100%" />
     </div>
     <!-- #endregion -->
     <script>
       let exports = {};
+
     </script>
     <script src="renderer.js"></script>
   </body>
+
 </html>

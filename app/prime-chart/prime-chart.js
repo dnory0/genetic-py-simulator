@@ -137,11 +137,6 @@ let primeChart = window['createChart']('prime-chart', {
             name: 'Deviation',
             data: [],
         },
-        {
-            type: 'line',
-            name: 'QGA',
-            data: [],
-        },
     ],
     plotOptions: {
         series: {

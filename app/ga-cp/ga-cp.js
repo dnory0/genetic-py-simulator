@@ -7,7 +7,7 @@ delete window['settings'];
 let isClosable = true;
 let validatePath = window['validatePath'];
 let checkPath = (path) => {
-    let checkCode = validatePath(path);
+    let checkCode = validatePath(path, '.json', '.jsonc', '.js');
     switch (checkCode) {
         case -1:
             console.log("path doesn't exist.");
@@ -19,7 +19,7 @@ let checkPath = (path) => {
             console.log("the path doesn't point to a file.");
             break;
         case -4:
-            console.log('path should point to a python file (ends with .py).');
+            console.log('path should point to a JSON file (ends with .json/.jsonc/.js).');
             break;
         default:
             console.log('possible.');
@@ -27,6 +27,7 @@ let checkPath = (path) => {
     }
 };
 let browseBtn = document.getElementById('browse-btn');
+let applyBtn = document.getElementById('apply-btn');
 let paramsPath = document.getElementById('params-path');
 let saveBtn = document.getElementById('save-btn');
 let closeBtn = document.getElementById('close-btn');
@@ -36,11 +37,10 @@ browseBtn.onclick = () => {
         if (result.canceled)
             return;
         paramsPath.value = result.filePaths[0];
-        checkPath(result.filePaths[0]);
     });
     ipcRenderer.send('browse');
 };
-paramsPath.onkeyup = () => checkPath(paramsPath.value);
+applyBtn.onclick = () => checkPath(paramsPath.value);
 (() => {
     saveBtn.onclick = () => {
         revertSettings['renderer']['input'] = curSettings['renderer']['input'];
@@ -62,6 +62,9 @@ paramsPath.onkeyup = () => checkPath(paramsPath.value);
     let eventListener = () => (revertBtn.disabled = saveBtn.disabled = isClosable = false);
     Array.from(document.getElementsByTagName('input')).forEach(input => {
         if (input.type == 'checkbox') {
+            input.addEventListener('change', eventListener);
+        }
+        else if (input.type == 'radio') {
             input.addEventListener('change', eventListener);
         }
         else {
@@ -102,6 +105,15 @@ let toggleDisableOnRun = (disable) => {
         gaParam.disabled = disable;
         gaParam.parentElement.nextElementSibling.firstElementChild.disabled = disable;
         gaParam.parentElement.parentElement.title = !disable ? '' : 'Disabled when GA is Running';
+    });
+    let gaTypes = Array.from(document.getElementsByClassName('type-value'))
+        .reduce((accum, typeValue) => accum.concat(...Array.from(typeValue.children)), [])
+        .map((label) => label.firstElementChild)
+        .filter(radioInput => radioInput.name != 'update_pop');
+    curSettings['renderer']['input'][gaTypes[0].name.replace('_', '-')]['disable'] = disable;
+    gaTypes.forEach(gaType => {
+        gaType.disabled = disable;
+        gaType.parentElement.parentElement.title = disable ? 'Disabled when GA is Running' : '';
     });
 };
 ipcRenderer.on('update-settings', (_ev, activate) => {

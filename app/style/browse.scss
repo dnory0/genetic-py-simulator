@@ -3,17 +3,18 @@
 
   > input[type='text'] {
     flex: 1;
-    height: 24px;
+    height: 22px;
     outline: none;
     padding: 1px 5px;
     border: thin #a2a2a2 solid;
+    border-radius: 3px 0 0 3px;
     font-size: 14px;
   }
 
   > button {
     background-color: #e8e8e8;
-    font-weight: bold;
-    height: 28px;
+    font-weight: normal;
+    height: 26px;
     width: 36px;
     outline: none;
     user-select: none;
@@ -32,10 +33,9 @@
       height: 20px;
     }
 
-    &.browse-txt::after {
-      content: 'browse...';
-      position: relative;
-      top: -4px;
+    &:last-child {
+      width: 60px;
+      border-radius: 0 3px 3px 0;
     }
   }
 }

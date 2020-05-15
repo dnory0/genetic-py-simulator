@@ -1,6 +1,6 @@
 # Genetic Py
 
-A Simulator that solves optimization problems using Genetic Algorithms & Quantum Genetic Algorithms and shows results on charts.
+A Simulator that solves optimization problems using Genetic Algorithms and shows results on charts.
 
 > **Note:** The Project is in development stage (anything may change or be removed on the future).
 
@@ -8,7 +8,6 @@ A Simulator that solves optimization problems using Genetic Algorithms & Quantum
 
 1. Try to present a simple tool to use genetic algorithms to solve optimization problems.
 2. This project is going to be my graduation project.
-3. I love Quantum Algorithms 🚀🚀.
 
 ## Download
 
@@ -26,11 +25,11 @@ If you are a developer and you want to run the code on your machine, do the foll
 
 2. Run on CLI:
 
-    ```sh
-    git clone https://github.com/dnory0/genetic-py.git
-    cd genetic-py
-    yarn # or npm install
-    ```
+   ```sh
+   git clone https://github.com/dnory0/genetic-py.git
+   cd genetic-py
+   yarn # or npm install
+   ```
 
 3. Run the application:
 

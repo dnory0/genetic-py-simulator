@@ -36,6 +36,8 @@ function params() {
             return (Math.random() * (max - min) + min).toFixed(isInt ? 0 : 3);
         }
         let randomBtn = input.parentElement.nextElementSibling.firstElementChild;
+        if (randomBtn == null)
+            return;
         randomBtn.onclick = () => {
             input.value = rangedRandom(input.max == '' ? parseFloat(input.step) * 1000 : parseFloat(input.max), input.min == '' ? 0 : parseFloat(input.min), Number.isSafeInteger(parseFloat(input.step))).toString();
             if (!input.classList.replace('invalid', 'valid'))

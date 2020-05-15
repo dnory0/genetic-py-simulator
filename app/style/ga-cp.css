@@ -299,6 +299,66 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
   margin: 6px;
 }
 
+.params-man .complex-param.radio {
+  font-family: sans-serif;
+  font-size: 13px;
+}
+
+.params-man .complex-param.radio .param {
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: baseline;
+      -ms-flex-align: baseline;
+          align-items: baseline;
+}
+
+.params-man .complex-param.radio .param .param-name {
+  -ms-flex-item-align: baseline;
+      align-self: baseline;
+  width: 100%;
+  padding-top: 10px;
+}
+
+.params-man .complex-param.radio .param .param-settings {
+  padding: 5px;
+}
+
+.params-man .complex-param.radio .param .param-settings .param-value {
+  width: 100%;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: baseline;
+      -ms-flex-align: baseline;
+          align-items: baseline;
+}
+
+.params-man .complex-param.radio .param .param-settings .param-value > label {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  padding: 5px;
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  width: fit-content;
+}
+
+.params-man .complex-param.radio .param .param-settings .param-value > label > input {
+  margin-right: 5px;
+}
+
+.params-man .complex-param.radio .param .other-settings {
+  position: relative;
+  top: -29px;
+  left: 22px;
+}
+
 .params-man input[type='checkbox'].param-enabled {
   margin: 11px;
 }
@@ -329,17 +389,18 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
   -webkit-box-flex: 1;
       -ms-flex: 1;
           flex: 1;
-  height: 24px;
+  height: 22px;
   outline: none;
   padding: 1px 5px;
   border: thin #a2a2a2 solid;
+  border-radius: 3px 0 0 3px;
   font-size: 14px;
 }
 
 .browse > button {
   background-color: #e8e8e8;
-  font-weight: bold;
-  height: 28px;
+  font-weight: normal;
+  height: 26px;
   width: 36px;
   outline: none;
   -webkit-user-select: none;
@@ -362,10 +423,9 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
   height: 20px;
 }
 
-.browse > button.browse-txt::after {
-  content: 'browse...';
-  position: relative;
-  top: -4px;
+.browse > button:last-child {
+  width: 60px;
+  border-radius: 0 3px 3px 0;
 }
 
 #main {
@@ -406,6 +466,7 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  padding: 0 0 10px;
 }
 
 #main .configuration .params .sign .title {
@@ -486,5 +547,72 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
 
 #main .bottom .right #save-btn:disabled {
   background-color: #4e9dff;
+}
+
+.type-container {
+  font-family: sans-serif;
+  padding: 0 10px;
+  font-size: 13px;
+}
+
+.type-container .type {
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: baseline;
+      -ms-flex-align: baseline;
+          align-items: baseline;
+}
+
+.type-container .type .type-name {
+  width: 100%;
+}
+
+.type-container .type .type-name > p {
+  margin: 0;
+}
+
+.type-container .type .type-settings {
+  padding: 5px;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  width: 100%;
+}
+
+.type-container .type .type-settings .type-value {
+  -webkit-box-align: baseline;
+      -ms-flex-align: baseline;
+          align-items: baseline;
+  width: 100%;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+
+.type-container .type .type-settings .type-value > label {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  padding: 5px;
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  width: fit-content;
+}
+
+.type-container .type .type-settings .type-value > label > input {
+  margin-right: 5px;
+}
+
+.hide {
+  display: none !important;
 }
 /*# sourceMappingURL=ga-cp.css.map */
