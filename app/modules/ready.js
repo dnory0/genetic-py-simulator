@@ -6,7 +6,7 @@ module.exports = (pyshell, prime, side, treatResponse, webFrame) => {
             .toString()
             .split(/(?<=\n)/g)
             .map((data) => JSON.parse(data))
-            .forEach((data) => treatResponse(data));
+            .forEach((data) => { console.log(data); treatResponse(data); });
     });
     return () => {
         prime.setZoomFactor(webFrame.getZoomFactor());

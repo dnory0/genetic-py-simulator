@@ -102,10 +102,10 @@ class Evolve:
             for gene1, gene2 in zip(parent1.genes, parent2.genes):
                 if random() > .5:
                     offspring1.append(gene2)
-                    offspring1.append(gene1)
+                    offspring2.append(gene1)
                 else:
                     offspring1.append(gene1)
-                    offspring1.append(gene2)
+                    offspring2.append(gene2)
         return offsprings
 
     @staticmethod
@@ -114,15 +114,8 @@ class Evolve:
             for offspring in couple:
                 for index in range(genes_num):
                     if randint(0, 999)/1000 < mut_rate:
-                        offspring[
-                            index % len(offspring)
-                        ], offspring[
-                            (index + 1) % len(offspring)
-                        ] = offspring[
-                            (index + 1) % len(offspring)
-                        ], offspring[
-                            index % len(offspring)
-                        ]
+                        i, j = index % len(offspring), (index + 1) % len(offspring)
+                        offspring[i], offspring[j] = offspring[j], offspring[i]
         return offsprings
 
     @staticmethod
@@ -425,10 +418,10 @@ def update_parameters(command: dict):
         g_del_rate = float(command.get('del_rate'))
     if type(command.get('pause_gen')) is not type(None):
         # pause generations
-        g_pause_gen = float(command.get('pause_gen'))
+        g_pause_gen = False if command.get('pause_gen') is False else float(command.get('pause_gen'))
     if type(command.get('max_gen')) is not type(None):
         # maximum generations
-        g_max_gen = float(command.get('max_gen'))
+        g_max_gen = False if command.get('max_gen') is False else float(command.get('max_gen'))
     if type(command.get('update_pop')) is not type(None):
         # specifies when to update_population
         # if 0:
