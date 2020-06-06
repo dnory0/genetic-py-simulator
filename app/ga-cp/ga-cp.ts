@@ -57,11 +57,11 @@ let browseBtn = <HTMLButtonElement>document.getElementById('browse-btn');
 /**
  * apply button
  */
-let applyBtn = <HTMLButtonElement>document.getElementById('apply-btn');
+let loadBtn = <HTMLButtonElement>document.getElementById('load-btn');
 /**
  * input that takes the path to ga configuration
  */
-let paramsPath = <HTMLInputElement>document.getElementById('params-path');
+let paramsPath = <HTMLInputElement>document.getElementById('genes-data-path');
 /**
  * save button
  */
@@ -83,7 +83,11 @@ browseBtn.onclick = () => {
   ipcRenderer.send('browse');
 };
 
-applyBtn.onclick = () => checkPath(paramsPath.value);
+paramsPath.addEventListener('keyup', (ev) => {
+  if (ev.key == 'Enter') loadBtn.click()
+});
+
+loadBtn.onclick = () => checkPath(paramsPath.value);
 
 (() => {
   /**
@@ -121,7 +125,7 @@ applyBtn.onclick = () => checkPath(paramsPath.value);
     } else {
       input.addEventListener('keypress', eventListener);
       input.addEventListener('paste', eventListener);
-      if (!input.id.match('params-path'))
+      if (!input.id.match('genes-data-path'))
         input.addEventListener('keyup', ev => {
           if (['ArrowUp', 'ArrowDown'].includes(ev.key)) eventListener();
         });

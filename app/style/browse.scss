@@ -3,7 +3,7 @@
 
   > input[type='text'] {
     flex: 1;
-    height: 22px;
+    height: 20px;
     outline: none;
     padding: 1px 5px;
     border: thin #a2a2a2 solid;
@@ -12,19 +12,12 @@
   }
 
   > button {
-    background-color: #e8e8e8;
     font-weight: normal;
-    height: 26px;
-    width: 36px;
     outline: none;
     user-select: none;
     margin-left: -1px;
     border: thin #a2a2a2 solid;
     border-radius: 0;
-
-    &:hover {
-      background-color: #d2d2d2;
-    }
 
     img {
       position: relative;
@@ -34,7 +27,6 @@
     }
 
     &:last-child {
-      width: 60px;
       border-radius: 0 3px 3px 0;
     }
   }

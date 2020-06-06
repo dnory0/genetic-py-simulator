@@ -25,12 +25,7 @@ window['ipcRenderer'] = ipcRenderer;
  *
  * @returns set up chart
  */
-window['createChart'] = require(join(
-  __dirname,
-  '..',
-  'modules',
-  'create-chart'
-));
+window['createChart'] = require(join(__dirname, '..', 'modules', 'create-chart'));
 /**
  * enables or disable the hover settings for the passed chart
  * @param chart chart to apply hover settings on
@@ -40,34 +35,34 @@ window['toggleChartHover'] = (chart: Chart, enable: boolean) => {
   chart.update(
     {
       tooltip: {
-        enabled: enable
+        enabled: enable,
       },
       xAxis: {
-        crosshair: enable
+        crosshair: enable,
       },
       legend: {
         itemStyle: {
-          pointerEvents: enable ? 'all' : 'none'
+          pointerEvents: enable ? 'all' : 'none',
         },
         itemCheckboxStyle: {
-          pointerEvents: enable ? 'all' : 'none'
-        }
+          pointerEvents: enable ? 'all' : 'none',
+        },
       },
       plotOptions: {
         series: {
           marker: {
             enabled: enable,
-            radius: enable ? 1.5 : null
+            radius: enable ? 1.5 : null,
           },
           states: {
             hover: {
               halo: {
-                opacity: enable ? 0.5 : 0
-              }
-            }
-          }
-        }
-      }
+                opacity: enable ? 0.5 : 0,
+              },
+            },
+          },
+        },
+      },
     },
     true,
     false,
@@ -121,9 +116,9 @@ window['toggleZoom'] = (chart: Chart, enable: boolean) => {
       chart: {
         zoomType: enable ? 'x' : null,
         panning: {
-          enabled: enable
-        }
-      }
+          enabled: enable,
+        },
+      },
     },
     true,
     false,

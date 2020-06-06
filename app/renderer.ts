@@ -138,6 +138,7 @@ const treatResponse = (response: object) => {
   } else if (response['forced-pause']) {
     // if paused by pause generation parameter
     isRunning = false;
+    blinkPlayBtn();
     switchPlayBtn();
   }
 };
@@ -319,17 +320,15 @@ stepFBtn.onclick = () => ctrlClicked('step_f', false);
   let hidePane = <HTMLButtonElement>document.getElementById('pane-hide-btn');
   let showPane = <HTMLButtonElement>document.getElementById('pane-show-btn');
 
-  hidePane.onclick = () => {
-    showPane.parentElement.classList.toggle('hide', false);
-    contCont.classList.toggle('hide', true);
-    borderHide.classList.toggle('hide', true);
-  };
+  const togglePane = (ev: MouseEvent) => {
+    const hide = (<HTMLButtonElement>ev.currentTarget).id == 'pane-hide-btn';
+    showPane.parentElement.classList.toggle('hide', !hide);
+    contCont.classList.toggle('hide', hide);
+    borderHide.classList.toggle('hide', hide);
+  }
 
-  showPane.onclick = () => {
-    showPane.parentElement.classList.toggle('hide', true);
-    contCont.classList.toggle('hide', false);
-    borderHide.classList.toggle('hide', false);
-  };
+  hidePane.onclick = togglePane;
+  showPane.onclick = togglePane;
 })();
 /******** Declared Glabally to be when default settings are recieved ********/
 

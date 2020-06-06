@@ -53,6 +53,7 @@ const treatResponse = (response) => {
     }
     else if (response['forced-pause']) {
         isRunning = false;
+        blinkPlayBtn();
         switchPlayBtn();
     }
 };
@@ -176,16 +177,14 @@ stepFBtn.onclick = () => ctrlClicked('step_f', false);
     let borderHide = document.querySelector('.border-hide');
     let hidePane = document.getElementById('pane-hide-btn');
     let showPane = document.getElementById('pane-show-btn');
-    hidePane.onclick = () => {
-        showPane.parentElement.classList.toggle('hide', false);
-        contCont.classList.toggle('hide', true);
-        borderHide.classList.toggle('hide', true);
+    const togglePane = (ev) => {
+        const hide = ev.currentTarget.id == 'pane-hide-btn';
+        showPane.parentElement.classList.toggle('hide', !hide);
+        contCont.classList.toggle('hide', hide);
+        borderHide.classList.toggle('hide', hide);
     };
-    showPane.onclick = () => {
-        showPane.parentElement.classList.toggle('hide', true);
-        contCont.classList.toggle('hide', false);
-        borderHide.classList.toggle('hide', false);
-    };
+    hidePane.onclick = togglePane;
+    showPane.onclick = togglePane;
 })();
 const sendParameter = (key, value) => {
     window['sendSig'](JSON.stringify({

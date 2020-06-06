@@ -14,13 +14,32 @@
     flex: 1;
     display: flex;
     height: calc(100% - 45px);
+    background-color: whitesmoke;
 
-    .params {
+    
+    .title {
+      margin: 0;
+
+      &.pad {
+        padding: 8px 0;
+
+        &.small {
+          padding: 5px 0;
+        }
+      }
+
+      &.small {
+        font-size: 15px;
+      }
+    }
+
+    .params-man {
       width: 396px;
+      min-width: 396px;
+      max-width: 396px;
       display: flex;
       flex-direction: column;
       overflow-y: auto;
-      background-color: whitesmoke;
 
       .sign {
         display: flex;
@@ -28,8 +47,6 @@
 
         .title {
           flex: 1;
-          margin: 0;
-          padding: 8px 0;
           font-size: 17px;
           font-family: sans-serif;
         }
@@ -40,9 +57,6 @@
         }
       }
 
-      .params-file {
-        font-family: sans-serif;
-      }
     }
 
     .border {
@@ -50,9 +64,10 @@
       padding: 0;
     }
 
-    .details {
-      background-color: aliceblue;
+    .params-fitness {
+      padding: 10px 6px;
       flex: 1;
+      font-family: sans-serif;
     }
   }
 
@@ -140,4 +155,9 @@
 
 .hide {
   display: none !important;
+}
+
+.load-txt {
+  margin: 10px 0;
+  float: right;
 }

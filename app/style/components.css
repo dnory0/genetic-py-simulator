@@ -14,8 +14,7 @@ button:disabled {
   background-color: whitesmoke;
 }
 
-input[type='text']:not(#params-path).valid, input[type='text']:not(#params-path).valid:focus,
-input.tab-triggered.valid,
+input[type='text']:not(#params-path).valid:focus,
 input.tab-triggered.valid:focus {
   -webkit-box-shadow: 0 0 0 1px #6cdf00, 0 0 0 4px rgba(0, 255, 0, 0.3);
           box-shadow: 0 0 0 1px #6cdf00, 0 0 0 4px rgba(0, 255, 0, 0.3);

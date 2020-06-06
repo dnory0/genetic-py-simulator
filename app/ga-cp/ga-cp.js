@@ -27,8 +27,8 @@ let checkPath = (path) => {
     }
 };
 let browseBtn = document.getElementById('browse-btn');
-let applyBtn = document.getElementById('apply-btn');
-let paramsPath = document.getElementById('params-path');
+let loadBtn = document.getElementById('load-btn');
+let paramsPath = document.getElementById('genes-data-path');
 let saveBtn = document.getElementById('save-btn');
 let closeBtn = document.getElementById('close-btn');
 let revertBtn = document.getElementById('revert-btn');
@@ -40,7 +40,11 @@ browseBtn.onclick = () => {
     });
     ipcRenderer.send('browse');
 };
-applyBtn.onclick = () => checkPath(paramsPath.value);
+paramsPath.addEventListener('keyup', (ev) => {
+    if (ev.key == 'Enter')
+        loadBtn.click();
+});
+loadBtn.onclick = () => checkPath(paramsPath.value);
 (() => {
     saveBtn.onclick = () => {
         revertSettings['renderer']['input'] = curSettings['renderer']['input'];
@@ -70,7 +74,7 @@ applyBtn.onclick = () => checkPath(paramsPath.value);
         else {
             input.addEventListener('keypress', eventListener);
             input.addEventListener('paste', eventListener);
-            if (!input.id.match('params-path'))
+            if (!input.id.match('genes-data-path'))
                 input.addEventListener('keyup', ev => {
                     if (['ArrowUp', 'ArrowDown'].includes(ev.key))
                         eventListener();

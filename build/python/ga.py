@@ -214,14 +214,14 @@ class GAThread(Thread):
             "genes": pop.fittest().genes,
             "fitness": prvFitness,
         })
-        while g_max_gen == False or pop.generation < g_max_gen:
+        while g_max_gen is False or g_max_gen < 0 or pop.generation < g_max_gen:
             Evolve.evolve_population(pop)
             # takes the current generation fitness
             curFitness = pop.fittest().fitness()
             # if g_del_rate is 0 or False than just ignore it
             if g_del_rate:
                 sleep(g_del_rate)
-            if g_pause_gen != False and pop.generation == g_pause_gen + 1:
+            if g_pause_gen is not False and pop.generation == g_pause_gen + 1:
                 self.pause()
                 to_json({
                     'forced-pause': True
@@ -430,7 +430,7 @@ def update_parameters(command: dict):
         # maximum generations
         g_max_gen = float(command.get('max_gen'))
     if type(command.get('update_pop')) is not type(None):
-        # specifies when to update_populatio
+        # specifies when to update_population
         # if 0:
         #   parent is replaced only when offspring fitness is better than parent's
         # else (it equals 1)

@@ -1,4 +1,4 @@
-import { Chart, SeriesLineOptions, Options, Tooltip } from 'highcharts';
+import { Chart, SeriesLineOptions, Options, Tooltip, TooltipPositionerPointObject, Point } from 'highcharts';
 import { IpcRenderer } from 'electron';
 
 /**
@@ -166,7 +166,8 @@ let primeChart: Chart = window['createChart']('prime-chart', {
           `;
     },
     // to avoid the action buttons overlapping the tooltip
-    positioner(labelWidth, labelHeight, point) {
+    positioner(labelWidth, labelHeight, point: Point | TooltipPositionerPointObject) {
+      point = <TooltipPositionerPointObject> point;
       var x =
         point.plotX +
         primeChart.chartWidth -

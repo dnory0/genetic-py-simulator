@@ -108,6 +108,7 @@ let primeChart = window['createChart']('prime-chart', {
           `;
         },
         positioner(labelWidth, labelHeight, point) {
+            point = point;
             var x = point.plotX +
                 primeChart.chartWidth -
                 primeChart.plotWidth -

@@ -93,21 +93,20 @@ button:disabled {
   background-color: whitesmoke;
 }
 
-input[type='text']:not(#params-path).valid, input[type='text']:not(#params-path).valid:focus,
-input.tab-triggered.valid,
+input[type='text']:not(#genes-data-path).valid:focus,
 input.tab-triggered.valid:focus {
   -webkit-box-shadow: 0 0 0 1px #6cdf00, 0 0 0 4px rgba(0, 255, 0, 0.3);
           box-shadow: 0 0 0 1px #6cdf00, 0 0 0 4px rgba(0, 255, 0, 0.3);
 }
 
-input[type='text']:not(#params-path).invalid, input[type='text']:not(#params-path).invalid:focus,
+input[type='text']:not(#genes-data-path).invalid, input[type='text']:not(#genes-data-path).invalid:focus,
 input.tab-triggered.invalid,
 input.tab-triggered.invalid:focus {
   -webkit-box-shadow: 0 0 0 1px #df0000, 0 0 0 4px rgba(255, 0, 0, 0.3);
           box-shadow: 0 0 0 1px #df0000, 0 0 0 4px rgba(255, 0, 0, 0.3);
 }
 
-input[type='text']:not(#params-path):focus,
+input[type='text']:not(#genes-data-path):focus,
 input.tab-triggered:focus {
   -webkit-box-shadow: 0 0 0 1px #df9a00, 0 0 0 4px rgba(223, 165, 0, 0.3);
           box-shadow: 0 0 0 1px #df9a00, 0 0 0 4px rgba(223, 165, 0, 0.3);
@@ -197,13 +196,8 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
   opacity: 1;
 }
 
-.params-file,
 .params-man {
   padding: 10px 6px;
-}
-
-.params-file {
-  font-family: sans-serif;
 }
 
 .params-man {
@@ -389,7 +383,7 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
   -webkit-box-flex: 1;
       -ms-flex: 1;
           flex: 1;
-  height: 22px;
+  height: 20px;
   outline: none;
   padding: 1px 5px;
   border: thin #a2a2a2 solid;
@@ -398,10 +392,7 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
 }
 
 .browse > button {
-  background-color: #e8e8e8;
   font-weight: normal;
-  height: 26px;
-  width: 36px;
   outline: none;
   -webkit-user-select: none;
      -moz-user-select: none;
@@ -412,10 +403,6 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
   border-radius: 0;
 }
 
-.browse > button:hover {
-  background-color: #d2d2d2;
-}
-
 .browse > button img {
   position: relative;
   top: 2px;
@@ -424,7 +411,6 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
 }
 
 .browse > button:last-child {
-  width: 60px;
   border-radius: 0 3px 3px 0;
 }
 
@@ -447,10 +433,29 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
   display: -ms-flexbox;
   display: flex;
   height: calc(100% - 45px);
+  background-color: whitesmoke;
 }
 
-#main .configuration .params {
+#main .configuration .title {
+  margin: 0;
+}
+
+#main .configuration .title.pad {
+  padding: 8px 0;
+}
+
+#main .configuration .title.pad.small {
+  padding: 5px 0;
+}
+
+#main .configuration .title.small {
+  font-size: 15px;
+}
+
+#main .configuration .params-man {
   width: 396px;
+  min-width: 396px;
+  max-width: 396px;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -459,35 +464,28 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
       -ms-flex-direction: column;
           flex-direction: column;
   overflow-y: auto;
-  background-color: whitesmoke;
 }
 
-#main .configuration .params .sign {
+#main .configuration .params-man .sign {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   padding: 0 0 10px;
 }
 
-#main .configuration .params .sign .title {
+#main .configuration .params-man .sign .title {
   -webkit-box-flex: 1;
       -ms-flex: 1;
           flex: 1;
-  margin: 0;
-  padding: 8px 0;
   font-size: 17px;
   font-family: sans-serif;
 }
 
-#main .configuration .params .sign .random-all-btn {
+#main .configuration .params-man .sign .random-all-btn {
   width: -webkit-fit-content;
   width: -moz-fit-content;
   width: fit-content;
   margin: 6px;
-}
-
-#main .configuration .params .params-file {
-  font-family: sans-serif;
 }
 
 #main .configuration .border {
@@ -495,11 +493,12 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
   padding: 0;
 }
 
-#main .configuration .details {
-  background-color: aliceblue;
+#main .configuration .params-fitness {
+  padding: 10px 6px;
   -webkit-box-flex: 1;
       -ms-flex: 1;
           flex: 1;
+  font-family: sans-serif;
 }
 
 #main .bottom {
@@ -614,5 +613,10 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
 
 .hide {
   display: none !important;
+}
+
+.load-txt {
+  margin: 10px 0;
+  float: right;
 }
 /*# sourceMappingURL=ga-cp.css.map */

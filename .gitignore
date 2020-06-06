@@ -90,6 +90,7 @@ typings/
 # what I added
 dist
 .idea
+details.md
 .vscode
 TODO.*
 IDEA.*
