@@ -32,7 +32,7 @@ global['pyshell'] = pyshell;
 /**
  * load settings
  */
-let settings: object = require(join(__dirname, 'modules', 'load-settings.js'))(app);
+let settings: object = require(join(__dirname, 'modules', 'load-settings.js'))(app, process.argv.some(arg => ['--reset-settings', '-S'].includes(arg)));
 global['settings'] = settings;
 
 /**
