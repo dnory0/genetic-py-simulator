@@ -9,6 +9,26 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+if (process.argv.some(arg => ['--help', '-h'].includes(arg))) {
+    const { description, homepage } = require('../package.json');
+    console.log(`Description: ${description}.`);
+    console.log(`For more, visit: ${homepage}.`);
+    console.log(`
+-h  --help\t\tprint this help
+-d  -D  --dev\t\tto launch app on development mode, and be able to open devTools
+-S  --reset-settings\tforce app to reset settings, this is useful on major updates
+-v  --version\t\tprint versions`);
+    process.exit();
+}
+else if (process.argv.some(arg => ['--version', '-v'].includes(arg))) {
+    const { name, productName, version, dependencies, devDependencies } = require('../package.json');
+    console.log(`${name} (${productName}): ${version}`);
+    for (let dependency in dependencies)
+        console.log(`${dependency}: ${dependencies[dependency].replace('^', '')}`);
+    for (let devDependency in devDependencies)
+        console.log(`${devDependency}: ${devDependencies[devDependency].replace('^', '')}`);
+    process.exit();
+}
 const electron_1 = require("electron");
 const path_1 = require("path");
 const fs_1 = require("fs");
