@@ -11,10 +11,7 @@
     "ui": {
       "zoom": 1,
       "horizontal": {
-        "height": 410
-      },
-      "vertical": {
-        "width": 440
+        "height": 250
       }
     },
     "input": {
@@ -22,6 +19,9 @@
         "enabled": true
       },
       "genes-data-path": {
+        "value": ""
+      },
+      "fitness-function-path": {
         "value": ""
       },
       "pop-size": {

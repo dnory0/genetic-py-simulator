@@ -14,7 +14,7 @@ module.exports = (
       .toString()
       .split(/(?<=\n)/g)
       .map((data: string) => JSON.parse(data))
-      .forEach((data: object) => {console.log(data);treatResponse(data)});
+      .forEach((data: object) => treatResponse(data));
   });
 
   // returns webviews zoom factor resetter.

@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GA Control Panel</title>
+    <link rel="stylesheet" href="../../node_modules/json-view/dist/jsonview.bundle.css" />
     <link rel="stylesheet" href="../style/ga-cp.css" />
   </head>
 
@@ -241,16 +242,29 @@
           </div>
         </div>
         <div class="border ver"></div>
-        <div class="params-fitness">
+        <div class="params-fitness scrollbar">
           <p class="title pad">Fitness Configuration</p>
-          <!-- <div class="params-file"> -->
-          <div class="genes-data">
+          <div class="genes-data browse-container">
             <p class="title pad small">Genes Data</p>
             <div class="browse">
-              <input type="text" id="genes-data-path" />
-              <button id="browse-btn" class="browse-txt" title="Browse..."><span class="alt-trigger">B</span>rowse</button>
+              <input type="text" id="genes-data-path" class="load-path genes-data"/>
+              <button id="browse-genes-data-btn" class="browse-btn genes-data" title="Browse..."><span class="alt-trigger">B</span>rowse</button>
             </div>
-            <button id="load-btn" class="load-txt"><span class="alt-trigger">L</span>oad</button>
+            <div class="other-browse-btns">
+              <button id="load-genes-data-btn" class="load-btn genes-data" title="Load"><span class="alt-trigger">L</span>oad</button>
+            </div>
+          </div>
+          <div class="genes-tree"></div>
+          <div class="fitness-function browse-container">
+            <p class="title pad small">Fitness Function</p>
+            <div class="browse">
+              <input type="text" id="fitness-function-path" class="load-path fitness-function"/>
+              <button id="browse-fitness-function-btn" class="browse-btn fitness-function" title="Browse..."><span class="alt-trigger">B</span>rowse</button>
+            </div>
+            <div class="other-browse-btns">
+              <button class="get-template-btn fitness-function" title="Get Default Template">Get Template</button>
+              <button id="load-fitness-function-btn" class="load-btn fitness-function" title="Load"><span class="alt-trigger">L</span>oad</button>
+            </div>
           </div>
         </div>
       </div>
@@ -275,9 +289,12 @@
         </div>
       </div>
     </div>
+    <script src="../../node_modules/json-view/dist/jsonview.bundle.js"></script>
     <script>
       let exports = {};
-
+      window['jsonTree'] = function(treeContainer, data) {
+        JsonView.render(JsonView.createTree(data), treeContainer);
+      }
     </script>
     <script src="ga-cp.js"></script>
   </body>

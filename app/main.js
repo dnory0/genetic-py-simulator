@@ -94,7 +94,7 @@ electron_1.app.once('ready', () => {
                 return;
             }
             gaWindow = createWindow(path_1.join(__dirname, 'ga-cp', 'ga-cp.html'), {
-                minWidth: 680,
+                minWidth: 760,
                 minHeight: 480,
                 maximizable: false,
                 minimizable: false,
@@ -106,9 +106,9 @@ electron_1.app.once('ready', () => {
             gaWindow.once('ready-to-show', gaWindow.show);
             if (!isDev)
                 gaWindow.removeMenu();
-            gaWindow.webContents.on('ipc-message', (_ev, gaChannel, updatedSettings) => {
+            gaWindow.webContents.on('ipc-message', (_ev, gaChannel, other) => {
                 if (gaChannel == 'ga-cp-finished') {
-                    mainWindow.webContents.send('ga-cp-finished', updatedSettings);
+                    mainWindow.webContents.send('ga-cp-finished', other);
                     gaWindow.destroy();
                 }
                 else if (gaChannel == 'close-confirm') {
@@ -127,7 +127,7 @@ electron_1.app.once('ready', () => {
                             .then(result => {
                             if (!result.response)
                                 return;
-                            mainWindow.webContents.send('ga-cp-finished', updatedSettings);
+                            mainWindow.webContents.send('ga-cp-finished', other);
                             gaWindow.destroy();
                         })
                             .catch(reason => {
@@ -141,10 +141,11 @@ electron_1.app.once('ready', () => {
                         title: 'Open GA Configuration file',
                         defaultPath: electron_1.app.getPath('desktop'),
                         filters: [
+                            other,
                             {
-                                name: 'JSON File (.json)',
-                                extensions: ['json', 'jsonc', 'js'],
-                            },
+                                name: 'All Files',
+                                extensions: ['*'],
+                            }
                         ],
                         properties: ['openFile'],
                     }, result => gaWindow.webContents.send('browsed-path', result), reason => {

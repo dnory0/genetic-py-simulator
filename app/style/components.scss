@@ -15,7 +15,7 @@ button {
   }
 }
 
-input[type='text']:not(#genes-data-path),
+input[type='text']:not(.load-path),
 input.tab-triggered {
   &.valid:focus {
     box-shadow: 0 0 0 1px #6cdf00, 0 0 0 4px rgba(0, 255, 0, 0.3);

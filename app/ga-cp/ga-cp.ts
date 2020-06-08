@@ -16,7 +16,7 @@ delete window['settings'];
  */
 let isClosable = true;
 /**
- * checks if path is valid, check conditions are ordered and return value is as follows:
+ * checks if given path is valid, check conditions are ordered and return value is as follows:
  *
  * - ```-1``` if path does not exist.
  * - ```-2``` if path is not an absolute path.
@@ -24,44 +24,23 @@ let isClosable = true;
  * - ```-4``` if the file extention is not equal to any of the given ```ext```.
  * - ```0``` if path matchs all conditions.
  *
- * @param gaConfigPath GA configuration path to check.
- * @param ext extensions array.
+ * @param filePath file path to check & validate.
+ * @param exts extensions array.
  */
-let validatePath: (gaConfigPath: string, ...ext: string[]) => number = window['validatePath'];
-
-let checkPath = (path: string) => {
-  let checkCode = validatePath(path, '.json', '.jsonc', '.js');
-  switch (checkCode) {
-    case -1:
-      console.log("path doesn't exist.");
-      break;
-    case -2:
-      console.log('path should be absolute, found relative path.');
-      break;
-    case -3:
-      console.log("the path doesn't point to a file.");
-      break;
-    case -4:
-      console.log('path should point to a JSON file (ends with .json/.jsonc/.js).');
-      break;
-    default:
-      console.log('possible.');
-      break;
-  }
-};
+let validatePath: (filePath: string, ...exts: string[]) => number = window['validatePath'];
 
 /**
- * browse button
+ * browse buttons
  */
-let browseBtn = <HTMLButtonElement>document.getElementById('browse-btn');
+let browseBtns = <HTMLButtonElement[]>Array.from(document.getElementsByClassName('browse-btn'));
 /**
- * apply button
+ * load buttons
  */
-let loadBtn = <HTMLButtonElement>document.getElementById('load-btn');
+let loadBtns = <HTMLButtonElement[]>Array.from(document.getElementsByClassName('load-btn'));
 /**
- * input that takes the path to ga configuration
+ * inputs that take the path to whether genes data or fitness function
  */
-let paramsPath = <HTMLInputElement>document.getElementById('genes-data-path');
+let pathInputs = <HTMLInputElement[]>Array.from(document.getElementsByClassName('load-path'));
 /**
  * save button
  */
@@ -75,19 +54,70 @@ let closeBtn = <HTMLButtonElement>document.getElementById('close-btn');
  */
 let revertBtn = <HTMLButtonElement>document.getElementById('revert-btn');
 
-browseBtn.onclick = () => {
-  ipcRenderer.once('browsed-path', (_ev, result: OpenDialogReturnValue) => {
-    if (result.canceled) return;
-    paramsPath.value = result.filePaths[0];
-  });
-  ipcRenderer.send('browse');
-};
-
-paramsPath.addEventListener('keyup', (ev) => {
-  if (ev.key == 'Enter') loadBtn.click()
+browseBtns.forEach(function(browseBtn) {
+  let type = browseBtn.classList.contains('genes-data')? 'genes-data': 'fitness-function';
+  browseBtn.onclick = () => {
+    ipcRenderer.once('browsed-path', (_ev, result: OpenDialogReturnValue) => {
+      if (result.canceled) return;
+      
+      pathInputs.filter((pathInput) => pathInput.classList.contains(type))[0].value = result.filePaths[0];
+    });
+    ipcRenderer.send(
+      'browse', 
+      type == 'genes-data'? {
+        name: 'JSON File (.json)',
+        extensions: ['json', 'jsonc', 'js'],
+      }: 
+      {
+        name: 'Python File (.py)',
+        extensions: ['py', 'py3'],
+      },
+    );
+  }
 });
 
-loadBtn.onclick = () => checkPath(paramsPath.value);
+let checkPathInput = (pathInput: HTMLInputElement, type: string) => {
+  if (!pathInput.value) return;
+  if (validatePath(pathInput.value, ... type == 'genes-data'? ['.json', '.jsonc', '.js']:['.py', '.py3']) == 0) {
+    pathInput.style.backgroundColor = '#a8fba8';
+    return true;
+  } else {
+    pathInput.style.backgroundColor = '#ffbfbf';
+    return false;
+  }
+}
+
+pathInputs.forEach(pathInput => {
+  let type = pathInput.classList.contains('genes-data')? 'genes-data': 'fitness-function';
+  pathInput.addEventListener('keyup', (ev) => {
+    if (ev.key != 'Enter') return;
+    checkPathInput(pathInput, type);
+  });
+})
+
+loadBtns.forEach(loadBtn => {
+  let type = loadBtn.classList.contains('genes-data')? 'genes-data': 'fitness-function';
+  let pathInput = pathInputs.filter(pathInput => pathInput.classList.contains(type))[0];
+  let treeContainer = document.querySelector('.genes-tree');
+  loadBtn.onclick = () => {
+    if (checkPathInput(pathInput, type)) {
+      fetch(pathInput.value)
+      .then((res) => res.text())
+      .then(data => {
+        try {
+          JSON.stringify(JSON.parse(data))
+        } catch (error) {
+          // alert('This json data contains error!')
+          alert(error)
+          return;
+        }
+        Array.from(treeContainer.getElementsByClassName('json-container')).forEach(jsonContainer => jsonContainer.remove())
+        window['jsonTree'](treeContainer, data);
+        treeContainer.firstElementChild.classList.add('scrollbar')
+      });
+    }
+  };
+});
 
 (() => {
   /**
@@ -125,7 +155,7 @@ loadBtn.onclick = () => checkPath(paramsPath.value);
     } else {
       input.addEventListener('keypress', eventListener);
       input.addEventListener('paste', eventListener);
-      if (!input.id.match('genes-data-path'))
+      if (!input.classList.contains('load-path'))
         input.addEventListener('keyup', ev => {
           if (['ArrowUp', 'ArrowDown'].includes(ev.key)) eventListener();
         });

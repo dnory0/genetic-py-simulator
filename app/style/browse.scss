@@ -26,8 +26,16 @@
       height: 20px;
     }
 
+    
     &:last-child {
       border-radius: 0 3px 3px 0;
     }
   }
+  
+  
+}
+
+.other-browse-btns {
+  margin: 10px 0;
+  float: right;
 }

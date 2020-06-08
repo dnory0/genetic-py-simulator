@@ -42,9 +42,14 @@ function affectSettings(settings: object, targetedWindow: 'main' | 'ga-cp') {
       coRate.parentElement.parentElement.title = coRate.disabled ? 'Disabled if crossover type set to Uniform' : '';
       (<HTMLButtonElement>coRate.parentElement.nextElementSibling.firstElementChild).disabled = coRate.disabled;
     } else {
-      input.value = settings[input.id]['value'];
-      if (targetedWindow == 'main' && settings[input.id]['disable-on-run']) {
-        input.classList.add('disable-on-run');
+      try {
+        input.value = settings[input.id]['value'];
+        if (targetedWindow == 'main' && settings[input.id]['disable-on-run']) {
+          input.classList.add('disable-on-run');
+        }
+      } catch (e) {
+        console.log(`This should be a new input, add it to settings.json`);
+        console.log(input);
       }
     }
   });

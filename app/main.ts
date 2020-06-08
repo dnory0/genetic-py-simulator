@@ -30,6 +30,7 @@ import {
   dialog,
   OpenDialogOptions,
   OpenDialogReturnValue,
+  FileFilter,
 } from 'electron';
 import { join } from 'path';
 import { writeFileSync } from 'fs';
@@ -161,7 +162,7 @@ app.once('ready', () => {
         return;
       }
       gaWindow = createWindow(join(__dirname, 'ga-cp', 'ga-cp.html'), {
-        minWidth: 680,
+        minWidth: 760,
         minHeight: 480,
         maximizable: false,
         minimizable: false,
@@ -175,9 +176,9 @@ app.once('ready', () => {
 
       if (!isDev) gaWindow.removeMenu();
 
-      gaWindow.webContents.on('ipc-message', (_ev, gaChannel, updatedSettings: boolean) => {
+      gaWindow.webContents.on('ipc-message', (_ev, gaChannel, other: boolean | FileFilter) => {
         if (gaChannel == 'ga-cp-finished') {
-          mainWindow.webContents.send('ga-cp-finished', updatedSettings);
+          mainWindow.webContents.send('ga-cp-finished', other);
           gaWindow.destroy();
         } else if (gaChannel == 'close-confirm') {
           (async () => {
@@ -194,7 +195,7 @@ app.once('ready', () => {
             })()
               .then(result => {
                 if (!result.response) return;
-                mainWindow.webContents.send('ga-cp-finished', updatedSettings);
+                mainWindow.webContents.send('ga-cp-finished', other);
                 gaWindow.destroy();
               })
               .catch(reason => {
@@ -209,10 +210,11 @@ app.once('ready', () => {
               // TODO: read from runSettings
               defaultPath: app.getPath('desktop'),
               filters: [
+                <FileFilter>other,
                 {
-                  name: 'JSON File (.json)',
-                  extensions: ['json', 'jsonc', 'js'],
-                },
+                  name: 'All Files',
+                  extensions: ['*'],
+                }
               ],
               properties: ['openFile'],
             },

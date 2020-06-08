@@ -32,6 +32,7 @@ body {
 
 .scrollbar::-webkit-scrollbar {
   width: 12px;
+  height: 12px;
 }
 
 .scrollbar::-webkit-scrollbar-track {
@@ -93,20 +94,20 @@ button:disabled {
   background-color: whitesmoke;
 }
 
-input[type='text']:not(#genes-data-path).valid:focus,
+input[type='text']:not(.load-path).valid:focus,
 input.tab-triggered.valid:focus {
   -webkit-box-shadow: 0 0 0 1px #6cdf00, 0 0 0 4px rgba(0, 255, 0, 0.3);
           box-shadow: 0 0 0 1px #6cdf00, 0 0 0 4px rgba(0, 255, 0, 0.3);
 }
 
-input[type='text']:not(#genes-data-path).invalid, input[type='text']:not(#genes-data-path).invalid:focus,
+input[type='text']:not(.load-path).invalid, input[type='text']:not(.load-path).invalid:focus,
 input.tab-triggered.invalid,
 input.tab-triggered.invalid:focus {
   -webkit-box-shadow: 0 0 0 1px #df0000, 0 0 0 4px rgba(255, 0, 0, 0.3);
           box-shadow: 0 0 0 1px #df0000, 0 0 0 4px rgba(255, 0, 0, 0.3);
 }
 
-input[type='text']:not(#genes-data-path):focus,
+input[type='text']:not(.load-path):focus,
 input.tab-triggered:focus {
   -webkit-box-shadow: 0 0 0 1px #df9a00, 0 0 0 4px rgba(223, 165, 0, 0.3);
           box-shadow: 0 0 0 1px #df9a00, 0 0 0 4px rgba(223, 165, 0, 0.3);
@@ -414,6 +415,11 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
   border-radius: 0 3px 3px 0;
 }
 
+.other-browse-btns {
+  margin: 10px 0;
+  float: right;
+}
+
 #main {
   height: 100%;
   display: -webkit-box;
@@ -438,6 +444,7 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
 
 #main .configuration .title {
   margin: 0;
+  font-size: 17px;
 }
 
 #main .configuration .title.pad {
@@ -477,7 +484,6 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
   -webkit-box-flex: 1;
       -ms-flex: 1;
           flex: 1;
-  font-size: 17px;
   font-family: sans-serif;
 }
 
@@ -486,6 +492,14 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
   width: -moz-fit-content;
   width: fit-content;
   margin: 6px;
+}
+
+#main .configuration .browse-container {
+  padding-bottom: 44px;
+}
+
+#main .configuration .browse-container .get-template-btn {
+  width: 96px;
 }
 
 #main .configuration .border {
@@ -499,6 +513,20 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
       -ms-flex: 1;
           flex: 1;
   font-family: sans-serif;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+#main .configuration .params-fitness .genes-tree {
+  max-height: 350px;
+}
+
+#main .configuration .params-fitness .genes-tree .json-container {
+  border: thin solid #999999;
+  border-radius: 2px;
+  max-height: 350px;
+  overflow: auto;
+  max-width: calc(100vw - 397px - 16px);
 }
 
 #main .bottom {
@@ -613,10 +641,5 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
 
 .hide {
   display: none !important;
-}
-
-.load-txt {
-  margin: 10px 0;
-  float: right;
 }
 /*# sourceMappingURL=ga-cp.css.map */

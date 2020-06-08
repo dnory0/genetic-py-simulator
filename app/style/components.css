@@ -14,20 +14,20 @@ button:disabled {
   background-color: whitesmoke;
 }
 
-input[type='text']:not(#params-path).valid:focus,
+input[type='text']:not(.load-path).valid:focus,
 input.tab-triggered.valid:focus {
   -webkit-box-shadow: 0 0 0 1px #6cdf00, 0 0 0 4px rgba(0, 255, 0, 0.3);
           box-shadow: 0 0 0 1px #6cdf00, 0 0 0 4px rgba(0, 255, 0, 0.3);
 }
 
-input[type='text']:not(#params-path).invalid, input[type='text']:not(#params-path).invalid:focus,
+input[type='text']:not(.load-path).invalid, input[type='text']:not(.load-path).invalid:focus,
 input.tab-triggered.invalid,
 input.tab-triggered.invalid:focus {
   -webkit-box-shadow: 0 0 0 1px #df0000, 0 0 0 4px rgba(255, 0, 0, 0.3);
           box-shadow: 0 0 0 1px #df0000, 0 0 0 4px rgba(255, 0, 0, 0.3);
 }
 
-input[type='text']:not(#params-path):focus,
+input[type='text']:not(.load-path):focus,
 input.tab-triggered:focus {
   -webkit-box-shadow: 0 0 0 1px #df9a00, 0 0 0 4px rgba(223, 165, 0, 0.3);
           box-shadow: 0 0 0 1px #df9a00, 0 0 0 4px rgba(223, 165, 0, 0.3);

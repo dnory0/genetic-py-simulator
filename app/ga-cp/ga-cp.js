@@ -6,45 +6,73 @@ let curSettings = JSON.parse(JSON.stringify(window['settings']));
 delete window['settings'];
 let isClosable = true;
 let validatePath = window['validatePath'];
-let checkPath = (path) => {
-    let checkCode = validatePath(path, '.json', '.jsonc', '.js');
-    switch (checkCode) {
-        case -1:
-            console.log("path doesn't exist.");
-            break;
-        case -2:
-            console.log('path should be absolute, found relative path.');
-            break;
-        case -3:
-            console.log("the path doesn't point to a file.");
-            break;
-        case -4:
-            console.log('path should point to a JSON file (ends with .json/.jsonc/.js).');
-            break;
-        default:
-            console.log('possible.');
-            break;
-    }
-};
-let browseBtn = document.getElementById('browse-btn');
-let loadBtn = document.getElementById('load-btn');
-let paramsPath = document.getElementById('genes-data-path');
+let browseBtns = Array.from(document.getElementsByClassName('browse-btn'));
+let loadBtns = Array.from(document.getElementsByClassName('load-btn'));
+let pathInputs = Array.from(document.getElementsByClassName('load-path'));
 let saveBtn = document.getElementById('save-btn');
 let closeBtn = document.getElementById('close-btn');
 let revertBtn = document.getElementById('revert-btn');
-browseBtn.onclick = () => {
-    ipcRenderer.once('browsed-path', (_ev, result) => {
-        if (result.canceled)
-            return;
-        paramsPath.value = result.filePaths[0];
-    });
-    ipcRenderer.send('browse');
-};
-paramsPath.addEventListener('keyup', (ev) => {
-    if (ev.key == 'Enter')
-        loadBtn.click();
+browseBtns.forEach(function (browseBtn) {
+    let type = browseBtn.classList.contains('genes-data') ? 'genes-data' : 'fitness-function';
+    browseBtn.onclick = () => {
+        ipcRenderer.once('browsed-path', (_ev, result) => {
+            if (result.canceled)
+                return;
+            pathInputs.filter((pathInput) => pathInput.classList.contains(type))[0].value = result.filePaths[0];
+        });
+        ipcRenderer.send('browse', type == 'genes-data' ? {
+            name: 'JSON File (.json)',
+            extensions: ['json', 'jsonc', 'js'],
+        } :
+            {
+                name: 'Python File (.py)',
+                extensions: ['py', 'py3'],
+            });
+    };
 });
-loadBtn.onclick = () => checkPath(paramsPath.value);
+let checkPathInput = (pathInput, type) => {
+    if (!pathInput.value)
+        return;
+    if (validatePath(pathInput.value, ...type == 'genes-data' ? ['.json', '.jsonc', '.js'] : ['.py', '.py3']) == 0) {
+        pathInput.style.backgroundColor = '#a8fba8';
+        return true;
+    }
+    else {
+        pathInput.style.backgroundColor = '#ffbfbf';
+        return false;
+    }
+};
+pathInputs.forEach(pathInput => {
+    let type = pathInput.classList.contains('genes-data') ? 'genes-data' : 'fitness-function';
+    pathInput.addEventListener('keyup', (ev) => {
+        if (ev.key != 'Enter')
+            return;
+        checkPathInput(pathInput, type);
+    });
+});
+loadBtns.forEach(loadBtn => {
+    let type = loadBtn.classList.contains('genes-data') ? 'genes-data' : 'fitness-function';
+    let pathInput = pathInputs.filter(pathInput => pathInput.classList.contains(type))[0];
+    let treeContainer = document.querySelector('.genes-tree');
+    loadBtn.onclick = () => {
+        if (checkPathInput(pathInput, type)) {
+            fetch(pathInput.value)
+                .then((res) => res.text())
+                .then(data => {
+                try {
+                    JSON.stringify(JSON.parse(data));
+                }
+                catch (error) {
+                    alert(error);
+                    return;
+                }
+                Array.from(treeContainer.getElementsByClassName('json-container')).forEach(jsonContainer => jsonContainer.remove());
+                window['jsonTree'](treeContainer, data);
+                treeContainer.firstElementChild.classList.add('scrollbar');
+            });
+        }
+    };
+});
 (() => {
     saveBtn.onclick = () => {
         revertSettings['renderer']['input'] = curSettings['renderer']['input'];
@@ -74,7 +102,7 @@ loadBtn.onclick = () => checkPath(paramsPath.value);
         else {
             input.addEventListener('keypress', eventListener);
             input.addEventListener('paste', eventListener);
-            if (!input.id.match('genes-data-path'))
+            if (!input.classList.contains('load-path'))
                 input.addEventListener('keyup', ev => {
                     if (['ArrowUp', 'ArrowDown'].includes(ev.key))
                         eventListener();

@@ -2,7 +2,7 @@ import { existsSync, statSync } from 'fs';
 import { isAbsolute, extname } from 'path';
 
 /**
- * checks if path is valid, check conditions are ordered and return value is as follows:
+ * checks if given path is valid, check conditions are ordered and return value is as follows:
  *
  * - ```-1``` if path does not exist.
  * - ```-2``` if path is not an absolute path.
@@ -10,14 +10,14 @@ import { isAbsolute, extname } from 'path';
  * - ```-4``` if the file extention is not equal to any of the given ```ext```.
  * - ```0``` if path matchs all conditions.
  *
- * @param gaConfigPath GA configuration path to check.
- * @param ext extensions array.
+ * @param filePath file path to check & validate.
+ * @param exts extensions array.
  */
-function validatePath(gaConfigPath: string, ...ext: string[]) {
-  return existsSync(gaConfigPath)
-    ? isAbsolute(gaConfigPath)
-      ? statSync(gaConfigPath).isFile()
-        ? ext.includes(extname(gaConfigPath).toLowerCase())
+function validatePath(filePath: string, ...exts: string[]) {
+  return existsSync(filePath)
+    ? isAbsolute(filePath)
+      ? statSync(filePath).isFile()
+        ? exts.includes(extname(filePath).toLowerCase())
           ? 0
           : -4
         : -3

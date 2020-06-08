@@ -16,9 +16,9 @@
     height: calc(100% - 45px);
     background-color: whitesmoke;
 
-    
     .title {
       margin: 0;
+      font-size: 17px;
 
       &.pad {
         padding: 8px 0;
@@ -47,7 +47,6 @@
 
         .title {
           flex: 1;
-          font-size: 17px;
           font-family: sans-serif;
         }
 
@@ -56,7 +55,14 @@
           margin: 6px;
         }
       }
+    }
 
+    .browse-container {
+      padding-bottom: 44px;
+
+      .get-template-btn {
+        width: 96px;
+      }
     }
 
     .border {
@@ -68,6 +74,20 @@
       padding: 10px 6px;
       flex: 1;
       font-family: sans-serif;
+      overflow-x: hidden;
+      overflow-y: auto;
+
+      .genes-tree {
+        max-height: 350px;
+
+        .json-container {
+          border: thin solid #999999;
+          border-radius: 2px;
+          max-height: 350px;
+          overflow: auto;
+          max-width: calc(100vw - 397px - 16px);
+        }
+      }
     }
   }
 
@@ -155,9 +175,4 @@
 
 .hide {
   display: none !important;
-}
-
-.load-txt {
-  margin: 10px 0;
-  float: right;
 }
