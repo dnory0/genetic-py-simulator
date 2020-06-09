@@ -133,10 +133,7 @@ loadBtns.forEach(loadBtn => {
   /**
    * bottom-right buttons setup
    */
-  saveBtn.onclick = () => {
-    revertSettings['renderer']['input'] = curSettings['renderer']['input'];
-    ipcRenderer.send('ga-cp-finished', curSettings);
-  };
+  saveBtn.onclick = () => ipcRenderer.send('ga-cp-finished', curSettings);
 
   closeBtn.onclick = () => {
     if (isClosable) ipcRenderer.send('ga-cp-finished');

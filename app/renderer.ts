@@ -467,6 +467,7 @@ document.addEventListener('DOMContentLoaded', function loaded() {
         isGACPOpen = false;
         main.classList.toggle('blur', false);
         if (!updatedSettings) return;
+        settings['renderer']['input'] = updatedSettings['renderer']['input'];
         saveSettings(settings['renderer']['input']);
         affectSettings(settings['renderer']['input'], 'main');
         sendParams();
