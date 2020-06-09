@@ -6,6 +6,7 @@ For more, visit: ${homepage}.
 -h  --help\t\tprint this help
 -d  -D  --dev\t\tto launch app on development mode, and be able to open devTools
 -S  --reset-settings\tforce app to reset settings, this is useful on major updates
+-R  \t\t\tsame as -S but does not launch the app
 -v  --version\t\tprint versions
   `);
 
@@ -53,10 +54,28 @@ let gaWindow: BrowserWindow;
  */
 const pyshell: ChildProcess = require(join(__dirname, 'modules', 'create-pyshell.js'))(app);
 global['pyshell'] = pyshell;
+
+/**
+ * writes current settings to current settings file
+ */
+function writeSettings () {
+  writeFileSync(
+      join(app.isPackaged ? app.getPath('userData') : join(app.getAppPath(), '..'), 'settings.json'),
+      JSON.stringify(settings)
+    );
+}
+
 /**
  * load settings
  */
-let settings: object = require(join(__dirname, 'modules', 'load-settings.js'))(app, process.argv.some(arg => ['--reset-settings', '-S'].includes(arg)));
+let settings: object = require(join(__dirname, 'modules', 'load-settings.js'))(app, process.argv.some(arg => ['--reset-settings', '-S', '-R'].includes(arg)));
+
+// -R argument is to reset settings so it writes settings, exit, and does not allow app to start.
+if (process.argv.some(arg => arg === '-R')) {
+  writeSettings();
+  process.exit();
+}
+
 global['settings'] = settings;
 
 /**
@@ -259,11 +278,8 @@ app.once('ready', () => {
       settings['main']['x'] = mainWindow.getNormalBounds().x;
       settings['main']['y'] = mainWindow.getNormalBounds().y;
     }
-
-    writeFileSync(
-      join(app.isPackaged ? app.getPath('userData') : join(app.getAppPath(), '..'), 'settings.json'),
-      JSON.stringify(settings)
-    );
+    
+    writeSettings();
   });
 });
 

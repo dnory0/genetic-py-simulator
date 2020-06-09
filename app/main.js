@@ -17,6 +17,7 @@ For more, visit: ${homepage}.
 -h  --help\t\tprint this help
 -d  -D  --dev\t\tto launch app on development mode, and be able to open devTools
 -S  --reset-settings\tforce app to reset settings, this is useful on major updates
+-R  \t\t\tsame as -S but does not launch the app
 -v  --version\t\tprint versions
   `);
     process.exit();
@@ -39,7 +40,14 @@ let mainWindow;
 let gaWindow;
 const pyshell = require(path_1.join(__dirname, 'modules', 'create-pyshell.js'))(electron_1.app);
 global['pyshell'] = pyshell;
-let settings = require(path_1.join(__dirname, 'modules', 'load-settings.js'))(electron_1.app, process.argv.some(arg => ['--reset-settings', '-S'].includes(arg)));
+function writeSettings() {
+    fs_1.writeFileSync(path_1.join(electron_1.app.isPackaged ? electron_1.app.getPath('userData') : path_1.join(electron_1.app.getAppPath(), '..'), 'settings.json'), JSON.stringify(settings));
+}
+let settings = require(path_1.join(__dirname, 'modules', 'load-settings.js'))(electron_1.app, process.argv.some(arg => ['--reset-settings', '-S', '-R'].includes(arg)));
+if (process.argv.some(arg => arg === '-R')) {
+    writeSettings();
+    process.exit();
+}
 global['settings'] = settings;
 const createWindow = (filePath, { minWidth, minHeight, width, height, resizable, minimizable, maximizable, parent, frame, webPreferences: { preload, webviewTag }, } = {}) => {
     let targetWindow = new electron_1.BrowserWindow({
@@ -184,7 +192,7 @@ electron_1.app.once('ready', () => {
             settings['main']['x'] = mainWindow.getNormalBounds().x;
             settings['main']['y'] = mainWindow.getNormalBounds().y;
         }
-        fs_1.writeFileSync(path_1.join(electron_1.app.isPackaged ? electron_1.app.getPath('userData') : path_1.join(electron_1.app.getAppPath(), '..'), 'settings.json'), JSON.stringify(settings));
+        writeSettings();
     });
 });
 electron_1.app.once('will-quit', () => pyshell.stdin.write('exit\n'));
