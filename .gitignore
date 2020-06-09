@@ -94,4 +94,7 @@ details.md
 .vscode
 TODO.*
 IDEA.*
+#this is now used on development as current settings insted of default.
 /settings.json
+build/python/__pycache__
+build/python/ff.py

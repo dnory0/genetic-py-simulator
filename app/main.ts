@@ -1,14 +1,13 @@
 if (process.argv.some(arg => ['--help', '-h'].includes(arg))) {
   const { description, homepage} = require('../package.json');
-  console.log(`Description: ${description}.`);
-  console.log(`For more, visit: ${homepage}.`);
-  
-  
   console.log(`
+Description: ${description}.
+For more, visit: ${homepage}.
 -h  --help\t\tprint this help
 -d  -D  --dev\t\tto launch app on development mode, and be able to open devTools
 -S  --reset-settings\tforce app to reset settings, this is useful on major updates
--v  --version\t\tprint versions`);
+-v  --version\t\tprint versions
+  `);
 
   process.exit();
 } else if (process.argv.some(arg => ['--version', '-v'].includes(arg))) {

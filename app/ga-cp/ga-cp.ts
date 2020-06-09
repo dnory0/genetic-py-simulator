@@ -56,12 +56,15 @@ let revertBtn = <HTMLButtonElement>document.getElementById('revert-btn');
 
 browseBtns.forEach(function(browseBtn) {
   let type = browseBtn.classList.contains('genes-data')? 'genes-data': 'fitness-function';
+  let pathInput = pathInputs.filter((pathInput) => pathInput.classList.contains(type))[0];
+
   browseBtn.onclick = () => {
     ipcRenderer.once('browsed-path', (_ev, result: OpenDialogReturnValue) => {
       if (result.canceled) return;
-      
-      pathInputs.filter((pathInput) => pathInput.classList.contains(type))[0].value = result.filePaths[0];
+      pathInput.value = result.filePaths[0];
+      pathInput['pathHasLoaded']()
     });
+
     ipcRenderer.send(
       'browse', 
       type == 'genes-data'? {
@@ -78,6 +81,8 @@ browseBtns.forEach(function(browseBtn) {
 
 let checkPathInput = (pathInput: HTMLInputElement, type: string) => {
   if (!pathInput.value) return;
+  clearTimeout(pathInput['bgTimeout'])
+  pathInput['bgTimeout'] = setTimeout(() => pathInput.style.backgroundColor = '', 1500)
   if (validatePath(pathInput.value, ... type == 'genes-data'? ['.json', '.jsonc', '.js']:['.py', '.py3']) == 0) {
     pathInput.style.backgroundColor = '#a8fba8';
     return true;
@@ -100,12 +105,17 @@ loadBtns.forEach(loadBtn => {
   let pathInput = pathInputs.filter(pathInput => pathInput.classList.contains(type))[0];
   let treeContainer = document.querySelector('.genes-tree');
   loadBtn.onclick = () => {
+    // todo: add test fitness-function
+    if (type == 'fitness-function') {
+      alert('no python load for now');
+      return;
+    }
     if (checkPathInput(pathInput, type)) {
       fetch(pathInput.value)
       .then((res) => res.text())
       .then(data => {
         try {
-          JSON.stringify(JSON.parse(data))
+          JSON.parse(data)
         } catch (error) {
           // alert('This json data contains error!')
           alert(error)
@@ -155,10 +165,12 @@ loadBtns.forEach(loadBtn => {
     } else {
       input.addEventListener('keypress', eventListener);
       input.addEventListener('paste', eventListener);
-      if (!input.classList.contains('load-path'))
-        input.addEventListener('keyup', ev => {
-          if (['ArrowUp', 'ArrowDown'].includes(ev.key)) eventListener();
-        });
+      if (input.classList.contains('load-path'))
+      // this is triggered when path is browsed using browse button
+      input['pathHasLoaded'] = eventListener;
+      else input.addEventListener('keyup', ev => {
+            if (['ArrowUp', 'ArrowDown'].includes(ev.key)) eventListener();
+          });
       if (input.classList.contains('textfieldable')) {
         input.addEventListener('change', eventListener);
       }
