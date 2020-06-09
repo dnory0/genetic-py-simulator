@@ -11,7 +11,7 @@ function saveSettings(settings: object) {
     settings[input.id.replace(`-${type}`, '')][type] = input.checked;
   };
 
-  let inputEventListener = (ev: KeyboardEvent) => {
+  let inputEventListener = (ev: Event) => {
     let input = <HTMLInputElement>ev.target;
     settings[input.id]['value'] = input.value;
   };
@@ -34,6 +34,8 @@ function saveSettings(settings: object) {
     } else if (input.type == 'checkbox') input.onchange = cbEventListener;
     else {
       input.onkeyup = inputEventListener;
+      if (input.classList.contains('load-path') && input['isGACP'])
+        input.addEventListener('browsedPath', (ev) => inputEventListener(ev));
       if (input.classList.contains('textfieldable')) input.onchange = inputEventListener;
     }
   });

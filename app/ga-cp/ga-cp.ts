@@ -62,7 +62,7 @@ browseBtns.forEach(function(browseBtn) {
     ipcRenderer.once('browsed-path', (_ev, result: OpenDialogReturnValue) => {
       if (result.canceled) return;
       pathInput.value = result.filePaths[0];
-      pathInput['pathHasLoaded']()
+      pathInput.dispatchEvent(new Event('browsedPath'));
     });
 
     ipcRenderer.send(
@@ -162,14 +162,17 @@ loadBtns.forEach(loadBtn => {
     } else {
       input.addEventListener('keypress', eventListener);
       input.addEventListener('paste', eventListener);
-      if (input.classList.contains('load-path'))
-      // this is triggered when path is browsed using browse button
-      input['pathHasLoaded'] = eventListener;
-      else input.addEventListener('keyup', ev => {
-            if (['ArrowUp', 'ArrowDown'].includes(ev.key)) eventListener();
-          });
-      if (input.classList.contains('textfieldable')) {
-        input.addEventListener('change', eventListener);
+      if (input.classList.contains('load-path')) {
+        input['isGACP'] = true;
+        // this is triggered when path is browsed using browse button
+        input.addEventListener('browsedPath', eventListener);
+      } else {
+        input.addEventListener('keyup', ev => {
+          if (['ArrowUp', 'ArrowDown'].includes(ev.key)) eventListener();
+        });
+        if (input.classList.contains('textfieldable')) {
+          input.addEventListener('change', eventListener);
+        }
       }
     }
   });

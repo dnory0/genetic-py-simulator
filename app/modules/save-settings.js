@@ -27,6 +27,8 @@ function saveSettings(settings) {
             input.onchange = cbEventListener;
         else {
             input.onkeyup = inputEventListener;
+            if (input.classList.contains('load-path') && input['isGACP'])
+                input.addEventListener('browsedPath', (ev) => inputEventListener(ev));
             if (input.classList.contains('textfieldable'))
                 input.onchange = inputEventListener;
         }

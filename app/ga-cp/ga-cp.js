@@ -20,7 +20,7 @@ browseBtns.forEach(function (browseBtn) {
             if (result.canceled)
                 return;
             pathInput.value = result.filePaths[0];
-            pathInput['pathHasLoaded']();
+            pathInput.dispatchEvent(new Event('browsedPath'));
         });
         ipcRenderer.send('browse', type == 'genes-data' ? {
             name: 'JSON File (.json)',
@@ -107,15 +107,18 @@ loadBtns.forEach(loadBtn => {
         else {
             input.addEventListener('keypress', eventListener);
             input.addEventListener('paste', eventListener);
-            if (input.classList.contains('load-path'))
-                input['pathHasLoaded'] = eventListener;
-            else
+            if (input.classList.contains('load-path')) {
+                input['isGACP'] = true;
+                input.addEventListener('browsedPath', eventListener);
+            }
+            else {
                 input.addEventListener('keyup', ev => {
                     if (['ArrowUp', 'ArrowDown'].includes(ev.key))
                         eventListener();
                 });
-            if (input.classList.contains('textfieldable')) {
-                input.addEventListener('change', eventListener);
+                if (input.classList.contains('textfieldable')) {
+                    input.addEventListener('change', eventListener);
+                }
             }
         }
     });
