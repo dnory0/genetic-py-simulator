@@ -34,9 +34,9 @@ let validatePath: (filePath: string, ...exts: string[]) => number = window['vali
  */
 let browseBtns = <HTMLButtonElement[]>Array.from(document.getElementsByClassName('browse-btn'));
 /**
- * load buttons
+ * show output of loaded path and data
  */
-let loadBtns = <HTMLButtonElement[]>Array.from(document.getElementsByClassName('load-btn'));
+let showOutputs = <HTMLButtonElement[]>Array.from(document.getElementsByClassName('show-output-btn'));
 /**
  * inputs that take the path to whether genes data or fitness function
  */
@@ -54,9 +54,9 @@ let closeBtn = <HTMLButtonElement>document.getElementById('close-btn');
  */
 let revertBtn = <HTMLButtonElement>document.getElementById('revert-btn');
 
-browseBtns.forEach(function(browseBtn) {
-  let type = browseBtn.classList.contains('genes-data')? 'genes-data': 'fitness-function';
-  let pathInput = pathInputs.filter((pathInput) => pathInput.classList.contains(type))[0];
+browseBtns.forEach(function (browseBtn) {
+  let type = browseBtn.classList.contains('genes-data') ? 'genes-data' : 'fitness-function';
+  let pathInput = pathInputs.filter(pathInput => pathInput.classList.contains(type))[0];
 
   browseBtn.onclick = () => {
     ipcRenderer.once('browsed-path', (_ev, result: OpenDialogReturnValue) => {
@@ -66,65 +66,93 @@ browseBtns.forEach(function(browseBtn) {
     });
 
     ipcRenderer.send(
-      'browse', 
-      type == 'genes-data'? {
-        name: 'JSON File (.json)',
-        extensions: ['json', 'jsonc', 'js'],
-      }: 
-      {
-        name: 'Python File (.py)',
-        extensions: ['py', 'py3'],
-      },
+      'browse',
+      type == 'genes-data'
+        ? {
+            name: 'JSON File (.json)',
+            extensions: ['json', 'jsonc', 'js'],
+          }
+        : {
+            name: 'Python File (.py)',
+            extensions: ['py', 'py3'],
+          }
     );
-  }
+  };
 });
 
-let checkPathInput = (pathInput: HTMLInputElement, type: string) => {
+/**
+ * fetch data from the path in pathInput, and checks data validity according to given type
+ * @param pathInput holds absolute path of a [```json``` | ```py```] file that holds data
+ * @param type ```genes-data``` | ```fitness-function```, data type inside the file
+ */
+let validateData = async (pathInput: HTMLInputElement, type: string) => {
+  return await fetch(pathInput.value)
+    .then(res => res.text())
+    .then(data => {
+      try {
+        if (type == 'genes-data') {
+          curSettings['renderer']['input'][type]['data'] = JSON.parse(data);
+        }
+        return true;
+      } catch (error) {
+        if (type == 'genes-data') {
+          // alert('This json data contains error!')
+          alert(error);
+          return false;
+        }
+      }
+    });
+};
+
+/**
+ * checks if the path in pathInput is valide, and whether its data is valide according to given type
+ * @param pathInput holds absolute path of a [```json``` | ```py```] file that holds data
+ * @param type ```genes-data``` | ```fitness-function```, data type inside the file
+ */
+let validatePathInput = async (pathInput: HTMLInputElement, type: string) => {
   if (!pathInput.value) return;
-  clearTimeout(pathInput['bgTimeout'])
-  pathInput['bgTimeout'] = setTimeout(() => pathInput.style.backgroundColor = '', 1500)
-  if (validatePath(pathInput.value, ... type == 'genes-data'? ['.json', '.jsonc', '.js']:['.py', '.py3']) == 0) {
+  clearTimeout(pathInput['bgTimeout']);
+  pathInput['bgTimeout'] = setTimeout(() => (pathInput.style.backgroundColor = ''), 1500);
+  if (
+    validatePath(pathInput.value, ...(type == 'genes-data' ? ['.json', '.jsonc', '.js'] : ['.py', '.py3'])) == 0 &&
+    (await validateData(pathInput, type))
+  ) {
     pathInput.style.backgroundColor = '#a8fba8';
     return true;
   } else {
     pathInput.style.backgroundColor = '#ffbfbf';
     return false;
   }
-}
+};
 
+/**
+ * to loads data when Enter key pressed inside pathInputs
+ */
 pathInputs.forEach(pathInput => {
-  let type = pathInput.classList.contains('genes-data')? 'genes-data': 'fitness-function';
-  pathInput.addEventListener('keyup', (ev) => {
+  let type = pathInput.classList.contains('genes-data') ? 'genes-data' : 'fitness-function';
+  pathInput.addEventListener('keyup', ev => {
     if (ev.key != 'Enter') return;
-    checkPathInput(pathInput, type);
+    validatePathInput(pathInput, type);
   });
-})
+});
 
-loadBtns.forEach(loadBtn => {
-  let type = loadBtn.classList.contains('genes-data')? 'genes-data': 'fitness-function';
+showOutputs.forEach(showOutput => {
+  let type = showOutput.classList.contains('genes-data') ? 'genes-data' : 'fitness-function';
   let pathInput = pathInputs.filter(pathInput => pathInput.classList.contains(type))[0];
   let treeContainer = document.querySelector('.genes-tree');
-  loadBtn.onclick = () => {
+  showOutput.onclick = async () => {
     // todo: add test fitness-function
     if (type == 'fitness-function') {
       alert('no python load for now');
       return;
     }
-    if (checkPathInput(pathInput, type)) {
-      fetch(pathInput.value)
-      .then((res) => res.text())
-      .then(data => {
-        try {
-          JSON.parse(data)
-        } catch (error) {
-          // alert('This json data contains error!')
-          alert(error)
-          return;
-        }
-        Array.from(treeContainer.getElementsByClassName('json-container')).forEach(jsonContainer => jsonContainer.remove())
-        window['jsonTree'](treeContainer, data);
-        treeContainer.firstElementChild.classList.add('scrollbar')
-      });
+    if (
+      validatePath(pathInput.value, ...(type == 'genes-data' ? ['.json', '.jsonc', '.js'] : ['.py', '.py3'])) == 0 &&
+      (await validateData(pathInput, type))
+    ) {
+      Array.from(treeContainer.getElementsByClassName('json-container')).forEach(jsonContainer => jsonContainer.remove());
+      window['jsonTree'](treeContainer, pathInput['loadedData']);
+      treeContainer.firstElementChild.classList.add('scrollbar');
     }
   };
 });

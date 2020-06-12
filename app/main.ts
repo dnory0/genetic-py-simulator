@@ -1,5 +1,5 @@
 if (process.argv.some(arg => ['--help', '-h'].includes(arg))) {
-  const { description, homepage} = require('../package.json');
+  const { description, homepage } = require('../package.json');
   console.log(`
 Description: ${description}.
 For more, visit: ${homepage}.
@@ -14,9 +14,9 @@ For more, visit: ${homepage}.
 } else if (process.argv.some(arg => ['--version', '-v'].includes(arg))) {
   const { name, productName, version, dependencies, devDependencies } = require('../package.json');
   console.log(`${name} (${productName}): ${version}`);
-  for (let dependency in (<object>dependencies)) 
+  for (let dependency in <object>dependencies)
     console.log(`${dependency}: ${(<string>dependencies[dependency]).replace('^', '')}`);
-  for (let devDependency in (<object>devDependencies)) 
+  for (let devDependency in <object>devDependencies)
     console.log(`${devDependency}: ${(<string>devDependencies[devDependency]).replace('^', '')}`);
 
   process.exit();
@@ -58,17 +58,20 @@ global['pyshell'] = pyshell;
 /**
  * writes current settings to current settings file
  */
-function writeSettings () {
+function writeSettings() {
   writeFileSync(
-      join(app.isPackaged ? app.getPath('userData') : join(app.getAppPath(), '..'), 'settings.json'),
-      JSON.stringify(settings)
-    );
+    join(app.isPackaged ? app.getPath('userData') : join(app.getAppPath(), '..'), 'settings.json'),
+    JSON.stringify(settings)
+  );
 }
 
 /**
  * load settings
  */
-let settings: object = require(join(__dirname, 'modules', 'load-settings.js'))(app, process.argv.some(arg => ['--reset-settings', '-S', '-R'].includes(arg)));
+let settings: object = require(join(__dirname, 'modules', 'load-settings.js'))(
+  app,
+  process.argv.some(arg => ['--reset-settings', '-S', '-R'].includes(arg))
+);
 
 // -R argument is to reset settings so it writes settings, exit, and does not allow app to start.
 if (process.argv.some(arg => arg === '-R')) {
@@ -232,7 +235,7 @@ app.once('ready', () => {
                 {
                   name: 'All Files',
                   extensions: ['*'],
-                }
+                },
               ],
               properties: ['openFile'],
             },
@@ -278,7 +281,7 @@ app.once('ready', () => {
       settings['main']['x'] = mainWindow.getNormalBounds().x;
       settings['main']['y'] = mainWindow.getNormalBounds().y;
     }
-    
+
     writeSettings();
   });
 });

@@ -498,6 +498,10 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
   padding-bottom: 44px;
 }
 
+#main .configuration .browse-container .show-output-btn {
+  width: 96px;
+}
+
 #main .configuration .browse-container .get-template-btn {
   width: 96px;
 }

@@ -154,7 +154,7 @@ electron_1.app.once('ready', () => {
                             {
                                 name: 'All Files',
                                 extensions: ['*'],
-                            }
+                            },
                         ],
                         properties: ['openFile'],
                     }, result => gaWindow.webContents.send('browsed-path', result), reason => {

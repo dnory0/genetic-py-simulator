@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -15,9 +14,7 @@
         <div class="params-man scrollbar">
           <div class="sign">
             <p class="title pad">Parameters Configuration</p>
-            <button id="random-all-btn" class="random-all-btn">
-              R<span class="alt-trigger">a</span>ndom All
-            </button>
+            <button id="random-all-btn" class="random-all-btn">R<span class="alt-trigger">a</span>ndom All</button>
           </div>
 
           <div class="complex-param">
@@ -27,8 +24,17 @@
               </div>
               <div class="param-settings">
                 <div class="param-value">
-                  <input type="text" min="1" step="1" id="pop-size" name="pop_size" pattern="^[-+]?\d*\.?0*$"
-                    inputmode="numeric" class="disable-on-run" required />
+                  <input
+                    type="text"
+                    min="1"
+                    step="1"
+                    id="pop-size"
+                    name="pop_size"
+                    pattern="^[-+]?\d*\.?0*$"
+                    inputmode="numeric"
+                    class="disable-on-run"
+                    required
+                  />
                 </div>
                 <div class="other-settings">
                   <button class="random-btn">Random</button>
@@ -49,8 +55,17 @@
               </div>
               <div class="param-settings">
                 <div class="param-value">
-                  <input type="text" min="1" step="1" id="genes-num" name="genes_num" pattern="^[-+]?\d*\.?0*$"
-                    inputmode="numeric" class="disable-on-run" required />
+                  <input
+                    type="text"
+                    min="1"
+                    step="1"
+                    id="genes-num"
+                    name="genes_num"
+                    pattern="^[-+]?\d*\.?0*$"
+                    inputmode="numeric"
+                    class="disable-on-run"
+                    required
+                  />
                 </div>
                 <div class="other-settings">
                   <button class="random-btn">Random</button>
@@ -71,8 +86,18 @@
               </div>
               <div class="param-settings">
                 <div class="param-value">
-                  <input type="range" inputmode="numeric" min="0.001" max="1" step="0.001" id="co-rate" name="co_rate"
-                    pattern="^[-+]?\d*\.?\d*$" class="textfieldable" required />
+                  <input
+                    type="range"
+                    inputmode="numeric"
+                    min="0.001"
+                    max="1"
+                    step="0.001"
+                    id="co-rate"
+                    name="co_rate"
+                    pattern="^[-+]?\d*\.?\d*$"
+                    class="textfieldable"
+                    required
+                  />
                 </div>
                 <div class="other-settings">
                   <button class="random-btn">Random</button>
@@ -113,8 +138,18 @@
               </div>
               <div class="param-settings">
                 <div class="param-value">
-                  <input type="range" inputmode="numeric" min="0" max="1" step="0.001" id="mut-rate" name="mut_rate"
-                    pattern="^[-+]?\d*\.?\d*$" class="textfieldable" required />
+                  <input
+                    type="range"
+                    inputmode="numeric"
+                    min="0"
+                    max="1"
+                    step="0.001"
+                    id="mut-rate"
+                    name="mut_rate"
+                    pattern="^[-+]?\d*\.?\d*$"
+                    class="textfieldable"
+                    required
+                  />
                 </div>
                 <div class="other-settings">
                   <button class="random-btn">Random</button>
@@ -152,8 +187,18 @@
               </div>
               <div class="param-settings">
                 <div class="param-value">
-                  <input type="range" inputmode="numeric" min="0" max="5" step="0.05" id="del-rate" name="del_rate"
-                    pattern="^[-+]?\d*\.?\d*$" class="textfieldable is-disable-able" required />
+                  <input
+                    type="range"
+                    inputmode="numeric"
+                    min="0"
+                    max="5"
+                    step="0.05"
+                    id="del-rate"
+                    name="del_rate"
+                    pattern="^[-+]?\d*\.?\d*$"
+                    class="textfieldable is-disable-able"
+                    required
+                  />
                 </div>
                 <div class="other-settings">
                   <button class="random-btn">Random</button>
@@ -175,8 +220,17 @@
               </div>
               <div class="param-settings">
                 <div class="param-value">
-                  <input type="text" min="1" step="1" id="pause-gen" name="pause_gen" pattern="^[-+]?\d*\.?0*$"
-                    class="is-disable-able" inputmode="numeric" required />
+                  <input
+                    type="text"
+                    min="1"
+                    step="1"
+                    id="pause-gen"
+                    name="pause_gen"
+                    pattern="^[-+]?\d*\.?0*$"
+                    class="is-disable-able"
+                    inputmode="numeric"
+                    required
+                  />
                 </div>
                 <div class="other-settings">
                   <button class="random-btn">Random</button>
@@ -198,8 +252,17 @@
               </div>
               <div class="param-settings">
                 <div class="param-value">
-                  <input type="text" min="1" step="1" id="max-gen" name="max_gen" pattern="^[-+]?\d*\.?0*$"
-                    class="is-disable-able" inputmode="numeric" required />
+                  <input
+                    type="text"
+                    min="1"
+                    step="1"
+                    id="max-gen"
+                    name="max_gen"
+                    pattern="^[-+]?\d*\.?0*$"
+                    class="is-disable-able"
+                    inputmode="numeric"
+                    required
+                  />
                 </div>
                 <div class="other-settings">
                   <button class="random-btn">Random</button>
@@ -231,9 +294,9 @@
                 </div>
                 <div class="other-settings">
                   <div class="checkbox-wrapper" title="Pin to Main Window">
-                    <input type="checkbox" name="update_pop_pin" id="update-pop-pin">
+                    <input type="checkbox" name="update_pop_pin" id="update-pop-pin" />
                     <label for="update-pop-pin">
-                      <img src="../img/pin.png">
+                      <img src="../img/pin.png" />
                     </label>
                   </div>
                 </div>
@@ -247,23 +310,25 @@
           <div class="genes-data browse-container">
             <p class="title pad small">Genes Data</p>
             <div class="browse">
-              <input type="text" id="genes-data-path" class="load-path genes-data"/>
-              <button id="browse-genes-data-btn" class="browse-btn genes-data" title="Browse..."><span class="alt-trigger">B</span>rowse</button>
+              <input type="text" id="genes-data-path" class="load-path genes-data" />
+              <button id="browse-genes-data-btn" class="browse-btn genes-data" title="Browse...">Browse</button>
             </div>
             <div class="other-browse-btns">
-              <button id="load-genes-data-btn" class="load-btn genes-data" title="Load"><span class="alt-trigger">L</span>oad</button>
+              <button class="show-output-btn genes-data" title="Show Output">Show Output</button>
+              <!-- <button class="load-data-btn genes-data" title="Load Data">Load</button> -->
             </div>
           </div>
           <div class="genes-tree"></div>
           <div class="fitness-function browse-container">
             <p class="title pad small">Fitness Function</p>
             <div class="browse">
-              <input type="text" id="fitness-function-path" class="load-path fitness-function"/>
-              <button id="browse-fitness-function-btn" class="browse-btn fitness-function" title="Browse..."><span class="alt-trigger">B</span>rowse</button>
+              <input type="text" id="fitness-function-path" class="load-path fitness-function" />
+              <button id="browse-fitness-function-btn" class="browse-btn fitness-function" title="Browse...">Browse</button>
             </div>
             <div class="other-browse-btns">
               <button class="get-template-btn fitness-function" title="Get Default Template">Get Template</button>
-              <button id="load-fitness-function-btn" class="load-btn fitness-function" title="Load"><span class="alt-trigger">L</span>oad</button>
+              <button class="show-output-btn fitness-function" title="Show Output">Show Output</button>
+              <!-- <button class="load-data-btn fitness-function" title="Load Data">Load</button> -->
             </div>
           </div>
         </div>
@@ -271,32 +336,23 @@
       <div class="border hor"></div>
       <div class="bottom">
         <div class="left">
-          <label for="force-tf-enabled">
-            <span class="alt-trigger">F</span>orce Using TextFields
-          </label>
+          <label for="force-tf-enabled"> <span class="alt-trigger">F</span>orce Using TextFields </label>
           <input type="checkbox" name="force_textfields" class="force-tf-enabled" id="force-tf-enabled" />
         </div>
         <div class="right">
-          <button id="save-btn" title="Save & Exit" disabled>
-            <span class="alt-trigger">S</span>ave
-          </button>
-          <button id="close-btn" title="Close">
-            <span class="alt-trigger">C</span>lose
-          </button>
-          <button id="revert-btn" title="Revert Changes" disabled>
-            <span class="alt-trigger">R</span>evert
-          </button>
+          <button id="save-btn" title="Save & Exit" disabled><span class="alt-trigger">S</span>ave</button>
+          <button id="close-btn" title="Close"><span class="alt-trigger">C</span>lose</button>
+          <button id="revert-btn" title="Revert Changes" disabled><span class="alt-trigger">R</span>evert</button>
         </div>
       </div>
     </div>
     <script src="../../node_modules/json-view/dist/jsonview.bundle.js"></script>
     <script>
       let exports = {};
-      window['jsonTree'] = function(treeContainer, data) {
+      window['jsonTree'] = function (treeContainer, data) {
         JsonView.render(JsonView.createTree(data), treeContainer);
-      }
+      };
     </script>
     <script src="ga-cp.js"></script>
   </body>
-
 </html>

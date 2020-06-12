@@ -35,7 +35,7 @@ function saveSettings(settings: object) {
     else {
       input.onkeyup = inputEventListener;
       if (input.classList.contains('load-path') && input['isGACP'])
-        input.addEventListener('browsedPath', (ev) => inputEventListener(ev));
+        input.addEventListener('browsedPath', ev => inputEventListener(ev));
       if (input.classList.contains('textfieldable')) input.onchange = inputEventListener;
     }
   });

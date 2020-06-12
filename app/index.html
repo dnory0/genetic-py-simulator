@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -44,8 +43,15 @@
             <img src="img/minimize.png" />
           </button>
         </div>
-        <webview id="prime-chart" src="prime-chart/prime-chart.html" autosize="on" style="height: 100%;"
-          allowtransparency nodeintegration preload="preloads/prime-preload"></webview>
+        <webview
+          id="prime-chart"
+          src="prime-chart/prime-chart.html"
+          autosize="on"
+          style="height: 100%;"
+          allowtransparency
+          nodeintegration
+          preload="preloads/prime-preload"
+        ></webview>
         <div class="resize-cover hide for-prime"></div>
       </div>
       <div class="border hor resize"></div>
@@ -91,8 +97,17 @@
                 </div>
                 <div class="param-settings">
                   <div class="param-value">
-                    <input type="text" min="1" step="1" id="pop-size" name="pop_size" pattern="^[-+]?\d*\.?0*$"
-                      inputmode="numeric" class="disable-on-run" required />
+                    <input
+                      type="text"
+                      min="1"
+                      step="1"
+                      id="pop-size"
+                      name="pop_size"
+                      pattern="^[-+]?\d*\.?0*$"
+                      inputmode="numeric"
+                      class="disable-on-run"
+                      required
+                    />
                   </div>
                   <div class="other-settings">
                     <button class="random-btn">Random</button>
@@ -113,8 +128,17 @@
                 </div>
                 <div class="param-settings">
                   <div class="param-value">
-                    <input type="text" min="1" step="1" id="genes-num" name="genes_num" pattern="^[-+]?\d*\.?0*$"
-                      inputmode="numeric" class="disable-on-run" required />
+                    <input
+                      type="text"
+                      min="1"
+                      step="1"
+                      id="genes-num"
+                      name="genes_num"
+                      pattern="^[-+]?\d*\.?0*$"
+                      inputmode="numeric"
+                      class="disable-on-run"
+                      required
+                    />
                   </div>
                   <div class="other-settings">
                     <button class="random-btn">Random</button>
@@ -135,8 +159,18 @@
                 </div>
                 <div class="param-settings">
                   <div class="param-value">
-                    <input type="range" inputmode="numeric" min="0.001" max="1" step="0.001" id="co-rate" name="co_rate"
-                      pattern="^[-+]?\d*\.?\d*$" class="textfieldable" required />
+                    <input
+                      type="range"
+                      inputmode="numeric"
+                      min="0.001"
+                      max="1"
+                      step="0.001"
+                      id="co-rate"
+                      name="co_rate"
+                      pattern="^[-+]?\d*\.?\d*$"
+                      class="textfieldable"
+                      required
+                    />
                   </div>
                   <div class="other-settings">
                     <button class="random-btn">Random</button>
@@ -174,8 +208,18 @@
                 </div>
                 <div class="param-settings">
                   <div class="param-value">
-                    <input type="range" inputmode="numeric" min="0" max="1" step="0.001" id="mut-rate" name="mut_rate"
-                      pattern="^[-+]?\d*\.?\d*$" class="textfieldable" required />
+                    <input
+                      type="range"
+                      inputmode="numeric"
+                      min="0"
+                      max="1"
+                      step="0.001"
+                      id="mut-rate"
+                      name="mut_rate"
+                      pattern="^[-+]?\d*\.?\d*$"
+                      class="textfieldable"
+                      required
+                    />
                   </div>
                   <div class="other-settings">
                     <button class="random-btn">Random</button>
@@ -210,8 +254,18 @@
                 </div>
                 <div class="param-settings">
                   <div class="param-value">
-                    <input type="range" inputmode="numeric" min="0" max="5" step="0.05" id="del-rate" name="del_rate"
-                      pattern="^[-+]?\d*\.?\d*$" class="textfieldable is-disable-able" required />
+                    <input
+                      type="range"
+                      inputmode="numeric"
+                      min="0"
+                      max="5"
+                      step="0.05"
+                      id="del-rate"
+                      name="del_rate"
+                      pattern="^[-+]?\d*\.?\d*$"
+                      class="textfieldable is-disable-able"
+                      required
+                    />
                   </div>
                   <div class="other-settings">
                     <button class="random-btn">Random</button>
@@ -233,8 +287,17 @@
                 </div>
                 <div class="param-settings">
                   <div class="param-value">
-                    <input type="text" min="-1" step="1" id="pause-gen" name="pause_gen" pattern="^[-+]?\d*\.?0*$"
-                      class="is-disable-able" inputmode="numeric" required />
+                    <input
+                      type="text"
+                      min="-1"
+                      step="1"
+                      id="pause-gen"
+                      name="pause_gen"
+                      pattern="^[-+]?\d*\.?0*$"
+                      class="is-disable-able"
+                      inputmode="numeric"
+                      required
+                    />
                   </div>
                   <div class="other-settings">
                     <button class="random-btn">Random</button>
@@ -256,8 +319,17 @@
                 </div>
                 <div class="param-settings">
                   <div class="param-value">
-                    <input type="text" min="-1" step="1" id="max-gen" name="max_gen" pattern="^[-+]?\d*\.?0*$"
-                      class="is-disable-able" inputmode="numeric" required />
+                    <input
+                      type="text"
+                      min="-1"
+                      step="1"
+                      id="max-gen"
+                      name="max_gen"
+                      pattern="^[-+]?\d*\.?0*$"
+                      class="is-disable-able"
+                      inputmode="numeric"
+                      required
+                    />
                   </div>
                   <div class="other-settings">
                     <button class="random-btn">Random</button>
@@ -289,9 +361,9 @@
                   </div>
                   <div class="other-settings hide">
                     <div class="checkbox-wrapper" title="Pin to Main Window">
-                      <input type="checkbox" name="update_pop_pin" id="update-pop-pin">
+                      <input type="checkbox" name="update_pop_pin" id="update-pop-pin" />
                       <label for="update-pop-pin">
-                        <img src="img/pin.png">
+                        <img src="img/pin.png" />
                       </label>
                     </div>
                   </div>
@@ -302,13 +374,13 @@
             <div class="genes-data browse-container hide">
               <p class="title pad small">Genes Data</p>
               <div class="browse">
-                <input type="text" id="genes-data-path" class="load-path genes-data"/>
+                <input type="text" id="genes-data" class="load-path genes-data" />
               </div>
             </div>
             <div class="fitness-function browse-container hide">
               <p class="title pad small">Fitness Function</p>
               <div class="browse">
-                <input type="text" id="fitness-function-path" class="load-path fitness-function"/>
+                <input type="text" id="fitness-function" class="load-path fitness-function" />
               </div>
             </div>
           </div>
@@ -347,8 +419,15 @@
               <img src="img/minimize.png" />
             </button>
           </div>
-          <webview id="side-chart" src="side-chart/side-chart.html" autosize="on" style="height: 100%;"
-            allowtransparency nodeintegration preload="preloads/side-preload"></webview>
+          <webview
+            id="side-chart"
+            src="side-chart/side-chart.html"
+            autosize="on"
+            style="height: 100%;"
+            allowtransparency
+            nodeintegration
+            preload="preloads/side-preload"
+          ></webview>
           <div class="resize-cover hide for-side"></div>
         </div>
       </div>
@@ -356,16 +435,16 @@
     </div>
     <!-- #endregion -->
     <!-- #region Loading (empty after load) -->
-    <div id="loading-bg"
-      style="position: absolute; transition: opacity 0.2s; top: 34%; left: calc((100vw - 32vh) / 2); height: 32vh;">
+    <div
+      id="loading-bg"
+      style="position: absolute; transition: opacity 0.2s; top: 34%; left: calc((100vw - 32vh) / 2); height: 32vh;"
+    >
       <img src="img/loading.svg" alt="Loading..." height="100%" />
     </div>
     <!-- #endregion -->
     <script>
       let exports = {};
-
     </script>
     <script src="renderer.js"></script>
   </body>
-
 </html>
