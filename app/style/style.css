@@ -202,6 +202,10 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
 .checkbox-wrapper input[type='checkbox'] + label > img {
   opacity: 0.5;
   height: 18px;
+  -webkit-transition: -webkit-transform 0.2s ease;
+  transition: -webkit-transform 0.2s ease;
+  transition: transform 0.2s ease;
+  transition: transform 0.2s ease, -webkit-transform 0.2s ease;
 }
 
 .checkbox-wrapper input[type='checkbox']:not(:disabled) + label:hover {
@@ -209,6 +213,8 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
 }
 
 .checkbox-wrapper input[type='checkbox']:checked + label > img {
+  -webkit-transform: rotate(-45deg);
+          transform: rotate(-45deg);
   opacity: 1;
 }
 

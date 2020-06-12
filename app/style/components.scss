@@ -97,6 +97,7 @@ input[type='range'] {
       > img {
         opacity: 0.5;
         height: 18px;
+        transition: transform 0.2s ease;
       }
     }
 
@@ -105,6 +106,7 @@ input[type='range'] {
     }
 
     &:checked + label > img {
+      transform: rotate(-45deg);
       opacity: 1;
     }
   }
