@@ -82,6 +82,8 @@ electron_1.app.once('ready', () => {
     mainWindow = createWindow(path_1.join(__dirname, 'index.html'), {
         minWidth: 720,
         minHeight: 500,
+        width: 800,
+        height: 550,
         webPreferences: {
             preload: path_1.join(__dirname, 'preloads', 'preload.js'),
             webviewTag: true,
@@ -103,8 +105,10 @@ electron_1.app.once('ready', () => {
                 return;
             }
             gaWindow = createWindow(path_1.join(__dirname, 'ga-cp', 'ga-cp.html'), {
-                minWidth: 760,
-                minHeight: 480,
+                minWidth: 780,
+                minHeight: 550,
+                width: 820,
+                height: 560,
                 maximizable: false,
                 minimizable: false,
                 parent: mainWindow,

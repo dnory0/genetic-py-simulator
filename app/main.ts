@@ -154,6 +154,8 @@ app.once('ready', () => {
   mainWindow = createWindow(join(__dirname, 'index.html'), {
     minWidth: 720,
     minHeight: 500,
+    width: 800,
+    height: 550,
     webPreferences: {
       preload: join(__dirname, 'preloads', 'preload.js'),
       webviewTag: true,
@@ -183,8 +185,10 @@ app.once('ready', () => {
         return;
       }
       gaWindow = createWindow(join(__dirname, 'ga-cp', 'ga-cp.html'), {
-        minWidth: 760,
-        minHeight: 480,
+        minWidth: 780,
+        minHeight: 550,
+        width: 820,
+        height: 560,
         maximizable: false,
         minimizable: false,
         parent: mainWindow,

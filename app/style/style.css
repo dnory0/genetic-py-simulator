@@ -417,7 +417,7 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  height: calc(30% - 37px);
+  height: 216px;
   margin-top: -4px;
   overflow: hidden;
 }
