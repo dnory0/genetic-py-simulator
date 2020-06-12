@@ -34,6 +34,10 @@ let validatePath: (filePath: string, ...exts: string[]) => number = window['vali
  */
 let browseBtns = <HTMLButtonElement[]>Array.from(document.getElementsByClassName('browse-btn'));
 /**
+ * load buttons
+ */
+let loadBtns = <HTMLButtonElement[]>Array.from(document.getElementsByClassName('load-data-btn'));
+/**
  * show output of loaded path and data
  */
 let showOutputs = <HTMLButtonElement[]>Array.from(document.getElementsByClassName('show-output-btn'));
@@ -110,13 +114,12 @@ let validateData = async (pathInput: HTMLInputElement, type: string) => {
  * @param type ```genes-data``` | ```fitness-function```, data type inside the file
  */
 let validatePathInput = async (pathInput: HTMLInputElement, type: string) => {
-  if (!pathInput.value) return;
   clearTimeout(pathInput['bgTimeout']);
   pathInput['bgTimeout'] = setTimeout(() => (pathInput.style.backgroundColor = ''), 1500);
-  if (
-    validatePath(pathInput.value, ...(type == 'genes-data' ? ['.json', '.jsonc', '.js'] : ['.py', '.py3'])) == 0 &&
-    (await validateData(pathInput, type))
-  ) {
+  clearJSONOutput();
+  pathInput.dispatchEvent(new Event('browsedPath'));
+  let extensions = type == 'genes-data' ? ['.json', '.jsonc', '.js'] : ['.py', '.py3'];
+  if (validatePath(pathInput.value, ...extensions) == 0 && (await validateData(pathInput, type))) {
     pathInput.style.backgroundColor = '#a8fba8';
     return true;
   } else {
@@ -124,6 +127,13 @@ let validatePathInput = async (pathInput: HTMLInputElement, type: string) => {
     return false;
   }
 };
+
+loadBtns.forEach(loadBtn => {
+  let type = loadBtn.classList.contains('genes-data') ? 'genes-data' : 'fitness-function';
+  loadBtn.addEventListener('click', () => {
+    validatePathInput(pathInputs.filter(pathInput => pathInput.classList.contains(type))[0], type);
+  });
+});
 
 /**
  * to loads data when Enter key pressed inside pathInputs
@@ -136,6 +146,11 @@ pathInputs.forEach(pathInput => {
   });
 });
 
+let clearJSONOutput = () => {
+  let treeContainer = document.querySelector('.genes-tree');
+  Array.from(treeContainer.getElementsByClassName('json-container')).forEach(jsonContainer => jsonContainer.remove());
+};
+
 showOutputs.forEach(showOutput => {
   let type = showOutput.classList.contains('genes-data') ? 'genes-data' : 'fitness-function';
   let pathInput = pathInputs.filter(pathInput => pathInput.classList.contains(type))[0];
@@ -146,11 +161,7 @@ showOutputs.forEach(showOutput => {
       alert('no python load for now');
       return;
     }
-    if (
-      validatePath(pathInput.value, ...(type == 'genes-data' ? ['.json', '.jsonc', '.js'] : ['.py', '.py3'])) == 0 &&
-      (await validateData(pathInput, type))
-    ) {
-      Array.from(treeContainer.getElementsByClassName('json-container')).forEach(jsonContainer => jsonContainer.remove());
+    if (await validatePathInput(pathInput, type)) {
       window['jsonTree'](treeContainer, curSettings['renderer']['input'][pathInput.id]['data']);
       treeContainer.firstElementChild.classList.add('scrollbar');
     }
@@ -169,6 +180,7 @@ showOutputs.forEach(showOutput => {
   };
 
   revertBtn.onclick = () => {
+    clearJSONOutput();
     revertBtn.disabled = true;
     saveBtn.disabled = true;
     isClosable = true;
@@ -188,13 +200,13 @@ showOutputs.forEach(showOutput => {
     } else if (input.type == 'radio') {
       input.addEventListener('change', eventListener);
     } else {
-      input.addEventListener('keypress', eventListener);
-      input.addEventListener('paste', eventListener);
       if (input.classList.contains('load-path')) {
         input['isGACP'] = true;
         // this is triggered when path is browsed using browse button
         input.addEventListener('browsedPath', eventListener);
       } else {
+        input.addEventListener('keypress', eventListener);
+        input.addEventListener('paste', eventListener);
         input.addEventListener('keyup', ev => {
           if (['ArrowUp', 'ArrowDown'].includes(ev.key)) eventListener();
         });
