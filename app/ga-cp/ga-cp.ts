@@ -91,7 +91,7 @@ let validateData = async (pathInput: HTMLInputElement, type: string) => {
     .then(data => {
       try {
         if (type == 'genes-data') {
-          curSettings['renderer']['input'][type]['data'] = JSON.parse(data);
+          curSettings['renderer']['input'][pathInput.id]['data'] = JSON.parse(data);
         }
         return true;
       } catch (error) {
@@ -151,7 +151,7 @@ showOutputs.forEach(showOutput => {
       (await validateData(pathInput, type))
     ) {
       Array.from(treeContainer.getElementsByClassName('json-container')).forEach(jsonContainer => jsonContainer.remove());
-      window['jsonTree'](treeContainer, pathInput['loadedData']);
+      window['jsonTree'](treeContainer, curSettings['renderer']['input'][pathInput.id]['data']);
       treeContainer.firstElementChild.classList.add('scrollbar');
     }
   };

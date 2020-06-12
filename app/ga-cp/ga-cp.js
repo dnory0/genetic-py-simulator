@@ -48,7 +48,7 @@ let validateData = (pathInput, type) => __awaiter(void 0, void 0, void 0, functi
         .then(data => {
         try {
             if (type == 'genes-data') {
-                curSettings['renderer']['input'][type]['data'] = JSON.parse(data);
+                curSettings['renderer']['input'][pathInput.id]['data'] = JSON.parse(data);
             }
             return true;
         }
@@ -95,7 +95,7 @@ showOutputs.forEach(showOutput => {
         if (validatePath(pathInput.value, ...(type == 'genes-data' ? ['.json', '.jsonc', '.js'] : ['.py', '.py3'])) == 0 &&
             (yield validateData(pathInput, type))) {
             Array.from(treeContainer.getElementsByClassName('json-container')).forEach(jsonContainer => jsonContainer.remove());
-            window['jsonTree'](treeContainer, pathInput['loadedData']);
+            window['jsonTree'](treeContainer, curSettings['renderer']['input'][pathInput.id]['data']);
             treeContainer.firstElementChild.classList.add('scrollbar');
         }
     });
