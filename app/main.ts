@@ -201,7 +201,7 @@ app.once('ready', () => {
 
       if (!isDev) gaWindow.removeMenu();
 
-      gaWindow.webContents.on('ipc-message', (_ev, gaChannel, other: boolean | FileFilter) => {
+      gaWindow.webContents.on('ipc-message', (_ev, gaChannel, other: object | boolean | FileFilter) => {
         if (gaChannel == 'ga-cp-finished') {
           mainWindow.webContents.send('ga-cp-finished', other);
           gaWindow.destroy();
