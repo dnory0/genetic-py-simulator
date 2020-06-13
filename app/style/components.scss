@@ -97,8 +97,11 @@ input[type='range'] {
       > img {
         opacity: 0.5;
         height: 18px;
-        transition: transform 0.2s ease;
       }
+    }
+
+    &[id$='-pin'] + label > img {
+      transition: transform 0.2s ease;
     }
 
     &:not(:disabled) + label:hover {
@@ -106,8 +109,11 @@ input[type='range'] {
     }
 
     &:checked + label > img {
-      transform: rotate(-45deg);
       opacity: 1;
+    }
+
+    &[id$='-pin']:checked + label > img {
+      transform: rotate(-45deg);
     }
   }
 }

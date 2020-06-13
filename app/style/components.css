@@ -107,6 +107,9 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
 .checkbox-wrapper input[type='checkbox'] + label > img {
   opacity: 0.5;
   height: 18px;
+}
+
+.checkbox-wrapper input[type='checkbox'][id$='-pin'] + label > img {
   -webkit-transition: -webkit-transform 0.2s ease;
   transition: -webkit-transform 0.2s ease;
   transition: transform 0.2s ease;
@@ -118,8 +121,11 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
 }
 
 .checkbox-wrapper input[type='checkbox']:checked + label > img {
+  opacity: 1;
+}
+
+.checkbox-wrapper input[type='checkbox'][id$='-pin']:checked + label > img {
   -webkit-transform: rotate(-45deg);
           transform: rotate(-45deg);
-  opacity: 1;
 }
 /*# sourceMappingURL=components.css.map */
