@@ -468,6 +468,16 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
           justify-content: flex-end;
 }
 
+#main .middle-container .controls-container .state-controls-container .ga-cp .red-dot {
+  width: 7px;
+  height: 7px;
+  background-color: #ff2b2b;
+  border-radius: 50%;
+  position: relative;
+  top: -2px;
+  left: -2px;
+}
+
 #main .middle-container .controls-container .state-controls-container .pane-hide button > img {
   -webkit-transform: rotate(180deg);
           transform: rotate(180deg);

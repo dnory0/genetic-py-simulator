@@ -64,6 +64,10 @@ let lRSwitch = <HTMLInputElement>document.getElementById('lr-enabled');
  * opens GA configuration panel to configure next run of the GA.
  */
 let gaCPBtn = <HTMLInputElement>document.getElementById('ga-cp-btn');
+/**
+ * red dot div that is shown only when load path inputs data is not loaded
+ */
+let redDot = <HTMLDivElement>document.getElementById('red-dot');
 
 /***************************** Parameters inputs *****************************/
 /**
@@ -325,7 +329,7 @@ stepFBtn.onclick = () => ctrlClicked('step_f', false);
     showPane.parentElement.classList.toggle('hide', !hide);
     contCont.classList.toggle('hide', hide);
     borderHide.classList.toggle('hide', hide);
-  }
+  };
 
   hidePane.onclick = togglePane;
   showPane.onclick = togglePane;
@@ -343,6 +347,21 @@ const sendParameter = (key: string, value: any) => {
       [key]: parseFloat(value) || value,
     })
   );
+};
+
+/**
+ * checks if genes data and fitness function are loaded or not, and toggles the red dot
+ * above settings icon if anything not loaded.
+ */
+let toggleRedDot = () => {
+  let inputsSettings = <object>settings['renderer']['input'];
+  for (let inputId in inputsSettings) {
+    if (inputId.match(/.*-path/) && inputsSettings[inputId]['data'] == undefined) {
+      redDot.classList.toggle('hide', false);
+      return;
+    }
+  }
+  redDot.classList.toggle('hide', true);
 };
 
 /**
@@ -376,7 +395,8 @@ document.addEventListener('DOMContentLoaded', function loaded() {
        */
       ready = () => {
         window['affectSettings'](settings['renderer']['input'], 'main');
-
+        // checks for missing data due to not being loaded by user
+        toggleRedDot();
         // send startup settings to pyshell
         sendParams();
 
@@ -463,13 +483,16 @@ document.addEventListener('DOMContentLoaded', function loaded() {
       isGACPOpen = true;
       ipcRenderer.send('ga-cp', settings);
       main.classList.toggle('blur', true);
-      ipcRenderer.once('ga-cp-finished', (_ev, updatedSettings: boolean) => {
+      ipcRenderer.once('ga-cp-finished', (_ev, updatedSettings: object | boolean) => {
         isGACPOpen = false;
         main.classList.toggle('blur', false);
         if (!updatedSettings) return;
         settings['renderer']['input'] = updatedSettings['renderer']['input'];
         saveSettings(settings['renderer']['input']);
         affectSettings(settings['renderer']['input'], 'main');
+        // checks for missing data due to not being loaded by user
+        toggleRedDot();
+        // send the new attached settings to pyshell
         sendParams();
       });
     };

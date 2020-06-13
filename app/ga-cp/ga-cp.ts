@@ -66,7 +66,7 @@ browseBtns.forEach(function (browseBtn) {
     ipcRenderer.once('browsed-path', (_ev, result: OpenDialogReturnValue) => {
       if (result.canceled) return;
       pathInput.value = result.filePaths[0];
-      pathInput.dispatchEvent(new Event('browsedPath'));
+      validatePathInput(pathInput, type);
     });
 
     ipcRenderer.send(
@@ -95,13 +95,15 @@ let validateData = async (pathInput: HTMLInputElement, type: string) => {
     .then(data => {
       try {
         if (type == 'genes-data') {
-          curSettings['renderer']['input'][pathInput.id]['data'] = JSON.parse(data);
+          curSettings['renderer']['input'][pathInput.id]['data'] = JSON.stringify(JSON.parse(data));
+        } else {
+          curSettings['renderer']['input'][pathInput.id]['data'] = data;
         }
         return true;
       } catch (error) {
         if (type == 'genes-data') {
           // alert('This json data contains error!')
-          alert(error);
+          alert('Data has Errors');
           return false;
         }
       }
@@ -117,6 +119,7 @@ let validatePathInput = async (pathInput: HTMLInputElement, type: string) => {
   clearTimeout(pathInput['bgTimeout']);
   pathInput['bgTimeout'] = setTimeout(() => (pathInput.style.backgroundColor = ''), 1500);
   clearJSONOutput();
+  curSettings['renderer']['input'][pathInput.id]['data'] = null;
   pathInput.dispatchEvent(new Event('browsedPath'));
   let extensions = type == 'genes-data' ? ['.json', '.jsonc', '.js'] : ['.py', '.py3'];
   if (validatePath(pathInput.value, ...extensions) == 0 && (await validateData(pathInput, type))) {
@@ -130,8 +133,9 @@ let validatePathInput = async (pathInput: HTMLInputElement, type: string) => {
 
 loadBtns.forEach(loadBtn => {
   let type = loadBtn.classList.contains('genes-data') ? 'genes-data' : 'fitness-function';
+  let pathInput = pathInputs.filter(pathInput => pathInput.classList.contains(type))[0];
   loadBtn.addEventListener('click', () => {
-    validatePathInput(pathInputs.filter(pathInput => pathInput.classList.contains(type))[0], type);
+    validatePathInput(pathInput, type);
   });
 });
 
@@ -143,6 +147,21 @@ pathInputs.forEach(pathInput => {
   pathInput.addEventListener('keyup', ev => {
     if (ev.key != 'Enter') return;
     validatePathInput(pathInput, type);
+  });
+  setTimeout(() => {
+    if (curSettings['renderer']['input'][pathInput.id]['data'] == undefined) {
+      let loadBtn = loadBtns.filter(loadBtn => loadBtn.classList.contains(type))[0];
+      let browseBtn = browseBtns.filter(browseBtn => browseBtn.classList.contains(type))[0];
+      let extensions = type == 'genes-data' ? ['.json', '.jsonc', '.js'] : ['.py', '.py3'];
+      let flikrBtn = validatePath(pathInput.value, ...extensions) == 0 ? loadBtn : browseBtn;
+
+      flikrBtn.classList.add('notice-me');
+      setTimeout(() => flikrBtn.classList.add('notice-me-transition'), 0);
+      setTimeout(() => flikrBtn.classList.add('fade-white'), 200);
+      setTimeout(() => flikrBtn.classList.remove('fade-white'), 350);
+      setTimeout(() => flikrBtn.classList.add('fade-white'), 550);
+      setTimeout(() => flikrBtn.classList.remove('notice-me', 'fade-white', 'notice-me-transition'), 750);
+    }
   });
 });
 

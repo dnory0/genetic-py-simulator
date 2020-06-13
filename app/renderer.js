@@ -12,6 +12,7 @@ let toStartBtn = document.getElementById('to-start-btn');
 let stepFBtn = document.getElementById('step-forward-btn');
 let lRSwitch = document.getElementById('lr-enabled');
 let gaCPBtn = document.getElementById('ga-cp-btn');
+let redDot = document.getElementById('red-dot');
 let gaParams = (Array.from(document.getElementsByClassName('param-value')).map(paramValue => paramValue.firstElementChild));
 let gaTypes = Array.from(document.getElementsByClassName('type-value'))
     .reduce((accum, typeValue) => accum.concat(...Array.from(typeValue.children)), [])
@@ -191,6 +192,16 @@ const sendParameter = (key, value) => {
         [key]: parseFloat(value) || value,
     }));
 };
+let toggleRedDot = () => {
+    let inputsSettings = settings['renderer']['input'];
+    for (let inputId in inputsSettings) {
+        if (inputId.match(/.*-path/) && inputsSettings[inputId]['data'] == undefined) {
+            redDot.classList.toggle('hide', false);
+            return;
+        }
+    }
+    redDot.classList.toggle('hide', true);
+};
 let sendParams = () => {
     gaParams.forEach(gaParam => {
         let value;
@@ -209,6 +220,7 @@ document.addEventListener('DOMContentLoaded', function loaded() {
         let ready = () => {
             ready = () => {
                 window['affectSettings'](settings['renderer']['input'], 'main');
+                toggleRedDot();
                 sendParams();
                 (() => {
                     let eventListener = (ev) => {
@@ -276,6 +288,7 @@ document.addEventListener('DOMContentLoaded', function loaded() {
                 settings['renderer']['input'] = updatedSettings['renderer']['input'];
                 saveSettings(settings['renderer']['input']);
                 affectSettings(settings['renderer']['input'], 'main');
+                toggleRedDot();
                 sendParams();
             });
         };
