@@ -189,6 +189,7 @@ document.getElementById('force-tf-enabled').addEventListener('change', ev => {
 });
 let toggleDisableOnRun = (disable) => {
     (Array.from(document.getElementsByClassName('param-value')).map(paramValue => paramValue.firstElementChild)).forEach(gaParam => {
+        console.log(gaParam);
         if (!gaParam.classList.contains('disable-on-run'))
             return;
         curSettings['renderer']['input'][gaParam.id]['disable'] = disable;
@@ -205,6 +206,9 @@ let toggleDisableOnRun = (disable) => {
         gaType.disabled = disable;
         gaType.parentElement.parentElement.title = disable ? 'Disabled when GA is Running' : '';
     });
+    pathInputs.forEach(pathInput => (pathInput.disabled = disable));
+    browseBtns.forEach(browseBtns => (browseBtns.disabled = disable));
+    loadBtns.forEach(loadBtn => (loadBtn.disabled = disable));
 };
 ipcRenderer.on('update-settings', (_ev, activate) => {
     toggleDisableOnRun(!activate);
