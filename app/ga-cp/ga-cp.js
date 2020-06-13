@@ -30,7 +30,7 @@ browseBtns.forEach(function (browseBtn) {
             if (result.canceled)
                 return;
             pathInput.value = result.filePaths[0];
-            pathInput.dispatchEvent(new Event('browsedPath'));
+            validatePathInput(pathInput, type);
         });
         ipcRenderer.send('browse', type == 'genes-data'
             ? {
@@ -86,14 +86,6 @@ loadBtns.forEach(loadBtn => {
     loadBtn.addEventListener('click', () => {
         validatePathInput(pathInput, type);
     });
-    if (curSettings['renderer']['input'][pathInput.id]['data'] == undefined) {
-        loadBtn.classList.add('notice-me');
-        setTimeout(() => loadBtn.classList.add('notice-me-transition'), 0);
-        setTimeout(() => loadBtn.classList.add('fade-white'), 200);
-        setTimeout(() => loadBtn.classList.remove('fade-white'), 350);
-        setTimeout(() => loadBtn.classList.add('fade-white'), 550);
-        setTimeout(() => loadBtn.classList.remove('notice-me', 'fade-white', 'notice-me-transition'), 750);
-    }
 });
 pathInputs.forEach(pathInput => {
     let type = pathInput.classList.contains('genes-data') ? 'genes-data' : 'fitness-function';
@@ -101,6 +93,20 @@ pathInputs.forEach(pathInput => {
         if (ev.key != 'Enter')
             return;
         validatePathInput(pathInput, type);
+    });
+    setTimeout(() => {
+        if (curSettings['renderer']['input'][pathInput.id]['data'] == undefined) {
+            let loadBtn = loadBtns.filter(loadBtn => loadBtn.classList.contains(type))[0];
+            let browseBtn = browseBtns.filter(browseBtn => browseBtn.classList.contains(type))[0];
+            let extensions = type == 'genes-data' ? ['.json', '.jsonc', '.js'] : ['.py', '.py3'];
+            let flikrBtn = validatePath(pathInput.value, ...extensions) == 0 ? loadBtn : browseBtn;
+            flikrBtn.classList.add('notice-me');
+            setTimeout(() => flikrBtn.classList.add('notice-me-transition'), 0);
+            setTimeout(() => flikrBtn.classList.add('fade-white'), 200);
+            setTimeout(() => flikrBtn.classList.remove('fade-white'), 350);
+            setTimeout(() => flikrBtn.classList.add('fade-white'), 550);
+            setTimeout(() => flikrBtn.classList.remove('notice-me', 'fade-white', 'notice-me-transition'), 750);
+        }
     });
 });
 let clearJSONOutput = () => {
