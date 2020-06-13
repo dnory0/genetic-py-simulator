@@ -43,6 +43,16 @@
         .ga-cp {
           flex: 1;
           justify-content: flex-end;
+
+          .missing-param {
+            width: 7px;
+            height: 7px;
+            background-color: #ff2b2b;
+            border-radius: 50%;
+            position: relative;
+            top: -2px;
+            left: -2px;
+          }
         }
 
         .pane-hide {
