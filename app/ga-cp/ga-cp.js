@@ -68,6 +68,7 @@ let validatePathInput = (pathInput, type) => __awaiter(void 0, void 0, void 0, f
     clearTimeout(pathInput['bgTimeout']);
     pathInput['bgTimeout'] = setTimeout(() => (pathInput.style.backgroundColor = ''), 1500);
     clearJSONOutput();
+    curSettings['renderer']['input'][pathInput.id]['data'] = null;
     pathInput.dispatchEvent(new Event('browsedPath'));
     let extensions = type == 'genes-data' ? ['.json', '.jsonc', '.js'] : ['.py', '.py3'];
     if (validatePath(pathInput.value, ...extensions) == 0 && (yield validateData(pathInput, type))) {
