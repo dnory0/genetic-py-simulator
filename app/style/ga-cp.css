@@ -658,4 +658,17 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
 .hide {
   display: none !important;
 }
+
+.notice-me {
+  background-color: #ff9900;
+}
+
+.notice-me-transition {
+  -webkit-transition: background-color 0.2s ease;
+  transition: background-color 0.2s ease;
+}
+
+.fade-white {
+  background-color: white;
+}
 /*# sourceMappingURL=ga-cp.css.map */

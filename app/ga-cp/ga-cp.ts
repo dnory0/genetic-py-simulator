@@ -95,13 +95,15 @@ let validateData = async (pathInput: HTMLInputElement, type: string) => {
     .then(data => {
       try {
         if (type == 'genes-data') {
-          curSettings['renderer']['input'][pathInput.id]['data'] = JSON.parse(data);
+          curSettings['renderer']['input'][pathInput.id]['data'] = JSON.stringify(JSON.parse(data));
+        } else {
+          curSettings['renderer']['input'][pathInput.id]['data'] = data;
         }
         return true;
       } catch (error) {
         if (type == 'genes-data') {
           // alert('This json data contains error!')
-          alert(error);
+          alert('Data has Errors');
           return false;
         }
       }
@@ -130,9 +132,18 @@ let validatePathInput = async (pathInput: HTMLInputElement, type: string) => {
 
 loadBtns.forEach(loadBtn => {
   let type = loadBtn.classList.contains('genes-data') ? 'genes-data' : 'fitness-function';
+  let pathInput = pathInputs.filter(pathInput => pathInput.classList.contains(type))[0];
   loadBtn.addEventListener('click', () => {
-    validatePathInput(pathInputs.filter(pathInput => pathInput.classList.contains(type))[0], type);
+    validatePathInput(pathInput, type);
   });
+  if (curSettings['renderer']['input'][pathInput.id]['data'] == undefined) {
+    loadBtn.classList.add('notice-me');
+    setTimeout(() => loadBtn.classList.add('notice-me-transition'), 0);
+    setTimeout(() => loadBtn.classList.add('fade-white'), 200);
+    setTimeout(() => loadBtn.classList.remove('fade-white'), 350);
+    setTimeout(() => loadBtn.classList.add('fade-white'), 550);
+    setTimeout(() => loadBtn.classList.remove('notice-me', 'fade-white', 'notice-me-transition'), 750);
+  }
 });
 
 /**

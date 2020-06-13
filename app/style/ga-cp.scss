@@ -180,3 +180,14 @@
 .hide {
   display: none !important;
 }
+
+.notice-me {
+  background-color: #ff9900;
+}
+.notice-me-transition {
+  transition: background-color 0.2s ease;
+}
+
+.fade-white {
+  background-color: white;
+}
