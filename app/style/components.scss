@@ -15,9 +15,8 @@ button {
   }
 }
 
-input[type='text']:not(#params-path),
+input[type='text']:not(.load-path),
 input.tab-triggered {
-  &.valid,
   &.valid:focus {
     box-shadow: 0 0 0 1px #6cdf00, 0 0 0 4px rgba(0, 255, 0, 0.3);
   }
@@ -101,12 +100,20 @@ input[type='range'] {
       }
     }
 
+    &[id$='-pin'] + label > img {
+      transition: transform 0.2s ease;
+    }
+
     &:not(:disabled) + label:hover {
       background-color: #c4c4c4;
     }
 
     &:checked + label > img {
       opacity: 1;
+    }
+
+    &[id$='-pin']:checked + label > img {
+      transform: rotate(-45deg);
     }
   }
 }

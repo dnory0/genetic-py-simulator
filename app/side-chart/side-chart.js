@@ -83,6 +83,7 @@ let sideChart = window['createChart']('side-chart', {
       `;
         },
         positioner(labelWidth, labelHeight, point) {
+            point = point;
             var x = point.plotX + labelWidth + 80 < sideChart.plotWidth ? point.plotX + 9 : point.plotX - (labelWidth - 9);
             var y = point.plotY + (point.plotY > 30 ? 8 : labelHeight + 50);
             return { x, y };

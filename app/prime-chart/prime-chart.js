@@ -108,6 +108,7 @@ let primeChart = window['createChart']('prime-chart', {
           `;
         },
         positioner(labelWidth, labelHeight, point) {
+            point = point;
             var x = point.plotX +
                 primeChart.chartWidth -
                 primeChart.plotWidth -
@@ -135,11 +136,6 @@ let primeChart = window['createChart']('prime-chart', {
         {
             type: 'columnrange',
             name: 'Deviation',
-            data: [],
-        },
-        {
-            type: 'line',
-            name: 'QGA',
             data: [],
         },
     ],

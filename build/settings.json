@@ -11,17 +11,17 @@
     "ui": {
       "zoom": 1,
       "horizontal": {
-        "height": 410
-      },
-      "vertical": {
-        "width": 440
+        "height": 250
       }
     },
     "input": {
       "lr": {
         "enabled": true
       },
-      "params-path": {
+      "genes-data-path": {
+        "value": ""
+      },
+      "fitness-function-path": {
         "value": ""
       },
       "pop-size": {
@@ -37,19 +37,35 @@
       "co-rate": {
         "value": 0.15
       },
+      "co-type": {
+        "value": 0,
+        "disable": false
+      },
       "mut-rate": {
         "value": 0.013
+      },
+      "mut-type": {
+        "value": 0,
+        "disable": false
       },
       "del-rate": {
         "value": 0,
         "pin": true,
         "enabled": true
       },
-      "max-gen": {
-        "value": 1,
+      "pause-gen": {
+        "value": 10,
         "pin": false,
-        "enabled": false,
-        "disable": false
+        "enabled": false
+      },
+      "max-gen": {
+        "value": 10,
+        "pin": false,
+        "enabled": false
+      },
+      "update-pop": {
+        "value": 0,
+        "pin": false
       },
       "force-tf": {
         "enabled": false

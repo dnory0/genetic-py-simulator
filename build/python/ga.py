@@ -13,7 +13,9 @@ class Population:
     """
 
     def __init__(self, pop_size: int, genes_num: int):
-        self.individuals = [Individual(genes_num=genes_num) for _ in range(pop_size)]
+        self.individuals = [
+            Individual(genes_num=genes_num) for _ in range(pop_size)
+        ]
         self.pop_size = pop_size
         self.genes_num = genes_num
 
@@ -62,23 +64,62 @@ class Evolve:
     def to_couples(pop_inds: list, pop_size: int) -> list:
         parents = []
         for _ in range(pop_size // 2):
-            couple = [pop_inds.pop(randrange(0, len(pop_inds))) for _ in range(2)]
+            couple = [
+                pop_inds.pop(randrange(0, len(pop_inds))) for _ in range(2)
+            ]
             parents.append(couple)
         return parents
 
     @staticmethod
-    def crossover(parents: list, co_point: int) -> list:
+    def single_point_crossover(parents: list, co_point: int) -> list:
         offsprings = []
-        for couple in parents:
-            offspring1 = couple[0].genes[: co_point]
-            offspring1.extend(couple[1].genes[co_point:])
-            offspring2 = couple[1].genes[: co_point]
-            offspring2.extend(couple[0].genes[co_point:])
+        for parent1, parent2 in parents:
+            offspring1 = parent1.genes[: co_point]
+            offspring1.extend(parent2.genes[co_point:])
+            offspring2 = parent2.genes[: co_point]
+            offspring2.extend(parent1.genes[co_point:])
             offsprings.append([offspring1, offspring2])
         return offsprings
 
     @staticmethod
-    def mutate(offsprings: list, genes_num: int, mut_rate: float) -> list:
+    def two_point_and_k_point_crossover(parents: list, co_point: int, co_point2: int) -> list:
+        offsprings = []
+        for parent1, parent2 in parents:
+            offspring1 = parent1.genes[: co_point]
+            offspring1.extend(parent2.genes[co_point:co_point2])
+            offspring1.extend(parent1.genes[co_point2:])
+            offspring2 = parent2.genes[: co_point]
+            offspring2.extend(parent1.genes[co_point:co_point2])
+            offspring2.extend(parent2.genes[co_point2:])
+            offsprings.append([offspring1, offspring2])
+        return offsprings
+
+    @staticmethod
+    def uniform_crossover(parents: list) -> list:
+        offsprings = []
+        for parent1, parent2 in parents:
+            offspring1 = [], offspring2 = []
+            for gene1, gene2 in zip(parent1.genes, parent2.genes):
+                if random() > .5:
+                    offspring1.append(gene2)
+                    offspring2.append(gene1)
+                else:
+                    offspring1.append(gene1)
+                    offspring2.append(gene2)
+        return offsprings
+
+    @staticmethod
+    def bit_string_mutation(offsprings: list, genes_num: int, mut_rate: float) -> list:
+        for couple in offsprings:
+            for offspring in couple:
+                for index in range(genes_num):
+                    if randint(0, 999)/1000 < mut_rate:
+                        i, j = index % len(offspring), (index + 1) % len(offspring)
+                        offspring[i], offspring[j] = offspring[j], offspring[i]
+        return offsprings
+
+    @staticmethod
+    def flip_bit_mutation(offsprings: list, genes_num: int, mut_rate: float) -> list:
         for couple in offsprings:
             for offspring in couple:
                 for index in range(genes_num):
@@ -90,7 +131,7 @@ class Evolve:
     def update_population(parents: list, offsprings: list):
         for parent_couple, offspring_couple in zip(parents, offsprings):
             for parent, offspring in zip(parent_couple, offspring_couple):
-                if parent.fitness() < Individual.genes_fitness(offspring):
+                if g_update_pop or parent.fitness() < Individual.genes_fitness(offspring):
                     parent.replace_genes(offspring)
 
     @staticmethod
@@ -101,12 +142,26 @@ class Evolve:
         parents = Evolve.to_couples(pop_inds, pop.pop_size)
         # defined here to avoid co_rate being changed
         # by user on the cross over process.
-        co_point = int(g_co_rate * pop.genes_num)
-        # list of couples of offsprings.
-        offsprings = Evolve.crossover(parents, co_point)
+        offsprings = []
+        if g_co_type == 0:
+            co_point = int(g_co_rate * pop.genes_num)
+            offsprings = Evolve.single_point_crossover(parents, co_point)
+        elif g_co_type == 1:
+            g_length = int(g_co_rate * pop.genes_num)
+            co_point = (pop.genes_num - g_length)//2
+            co_point2 = pop.genes_num - co_point
+            offsprings = Evolve.two_point_and_k_point_crossover(
+                parents, co_point, co_point2
+            )
+        else:
+            offsprings = Evolve.uniform_crossover(parents)
         # list of couples of offsprings, mut_rate is passed here
         # to avoid being changed by user on the mutation process.
-        offsprings = Evolve.mutate(offsprings, pop.genes_num, g_mut_rate)
+        offsprings = Evolve.bit_string_mutation(
+            offsprings, pop.genes_num, g_mut_rate
+        ) if g_mut_type == 0 else Evolve.flip_bit_mutation(
+            offsprings, pop.genes_num, g_mut_rate
+        )
         # parents and offsprings are sorted
         Evolve.update_population(parents, offsprings)
         # finished generating the next generation
@@ -152,13 +207,18 @@ class GAThread(Thread):
             "genes": pop.fittest().genes,
             "fitness": prvFitness,
         })
-        while g_max_gen == False or pop.generation < g_max_gen:
+        while g_max_gen is False or g_max_gen < 0 or pop.generation < g_max_gen:
             Evolve.evolve_population(pop)
             # takes the current generation fitness
             curFitness = pop.fittest().fitness()
             # if g_del_rate is 0 or False than just ignore it
             if g_del_rate:
                 sleep(g_del_rate)
+            if g_pause_gen is not False and pop.generation == g_pause_gen + 1:
+                self.pause()
+                to_json({
+                    'forced-pause': True
+                })
             # pause check, moved down to avoid another iteration if stop event
             # was triggered after a pause event
             self.__pause_check()
@@ -184,7 +244,6 @@ class GAThread(Thread):
         to_json({
             "finished": True
         })
-
 
     def __pause_check(self):
         """
@@ -241,7 +300,8 @@ class GAThread(Thread):
         # user triggered pause (through play button) through GUI and self.paused is still false means
         # GA is too slow on generating the next generation, than when the user clicked play (for resume)
         # it just turns self.__pause_now to false to prevent GA from pausing.
-        elif self.__pause_now: self.__pause_now = False
+        elif self.__pause_now:
+            self.__pause_now = False
 
     def step_forward(self):
         """
@@ -285,7 +345,8 @@ class GAThread(Thread):
                 self.pause_cond.release()
                 self.paused = False
             # in case is going to pause but user pressed stop, GA should pass the pause check test to stop
-            else: self.__pause_now = False
+            else:
+                self.__pause_now = False
             self.join()
 
 
@@ -294,6 +355,7 @@ def to_json(word: dict):
     prints a dict to json and flush it for instant respond (doesn't buffer output)
     """
     print(dumps(word), flush=True)
+
 
 # it's going to hold imported fitness function
 fitness_function = None
@@ -311,7 +373,12 @@ g_mut_rate = .06
 g_pop_size = int(argv[1]) if len(argv) > 1 else randint(1, 500)
 g_genes_num = int(argv[2]) if len(argv) > 2 else randint(1, 200)
 g_del_rate = int(argv[3]) if len(argv) > 3 else 0
+g_pause_gen = False
 g_max_gen = False
+g_co_type = 0
+g_mut_type = 0
+g_update_pop = 0
+
 
 def update_parameters(command: dict):
     """
@@ -320,9 +387,13 @@ def update_parameters(command: dict):
     global g_pop_size
     global g_genes_num
     global g_co_rate
+    global g_co_type
     global g_mut_rate
+    global g_mut_type
     global g_del_rate
+    global g_pause_gen
     global g_max_gen
+    global g_update_pop
 
     if command.get('pop_size'):
         # population size
@@ -333,19 +404,35 @@ def update_parameters(command: dict):
     if command.get('co_rate'):
         # crossover rate change, it should not be 0
         g_co_rate = command.get('co_rate')
+    if type(command.get('co_type')) is not type(None):
+        # crossover type
+        g_co_type = int(command.get('co_type'))
     if type(command.get('mut_rate')) is not type(None):
         # mutation rate change, can be 0
         g_mut_rate = float(command.get('mut_rate'))
+    if type(command.get('mut_type')) is not type(None):
+        # mutation type
+        g_mut_type = int(command.get('mut_type'))
     if type(command.get('del_rate')) is not type(None):
         # sleep in seconds
         g_del_rate = float(command.get('del_rate'))
+    if type(command.get('pause_gen')) is not type(None):
+        # pause generations
+        g_pause_gen = False if command.get('pause_gen') is False else float(command.get('pause_gen'))
     if type(command.get('max_gen')) is not type(None):
         # maximum generations
-        g_max_gen = float(command.get('max_gen'))
-        
-    
+        g_max_gen = False if command.get('max_gen') is False else float(command.get('max_gen'))
+    if type(command.get('update_pop')) is not type(None):
+        # specifies when to update_population
+        # if 0:
+        #   parent is replaced only when offspring fitness is better than parent's
+        # else (it equals 1)
+        #   parent is always replaced by offspring
+        g_update_pop = int(command.get('update_pop'))
+
     # if command.get('ff'):
     #     import_module(command.get('ff'))
+
 
 def init_ga():
     """
@@ -357,11 +444,11 @@ def init_ga():
     global solution
     solution = Individual(genes_num=g_genes_num)
 
+
 # possible to add condition here in near future
 while True:
     # read a command
     cmd = input()
-    # to_json(cmd)
     if cmd == 'play':
         if ga_thread is not None and ga_thread.is_alive():
             ga_thread.resume()
@@ -394,4 +481,3 @@ while True:
             pass
         else:
             update_parameters(load)
-

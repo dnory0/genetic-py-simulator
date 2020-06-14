@@ -1,4 +1,4 @@
-import { Chart, Options } from 'highcharts';
+import { Chart, Options, TooltipPositionerPointObject, Point } from 'highcharts';
 import { IpcRenderer } from 'electron';
 
 /****************************** passed by preload ******************************
@@ -142,7 +142,8 @@ let sideChart: Chart = window['createChart']('side-chart', {
         <span>,&nbsp;Value:&nbsp<b>${this.point.value}</b></span>
       `;
     },
-    positioner(labelWidth, labelHeight, point) {
+    positioner(labelWidth, labelHeight, point: Point | TooltipPositionerPointObject) {
+      point = <TooltipPositionerPointObject> point;
       var x = point.plotX + labelWidth + 80 < sideChart.plotWidth ? point.plotX + 9 : point.plotX - (labelWidth - 9);
       var y = point.plotY + (point.plotY > 30 ? 8 : labelHeight + 50);
       return { x, y };

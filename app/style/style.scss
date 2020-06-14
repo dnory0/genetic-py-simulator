@@ -23,13 +23,14 @@
     position: relative;
     min-height: 165px;
     display: flex;
-    height: calc(30% - 37px);
+    height: 216px;
     margin-top: -4px;
     overflow: hidden;
 
     .controls-container {
       display: flex;
       flex-flow: column;
+      background-color: white;
       width: 324px;
       overflow: hidden;
 
@@ -42,6 +43,16 @@
         .ga-cp {
           flex: 1;
           justify-content: flex-end;
+
+          .red-dot {
+            width: 7px;
+            height: 7px;
+            background-color: #ff2b2b;
+            border-radius: 50%;
+            position: relative;
+            top: -2px;
+            left: -2px;
+          }
         }
 
         .pane-hide {
@@ -52,7 +63,7 @@
       }
 
       .params-man {
-        padding: 0 0 0 6px;
+        padding: 0 0 3px 6px;
       }
     }
 
@@ -194,4 +205,47 @@
 
 .hide {
   display: none !important;
+}
+
+.complex-param.radio {
+  font-family: sans-serif;
+  font-size: 13px;
+
+  .param {
+    flex-direction: column;
+    align-items: baseline;
+
+    .param-name {
+      align-self: baseline;
+      width: 100%;
+      padding-top: 10px;
+    }
+
+    .param-settings {
+      padding: 5px;
+
+      .param-value {
+        width: 100%;
+        flex-direction: column;
+        align-items: baseline;
+
+        > label {
+          display: flex;
+          align-items: center;
+          padding: 5px;
+          width: fit-content;
+
+          > input {
+            margin-right: 5px;
+          }
+        }
+      }
+    }
+
+    .other-settings {
+      position: relative;
+      top: -24px;
+      left: 64px;
+    }
+  }
 }

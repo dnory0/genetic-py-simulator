@@ -1,4 +1,4 @@
-import { Chart, SeriesLineOptions, Options, Tooltip } from 'highcharts';
+import { Chart, SeriesLineOptions, Options, Tooltip, TooltipPositionerPointObject, Point } from 'highcharts';
 import { IpcRenderer } from 'electron';
 
 /**
@@ -166,7 +166,8 @@ let primeChart: Chart = window['createChart']('prime-chart', {
           `;
     },
     // to avoid the action buttons overlapping the tooltip
-    positioner(labelWidth, labelHeight, point) {
+    positioner(labelWidth, labelHeight, point: Point | TooltipPositionerPointObject) {
+      point = <TooltipPositionerPointObject> point;
       var x =
         point.plotX +
         primeChart.chartWidth -
@@ -195,11 +196,6 @@ let primeChart: Chart = window['createChart']('prime-chart', {
     {
       type: 'columnrange',
       name: 'Deviation',
-      data: [],
-    },
-    {
-      type: 'line',
-      name: 'QGA',
       data: [],
     },
   ] as SeriesLineOptions[],
@@ -266,11 +262,6 @@ ipcRenderer.on('zoom-out', () => {
 //           ? `
 //           <rect x="2" y="4" width="12" height="12" fill="#434348" rx="6" ry="6" class="highcharts-point" data-z-index="3"></rect>
 //           `
-//           : series == 'QGA'
-//           ? `
-//         <path fill="none" d="M 0 11 L 16 11" class="highcharts-graph" stroke="#90ed7d" stroke-width="1.5"></path>
-//         <path fill="#90ed7d" d="M 8 9 L 10 11 8 13 6 11 Z" class="highcharts-point" opacity="1"></path>
-//         `
 //           : ''
 //       }
 //         </g>

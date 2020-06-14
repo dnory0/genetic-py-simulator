@@ -14,22 +14,39 @@
     flex: 1;
     display: flex;
     height: calc(100% - 45px);
+    background-color: whitesmoke;
 
-    .params {
+    .title {
+      margin: 0;
+      font-size: 17px;
+
+      &.pad {
+        padding: 8px 0;
+
+        &.small {
+          padding: 5px 0;
+        }
+      }
+
+      &.small {
+        font-size: 15px;
+      }
+    }
+
+    .params-man {
       width: 396px;
+      min-width: 396px;
+      max-width: 396px;
       display: flex;
       flex-direction: column;
       overflow-y: auto;
-      background-color: whitesmoke;
 
       .sign {
         display: flex;
+        padding: 0 0 10px;
 
         .title {
           flex: 1;
-          margin: 0;
-          padding: 8px 0;
-          font-size: 17px;
           font-family: sans-serif;
         }
 
@@ -38,9 +55,17 @@
           margin: 6px;
         }
       }
+    }
 
-      .params-file {
-        font-family: sans-serif;
+    .browse-container {
+      padding-bottom: 44px;
+
+      .show-output-btn {
+        width: 96px;
+      }
+
+      .get-template-btn {
+        width: 96px;
       }
     }
 
@@ -49,9 +74,24 @@
       padding: 0;
     }
 
-    .details {
-      background-color: aliceblue;
+    .params-fitness {
+      padding: 10px 6px;
       flex: 1;
+      font-family: sans-serif;
+      overflow-x: hidden;
+      overflow-y: auto;
+
+      .genes-tree {
+        max-height: 350px;
+
+        .json-container {
+          border: thin solid #999999;
+          border-radius: 2px;
+          max-height: 350px;
+          overflow: auto;
+          max-width: calc(100vw - 397px - 16px);
+        }
+      }
     }
   }
 
@@ -93,4 +133,61 @@
       }
     }
   }
+}
+
+.type-container {
+  font-family: sans-serif;
+  padding: 0 10px;
+  font-size: 13px;
+
+  .type {
+    flex-direction: column;
+    align-items: baseline;
+
+    .type-name {
+      width: 100%;
+
+      > p {
+        margin: 0;
+      }
+    }
+    .type-settings {
+      padding: 5px;
+      flex-direction: column;
+      box-sizing: border-box;
+      width: 100%;
+
+      .type-value {
+        align-items: baseline;
+        width: 100%;
+        flex-direction: column;
+
+        > label {
+          display: flex;
+          align-items: center;
+          padding: 5px;
+          width: fit-content;
+
+          > input {
+            margin-right: 5px;
+          }
+        }
+      }
+    }
+  }
+}
+
+.hide {
+  display: none !important;
+}
+
+.notice-me {
+  background-color: #ff9900;
+}
+.notice-me-transition {
+  transition: background-color 0.2s ease;
+}
+
+.fade-white {
+  background-color: white;
 }

@@ -3,27 +3,21 @@
 
   > input[type='text'] {
     flex: 1;
-    height: 24px;
+    height: 20px;
     outline: none;
     padding: 1px 5px;
     border: thin #a2a2a2 solid;
+    border-radius: 3px 0 0 3px;
     font-size: 14px;
   }
 
   > button {
-    background-color: #e8e8e8;
-    font-weight: bold;
-    height: 28px;
-    width: 36px;
+    font-weight: normal;
     outline: none;
     user-select: none;
     margin-left: -1px;
     border: thin #a2a2a2 solid;
     border-radius: 0;
-
-    &:hover {
-      background-color: #d2d2d2;
-    }
 
     img {
       position: relative;
@@ -32,10 +26,16 @@
       height: 20px;
     }
 
-    &.browse-txt::after {
-      content: 'browse...';
-      position: relative;
-      top: -4px;
+    
+    &:last-child {
+      border-radius: 0 3px 3px 0;
     }
   }
+  
+  
+}
+
+.other-browse-btns {
+  margin: 10px 0;
+  float: right;
 }

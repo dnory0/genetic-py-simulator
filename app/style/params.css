@@ -1,10 +1,5 @@
-.params-file,
 .params-man {
   padding: 10px 6px;
-}
-
-.params-file {
-  font-family: sans-serif;
 }
 
 .params-man {
@@ -98,6 +93,66 @@
 
 .params-man .complex-param .param .param-settings .other-settings > * {
   margin: 6px;
+}
+
+.params-man .complex-param.radio {
+  font-family: sans-serif;
+  font-size: 13px;
+}
+
+.params-man .complex-param.radio .param {
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: baseline;
+      -ms-flex-align: baseline;
+          align-items: baseline;
+}
+
+.params-man .complex-param.radio .param .param-name {
+  -ms-flex-item-align: baseline;
+      align-self: baseline;
+  width: 100%;
+  padding-top: 10px;
+}
+
+.params-man .complex-param.radio .param .param-settings {
+  padding: 5px;
+}
+
+.params-man .complex-param.radio .param .param-settings .param-value {
+  width: 100%;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: baseline;
+      -ms-flex-align: baseline;
+          align-items: baseline;
+}
+
+.params-man .complex-param.radio .param .param-settings .param-value > label {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  padding: 5px;
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  width: fit-content;
+}
+
+.params-man .complex-param.radio .param .param-settings .param-value > label > input {
+  margin-right: 5px;
+}
+
+.params-man .complex-param.radio .param .other-settings {
+  position: relative;
+  top: -29px;
+  left: 22px;
 }
 
 .params-man input[type='checkbox'].param-enabled {

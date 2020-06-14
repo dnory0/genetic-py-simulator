@@ -16,50 +16,35 @@ delete window['settings'];
  */
 let isClosable = true;
 /**
- * checks if path is valid, check conditions are ordered and return value is as follows:
+ * checks if given path is valid, check conditions are ordered and return value is as follows:
  *
  * - ```-1``` if path does not exist.
  * - ```-2``` if path is not an absolute path.
  * - ```-3``` if path does not point to a file.
- * - ```-4``` if the file extention is not equal to the given ```ext```.
+ * - ```-4``` if the file extention is not equal to any of the given ```ext```.
  * - ```0``` if path matchs all conditions.
  *
- * @param gaConfigPath GA configuration path to check.
- * @param ext extension name, default is ```.py```.
+ * @param filePath file path to check & validate.
+ * @param exts extensions array.
  */
-let validatePath: (gaConfigPath: string, ext?: string) => number = window['validatePath'];
-
-let checkPath = (path: string) => {
-  let checkCode = validatePath(path);
-  switch (checkCode) {
-    case -1:
-      console.log("path doesn't exist.");
-      break;
-    case -2:
-      console.log('path should be absolute, found relative path.');
-      break;
-    case -3:
-      console.log("the path doesn't point to a file.");
-      break;
-    case -4:
-      console.log('path should point to a python file (ends with .py).');
-      break;
-    default:
-      console.log('possible.');
-      break;
-  }
-};
+let validatePath: (filePath: string, ...exts: string[]) => number = window['validatePath'];
 
 /**
- * browse button
+ * browse buttons
  */
-let browseBtn = <HTMLButtonElement>document.getElementById('browse-btn');
-
+let browseBtns = <HTMLButtonElement[]>Array.from(document.getElementsByClassName('browse-btn'));
 /**
- * input that takes the path to ga configuration
+ * load buttons
  */
-let paramsPath = <HTMLInputElement>document.getElementById('params-path');
-
+let loadBtns = <HTMLButtonElement[]>Array.from(document.getElementsByClassName('load-data-btn'));
+/**
+ * show output of loaded path and data
+ */
+let showOutputs = <HTMLButtonElement[]>Array.from(document.getElementsByClassName('show-output-btn'));
+/**
+ * inputs that take the path to whether genes data or fitness function
+ */
+let pathInputs = <HTMLInputElement[]>Array.from(document.getElementsByClassName('load-path'));
 /**
  * save button
  */
@@ -73,25 +58,140 @@ let closeBtn = <HTMLButtonElement>document.getElementById('close-btn');
  */
 let revertBtn = <HTMLButtonElement>document.getElementById('revert-btn');
 
-browseBtn.onclick = () => {
-  ipcRenderer.once('browsed-path', (_ev, result: OpenDialogReturnValue) => {
-    if (result.canceled) return;
-    paramsPath.value = result.filePaths[0];
-    checkPath(result.filePaths[0]);
-  });
-  ipcRenderer.send('browse');
+browseBtns.forEach(function (browseBtn) {
+  let type = browseBtn.classList.contains('genes-data') ? 'genes-data' : 'fitness-function';
+  let pathInput = pathInputs.filter(pathInput => pathInput.classList.contains(type))[0];
+
+  browseBtn.onclick = () => {
+    ipcRenderer.once('browsed-path', (_ev, result: OpenDialogReturnValue) => {
+      if (result.canceled) return;
+      pathInput.value = result.filePaths[0];
+      validatePathInput(pathInput, type);
+    });
+
+    ipcRenderer.send(
+      'browse',
+      type == 'genes-data'
+        ? {
+            name: 'JSON File (.json)',
+            extensions: ['json', 'jsonc', 'js'],
+          }
+        : {
+            name: 'Python File (.py)',
+            extensions: ['py', 'py3'],
+          }
+    );
+  };
+});
+
+/**
+ * fetch data from the path in pathInput, and checks data validity according to given type
+ * @param pathInput holds absolute path of a [```json``` | ```py```] file that holds data
+ * @param type ```genes-data``` | ```fitness-function```, data type inside the file
+ */
+let validateData = async (pathInput: HTMLInputElement, type: string) => {
+  return await fetch(pathInput.value)
+    .then(res => res.text())
+    .then(data => {
+      try {
+        if (type == 'genes-data') {
+          curSettings['renderer']['input'][pathInput.id]['data'] = JSON.stringify(JSON.parse(data));
+        } else {
+          curSettings['renderer']['input'][pathInput.id]['data'] = data;
+        }
+        return true;
+      } catch (error) {
+        if (type == 'genes-data') {
+          // alert('This json data contains error!')
+          alert('Data has Errors');
+          return false;
+        }
+      }
+    });
 };
 
-paramsPath.onkeyup = () => checkPath(paramsPath.value);
+/**
+ * checks if the path in pathInput is valide, and whether its data is valide according to given type
+ * @param pathInput holds absolute path of a [```json``` | ```py```] file that holds data
+ * @param type ```genes-data``` | ```fitness-function```, data type inside the file
+ */
+let validatePathInput = async (pathInput: HTMLInputElement, type: string) => {
+  clearTimeout(pathInput['bgTimeout']);
+  pathInput['bgTimeout'] = setTimeout(() => (pathInput.style.backgroundColor = ''), 1500);
+  clearJSONOutput();
+  curSettings['renderer']['input'][pathInput.id]['data'] = null;
+  pathInput.dispatchEvent(new Event('browsedPath'));
+  let extensions = type == 'genes-data' ? ['.json', '.jsonc', '.js'] : ['.py', '.py3'];
+  if (validatePath(pathInput.value, ...extensions) == 0 && (await validateData(pathInput, type))) {
+    pathInput.style.backgroundColor = '#a8fba8';
+    return true;
+  } else {
+    pathInput.style.backgroundColor = '#ffbfbf';
+    return false;
+  }
+};
+
+loadBtns.forEach(loadBtn => {
+  let type = loadBtn.classList.contains('genes-data') ? 'genes-data' : 'fitness-function';
+  let pathInput = pathInputs.filter(pathInput => pathInput.classList.contains(type))[0];
+  loadBtn.addEventListener('click', () => {
+    validatePathInput(pathInput, type);
+  });
+});
+
+/**
+ * to loads data when Enter key pressed inside pathInputs
+ */
+pathInputs.forEach(pathInput => {
+  let type = pathInput.classList.contains('genes-data') ? 'genes-data' : 'fitness-function';
+  pathInput.addEventListener('keyup', ev => {
+    if (ev.key != 'Enter') return;
+    validatePathInput(pathInput, type);
+  });
+  setTimeout(() => {
+    if (curSettings['renderer']['input'][pathInput.id]['data'] == undefined) {
+      let loadBtn = loadBtns.filter(loadBtn => loadBtn.classList.contains(type))[0];
+      let browseBtn = browseBtns.filter(browseBtn => browseBtn.classList.contains(type))[0];
+      let extensions = type == 'genes-data' ? ['.json', '.jsonc', '.js'] : ['.py', '.py3'];
+      let flikrBtn = validatePath(pathInput.value, ...extensions) == 0 ? loadBtn : browseBtn;
+
+      flikrBtn.classList.add('notice-me');
+      setTimeout(() => flikrBtn.classList.add('notice-me-transition'), 0);
+      setTimeout(() => flikrBtn.classList.add('fade-white'), 200);
+      setTimeout(() => flikrBtn.classList.remove('fade-white'), 350);
+      setTimeout(() => flikrBtn.classList.add('fade-white'), 550);
+      setTimeout(() => flikrBtn.classList.remove('notice-me', 'fade-white', 'notice-me-transition'), 750);
+    }
+  });
+});
+
+let clearJSONOutput = () => {
+  let treeContainer = document.querySelector('.genes-tree');
+  Array.from(treeContainer.getElementsByClassName('json-container')).forEach(jsonContainer => jsonContainer.remove());
+};
+
+showOutputs.forEach(showOutput => {
+  let type = showOutput.classList.contains('genes-data') ? 'genes-data' : 'fitness-function';
+  let pathInput = pathInputs.filter(pathInput => pathInput.classList.contains(type))[0];
+  let treeContainer = document.querySelector('.genes-tree');
+  showOutput.onclick = async () => {
+    // todo: add test fitness-function
+    if (type == 'fitness-function') {
+      alert('no python load for now');
+      return;
+    }
+    if (await validatePathInput(pathInput, type)) {
+      window['jsonTree'](treeContainer, curSettings['renderer']['input'][pathInput.id]['data']);
+      treeContainer.firstElementChild.classList.add('scrollbar');
+    }
+  };
+});
 
 (() => {
   /**
    * bottom-right buttons setup
    */
-  saveBtn.onclick = () => {
-    revertSettings['renderer']['input'] = curSettings['renderer']['input'];
-    ipcRenderer.send('ga-cp-finished', curSettings);
-  };
+  saveBtn.onclick = () => ipcRenderer.send('ga-cp-finished', curSettings);
 
   closeBtn.onclick = () => {
     if (isClosable) ipcRenderer.send('ga-cp-finished');
@@ -99,6 +199,7 @@ paramsPath.onkeyup = () => checkPath(paramsPath.value);
   };
 
   revertBtn.onclick = () => {
+    clearJSONOutput();
     revertBtn.disabled = true;
     saveBtn.disabled = true;
     isClosable = true;
@@ -115,15 +216,22 @@ paramsPath.onkeyup = () => checkPath(paramsPath.value);
   Array.from(document.getElementsByTagName('input')).forEach(input => {
     if (input.type == 'checkbox') {
       input.addEventListener('change', eventListener);
+    } else if (input.type == 'radio') {
+      input.addEventListener('change', eventListener);
     } else {
-      input.addEventListener('keypress', eventListener);
-      input.addEventListener('paste', eventListener);
-      if (!input.id.match('params-path'))
+      if (input.classList.contains('load-path')) {
+        input['isGACP'] = true;
+        // this is triggered when path is browsed using browse button
+        input.addEventListener('browsedPath', eventListener);
+      } else {
+        input.addEventListener('keypress', eventListener);
+        input.addEventListener('paste', eventListener);
         input.addEventListener('keyup', ev => {
           if (['ArrowUp', 'ArrowDown'].includes(ev.key)) eventListener();
         });
-      if (input.classList.contains('textfieldable')) {
-        input.addEventListener('change', eventListener);
+        if (input.classList.contains('textfieldable')) {
+          input.addEventListener('change', eventListener);
+        }
       }
     }
   });
@@ -167,12 +275,28 @@ let toggleDisableOnRun = (disable: boolean) => {
   (<HTMLInputElement[]>(
     (<HTMLDivElement[]>Array.from(document.getElementsByClassName('param-value'))).map(paramValue => paramValue.firstElementChild)
   )).forEach(gaParam => {
+    console.log(gaParam);
+
     if (!gaParam.classList.contains('disable-on-run')) return;
     curSettings['renderer']['input'][gaParam.id]['disable'] = disable;
     gaParam.disabled = disable;
     (<HTMLButtonElement>gaParam.parentElement.nextElementSibling.firstElementChild).disabled = disable;
     gaParam.parentElement.parentElement.title = !disable ? '' : 'Disabled when GA is Running';
   });
+
+  let gaTypes = (<HTMLDivElement[]>Array.from(document.getElementsByClassName('type-value')))
+    .reduce((accum: Element[], typeValue) => accum.concat(...Array.from(typeValue.children)), [])
+    .map((label: HTMLLabelElement) => <HTMLInputElement>label.firstElementChild)
+    .filter(radioInput => radioInput.name != 'update_pop');
+  curSettings['renderer']['input'][gaTypes[0].name.replace('_', '-')]['disable'] = disable;
+  gaTypes.forEach(gaType => {
+    gaType.disabled = disable;
+    gaType.parentElement.parentElement.title = disable ? 'Disabled when GA is Running' : '';
+  });
+
+  pathInputs.forEach(pathInput => (pathInput.disabled = disable));
+  browseBtns.forEach(browseBtns => (browseBtns.disabled = disable));
+  loadBtns.forEach(loadBtn => (loadBtn.disabled = disable));
 };
 
 ipcRenderer.on('update-settings', (_ev, activate: boolean) => {

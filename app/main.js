@@ -9,6 +9,28 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+if (process.argv.some(arg => ['--help', '-h'].includes(arg))) {
+    const { description, homepage } = require('../package.json');
+    console.log(`
+Description: ${description}.
+For more, visit: ${homepage}.
+-h  --help\t\tprint this help
+-d  -D  --dev\t\tto launch app on development mode, and be able to open devTools
+-S  --reset-settings\tforce app to reset settings, this is useful on major updates
+-R  \t\t\tsame as -S but does not launch the app
+-v  --version\t\tprint versions
+  `);
+    process.exit();
+}
+else if (process.argv.some(arg => ['--version', '-v'].includes(arg))) {
+    const { name, productName, version, dependencies, devDependencies } = require('../package.json');
+    console.log(`${name} (${productName}): ${version}`);
+    for (let dependency in dependencies)
+        console.log(`${dependency}: ${dependencies[dependency].replace('^', '')}`);
+    for (let devDependency in devDependencies)
+        console.log(`${devDependency}: ${devDependencies[devDependency].replace('^', '')}`);
+    process.exit();
+}
 const electron_1 = require("electron");
 const path_1 = require("path");
 const fs_1 = require("fs");
@@ -18,9 +40,16 @@ let mainWindow;
 let gaWindow;
 const pyshell = require(path_1.join(__dirname, 'modules', 'create-pyshell.js'))(electron_1.app);
 global['pyshell'] = pyshell;
-let settings = require(path_1.join(__dirname, 'modules', 'load-settings.js'))(electron_1.app);
+function writeSettings() {
+    fs_1.writeFileSync(path_1.join(electron_1.app.isPackaged ? electron_1.app.getPath('userData') : path_1.join(electron_1.app.getAppPath(), '..'), 'settings.json'), JSON.stringify(settings));
+}
+let settings = require(path_1.join(__dirname, 'modules', 'load-settings.js'))(electron_1.app, process.argv.some(arg => ['--reset-settings', '-S', '-R'].includes(arg)));
+if (process.argv.some(arg => arg === '-R')) {
+    writeSettings();
+    process.exit();
+}
 global['settings'] = settings;
-const createWindow = (filePath, { minWidth, minHeight, width, height, resizable, minimizable, maximizable, parent, frame, webPreferences: { preload, webviewTag } } = {}) => {
+const createWindow = (filePath, { minWidth, minHeight, width, height, resizable, minimizable, maximizable, parent, frame, webPreferences: { preload, webviewTag }, } = {}) => {
     let targetWindow = new electron_1.BrowserWindow({
         minWidth,
         minHeight,
@@ -36,8 +65,8 @@ const createWindow = (filePath, { minWidth, minHeight, width, height, resizable,
         show: false,
         webPreferences: {
             preload,
-            webviewTag
-        }
+            webviewTag,
+        },
     });
     targetWindow.loadFile(filePath);
     targetWindow.once('closed', () => {
@@ -46,20 +75,19 @@ const createWindow = (filePath, { minWidth, minHeight, width, height, resizable,
     return targetWindow;
 };
 const browse = (window, options, resolved, rejected) => {
-    electron_1.dialog
-        .showOpenDialog(window, options)
-        .then(resolved)
-        .catch(rejected);
+    electron_1.dialog.showOpenDialog(window, options).then(resolved).catch(rejected);
 };
 electron_1.app.once('ready', () => {
     process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true;
     mainWindow = createWindow(path_1.join(__dirname, 'index.html'), {
         minWidth: 720,
         minHeight: 500,
+        width: 800,
+        height: 550,
         webPreferences: {
             preload: path_1.join(__dirname, 'preloads', 'preload.js'),
-            webviewTag: true
-        }
+            webviewTag: true,
+        },
     });
     mainWindow.on('enter-full-screen', () => {
         mainWindow.autoHideMenuBar = true;
@@ -77,40 +105,42 @@ electron_1.app.once('ready', () => {
                 return;
             }
             gaWindow = createWindow(path_1.join(__dirname, 'ga-cp', 'ga-cp.html'), {
-                minWidth: 680,
-                minHeight: 480,
+                minWidth: 780,
+                minHeight: 550,
+                width: 820,
+                height: 560,
                 maximizable: false,
                 minimizable: false,
                 parent: mainWindow,
                 webPreferences: {
-                    preload: path_1.join(__dirname, 'preloads', 'ga-cp-preload.js')
-                }
+                    preload: path_1.join(__dirname, 'preloads', 'ga-cp-preload.js'),
+                },
             });
             gaWindow.once('ready-to-show', gaWindow.show);
             if (!isDev)
                 gaWindow.removeMenu();
-            gaWindow.webContents.on('ipc-message', (_ev, gaChannel, updatedSettings) => {
+            gaWindow.webContents.on('ipc-message', (_ev, gaChannel, other) => {
                 if (gaChannel == 'ga-cp-finished') {
-                    mainWindow.webContents.send('ga-cp-finished', updatedSettings);
+                    mainWindow.webContents.send('ga-cp-finished', other);
                     gaWindow.destroy();
                 }
                 else if (gaChannel == 'close-confirm') {
                     (() => __awaiter(void 0, void 0, void 0, function* () {
                         yield (() => {
                             return electron_1.dialog.showMessageBox(gaWindow, {
-                                type: 'question',
+                                type: 'warning',
                                 title: 'Are you sure?',
                                 message: 'You have unsaved changes, are you sure you want to close?',
                                 cancelId: 0,
                                 defaultId: 1,
                                 buttons: ['Ca&ncel', '&Confirm'],
-                                normalizeAccessKeys: true
+                                normalizeAccessKeys: true,
                             });
                         })()
                             .then(result => {
                             if (!result.response)
                                 return;
-                            mainWindow.webContents.send('ga-cp-finished', updatedSettings);
+                            mainWindow.webContents.send('ga-cp-finished', other);
                             gaWindow.destroy();
                         })
                             .catch(reason => {
@@ -124,12 +154,13 @@ electron_1.app.once('ready', () => {
                         title: 'Open GA Configuration file',
                         defaultPath: electron_1.app.getPath('desktop'),
                         filters: [
+                            other,
                             {
-                                name: 'Python File (.py)',
-                                extensions: ['py']
-                            }
+                                name: 'All Files',
+                                extensions: ['*'],
+                            },
                         ],
-                        properties: ['openFile']
+                        properties: ['openFile'],
                     }, result => gaWindow.webContents.send('browsed-path', result), reason => {
                         gaWindow.webContents.send('browsed-path', { canceled: true });
                         if (reason)
@@ -148,7 +179,7 @@ electron_1.app.once('ready', () => {
         if (settings['main']['x'] && settings['main']['y']) {
             mainWindow.setBounds({
                 x: settings['main']['x'],
-                y: settings['main']['y']
+                y: settings['main']['y'],
             });
         }
         if (settings['main']['maximized'])
@@ -165,7 +196,7 @@ electron_1.app.once('ready', () => {
             settings['main']['x'] = mainWindow.getNormalBounds().x;
             settings['main']['y'] = mainWindow.getNormalBounds().y;
         }
-        fs_1.writeFileSync(path_1.join(electron_1.app.isPackaged ? electron_1.app.getPath('userData') : path_1.join(electron_1.app.getAppPath(), '..'), 'settings.json'), JSON.stringify(settings));
+        writeSettings();
     });
 });
 electron_1.app.once('will-quit', () => pyshell.stdin.write('exit\n'));

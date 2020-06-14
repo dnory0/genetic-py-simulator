@@ -59,6 +59,8 @@ function params() {
 
     let randomBtn = <HTMLButtonElement>input.parentElement.nextElementSibling.firstElementChild;
 
+    if (randomBtn == null) return;
+
     randomBtn.onclick = () => {
       input.value = rangedRandom(
         input.max == '' ? parseFloat(input.step) * 1000 : parseFloat(input.max),

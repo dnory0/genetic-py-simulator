@@ -15,34 +15,34 @@ window['createChart'] = require(path_1.join(__dirname, '..', 'modules', 'create-
 window['toggleChartHover'] = (chart, enable) => {
     chart.update({
         tooltip: {
-            enabled: enable
+            enabled: enable,
         },
         xAxis: {
-            crosshair: enable
+            crosshair: enable,
         },
         legend: {
             itemStyle: {
-                pointerEvents: enable ? 'all' : 'none'
+                pointerEvents: enable ? 'all' : 'none',
             },
             itemCheckboxStyle: {
-                pointerEvents: enable ? 'all' : 'none'
-            }
+                pointerEvents: enable ? 'all' : 'none',
+            },
         },
         plotOptions: {
             series: {
                 marker: {
                     enabled: enable,
-                    radius: enable ? 1.5 : null
+                    radius: enable ? 1.5 : null,
                 },
                 states: {
                     hover: {
                         halo: {
-                            opacity: enable ? 0.5 : 0
-                        }
-                    }
-                }
-            }
-        }
+                            opacity: enable ? 0.5 : 0,
+                        },
+                    },
+                },
+            },
+        },
     }, true, false, false);
 };
 window['clearChart'] = (chart, categories = false) => {
@@ -76,9 +76,9 @@ window['toggleZoom'] = (chart, enable) => {
         chart: {
             zoomType: enable ? 'x' : null,
             panning: {
-                enabled: enable
-            }
-        }
+                enabled: enable,
+            },
+        },
     }, true, false, false);
 };
 //# sourceMappingURL=chart-preload.js.map

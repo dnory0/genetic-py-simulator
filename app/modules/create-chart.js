@@ -9,48 +9,48 @@ module.exports = (containerId, options) => {
                 theme: {
                     style: {
                         pointerEvents: 'none',
-                        opacity: 0
-                    }
-                }
+                        opacity: 0,
+                    },
+                },
             },
             spacingBottom: 3,
             marginRight: 3,
             backgroundColor: 'white',
             events: options.chart.events,
             panning: {
-                enabled: true
+                enabled: true,
             },
-            panKey: 'ctrl'
+            panKey: 'ctrl',
         },
         tooltip: options.tooltip,
         title: {
-            text: options.title.text
+            text: options.title.text,
         },
         xAxis: {
             crosshair: {
-                width: 1
+                width: 1,
             },
             title: {
                 text: options.xAxis.title.text,
-                align: 'high'
+                align: 'high',
             },
             tickInterval: 1,
             min: options.xAxis.min,
             labels: options.xAxis.labels,
-            minRange: options.xAxis.minRange
+            minRange: options.xAxis.minRange,
         },
         colorAxis: {
-            minColor: highcharts_1.getOptions().colors[2],
-            maxColor: highcharts_1.getOptions().colors[8]
+            minColor: highcharts_1.getOptions().colors[8],
+            maxColor: highcharts_1.getOptions().colors[2],
         },
         yAxis: {
             title: null,
             tickInterval: 1,
             labels: options.yAxis.labels,
-            gridLineWidth: options.yAxis.gridLineWidth
+            gridLineWidth: options.yAxis.gridLineWidth,
         },
         exporting: {
-            enabled: false
+            enabled: false,
         },
         series: options.series,
         plotOptions: {
@@ -60,21 +60,21 @@ module.exports = (containerId, options) => {
                 states: {
                     hover: {
                         halo: {
-                            opacity: 0
+                            opacity: 0,
                         },
-                        lineWidth: 1
-                    }
-                }
-            }
+                        lineWidth: 1,
+                    },
+                },
+            },
         },
         subtitle: {
             text: options.yAxis.title.text,
-            align: 'left'
+            align: 'left',
         },
         legend: options.legend,
         credits: {
-            enabled: false
-        }
+            enabled: false,
+        },
     });
 };
 //# sourceMappingURL=create-chart.js.map

@@ -22,19 +22,14 @@ module.exports = function () {
             winRes = 'innerHeight';
         }
         border.onmousedown = () => {
-            document
-                .querySelectorAll('.resize-cover')
-                .forEach((ele) => ele.classList.remove('hide'));
+            document.querySelectorAll('.resize-cover').forEach((ele) => ele.classList.remove('hide'));
             window.onmousemove = (e) => {
-                if (e[client] >= minPrevRes &&
-                    e[client] <= window[winRes] - minNextRes)
-                    nextSib.style[res] = window[winRes] - 24 - e[client] + 'px';
+                if (e[client] >= minPrevRes && e[client] <= window[winRes] - minNextRes)
+                    nextSib.style[res] = window[winRes] - e[client] + 'px';
             };
             window.onmouseup = () => {
                 window.onmousemove = window.onmouseup = null;
-                document
-                    .querySelectorAll('.resize-cover')
-                    .forEach((ele) => ele.classList.add('hide'));
+                document.querySelectorAll('.resize-cover').forEach((ele) => ele.classList.add('hide'));
             };
         };
         border.ondblclick = () => (nextSib.style[res] = minNextRes + 'px');

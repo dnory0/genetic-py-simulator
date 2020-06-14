@@ -10,5 +10,4 @@ window['border'] = require('../modules/border');
 window['params'] = require('../modules/params');
 window['validatePath'] = require('../modules/validate-path');
 window['settings'] = getGlobal('settings');
-window['pyshell'] = getGlobal('pyshell');
 //# sourceMappingURL=ga-cp-preload.js.map
