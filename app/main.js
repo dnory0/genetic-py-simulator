@@ -117,8 +117,7 @@ electron_1.app.once('ready', () => {
                 },
             });
             gaWindow.once('ready-to-show', gaWindow.show);
-            if (!isDev)
-                gaWindow.removeMenu();
+            gaWindow.setMenu(require(path_1.join(__dirname, 'modules', 'menubar.js'))(false, gaWindow));
             gaWindow.webContents.on('ipc-message', (_ev, gaChannel, other) => {
                 if (gaChannel == 'ga-cp-finished') {
                     mainWindow.webContents.send('ga-cp-finished', other);

@@ -199,7 +199,7 @@ app.once('ready', () => {
 
       gaWindow.once('ready-to-show', gaWindow.show);
 
-      if (!isDev) gaWindow.removeMenu();
+      gaWindow.setMenu(require(join(__dirname, 'modules', 'menubar.js'))(false, gaWindow));
 
       gaWindow.webContents.on('ipc-message', (_ev, gaChannel, other: object | boolean | FileFilter) => {
         if (gaChannel == 'ga-cp-finished') {
