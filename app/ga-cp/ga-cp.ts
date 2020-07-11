@@ -11,6 +11,19 @@ let revertSettings: object = window['settings'];
  */
 let curSettings: object = JSON.parse(JSON.stringify(window['settings']));
 delete window['settings'];
+
+
+/**
+ * affects settings to inputs
+ */
+window['affectSettings'](curSettings['renderer']['input'], 'ga-cp');
+/**
+ * add functionality to update settings onchange event for inputs
+ */
+window['saveSettings'](curSettings['renderer']['input']);
+
+window['border']();
+
 /**
  *
  */
@@ -267,7 +280,7 @@ window['params']();
  */
 document.getElementById('force-tf-enabled').addEventListener('change', ev => {
   Array.from(document.getElementsByClassName('textfieldable')).forEach((textfieldable: HTMLInputElement) => {
-    textfieldable.type = (<HTMLInputElement>ev.target).checked ? 'text' : 'range';
+    textfieldable['switchTextfieldable'](textfieldable, ev.target);
   });
 });
 
@@ -275,8 +288,6 @@ let toggleDisableOnRun = (disable: boolean) => {
   (<HTMLInputElement[]>(
     (<HTMLDivElement[]>Array.from(document.getElementsByClassName('param-value'))).map(paramValue => paramValue.firstElementChild)
   )).forEach(gaParam => {
-    console.log(gaParam);
-
     if (!gaParam.classList.contains('disable-on-run')) return;
     curSettings['renderer']['input'][gaParam.id]['disable'] = disable;
     gaParam.disabled = disable;
@@ -312,15 +323,5 @@ ipcRenderer.on('close-confirm', () => {
   else ipcRenderer.send('close-confirm');
 });
 
-/**
- * affects settings to inputs
- */
-window['affectSettings'](curSettings['renderer']['input'], 'ga-cp');
-/**
- * add functionality to update settings onchange event for inputs
- */
-window['saveSettings'](curSettings['renderer']['input']);
 // apply one of the .disable-on-run to be
 toggleDisableOnRun(curSettings['renderer']['input']['pop-size']['disable']);
-
-window['border']();

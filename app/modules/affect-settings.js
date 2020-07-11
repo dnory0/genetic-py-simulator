@@ -1,11 +1,34 @@
+let switchTextfieldable = (textfieldable, forceTFInput) => {
+    if (textfieldable.classList.contains('double-sync')) {
+        if (!(textfieldable.type == 'range'))
+            return;
+        textfieldable.classList.toggle('hide', forceTFInput.checked);
+        Array.from(textfieldable.parentElement.children)
+            .filter(siblingElement => siblingElement.getAttribute('synctype') == textfieldable.getAttribute('synctype') &&
+            siblingElement != textfieldable)
+            .forEach(siblingElement => siblingElement.classList.toggle('hide', !forceTFInput.checked));
+    }
+    else {
+        textfieldable.type = forceTFInput.checked ? 'text' : 'range';
+    }
+};
 function affectSettings(settings, targetedWindow) {
-    Array.from(document.getElementsByTagName('input')).forEach(input => {
+    Array.from(document.getElementsByTagName('input')).forEach((input, _, inputs) => {
         if (input.type == 'checkbox') {
             let type = input.id.match(/(?<=-)[^-]*$/)[0];
-            input.checked = settings[input.id.replace(`-${type}`, '')][type];
+            try {
+                input.checked = settings[input.id.replace(`-${type}`, '')][type];
+            }
+            catch (e) {
+                console.log(`This should be a new input, add it to settings.json`);
+                console.log(input);
+                return;
+            }
             if (input.id == 'force-tf-enabled') {
-                Array.from(document.getElementsByClassName('textfieldable')).forEach((textfieldable) => {
-                    textfieldable.type = input.checked ? 'text' : 'range';
+                inputs.filter(textfieldable => textfieldable.classList.contains('textfieldable')).forEach((textfieldable) => {
+                    if (targetedWindow == 'ga-cp')
+                        textfieldable['switchTextfieldable'] = () => switchTextfieldable(textfieldable, input);
+                    switchTextfieldable(textfieldable, input);
                 });
             }
             else if (targetedWindow == 'main') {

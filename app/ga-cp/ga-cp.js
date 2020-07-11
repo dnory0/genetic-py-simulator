@@ -13,6 +13,9 @@ let ipcRenderer = window['ipcRenderer'];
 let revertSettings = window['settings'];
 let curSettings = JSON.parse(JSON.stringify(window['settings']));
 delete window['settings'];
+window['affectSettings'](curSettings['renderer']['input'], 'ga-cp');
+window['saveSettings'](curSettings['renderer']['input']);
+window['border']();
 let isClosable = true;
 let validatePath = window['validatePath'];
 let browseBtns = Array.from(document.getElementsByClassName('browse-btn'));
@@ -184,12 +187,11 @@ document.getElementById('random-all-btn').onclick = () => {
 };
 document.getElementById('force-tf-enabled').addEventListener('change', ev => {
     Array.from(document.getElementsByClassName('textfieldable')).forEach((textfieldable) => {
-        textfieldable.type = ev.target.checked ? 'text' : 'range';
+        textfieldable['switchTextfieldable'](textfieldable, ev.target);
     });
 });
 let toggleDisableOnRun = (disable) => {
     (Array.from(document.getElementsByClassName('param-value')).map(paramValue => paramValue.firstElementChild)).forEach(gaParam => {
-        console.log(gaParam);
         if (!gaParam.classList.contains('disable-on-run'))
             return;
         curSettings['renderer']['input'][gaParam.id]['disable'] = disable;
@@ -219,8 +221,5 @@ ipcRenderer.on('close-confirm', () => {
     else
         ipcRenderer.send('close-confirm');
 });
-window['affectSettings'](curSettings['renderer']['input'], 'ga-cp');
-window['saveSettings'](curSettings['renderer']['input']);
 toggleDisableOnRun(curSettings['renderer']['input']['pop-size']['disable']);
-window['border']();
 //# sourceMappingURL=ga-cp.js.map

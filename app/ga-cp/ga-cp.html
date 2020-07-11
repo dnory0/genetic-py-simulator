@@ -276,7 +276,7 @@
               </div>
             </div>
           </div>
-          <div class="radio complex-param">
+          <div class="multiline complex-param">
             <div class="param">
               <div class="param-name">
                 <p>Update Population</p>
@@ -296,6 +296,69 @@
                   <div class="checkbox-wrapper" title="Pin to Main Window">
                     <input type="checkbox" name="update_pop_pin" id="update-pop-pin" />
                     <label for="update-pop-pin">
+                      <img src="../img/pin.png" />
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="multiline complex-param sync-param">
+            <input class="param-enabled" type="checkbox" name="del_rate_enabled" id="del-rate-enabled" />
+            <div class="param">
+              <div class="param-name">
+                <p>Control Number of 1s and 0s</p>
+              </div>
+              <div class="param-settings">
+                <div class="param-value">
+                  <div class="edge">0</div>
+                  <input
+                    type="range"
+                    inputmode="numeric"
+                    min="0"
+                    max="5"
+                    step="0.05"
+                    id="number-of-1sn0s-range"
+                    name="number_of_1sn0s_range"
+                    pattern="^[-+]?\d*\.?\d*$"
+                    class="textfieldable is-disable-able double-sync"
+                    synctype="number-of-1sn0s"
+                    required
+                  />
+                  <input
+                    type="text"
+                    inputmode="numeric"
+                    min="0"
+                    max="5"
+                    step="0.05"
+                    id="number-of-0s-text"
+                    name="number_of_0s_text"
+                    pattern="^[-+]?\d*\.?\d*$"
+                    class="textfieldable is-disable-able double-sync hide"
+                    synctype="number-of-1sn0s"
+                    disabled
+                    required
+                  />
+                  <div class="edge">1</div>
+                  <input
+                    type="text"
+                    inputmode="numeric"
+                    min="0"
+                    max="5"
+                    step="0.05"
+                    id="number-of-1s-text"
+                    name="number_of_1s_text"
+                    pattern="^[-+]?\d*\.?\d*$"
+                    class="textfieldable is-disable-able double-sync hide"
+                    synctype="number-of-1sn0s"
+                    required
+                  />
+                </div>
+                <div class="other-settings">
+                  <button class="random-btn">Random</button>
+                  <div class="checkbox-wrapper" title="Pin to Main Window">
+                    <input type="checkbox" name="number_of_1sn0s_pin" id="number-of-1sn0s-pin" />
+                    <label for="number-of-1sn0s-pin">
                       <img src="../img/pin.png" />
                     </label>
                   </div>

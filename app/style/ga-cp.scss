@@ -55,6 +55,31 @@
           margin: 6px;
         }
       }
+
+      .complex-param.sync-param {
+        .param {
+          .param-settings {
+            width: 315px !important;
+
+            .param-value {
+              flex-direction: row;
+              align-items: center;
+
+              .edge {
+                padding: 0 5px;
+              }
+
+              #number-of-0s-text {
+                margin-right: 10px;
+              }
+
+              input[type='text'] {
+                width: 50px;
+              }
+            }
+          }
+        }
+      }
     }
 
     .browse-container {

@@ -321,12 +321,12 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
   margin: 6px;
 }
 
-.params-man .complex-param.radio {
+.params-man .complex-param.multiline {
   font-family: sans-serif;
   font-size: 13px;
 }
 
-.params-man .complex-param.radio .param {
+.params-man .complex-param.multiline .param {
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
       -ms-flex-direction: column;
@@ -336,18 +336,18 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
           align-items: baseline;
 }
 
-.params-man .complex-param.radio .param .param-name {
+.params-man .complex-param.multiline .param .param-name {
   -ms-flex-item-align: baseline;
       align-self: baseline;
   width: 100%;
   padding-top: 10px;
 }
 
-.params-man .complex-param.radio .param .param-settings {
+.params-man .complex-param.multiline .param .param-settings {
   padding: 5px;
 }
 
-.params-man .complex-param.radio .param .param-settings .param-value {
+.params-man .complex-param.multiline .param .param-settings .param-value {
   width: 100%;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
@@ -358,7 +358,7 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
           align-items: baseline;
 }
 
-.params-man .complex-param.radio .param .param-settings .param-value > label {
+.params-man .complex-param.multiline .param .param-settings .param-value > label {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -371,13 +371,13 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
   width: fit-content;
 }
 
-.params-man .complex-param.radio .param .param-settings .param-value > label > input {
+.params-man .complex-param.multiline .param .param-settings .param-value > label > input {
   margin-right: 5px;
 }
 
-.params-man .complex-param.radio .param .other-settings {
+.params-man .complex-param.multiline .param .other-settings {
   position: relative;
-  top: -29px;
+  top: -30px;
   left: 22px;
 }
 
@@ -683,12 +683,12 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
   display: none !important;
 }
 
-.complex-param.radio {
+.complex-param.multiline {
   font-family: sans-serif;
   font-size: 13px;
 }
 
-.complex-param.radio .param {
+.complex-param.multiline .param {
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
       -ms-flex-direction: column;
@@ -698,18 +698,18 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
           align-items: baseline;
 }
 
-.complex-param.radio .param .param-name {
+.complex-param.multiline .param .param-name {
   -ms-flex-item-align: baseline;
       align-self: baseline;
   width: 100%;
   padding-top: 10px;
 }
 
-.complex-param.radio .param .param-settings {
+.complex-param.multiline .param .param-settings {
   padding: 5px;
 }
 
-.complex-param.radio .param .param-settings .param-value {
+.complex-param.multiline .param .param-settings .param-value {
   width: 100%;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
@@ -720,7 +720,7 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
           align-items: baseline;
 }
 
-.complex-param.radio .param .param-settings .param-value > label {
+.complex-param.multiline .param .param-settings .param-value > label {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -733,11 +733,11 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
   width: fit-content;
 }
 
-.complex-param.radio .param .param-settings .param-value > label > input {
+.complex-param.multiline .param .param-settings .param-value > label > input {
   margin-right: 5px;
 }
 
-.complex-param.radio .param .other-settings {
+.complex-param.multiline .param .other-settings {
   position: relative;
   top: -24px;
   left: 64px;

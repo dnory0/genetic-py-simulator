@@ -3,8 +3,8 @@ from threading import Thread, Lock, Condition
 from json import loads, dumps
 from random import random, randint, randrange, uniform
 from sys import argv, exit
+from typing import List, Union, Dict, Tuple, Set
 # from importlib import import_module
-# import types
 
 
 class Population:
@@ -48,7 +48,36 @@ class Individual:
 
     # call genes_fitness if possible
     def fitness(self) -> int:
-        return Individual.genes_fitness(self.genes)
+        # return Individual.genes_fitness(self.genes)
+        return Individual.get_fitness(self.genes, g_genes_data)
+
+    @staticmethod
+    def get_fitness(genes: List[int], data: Union[Dict, List, Tuple, Set]) -> Union[int, float]:
+        # this stores visited students to monitor students visited, if student is visited twice, those genes should get very low value to be eliminated.
+        visited_students = []
+        fitnesses = []
+        # 4 groups
+        for group_index in range(4):
+            group_fitness = 0
+            # each group has 7 students, every student is represented with 5 bits
+            for student_index in range(7):
+                student = genes[
+                    group_index * 35 + student_index * 5:
+                    group_index * 35 + (student_index + 1) * 5
+                ]
+                if student in visited_students:
+                    group_fitness += -1000
+                else:
+                    visited_students.append(student)
+                    group_fitness += data.get(
+                        int(''.join(str(e) for e in student), 2)
+                    )
+
+            fitnesses.append(group_fitness)
+        if (any(group_fitness < 0 for group_fitness in fitnesses)):
+            return int(sum(fitnesses))
+        else:
+            return int(sum(fitnesses) / 4 - min(fitnesses))
 
     @staticmethod
     def genes_fitness(genes) -> int:
@@ -114,7 +143,8 @@ class Evolve:
             for offspring in couple:
                 for index in range(genes_num):
                     if randint(0, 999)/1000 < mut_rate:
-                        i, j = index % len(offspring), (index + 1) % len(offspring)
+                        i, j = index % len(
+                            offspring), (index + 1) % len(offspring)
                         offspring[i], offspring[j] = offspring[j], offspring[i]
         return offsprings
 
@@ -378,6 +408,7 @@ g_max_gen = False
 g_co_type = 0
 g_mut_type = 0
 g_update_pop = 0
+g_genes_data = {i: randint(0, 100) if i < 28 else -1000 for i in range(32)}
 
 
 def update_parameters(command: dict):
@@ -418,10 +449,12 @@ def update_parameters(command: dict):
         g_del_rate = float(command.get('del_rate'))
     if type(command.get('pause_gen')) is not type(None):
         # pause generations
-        g_pause_gen = False if command.get('pause_gen') is False else float(command.get('pause_gen'))
+        g_pause_gen = False if command.get(
+            'pause_gen') is False else float(command.get('pause_gen'))
     if type(command.get('max_gen')) is not type(None):
         # maximum generations
-        g_max_gen = False if command.get('max_gen') is False else float(command.get('max_gen'))
+        g_max_gen = False if command.get(
+            'max_gen') is False else float(command.get('max_gen'))
     if type(command.get('update_pop')) is not type(None):
         # specifies when to update_population
         # if 0:
