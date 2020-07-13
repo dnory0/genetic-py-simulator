@@ -1,16 +1,13 @@
 let switchTextfieldable = (textfieldable, forceTFInput) => {
     if (textfieldable.classList.contains('double-sync')) {
-        if (!(textfieldable.type == 'range'))
+        if (textfieldable.disabled) {
+            textfieldable.classList.toggle('hide', !forceTFInput.checked);
             return;
-        textfieldable.classList.toggle('hide', forceTFInput.checked);
-        Array.from(textfieldable.parentElement.children)
-            .filter(siblingElement => siblingElement.getAttribute('synctype') == textfieldable.getAttribute('synctype') &&
-            siblingElement != textfieldable)
-            .forEach(siblingElement => siblingElement.classList.toggle('hide', !forceTFInput.checked));
+        }
+        textfieldable.previousElementSibling.classList.toggle('hide', !forceTFInput.checked);
+        textfieldable.nextElementSibling.classList.toggle('hide', forceTFInput.checked);
     }
-    else {
-        textfieldable.type = forceTFInput.checked ? 'text' : 'range';
-    }
+    textfieldable.type = forceTFInput.checked ? 'text' : 'range';
 };
 function affectSettings(settings, targetedWindow) {
     Array.from(document.getElementsByTagName('input')).forEach((input, _, inputs) => {
@@ -25,7 +22,9 @@ function affectSettings(settings, targetedWindow) {
                 return;
             }
             if (input.id == 'force-tf-enabled') {
-                inputs.filter(textfieldable => textfieldable.classList.contains('textfieldable')).forEach((textfieldable) => {
+                inputs
+                    .filter(textfieldable => textfieldable.classList.contains('textfieldable'))
+                    .forEach((textfieldable) => {
                     if (targetedWindow == 'ga-cp')
                         textfieldable['switchTextfieldable'] = () => switchTextfieldable(textfieldable, input);
                     switchTextfieldable(textfieldable, input);
@@ -57,10 +56,19 @@ function affectSettings(settings, targetedWindow) {
             coRate.parentElement.nextElementSibling.firstElementChild.disabled = coRate.disabled;
         }
         else {
+            if (input.classList.contains('double-sync')) {
+                if (input.getAttribute('synctype') == 'number-of-1sn0s') {
+                    input.max = (parseInt(document.getElementById('genes-num').value) - 1).toString();
+                }
+            }
             try {
-                input.value = settings[input.id]['value'];
-                if (targetedWindow == 'main' && settings[input.id]['disable-on-run']) {
-                    input.classList.add('disable-on-run');
+                if (input.classList.contains('double-sync') && input.disabled) {
+                    if (input.getAttribute('synctype') == 'number-of-1sn0s') {
+                        input.value = (parseInt(input.max) + 1 - settings['number-of-1s']['value']).toString();
+                    }
+                }
+                else {
+                    input.value = settings[input.id + (input.classList.contains('load-path') ? '-path' : '')]['value'];
                 }
             }
             catch (e) {

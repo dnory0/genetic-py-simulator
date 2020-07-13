@@ -67,6 +67,10 @@
         "value": 0,
         "pin": false
       },
+      "number-of-1s": {
+        "value": 40,
+        "pin": false
+      },
       "force-tf": {
         "enabled": false
       }

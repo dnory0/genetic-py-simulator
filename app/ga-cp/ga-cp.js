@@ -27,7 +27,7 @@ let closeBtn = document.getElementById('close-btn');
 let revertBtn = document.getElementById('revert-btn');
 browseBtns.forEach(function (browseBtn) {
     let type = browseBtn.classList.contains('genes-data') ? 'genes-data' : 'fitness-function';
-    let pathInput = pathInputs.filter(pathInput => pathInput.classList.contains(type))[0];
+    let pathInput = pathInputs.find(pathInput => pathInput.classList.contains(type));
     browseBtn.onclick = () => {
         ipcRenderer.once('browsed-path', (_ev, result) => {
             if (result.canceled)
@@ -85,7 +85,7 @@ let validatePathInput = (pathInput, type) => __awaiter(void 0, void 0, void 0, f
 });
 loadBtns.forEach(loadBtn => {
     let type = loadBtn.classList.contains('genes-data') ? 'genes-data' : 'fitness-function';
-    let pathInput = pathInputs.filter(pathInput => pathInput.classList.contains(type))[0];
+    let pathInput = pathInputs.find(pathInput => pathInput.classList.contains(type));
     loadBtn.addEventListener('click', () => {
         validatePathInput(pathInput, type);
     });
@@ -99,8 +99,8 @@ pathInputs.forEach(pathInput => {
     });
     setTimeout(() => {
         if (curSettings['renderer']['input'][pathInput.id]['data'] == undefined) {
-            let loadBtn = loadBtns.filter(loadBtn => loadBtn.classList.contains(type))[0];
-            let browseBtn = browseBtns.filter(browseBtn => browseBtn.classList.contains(type))[0];
+            let loadBtn = loadBtns.find(loadBtn => loadBtn.classList.contains(type));
+            let browseBtn = browseBtns.find(browseBtn => browseBtn.classList.contains(type));
             let extensions = type == 'genes-data' ? ['.json', '.jsonc', '.js'] : ['.py', '.py3'];
             let flikrBtn = validatePath(pathInput.value, ...extensions) == 0 ? loadBtn : browseBtn;
             flikrBtn.classList.add('notice-me');
@@ -118,7 +118,7 @@ let clearJSONOutput = () => {
 };
 showOutputs.forEach(showOutput => {
     let type = showOutput.classList.contains('genes-data') ? 'genes-data' : 'fitness-function';
-    let pathInput = pathInputs.filter(pathInput => pathInput.classList.contains(type))[0];
+    let pathInput = pathInputs.find(pathInput => pathInput.classList.contains(type));
     let treeContainer = document.querySelector('.genes-tree');
     showOutput.onclick = () => __awaiter(void 0, void 0, void 0, function* () {
         if (type == 'fitness-function') {
@@ -169,6 +169,45 @@ showOutputs.forEach(showOutput => {
                 });
                 if (input.classList.contains('textfieldable')) {
                     input.addEventListener('change', eventListener);
+                    if (input.classList.contains('double-sync') && !input.disabled) {
+                        if (input.getAttribute('synctype') == 'number-of-1sn0s') {
+                            const complementaryInput = input.parentElement.querySelector('input.double-sync:disabled');
+                            const doubleSyncMaxChangeEventListener = (ev) => {
+                                let relativeInput = ev.currentTarget;
+                                setTimeout(() => {
+                                    let newMax = parseInt(relativeInput.value);
+                                    if (newMax < parseInt(input.value) + 1 || parseInt(input.value) < 1) {
+                                        input.value = (newMax - 1).toString();
+                                        complementaryInput.value = '1';
+                                    }
+                                    else {
+                                        complementaryInput.value = (newMax - parseInt(input.value)).toString();
+                                    }
+                                    input.max = (newMax - 1).toString();
+                                    input.dispatchEvent(new Event('checkvalidityrequested'));
+                                }, 0);
+                            };
+                            const popSizeInput = document.getElementById('genes-num');
+                            popSizeInput.addEventListener('keypress', doubleSyncMaxChangeEventListener);
+                            popSizeInput.addEventListener('keyup', ev => {
+                                if (['ArrowUp', 'ArrowDown'].includes(ev.key))
+                                    doubleSyncMaxChangeEventListener(ev);
+                            });
+                            const doubleSyncSyncEventListener = (ev) => {
+                                let doubleSyncInput = ev.currentTarget;
+                                setTimeout(() => {
+                                    complementaryInput.value = (parseInt(doubleSyncInput.max) - parseInt(doubleSyncInput.value) + 1).toString();
+                                }, 0);
+                            };
+                            input.addEventListener('change', doubleSyncSyncEventListener);
+                            input.addEventListener('keypress', doubleSyncSyncEventListener);
+                            input.addEventListener('paste', doubleSyncSyncEventListener);
+                            input.addEventListener('keyup', ev => {
+                                if (['ArrowUp', 'ArrowDown'].includes(ev.key))
+                                    doubleSyncSyncEventListener(ev);
+                            });
+                        }
+                    }
                 }
             }
         }

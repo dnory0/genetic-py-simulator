@@ -10,7 +10,12 @@ function params() {
   let paramValues = <HTMLDivElement[]>Array.from(document.getElementsByClassName('param-value'));
 
   paramValues.forEach(paramValue => {
-    let input = <HTMLInputElement>paramValue.firstElementChild;
+    let input = <HTMLInputElement>(
+      (paramValue.classList.contains('double-sync')
+        ? Array.from(paramValue.children).find((ele: HTMLInputElement) => ele.classList.contains('double-sync') && !ele.disabled)
+        : paramValue.firstElementChild)
+    );
+    if (!input.type) return;
 
     let ArrowsKeys = ['ArrowUp', 'ArrowDown'];
 
@@ -28,7 +33,7 @@ function params() {
       }
     };
 
-    input.addEventListener('keyup', (ev: KeyboardEvent) => {
+    const checkValidityEventListener = (ev: KeyboardEvent) => {
       if (ev.key == 'Tab') return;
       if (
         input.checkValidity() &&
@@ -39,7 +44,10 @@ function params() {
       } else if (!(<unknown>input.classList.replace('valid', 'invalid'))) {
         input.classList.add('invalid');
       }
-    });
+    };
+
+    input.addEventListener('keyup', checkValidityEventListener);
+    input.addEventListener('checkvalidityrequested', checkValidityEventListener);
 
     input.onblur = () => {
       if (input.value != '') return;

@@ -310,31 +310,18 @@
                 <p>Control Number of 1s and 0s</p>
               </div>
               <div class="param-settings">
-                <div class="param-value">
+                <div class="param-value double-sync">
                   <div class="edge">0</div>
-                  <input
-                    type="range"
-                    inputmode="numeric"
-                    min="0"
-                    max="5"
-                    step="0.05"
-                    id="number-of-1sn0s-range"
-                    name="number_of_1sn0s_range"
-                    pattern="^[-+]?\d*\.?\d*$"
-                    class="textfieldable is-disable-able double-sync"
-                    synctype="number-of-1sn0s"
-                    required
-                  />
                   <input
                     type="text"
                     inputmode="numeric"
-                    min="0"
-                    max="5"
-                    step="0.05"
-                    id="number-of-0s-text"
-                    name="number_of_0s_text"
+                    min="1"
+                    max="79"
+                    step="1"
+                    id="number-of-0s"
+                    name="number_of_0s"
                     pattern="^[-+]?\d*\.?\d*$"
-                    class="textfieldable is-disable-able double-sync hide"
+                    class="textfieldable is-disable-able double-sync"
                     synctype="number-of-1sn0s"
                     disabled
                     required
@@ -343,16 +330,17 @@
                   <input
                     type="text"
                     inputmode="numeric"
-                    min="0"
-                    max="5"
-                    step="0.05"
-                    id="number-of-1s-text"
-                    name="number_of_1s_text"
+                    min="1"
+                    max="79"
+                    step="1"
+                    id="number-of-1s"
+                    name="number_of_1s"
                     pattern="^[-+]?\d*\.?\d*$"
-                    class="textfieldable is-disable-able double-sync hide"
+                    class="textfieldable is-disable-able double-sync"
                     synctype="number-of-1sn0s"
                     required
                   />
+                  <div class="edge">1</div>
                 </div>
                 <div class="other-settings">
                   <button class="random-btn">Random</button>

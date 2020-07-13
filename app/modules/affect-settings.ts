@@ -1,18 +1,15 @@
 let switchTextfieldable = (textfieldable: HTMLInputElement, forceTFInput: HTMLInputElement) => {
+  // additional changes to be made when toggling double-sync inputs
   if (textfieldable.classList.contains('double-sync')) {
-    if (!(textfieldable.type == 'range')) return;
-    textfieldable.classList.toggle('hide', forceTFInput.checked);
-    Array.from(textfieldable.parentElement.children)
-      .filter(
-        siblingElement =>
-          siblingElement.getAttribute('synctype') == textfieldable.getAttribute('synctype') &&
-          siblingElement != textfieldable
-      )
-      .forEach(siblingElement => siblingElement.classList.toggle('hide', !forceTFInput.checked));
-  } else {
-    textfieldable.type = forceTFInput.checked ? 'text' : 'range';
+    if (textfieldable.disabled) {
+      textfieldable.classList.toggle('hide', !forceTFInput.checked);
+      return;
+    }
+    textfieldable.previousElementSibling.classList.toggle('hide', !forceTFInput.checked);
+    textfieldable.nextElementSibling.classList.toggle('hide', forceTFInput.checked);
   }
-}
+  textfieldable.type = forceTFInput.checked ? 'text' : 'range';
+};
 
 /**
  * affect given settings to every input on the document.
@@ -33,10 +30,12 @@ function affectSettings(settings: object, targetedWindow: 'main' | 'ga-cp') {
       }
 
       if (input.id == 'force-tf-enabled') {
-        inputs.filter(textfieldable => textfieldable.classList.contains('textfieldable')).forEach((textfieldable: HTMLInputElement) => {
-          if (targetedWindow == 'ga-cp') textfieldable['switchTextfieldable'] = () => switchTextfieldable(textfieldable, input);
-          switchTextfieldable(textfieldable, input);
-        });
+        inputs
+          .filter(textfieldable => textfieldable.classList.contains('textfieldable'))
+          .forEach((textfieldable: HTMLInputElement) => {
+            if (targetedWindow == 'ga-cp') textfieldable['switchTextfieldable'] = () => switchTextfieldable(textfieldable, input);
+            switchTextfieldable(textfieldable, input);
+          });
       } else if (targetedWindow == 'main') {
         if ((type == 'pin' || type == 'enabled') && input.id != 'lr-enabled') {
           let complexParam = <HTMLDivElement>(
@@ -64,10 +63,18 @@ function affectSettings(settings: object, targetedWindow: 'main' | 'ga-cp') {
       coRate.parentElement.parentElement.title = coRate.disabled ? 'Disabled if crossover type set to Uniform' : '';
       (<HTMLButtonElement>coRate.parentElement.nextElementSibling.firstElementChild).disabled = coRate.disabled;
     } else {
+      if (input.classList.contains('double-sync')) {
+        if (input.getAttribute('synctype') == 'number-of-1sn0s') {
+          input.max = (parseInt((<HTMLInputElement>document.getElementById('genes-num')).value) - 1).toString();
+        }
+      }
       try {
-        input.value = settings[input.id]['value'];
-        if (targetedWindow == 'main' && settings[input.id]['disable-on-run']) {
-          input.classList.add('disable-on-run');
+        if (input.classList.contains('double-sync') && input.disabled) {
+          if (input.getAttribute('synctype') == 'number-of-1sn0s') {
+            input.value = (parseInt(input.max) + 1 - settings['number-of-1s']['value']).toString();
+          }
+        } else {
+          input.value = settings[input.id + (input.classList.contains('load-path') ? '-path' : '')]['value'];
         }
       } catch (e) {
         console.log(`This should be a new input, add it to settings.json`);

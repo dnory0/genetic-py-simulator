@@ -5,21 +5,18 @@
   /* Handle */
   /* Handle on hover */
 }
-
 .scrollbar::-webkit-scrollbar {
   width: 12px;
   height: 12px;
 }
-
 .scrollbar::-webkit-scrollbar-track {
   background: #f1f1f1;
 }
-
 .scrollbar::-webkit-scrollbar-thumb {
   background: #aaa;
 }
-
 .scrollbar::-webkit-scrollbar-thumb:hover {
   background: #777;
 }
+
 /*# sourceMappingURL=scrollbar.css.map */

@@ -1,7 +1,11 @@
 function params() {
     let paramValues = Array.from(document.getElementsByClassName('param-value'));
     paramValues.forEach(paramValue => {
-        let input = paramValue.firstElementChild;
+        let input = ((paramValue.classList.contains('double-sync')
+            ? Array.from(paramValue.children).find((ele) => ele.classList.contains('double-sync') && !ele.disabled)
+            : paramValue.firstElementChild));
+        if (!input.type)
+            return;
         let ArrowsKeys = ['ArrowUp', 'ArrowDown'];
         input.onkeydown = ev => {
             if (ArrowsKeys.includes(ev.key)) {
@@ -13,7 +17,7 @@ function params() {
                     .toString();
             }
         };
-        input.addEventListener('keyup', (ev) => {
+        const checkValidityEventListener = (ev) => {
             if (ev.key == 'Tab')
                 return;
             if (input.checkValidity() &&
@@ -25,7 +29,9 @@ function params() {
             else if (!input.classList.replace('valid', 'invalid')) {
                 input.classList.add('invalid');
             }
-        });
+        };
+        input.addEventListener('keyup', checkValidityEventListener);
+        input.addEventListener('checkvalidityrequested', checkValidityEventListener);
         input.onblur = () => {
             if (input.value != '')
                 return;

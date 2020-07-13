@@ -2,15 +2,33 @@ function saveSettings(settings) {
     let cbEventListener = (ev) => {
         let input = ev.target;
         let type = input.id.match(/(?<=-)[^-]*$/)[0];
-        settings[input.id.replace(`-${type}`, '')][type] = input.checked;
+        try {
+            settings[input.id.replace(`-${type}`, '')][type] = input.checked;
+        }
+        catch (e) {
+            console.log('input available but is not registered in settings.json or registered in wrong way');
+            console.log(input);
+        }
     };
     let inputEventListener = (ev) => {
         let input = ev.target;
-        settings[input.id]['value'] = input.value;
+        try {
+            settings[input.id]['value'] = input.value;
+        }
+        catch (e) {
+            console.log('input available but is not registered in settings.json or registered in wrong way');
+            console.log(input);
+        }
     };
     let radioEventListener = (ev) => {
         let input = ev.target;
-        settings[input.name.replace('_', '-')]['value'] = input.value;
+        try {
+            settings[input.name.replace('_', '-')]['value'] = input.value;
+        }
+        catch (e) {
+            console.log('input available but is not registered in settings.json or registered in wrong way');
+            console.log(input);
+        }
         if (input.name != 'co_type')
             return;
         let coRate = document.getElementById('co-rate');
