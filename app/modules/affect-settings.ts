@@ -74,7 +74,7 @@ function affectSettings(settings: object, targetedWindow: 'main' | 'ga-cp') {
             input.value = (parseInt(input.max) + 1 - settings['number-of-1s']['value']).toString();
           }
         } else {
-          input.value = settings[input.id + (input.classList.contains('load-path') ? '-path' : '')]['value'];
+          input.value = settings[input.id]['value'];
         }
       } catch (e) {
         console.log(`This should be a new input, add it to settings.json`);

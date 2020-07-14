@@ -68,7 +68,7 @@ function affectSettings(settings, targetedWindow) {
                     }
                 }
                 else {
-                    input.value = settings[input.id + (input.classList.contains('load-path') ? '-path' : '')]['value'];
+                    input.value = settings[input.id]['value'];
                 }
             }
             catch (e) {

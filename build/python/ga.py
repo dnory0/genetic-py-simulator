@@ -48,8 +48,8 @@ class Individual:
 
     # call genes_fitness if possible
     def fitness(self) -> int:
-        # return Individual.genes_fitness(self.genes)
-        return Individual.get_fitness(self.genes, g_genes_data)
+        return Individual.genes_fitness(self.genes)
+        # return Individual.get_fitness(self.genes, g_genes_data)
 
     @staticmethod
     def get_fitness(genes: List[int], data: Union[Dict, List, Tuple, Set]) -> Union[int, float]:
@@ -408,7 +408,7 @@ g_max_gen = False
 g_co_type = 0
 g_mut_type = 0
 g_update_pop = 0
-g_genes_data = {i: randint(0, 100) if i < 28 else -1000 for i in range(32)}
+# g_genes_data = {i: randint(0, 100) if i < 28 else -1000 for i in range(32)}
 
 
 def update_parameters(command: dict):

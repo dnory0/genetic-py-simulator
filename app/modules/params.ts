@@ -17,6 +17,46 @@ function params() {
     );
     if (!input.type) return;
 
+    if (input.classList.contains('double-sync') && !input.disabled) {
+      if (input.getAttribute('synctype') == 'number-of-1sn0s') {
+        const complementaryInput = <HTMLInputElement>input.parentElement.querySelector('input.double-sync:disabled');
+        const doubleSyncMaxChangeEventListener = (ev: Event) => {
+          let relativeInput = <HTMLInputElement>ev.currentTarget;
+          setTimeout(() => {
+            let newMax = parseInt(relativeInput.value);
+            if (newMax < parseInt(input.value) + 1 || parseInt(input.value) < 1) {
+              input.value = (newMax - 1).toString();
+              complementaryInput.value = '1';
+            } else {
+              complementaryInput.value = (newMax - parseInt(input.value)).toString();
+            }
+            input.max = (newMax - 1).toString();
+            input.dispatchEvent(new Event('checkvalidityrequested'));
+          }, 0);
+        };
+        const genesNumInput = document.getElementById('genes-num');
+
+        genesNumInput.addEventListener('keypress', doubleSyncMaxChangeEventListener);
+        genesNumInput.addEventListener('keyup', ev => {
+          if (['ArrowUp', 'ArrowDown'].includes(ev.key)) doubleSyncMaxChangeEventListener(ev);
+        });
+
+        const doubleSyncSyncEventListener = (ev: Event) => {
+          let doubleSyncInput = <HTMLInputElement>ev.currentTarget;
+          setTimeout(() => {
+            complementaryInput.value = (parseInt(doubleSyncInput.max) - parseInt(doubleSyncInput.value) + 1).toString();
+          }, 0);
+        };
+
+        input.addEventListener('change', doubleSyncSyncEventListener);
+        input.addEventListener('keypress', doubleSyncSyncEventListener);
+        input.addEventListener('paste', doubleSyncSyncEventListener);
+        input.addEventListener('keyup', ev => {
+          if (['ArrowUp', 'ArrowDown'].includes(ev.key)) doubleSyncSyncEventListener(ev);
+        });
+      }
+    }
+
     let ArrowsKeys = ['ArrowUp', 'ArrowDown'];
 
     input.onkeydown = ev => {

@@ -69,7 +69,8 @@
       },
       "number-of-1s": {
         "value": 40,
-        "pin": false
+        "pin": false,
+        "enabled": false
       },
       "force-tf": {
         "enabled": false
