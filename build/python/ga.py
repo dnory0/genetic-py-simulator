@@ -53,6 +53,7 @@ class Individual:
 
     @staticmethod
     def get_fitness(genes: List[int], data: Union[Dict, List, Tuple, Set]) -> Union[int, float]:
+        # WARN genes num needs to be multiple of 7
         # this stores visited students to monitor students visited, if student is visited twice, those genes should get very low value to be eliminated.
         visited_students = []
         fitnesses = []
