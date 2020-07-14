@@ -44,8 +44,17 @@ function params() {
         let randomBtn = input.parentElement.nextElementSibling.firstElementChild;
         if (randomBtn == null)
             return;
+        let isInt = Number.isSafeInteger(parseFloat(input.step));
         randomBtn.onclick = () => {
-            input.value = rangedRandom(input.max == '' ? parseFloat(input.step) * 1000 : parseFloat(input.max), input.min == '' ? 0 : parseFloat(input.min), Number.isSafeInteger(parseFloat(input.step))).toString();
+            let randomizedValue = rangedRandom(input.max == '' ? parseFloat(input.step) * 1000 : parseFloat(input.max), input.min == '' ? 0 : parseFloat(input.min), isInt);
+            if (input.classList.contains('double-sync')) {
+                if (input.max == randomizedValue.toString()) {
+                    randomizedValue = (parseFloat(randomizedValue) - parseFloat(input.step)).toFixed(isInt ? 0 : 3);
+                }
+                let complementaryInput = input.parentElement.querySelector('input.double-sync:disabled');
+                complementaryInput.value = (parseFloat(complementaryInput.max) - parseFloat(randomizedValue)).toFixed(isInt ? 0 : 3);
+            }
+            input.value = randomizedValue;
             if (!input.classList.replace('invalid', 'valid'))
                 input.classList.add('valid');
             input.dispatchEvent(new Event('keyup'));

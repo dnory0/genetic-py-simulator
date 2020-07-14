@@ -20,7 +20,7 @@ let switchTextfieldable = (textfieldable: HTMLInputElement, forceTFInput: HTMLIn
 function affectSettings(settings: object, targetedWindow: 'main' | 'ga-cp') {
   Array.from(document.getElementsByTagName('input')).forEach((input, _, inputs) => {
     if (input.type == 'checkbox') {
-      let type: 'enabled' | 'pin' = <'enabled' | 'pin'>input.id.match(/(?<=-)[^-]*$/)[0];
+      let type = <'enabled' | 'pin'>input.id.match(/(?<=-)[^-]*$/)[0];
       try {
         input.checked = settings[input.id.replace(`-${type}`, '')][type];
       } catch (e) {

@@ -102,6 +102,31 @@
         }
       }
     }
+
+    &.sync-param {
+      .param {
+        .param-settings {
+          width: 315px !important;
+
+          .param-value {
+            flex-direction: row;
+            align-items: center;
+
+            .edge {
+              padding: 0 5px;
+            }
+
+            #number-of-0s {
+              margin-right: 8px;
+            }
+
+            input[type='text'] {
+              width: 50px;
+            }
+          }
+        }
+      }
+    }
   }
 
   input[type='checkbox'].param-enabled {
