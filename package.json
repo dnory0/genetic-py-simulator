@@ -18,7 +18,8 @@
     "build": "./node_modules/.bin/electron-builder",
     "dist:d": "yarn build --dir",
     "dist:w": "yarn build -w --x64 && mv dist/GeneticPy.exe dist/GeneticPy-Portable-x64.exe && mv dist/GeneticPy-Installer.exe dist/GeneticPy-Installer-x64.exe && yarn build -w --ia32 && mv dist/GeneticPy.exe dist/GeneticPy-Portable-ia32.exe && mv dist/GeneticPy-Installer.exe dist/GeneticPy-Installer-ia32.exe",
-    "dist": "yarn build -l --ia32 --x64 && yarn dist:w"
+    "dist:l": "yarn build -l --ia32 --x64",
+    "dist": "yarn dist:l && yarn dist:w"
   },
   "keywords": [
     "genetic",

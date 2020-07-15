@@ -14,7 +14,7 @@ let revertSettings = window['settings'];
 let curSettings = JSON.parse(JSON.stringify(window['settings']));
 delete window['settings'];
 window['affectSettings'](curSettings['renderer']['input'], 'ga-cp');
-window['saveSettings'](curSettings['renderer']['input']);
+window['saveSettings'](curSettings['renderer']['input'], 'ga-cp');
 window['border']();
 let isClosable = true;
 let validatePath = window['validatePath'];
@@ -157,7 +157,6 @@ showOutputs.forEach(showOutput => {
         }
         else {
             if (input.classList.contains('load-path')) {
-                input['isGACP'] = true;
                 input.addEventListener('browsedPath', eventListener);
             }
             else {
@@ -195,7 +194,7 @@ let toggleDisableOnRun = (disable) => {
         if (!gaParam.classList.contains('disable-on-run'))
             return;
         curSettings['renderer']['input'][gaParam.id]['disable'] = disable;
-        gaParam.disabled = disable;
+        gaParam.disabled = (gaParam.classList.contains('forced-disable') && gaParam.disabled) || disable;
         gaParam.parentElement.nextElementSibling.firstElementChild.disabled = disable;
         gaParam.parentElement.parentElement.title = !disable ? '' : 'Disabled when GA is Running';
     });
@@ -205,7 +204,7 @@ let toggleDisableOnRun = (disable) => {
         .filter(radioInput => radioInput.name != 'update_pop');
     curSettings['renderer']['input'][gaTypes[0].name.replace('_', '-')]['disable'] = disable;
     gaTypes.forEach(gaType => {
-        gaType.disabled = disable;
+        gaType.disabled = (gaType.classList.contains('forced-disable') && gaType.disabled) || disable;
         gaType.parentElement.parentElement.title = disable ? 'Disabled when GA is Running' : '';
     });
     pathInputs.forEach(pathInput => (pathInput.disabled = disable));

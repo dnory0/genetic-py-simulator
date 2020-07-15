@@ -43,8 +43,23 @@ class Individual:
         if genes:
             self.genes = [int(gene) for gene in genes]
         else:
-            # rand 0s and 1s list
-            self.genes = [1 if random() >= .5 else 0 for _ in range(genes_num)]
+            # random 0s and 1s list
+            if g_number_of_1s:
+                ones_limit = g_number_of_1s
+                self.genes = []
+                for _ in range(genes_num):
+                    self.genes.append(
+                        1 if random() >= .5 and ones_limit else 0
+                    )
+                    if (self.genes[-1] == 1):
+                        ones_limit -= 1
+                to_json({
+                    'g_number_of_1s': list(filter(lambda gene: gene == 1, self.genes))
+                })
+            else:
+                self.genes = [
+                    1 if random() >= .5 else 0 for _ in range(genes_num)
+                ]
 
     # call genes_fitness if possible
     def fitness(self) -> int:
@@ -409,6 +424,7 @@ g_max_gen = False
 g_co_type = 0
 g_mut_type = 0
 g_update_pop = 0
+g_number_of_1s = False
 # g_genes_data = {i: randint(0, 100) if i < 28 else -1000 for i in range(32)}
 
 
@@ -426,6 +442,7 @@ def update_parameters(command: dict):
     global g_pause_gen
     global g_max_gen
     global g_update_pop
+    global g_number_of_1s
 
     if command.get('pop_size'):
         # population size
@@ -466,6 +483,9 @@ def update_parameters(command: dict):
 
     # if command.get('ff'):
     #     import_module(command.get('ff'))
+    if (type(command.get('number_of_1s'))) is not type(None):
+        g_number_of_1s = False if command.get(
+            'number_of_1s') is False else int(command.get('number_of_1s'))
 
 
 def init_ga():

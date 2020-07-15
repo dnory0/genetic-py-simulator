@@ -28,6 +28,16 @@ function affectSettings(settings: object, targetedWindow: 'main' | 'ga-cp') {
         console.log(input);
         return;
       }
+      if (input.id == 'number-of-1s-enabled' && targetedWindow == 'ga-cp') {
+        Array.from(document.getElementsByName('mut-type')).forEach((mutType: HTMLInputElement) => {
+          if (input.checked) {
+            mutType.checked = mutType.value == '0';
+            settings['mut-type']['value'] = 0;
+          }
+          mutType.classList.toggle('forced-disable', mutType.value != '0' && input.checked);
+          mutType.disabled = input.checked && 0 < parseInt(mutType.value);
+        });
+      }
 
       if (input.id == 'force-tf-enabled') {
         inputs
