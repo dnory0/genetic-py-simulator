@@ -33,7 +33,7 @@ input.tab-triggered {
 
 input[type='range'] {
   width: 120px;
-  appearance: none;
+  -webkit-appearance: none;
 
   &:not(:disabled) {
     cursor: pointer;

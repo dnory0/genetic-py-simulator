@@ -98,3 +98,4 @@ IDEA.*
 /settings.json
 build/python/__pycache__
 build/python/ff.py
+/ga simulator notes.txt

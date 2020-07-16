@@ -1,11 +1,43 @@
+let switchTextfieldable = (textfieldable, forceTFInput) => {
+    if (textfieldable.classList.contains('double-sync')) {
+        if (textfieldable.disabled) {
+            textfieldable.classList.toggle('hide', !forceTFInput.checked);
+            return;
+        }
+        textfieldable.previousElementSibling.classList.toggle('hide', !forceTFInput.checked);
+        textfieldable.nextElementSibling.classList.toggle('hide', forceTFInput.checked);
+    }
+    textfieldable.type = forceTFInput.checked ? 'text' : 'range';
+};
 function affectSettings(settings, targetedWindow) {
-    Array.from(document.getElementsByTagName('input')).forEach(input => {
+    Array.from(document.getElementsByTagName('input')).forEach((input, _, inputs) => {
         if (input.type == 'checkbox') {
             let type = input.id.match(/(?<=-)[^-]*$/)[0];
-            input.checked = settings[input.id.replace(`-${type}`, '')][type];
+            try {
+                input.checked = settings[input.id.replace(`-${type}`, '')][type];
+            }
+            catch (e) {
+                console.log(`This should be a new input, add it to settings.json`);
+                console.log(input);
+                return;
+            }
+            if (input.id == 'number-of-1s-enabled' && targetedWindow == 'ga-cp') {
+                Array.from(document.getElementsByName('mut-type')).forEach((mutType) => {
+                    if (input.checked) {
+                        mutType.checked = mutType.value == '0';
+                        settings['mut-type']['value'] = 0;
+                    }
+                    mutType.classList.toggle('forced-disable', mutType.value != '0' && input.checked);
+                    mutType.disabled = input.checked && 0 < parseInt(mutType.value);
+                });
+            }
             if (input.id == 'force-tf-enabled') {
-                Array.from(document.getElementsByClassName('textfieldable')).forEach((textfieldable) => {
-                    textfieldable.type = input.checked ? 'text' : 'range';
+                inputs
+                    .filter(textfieldable => textfieldable.classList.contains('textfieldable'))
+                    .forEach((textfieldable) => {
+                    if (targetedWindow == 'ga-cp')
+                        textfieldable['switchTextfieldable'] = () => switchTextfieldable(textfieldable, input);
+                    switchTextfieldable(textfieldable, input);
                 });
             }
             else if (targetedWindow == 'main') {
@@ -34,10 +66,19 @@ function affectSettings(settings, targetedWindow) {
             coRate.parentElement.nextElementSibling.firstElementChild.disabled = coRate.disabled;
         }
         else {
+            if (input.classList.contains('double-sync')) {
+                if (input.getAttribute('synctype') == 'number-of-1sn0s') {
+                    input.max = (parseInt(document.getElementById('genes-num').value) - 1).toString();
+                }
+            }
             try {
-                input.value = settings[input.id]['value'];
-                if (targetedWindow == 'main' && settings[input.id]['disable-on-run']) {
-                    input.classList.add('disable-on-run');
+                if (input.classList.contains('double-sync') && input.disabled) {
+                    if (input.getAttribute('synctype') == 'number-of-1sn0s') {
+                        input.value = (parseInt(input.max) + 1 - settings['number-of-1s']['value']).toString();
+                    }
+                }
+                else {
+                    input.value = settings[input.id]['value'];
                 }
             }
             catch (e) {

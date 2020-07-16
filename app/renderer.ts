@@ -74,10 +74,18 @@ let redDot = <HTMLDivElement>document.getElementById('red-dot');
  * ga input parameters.
  */
 let gaParams = <HTMLInputElement[]>(
-  (<HTMLDivElement[]>Array.from(document.getElementsByClassName('param-value'))).map(paramValue => paramValue.firstElementChild)
+  (<HTMLDivElement[]>Array.from(document.getElementsByClassName('param-value')))
+    .filter(
+      paramValue => paramValue.firstElementChild.tagName.toLowerCase() == 'input' || paramValue.classList.contains('double-sync')
+    )
+    .map(paramValue =>
+      paramValue.classList.contains('double-sync')
+        ? paramValue.querySelector('input.double-sync:not(:disabled)')
+        : paramValue.firstElementChild
+    )
 );
 /**
- * radio buttons for crossover/mutation types
+ * radio buttons for crossover/mutation types and update population param
  */
 let gaTypes = (<HTMLDivElement[]>Array.from(document.getElementsByClassName('type-value')))
   .reduce((accum: Element[], typeValue) => accum.concat(...Array.from(typeValue.children)), [])
@@ -369,8 +377,7 @@ let toggleRedDot = () => {
  */
 let sendParams = () => {
   gaParams.forEach(gaParam => {
-    let value: any;
-    value =
+    let value =
       gaParam.classList.contains('is-disable-able') &&
       !(<HTMLInputElement>gaParam.parentElement.parentElement.parentElement.previousElementSibling).checked
         ? false
@@ -458,7 +465,7 @@ document.addEventListener('DOMContentLoaded', function loaded() {
   /**
    * add functionality to update settings onchange event for inputs
    */
-  window['saveSettings'](settings['renderer']['input']);
+  window['saveSettings'](settings['renderer']['input'], 'main');
 
   ipcRenderer.on('zoom', (_event: IpcRendererEvent, type: string) => {
     if (type == 'in') {
@@ -488,7 +495,7 @@ document.addEventListener('DOMContentLoaded', function loaded() {
         main.classList.toggle('blur', false);
         if (!updatedSettings) return;
         settings['renderer']['input'] = updatedSettings['renderer']['input'];
-        saveSettings(settings['renderer']['input']);
+        saveSettings(settings['renderer']['input'], 'main');
         affectSettings(settings['renderer']['input'], 'main');
         // checks for missing data due to not being loaded by user
         toggleRedDot();

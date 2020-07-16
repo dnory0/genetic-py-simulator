@@ -13,7 +13,11 @@ let stepFBtn = document.getElementById('step-forward-btn');
 let lRSwitch = document.getElementById('lr-enabled');
 let gaCPBtn = document.getElementById('ga-cp-btn');
 let redDot = document.getElementById('red-dot');
-let gaParams = (Array.from(document.getElementsByClassName('param-value')).map(paramValue => paramValue.firstElementChild));
+let gaParams = (Array.from(document.getElementsByClassName('param-value'))
+    .filter(paramValue => paramValue.firstElementChild.tagName.toLowerCase() == 'input' || paramValue.classList.contains('double-sync'))
+    .map(paramValue => paramValue.classList.contains('double-sync')
+    ? paramValue.querySelector('input.double-sync:not(:disabled)')
+    : paramValue.firstElementChild));
 let gaTypes = Array.from(document.getElementsByClassName('type-value'))
     .reduce((accum, typeValue) => accum.concat(...Array.from(typeValue.children)), [])
     .map((label) => label.firstElementChild)
@@ -204,12 +208,10 @@ let toggleRedDot = () => {
 };
 let sendParams = () => {
     gaParams.forEach(gaParam => {
-        let value;
-        value =
-            gaParam.classList.contains('is-disable-able') &&
-                !gaParam.parentElement.parentElement.parentElement.previousElementSibling.checked
-                ? false
-                : gaParam.value;
+        let value = gaParam.classList.contains('is-disable-able') &&
+            !gaParam.parentElement.parentElement.parentElement.previousElementSibling.checked
+            ? false
+            : gaParam.value;
         sendParameter(gaParam.name, value);
     });
     gaTypes.filter(gaType => gaType.checked).forEach(gaType => sendParameter(gaType.name, gaType.value));
@@ -257,7 +259,7 @@ document.addEventListener('DOMContentLoaded', function loaded() {
         side.addEventListener('dom-ready', () => ready());
     })();
     window['params']();
-    window['saveSettings'](settings['renderer']['input']);
+    window['saveSettings'](settings['renderer']['input'], 'main');
     ipcRenderer.on('zoom', (_event, type) => {
         if (type == 'in') {
             if (webFrame.getZoomFactor() < 1.8)
@@ -286,7 +288,7 @@ document.addEventListener('DOMContentLoaded', function loaded() {
                 if (!updatedSettings)
                     return;
                 settings['renderer']['input'] = updatedSettings['renderer']['input'];
-                saveSettings(settings['renderer']['input']);
+                saveSettings(settings['renderer']['input'], 'main');
                 affectSettings(settings['renderer']['input'], 'main');
                 toggleRedDot();
                 sendParams();

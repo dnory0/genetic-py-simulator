@@ -3,21 +3,17 @@
   position: relative;
   z-index: 1;
 }
-
 .border.hor.resize {
   cursor: ns-resize;
   padding: 4px 0;
 }
-
 .border.hor > div {
   border-top: thin solid #cebbbb;
 }
-
 .border.ver.resize {
   cursor: ew-resize;
   padding: 0 4px;
 }
-
 .border.ver > div {
   height: 100%;
   border-left: thin solid #cebbbb;
@@ -28,4 +24,5 @@
   border-left: thin solid #cebbbb;
   margin: 3px;
 }
+
 /*# sourceMappingURL=border.css.map */

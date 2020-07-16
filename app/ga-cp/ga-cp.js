@@ -13,6 +13,9 @@ let ipcRenderer = window['ipcRenderer'];
 let revertSettings = window['settings'];
 let curSettings = JSON.parse(JSON.stringify(window['settings']));
 delete window['settings'];
+window['affectSettings'](curSettings['renderer']['input'], 'ga-cp');
+window['saveSettings'](curSettings['renderer']['input'], 'ga-cp');
+window['border']();
 let isClosable = true;
 let validatePath = window['validatePath'];
 let browseBtns = Array.from(document.getElementsByClassName('browse-btn'));
@@ -24,7 +27,7 @@ let closeBtn = document.getElementById('close-btn');
 let revertBtn = document.getElementById('revert-btn');
 browseBtns.forEach(function (browseBtn) {
     let type = browseBtn.classList.contains('genes-data') ? 'genes-data' : 'fitness-function';
-    let pathInput = pathInputs.filter(pathInput => pathInput.classList.contains(type))[0];
+    let pathInput = pathInputs.find(pathInput => pathInput.classList.contains(type));
     browseBtn.onclick = () => {
         ipcRenderer.once('browsed-path', (_ev, result) => {
             if (result.canceled)
@@ -82,7 +85,7 @@ let validatePathInput = (pathInput, type) => __awaiter(void 0, void 0, void 0, f
 });
 loadBtns.forEach(loadBtn => {
     let type = loadBtn.classList.contains('genes-data') ? 'genes-data' : 'fitness-function';
-    let pathInput = pathInputs.filter(pathInput => pathInput.classList.contains(type))[0];
+    let pathInput = pathInputs.find(pathInput => pathInput.classList.contains(type));
     loadBtn.addEventListener('click', () => {
         validatePathInput(pathInput, type);
     });
@@ -96,8 +99,8 @@ pathInputs.forEach(pathInput => {
     });
     setTimeout(() => {
         if (curSettings['renderer']['input'][pathInput.id]['data'] == undefined) {
-            let loadBtn = loadBtns.filter(loadBtn => loadBtn.classList.contains(type))[0];
-            let browseBtn = browseBtns.filter(browseBtn => browseBtn.classList.contains(type))[0];
+            let loadBtn = loadBtns.find(loadBtn => loadBtn.classList.contains(type));
+            let browseBtn = browseBtns.find(browseBtn => browseBtn.classList.contains(type));
             let extensions = type == 'genes-data' ? ['.json', '.jsonc', '.js'] : ['.py', '.py3'];
             let flikrBtn = validatePath(pathInput.value, ...extensions) == 0 ? loadBtn : browseBtn;
             flikrBtn.classList.add('notice-me');
@@ -115,7 +118,7 @@ let clearJSONOutput = () => {
 };
 showOutputs.forEach(showOutput => {
     let type = showOutput.classList.contains('genes-data') ? 'genes-data' : 'fitness-function';
-    let pathInput = pathInputs.filter(pathInput => pathInput.classList.contains(type))[0];
+    let pathInput = pathInputs.find(pathInput => pathInput.classList.contains(type));
     let treeContainer = document.querySelector('.genes-tree');
     showOutput.onclick = () => __awaiter(void 0, void 0, void 0, function* () {
         if (type == 'fitness-function') {
@@ -154,7 +157,6 @@ showOutputs.forEach(showOutput => {
         }
         else {
             if (input.classList.contains('load-path')) {
-                input['isGACP'] = true;
                 input.addEventListener('browsedPath', eventListener);
             }
             else {
@@ -184,16 +186,15 @@ document.getElementById('random-all-btn').onclick = () => {
 };
 document.getElementById('force-tf-enabled').addEventListener('change', ev => {
     Array.from(document.getElementsByClassName('textfieldable')).forEach((textfieldable) => {
-        textfieldable.type = ev.target.checked ? 'text' : 'range';
+        textfieldable['switchTextfieldable'](textfieldable, ev.target);
     });
 });
 let toggleDisableOnRun = (disable) => {
     (Array.from(document.getElementsByClassName('param-value')).map(paramValue => paramValue.firstElementChild)).forEach(gaParam => {
-        console.log(gaParam);
         if (!gaParam.classList.contains('disable-on-run'))
             return;
         curSettings['renderer']['input'][gaParam.id]['disable'] = disable;
-        gaParam.disabled = disable;
+        gaParam.disabled = (gaParam.classList.contains('forced-disable') && gaParam.disabled) || disable;
         gaParam.parentElement.nextElementSibling.firstElementChild.disabled = disable;
         gaParam.parentElement.parentElement.title = !disable ? '' : 'Disabled when GA is Running';
     });
@@ -203,7 +204,7 @@ let toggleDisableOnRun = (disable) => {
         .filter(radioInput => radioInput.name != 'update_pop');
     curSettings['renderer']['input'][gaTypes[0].name.replace('_', '-')]['disable'] = disable;
     gaTypes.forEach(gaType => {
-        gaType.disabled = disable;
+        gaType.disabled = (gaType.classList.contains('forced-disable') && gaType.disabled) || disable;
         gaType.parentElement.parentElement.title = disable ? 'Disabled when GA is Running' : '';
     });
     pathInputs.forEach(pathInput => (pathInput.disabled = disable));
@@ -219,8 +220,5 @@ ipcRenderer.on('close-confirm', () => {
     else
         ipcRenderer.send('close-confirm');
 });
-window['affectSettings'](curSettings['renderer']['input'], 'ga-cp');
-window['saveSettings'](curSettings['renderer']['input']);
 toggleDisableOnRun(curSettings['renderer']['input']['pop-size']['disable']);
-window['border']();
 //# sourceMappingURL=ga-cp.js.map
