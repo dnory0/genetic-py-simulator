@@ -425,7 +425,7 @@ g_co_type = 0
 g_mut_type = 0
 g_update_pop = 0
 g_number_of_1s = False
-# g_genes_data = {i: randint(0, 100) if i < 28 else -1000 for i in range(32)}
+g_genes_data = {i: randint(0, 100) if i < 28 else -1000 for i in range(32)}
 
 
 def update_parameters(command: dict):
@@ -443,6 +443,8 @@ def update_parameters(command: dict):
     global g_max_gen
     global g_update_pop
     global g_number_of_1s
+
+    global g_genes_data
 
     if command.get('pop_size'):
         # population size
@@ -486,6 +488,9 @@ def update_parameters(command: dict):
     if (type(command.get('number_of_1s'))) is not type(None):
         g_number_of_1s = False if command.get(
             'number_of_1s') is False else int(command.get('number_of_1s'))
+
+    if type(command.get('g_genes_data')) is not type(None):
+        pass
 
 
 def init_ga():
