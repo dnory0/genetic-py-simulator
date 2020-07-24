@@ -3,7 +3,7 @@ import { IpcRenderer, WebviewTag, IpcRendererEvent, WebFrame } from 'electron';
 /***************************** passed by preload *****************************
  *****************************************************************************/
 /**
- * used to listen to zoom channel for wain process to send zoom in/out/reset.
+ * used to listen to zoom channel for main process to send zoom in/out/reset.
  */
 let ipcRenderer: IpcRenderer = window['ipcRenderer'];
 delete window['ipcRenderer'];

@@ -5,7 +5,8 @@ from sys import argv
 # print(argv)
 
 # loading module spec, will raise FileNotFoundError if path is incorrect
-spec = spec_from_file_location("", "/media/dnory0/work/projects/nodejs/linux/genetic-py/build/python/ff.py")
+spec = spec_from_file_location(
+    "ff", "/media/dnory0/work/projects/nodejs/linux/genetic-py/build/python/ff.py")
 
 ff_holder = module_from_spec(spec)
 
@@ -52,14 +53,14 @@ print(get_fitness([1, 0, 1], [45, 12, 8]))
 #       "message": str(type(e))
 #     }
 #   })
-  # print(e.args)
-  # to_json({
-  #   "Error": "Syntax Error"
-  # })
+# print(e.args)
+# to_json({
+#   "Error": "Syntax Error"
+# })
 
 
 # def to_json(word: dict):
-#     """ 
+#     """
 #     prints a dict to json and flush it for instant respond (doesn't buffer output)
 #     """
 #     print(dumps(word), flush=True)

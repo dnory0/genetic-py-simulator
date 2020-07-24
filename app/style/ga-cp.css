@@ -296,7 +296,6 @@ input[type=range]:not(:disabled):hover::-webkit-slider-runnable-track {
 }
 .browse > input[type=text] {
   flex: 1;
-  height: 20px;
   outline: none;
   padding: 1px 5px;
   border: thin #a2a2a2 solid;
