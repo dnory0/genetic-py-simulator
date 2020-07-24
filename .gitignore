@@ -98,5 +98,5 @@ IDEA.*
 /settings.json
 build/python/__pycache__
 build/python/ff.py
-build/python/ff-tester.py
+build/python/ff-students.py
 /ga simulator notes.txt
