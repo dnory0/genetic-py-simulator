@@ -95,6 +95,8 @@ class Individual:
         else:
             return int(sum(fitnesses) / 4 - min(fitnesses))
 
+    # built-in fitness function^M
+
     @staticmethod
     def genes_fitness(genes) -> int:
         return sum(1 for ind_gene, solu_gene in zip(genes, solution.genes) if int(ind_gene) == solu_gene)
@@ -425,7 +427,8 @@ g_co_type = 0
 g_mut_type = 0
 g_update_pop = 0
 g_number_of_1s = False
-g_genes_data = {i: randint(0, 100) if i < 28 else -1000 for i in range(32)}
+g_genes_data: Union[Dict, List] = None
+# g_genes_data = {i: randint(0, 100) if i < 28 else -1000 for i in range(32)}
 
 
 def update_parameters(command: dict):
@@ -479,7 +482,7 @@ def update_parameters(command: dict):
         # specifies when to update_population
         # if 0:
         #   parent is replaced only when offspring fitness is better than parent's
-        # else (it equals 1)
+        # else: (it equals 1)
         #   parent is always replaced by offspring
         g_update_pop = int(command.get('update_pop'))
 
@@ -490,6 +493,8 @@ def update_parameters(command: dict):
             'number_of_1s') is False else int(command.get('number_of_1s'))
 
     if type(command.get('g_genes_data')) is not type(None):
+        pass
+    if type(command.get('fitness-function')) is not type(None):
         pass
 
 
