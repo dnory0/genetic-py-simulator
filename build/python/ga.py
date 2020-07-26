@@ -1,9 +1,14 @@
+#!/bin/python3
+
 from time import sleep
 from threading import Thread, Lock, Condition
 from json import loads, dumps
-from random import random, randint, randrange, uniform
-from sys import argv, exit
-from typing import List, Union, Dict, Tuple, Set
+from random import random, randint, randrange
+from sys import argv, exit, maxsize
+from typing import List, Union, Dict
+from functools import reduce
+
+
 # from importlib import import_module
 
 
@@ -35,7 +40,7 @@ class Population:
 
 class Individual:
     """
-    Individual of a population, can be instantiated by passing genes to 
+    Individual of a population, can be instantiated by passing genes to
     the constructor or optional genes number
     """
 
@@ -51,7 +56,7 @@ class Individual:
                     self.genes.append(
                         1 if random() >= .5 and ones_limit else 0
                     )
-                    if (self.genes[-1] == 1):
+                    if self.genes[-1] == 1:
                         ones_limit -= 1
                 to_json({
                     'g_number_of_1s': list(filter(lambda gene: gene == 1, self.genes))
@@ -66,40 +71,41 @@ class Individual:
         return Individual.genes_fitness(self.genes)
         # return Individual.get_fitness(self.genes, g_genes_data)
 
-    @staticmethod
-    def get_fitness(genes: List[int], data: Union[Dict, List, Tuple, Set]) -> Union[int, float]:
-        # WARN genes num needs to be multiple of 7
-        # this stores visited students to monitor students visited, if student is visited twice, those genes should get very low value to be eliminated.
-        visited_students = []
-        fitnesses = []
-        # 4 groups
-        for group_index in range(4):
-            group_fitness = 0
-            # each group has 7 students, every student is represented with 5 bits
-            for student_index in range(7):
-                student = genes[
-                    group_index * 35 + student_index * 5:
-                    group_index * 35 + (student_index + 1) * 5
-                ]
-                if student in visited_students:
-                    group_fitness += -1000
-                else:
-                    visited_students.append(student)
-                    group_fitness += data.get(
-                        int(''.join(str(e) for e in student), 2)
-                    )
+    # @staticmethod
+    # def get_fitness(genes: List[int], data: Union[Dict, List, Tuple, Set]) -> Union[int, float]:
+    #     # WARN genes num needs to be multiple of 7
+    #     # this stores visited students to monitor students visited, if student is visited twice,
+    #     # those genes should get very low value to be eliminated.
+    #     visited_students = []
+    #     fitness_values = []
+    #     # 4 groups
+    #     for group_index in range(4):
+    #         group_fitness = 0
+    #         # each group has 7 students, every student is represented with 5 bits
+    #         for student_index in range(7):
+    #             student = genes[
+    #                       group_index * 35 + student_index * 5:
+    #                       group_index * 35 + (student_index + 1) * 5
+    #                       ]
+    #             if student in visited_students:
+    #                 group_fitness += -1000
+    #             else:
+    #                 visited_students.append(student)
+    #                 group_fitness += data.get(
+    #                     int(''.join(str(e) for e in student), 2)
+    #                 )
+    #
+    #         fitness_values.append(group_fitness)
+    #
+    #     if any(group_fitness < 0 for group_fitness in fitness_values):
+    #         return int(sum(fitness_values))
+    #     else:
+    #         return int(sum(fitness_values) / 4 - min(fitness_values))
 
-            fitnesses.append(group_fitness)
-        if (any(group_fitness < 0 for group_fitness in fitnesses)):
-            return int(sum(fitnesses))
-        else:
-            return int(sum(fitnesses) / 4 - min(fitnesses))
-
-    # built-in fitness function^M
-
+    # built-in fitness function
     @staticmethod
     def genes_fitness(genes) -> int:
-        return sum(1 for ind_gene, solu_gene in zip(genes, solution.genes) if int(ind_gene) == solu_gene)
+        return sum(1 for ind_gene, solution_gene in zip(genes, solution.genes) if int(ind_gene) == solution_gene)
 
     def replace_genes(self, genes):
         self.genes = [int(gene) for gene in genes]
@@ -108,12 +114,107 @@ class Individual:
 
 class Evolve:
     @staticmethod
-    def to_couples(pop_inds: list, pop_size: int) -> list:
+    def random_selection(pop_individuals: List[Individual]) -> list:
+        return [
+            [
+                pop_individuals.pop(randrange(0, len(pop_individuals))) for __ in range(2)
+            ] for _ in range(len(pop_individuals) // 2)
+        ]
+
+    @staticmethod
+    def roulette_wheel_selection(pop_individuals: List[Individual]) -> list:
         parents = []
-        for _ in range(pop_size // 2):
-            couple = [
-                pop_inds.pop(randrange(0, len(pop_inds))) for _ in range(2)
-            ]
+        roulette_wheel: Dict[Individual, Union[float, int]] = {
+            ind: fitness for ind, fitness in zip(pop_individuals, [ind.fitness() for ind in pop_individuals])
+        }
+        sum_of_fitness = sum(ind.fitness() for ind in pop_individuals)
+        for _ in range(len(pop_individuals) // 2):
+            couple = []
+            for __ in range(2):
+                chosen_point = randrange(0, maxsize * 2 + 1) % sum_of_fitness
+                for ind in roulette_wheel:
+                    if roulette_wheel.get(ind) < chosen_point:
+                        chosen_point -= roulette_wheel.get(ind)
+                    else:
+                        sum_of_fitness -= roulette_wheel.get(ind)
+                        couple.append(ind)
+                        roulette_wheel.pop(ind)
+                        break
+            parents.append(couple)
+        return parents
+
+    @staticmethod
+    def __stochastic_universal_sampling_spinning(
+            roulette_wheel: Dict[Individual, Union[int, float]], sum_of_fitness: Union[int, float]
+    ) -> list:
+        """
+        sub-function designed to be only used by stochastic_universal_sampling_selection
+        :return: couple of 2 individuals
+        """
+        couple = []
+        chosen_points = [
+            randrange(sum_of_fitness // 2 if i == 1 else 0, maxsize * 2 + 1) % sum_of_fitness for i in range(2)
+        ]
+        for ind in roulette_wheel:
+            for chosen_point_index in range(len(chosen_points)):
+                if roulette_wheel.get(ind) < chosen_points[chosen_point_index]:
+                    # individual is not the chosen one, its fitness value is extracted from the chosen point value
+                    chosen_points[chosen_point_index] -= roulette_wheel.get(ind)
+                else:
+                    # chosen individual is found for ```chosen_point_index``` chosen point
+                    if len(couple) and couple[0] is ind:
+                        # this is when an individual is selected by both points, the best solution is to repeat rolling
+                        return Evolve.__stochastic_universal_sampling_spinning(roulette_wheel, sum_of_fitness)
+                    else:
+                        # individual is appended to couple
+                        couple.append(ind)
+                        # after a chosen_point reach the chosen individual it is assigned None and filtered later
+                        chosen_points[chosen_point_index] = None
+            # the chosen point is assigned None when individual is reached, then filtered before next iteration
+            chosen_points = list(filter(lambda chosen_point: not isinstance(chosen_point, type(None)), chosen_points))
+            # if couple has been established there is no need to keep iterating through remaining individuals
+            if len(couple) == 2:
+                break
+        return couple
+
+    @staticmethod
+    def stochastic_universal_sampling_selection(pop_individuals: List[Individual]) -> list:
+        parents = []
+        roulette_wheel: Dict[Individual, Union[float, int]] = {
+            ind: fitness for ind, fitness in zip(pop_individuals, [ind.fitness() for ind in pop_individuals])
+        }
+        sum_of_fitness = sum(ind.fitness() for ind in pop_individuals)
+        for _ in range(len(pop_individuals) // 2):
+            parents.append(Evolve.__stochastic_universal_sampling_spinning(roulette_wheel, sum_of_fitness))
+            for ind_of_couple in parents[-1]:
+                sum_of_fitness -= roulette_wheel.get(ind_of_couple)
+                roulette_wheel.pop(ind_of_couple)
+        return parents
+
+    @staticmethod
+    def tournament_selection(pop_individuals: List[Individual]) -> list:
+        parents = []
+        while len(pop_individuals) > 1:
+            couple = []
+            for _ in range(2):
+                # k way number
+                k_way = 1 if len(pop_individuals) == 1 else randrange(1, len(pop_individuals))
+                # a copy of individuals list is used to select k-way individuals to be able to pop chosen individuals
+                selection_individuals = pop_individuals.copy()
+                # k-way individuals to select the best out of them
+                selected_k_individuals = selection_individuals if len(selection_individuals) == 1 else [
+                    selection_individuals.pop(randrange(0, len(selection_individuals))) for _ in range(k_way)
+                ]
+                couple.append(
+                    # selecting the best out of the k-way individuals to append to couple list
+                    selected_k_individuals[-1] if len(selected_k_individuals) == 1
+                    else reduce(
+                        lambda chosen_ind, cur_ind: cur_ind if chosen_ind.fitness() < cur_ind.fitness() else chosen_ind,
+                        selected_k_individuals
+                    )
+                )
+                # element is popped of the list after being chosen
+                pop_individuals.remove(couple[-1])
             parents.append(couple)
         return parents
 
@@ -160,7 +261,7 @@ class Evolve:
         for couple in offsprings:
             for offspring in couple:
                 for index in range(genes_num):
-                    if randint(0, 999)/1000 < mut_rate:
+                    if randint(0, 999) / 1000 < mut_rate:
                         i, j = index % len(
                             offspring), (index + 1) % len(offspring)
                         offspring[i], offspring[j] = offspring[j], offspring[i]
@@ -171,7 +272,7 @@ class Evolve:
         for couple in offsprings:
             for offspring in couple:
                 for index in range(genes_num):
-                    if randint(0, 999)/1000 < mut_rate:
+                    if randint(0, 999) / 1000 < mut_rate:
                         offspring[index] = 0 if offspring[index] else 1
         return offsprings
 
@@ -184,19 +285,25 @@ class Evolve:
 
     @staticmethod
     def evolve_population(pop: Population):
-        # copy of same individuals to apply selection on it
-        pop_inds = pop.individuals.copy()
-        # list of couples to apply cross over on them
-        parents = Evolve.to_couples(pop_inds, pop.pop_size)
-        # defined here to avoid co_rate being changed
-        # by user on the cross over process.
-        offsprings = []
+        # selection phase: selecting the list of couples of parents
+        if g_selection_type == 0:
+            parents = Evolve.random_selection(pop.individuals.copy())
+        elif g_selection_type == 1:
+            parents = Evolve.roulette_wheel_selection(pop.individuals.copy())
+        elif g_selection_type == 2:
+            parents = Evolve.stochastic_universal_sampling_selection(
+                pop.individuals.copy()
+            )
+        else:
+            parents = Evolve.tournament_selection(pop.individuals.copy())
+
+        # defined here to avoid co_rate being changed by user on the crossover process.
         if g_co_type == 0:
             co_point = int(g_co_rate * pop.genes_num)
             offsprings = Evolve.single_point_crossover(parents, co_point)
         elif g_co_type == 1:
             g_length = int(g_co_rate * pop.genes_num)
-            co_point = (pop.genes_num - g_length)//2
+            co_point = (pop.genes_num - g_length) // 2
             co_point2 = pop.genes_num - co_point
             offsprings = Evolve.two_point_and_k_point_crossover(
                 parents, co_point, co_point2
@@ -239,13 +346,13 @@ class GAThread(Thread):
         # initializing the population
         pop = Population(g_pop_size, len(solution.genes))
         # fittest fitness of the previous generation, used to send deviation value
-        prvFitness = pop.fittest().fitness()
+        prv_fitness = pop.fittest().fitness()
 
         # started signal to the renderer process
         to_json({
             "started": True,
             "genesNum": pop.genes_num,
-            "fitness": prvFitness,
+            "fitness": prv_fitness,
             "first-step": self.__pause_now,
         })
 
@@ -253,12 +360,12 @@ class GAThread(Thread):
         to_json({
             "generation": pop.generation,
             "genes": pop.fittest().genes,
-            "fitness": prvFitness,
+            "fitness": prv_fitness,
         })
         while g_max_gen is False or g_max_gen < 0 or pop.generation < g_max_gen:
             Evolve.evolve_population(pop)
             # takes the current generation fitness
-            curFitness = pop.fittest().fitness()
+            cur_fitness = pop.fittest().fitness()
             # if g_del_rate is 0 or False than just ignore it
             if g_del_rate:
                 sleep(g_del_rate)
@@ -270,7 +377,7 @@ class GAThread(Thread):
             # pause check, moved down to avoid another iteration if stop event
             # was triggered after a pause event
             self.__pause_check()
-            # stopped event, seperating finished naturally (if there is valid
+            # stopped event, separating finished naturally (if there is valid
             # solution) from being forcefully stopped
             if self.__stop_now:
                 to_json({
@@ -280,13 +387,13 @@ class GAThread(Thread):
             # moved down, so when GA is heavy (slow), user might stop it before the point is added
             # the point must not be added, so ga stops before executing below code
             to_json({
-                "prv-fitness": prvFitness,
-                "fitness": curFitness,
+                "prv-fitness": prv_fitness,
+                "fitness": cur_fitness,
                 "generation": pop.generation,
                 "genes": pop.fittest().genes,
             })
-            # update prvFitness
-            prvFitness = curFitness
+            # update prv_fitness
+            prv_fitness = cur_fitness
 
         # finished event
         to_json({
@@ -307,30 +414,8 @@ class GAThread(Thread):
             while self.paused:
                 self.pause_cond.wait()
 
-    def start(self):
-        """
-        starts thread activity if start method was not called
-        before on this thread
-        """
-        if not self.start_triggered:
-            self.start_triggered = True
-            self.paused = False
-            Thread.start(self)
-
-    def pause(self):
-        """
-        pause thread if running
-        """
-        # thread should be running to pause
-        if not self.paused:
-            self.__pause_now = True
-            # notify app of the pause
-            to_json({
-                "paused": True
-            })
-
     # should just resume the thread
-    def resume(self):
+    def __resume(self):
         """
         resume thread if paused
         """
@@ -350,6 +435,30 @@ class GAThread(Thread):
         # it just turns self.__pause_now to false to prevent GA from pausing.
         elif self.__pause_now:
             self.__pause_now = False
+
+    def start(self):
+        """
+        starts thread activity if start method was not called
+        before on this thread
+        """
+        if not self.start_triggered:
+            self.start_triggered = True
+            self.paused = False
+            Thread.start(self)
+        else:
+            self.__resume()
+
+    def pause(self):
+        """
+        pause thread if running
+        """
+        # thread should be running to pause
+        if not self.paused:
+            self.__pause_now = True
+            # notify app of the pause
+            to_json({
+                "paused": True
+            })
 
     def step_forward(self):
         """
@@ -409,8 +518,8 @@ def to_json(word: dict):
 fitness_function = None
 
 # initialized when user sends play, replay or step_f signal if it's first step forward
-ga_thread = None
-solution = None
+ga_thread: Union[GAThread, type(None)] = None
+solution: Union[Individual, type(None)] = None
 
 # default values for the global settings, changes every time user passes them
 g_co_rate = .5
@@ -427,7 +536,11 @@ g_co_type = 0
 g_mut_type = 0
 g_update_pop = 0
 g_number_of_1s = False
-g_genes_data: Union[Dict, List] = None
+g_selection_type = 3
+
+g_genes_data: Union[Dict, List, type(None)] = None
+
+
 # g_genes_data = {i: randint(0, 100) if i < 28 else -1000 for i in range(32)}
 
 
@@ -446,6 +559,7 @@ def update_parameters(command: dict):
     global g_max_gen
     global g_update_pop
     global g_number_of_1s
+    global g_selection_type
 
     global g_genes_data
 
@@ -458,27 +572,30 @@ def update_parameters(command: dict):
     if command.get('co_rate'):
         # crossover rate change, it should not be 0
         g_co_rate = command.get('co_rate')
-    if type(command.get('co_type')) is not type(None):
+    if not isinstance(command.get('co_type'), type(None)):
         # crossover type
         g_co_type = int(command.get('co_type'))
-    if type(command.get('mut_rate')) is not type(None):
+    if not isinstance(command.get('mut_rate'), type(None)):
         # mutation rate change, can be 0
         g_mut_rate = float(command.get('mut_rate'))
-    if type(command.get('mut_type')) is not type(None):
+    if not isinstance(command.get('mut_type'), type(None)):
         # mutation type
         g_mut_type = int(command.get('mut_type'))
-    if type(command.get('del_rate')) is not type(None):
+    if not isinstance(command.get('del_rate'), type(None)):
         # sleep in seconds
         g_del_rate = float(command.get('del_rate'))
-    if type(command.get('pause_gen')) is not type(None):
+    if not isinstance(command.get('selection_type'), type(None)):
+        #
+        g_selection_type = float(command.get('selection_type'))
+    if not isinstance(command.get('pause_gen'), type(None)):
         # pause generations
         g_pause_gen = False if command.get(
             'pause_gen') is False else float(command.get('pause_gen'))
-    if type(command.get('max_gen')) is not type(None):
+    if not isinstance(command.get('max_gen'), type(None)):
         # maximum generations
         g_max_gen = False if command.get(
             'max_gen') is False else float(command.get('max_gen'))
-    if type(command.get('update_pop')) is not type(None):
+    if not isinstance(command.get('update_pop'), type(None)):
         # specifies when to update_population
         # if 0:
         #   parent is replaced only when offspring fitness is better than parent's
@@ -488,13 +605,13 @@ def update_parameters(command: dict):
 
     # if command.get('ff'):
     #     import_module(command.get('ff'))
-    if (type(command.get('number_of_1s'))) is not type(None):
+    if not isinstance(command.get('number_of_1s'), type(None)):
         g_number_of_1s = False if command.get(
             'number_of_1s') is False else int(command.get('number_of_1s'))
 
-    if type(command.get('g_genes_data')) is not type(None):
+    if not isinstance(command.get('g_genes_data'), type(None)):
         pass
-    if type(command.get('fitness-function')) is not type(None):
+    if not isinstance(command.get('fitness_function'), type(None)):
         pass
 
 
@@ -514,11 +631,10 @@ while True:
     # read a command
     cmd = input()
     if cmd == 'play':
-        if ga_thread is not None and ga_thread.is_alive():
-            ga_thread.resume()
-        else:
+        if ga_thread is None or not ga_thread.is_alive():
             init_ga()
-            ga_thread.start()
+        # start if this is new initiated ga_thread, else it resumes
+        ga_thread.start()
     elif cmd == 'pause':
         if ga_thread is not None and ga_thread.is_alive():
             ga_thread.pause()
@@ -539,9 +655,10 @@ while True:
             ga_thread.stop()
         exit(0)
     else:
+        # noinspection PyBroadException
         try:
             load = loads(cmd)
-        except:
+        except Exception:
             pass
         else:
             update_parameters(load)

@@ -1,4 +1,4 @@
-function saveSettings(settings, targetedWindow) {
+function saveSettings(settings, targetedWindow, toggleCOInputDisable, toggleMutTypeDisable) {
     let cbEventListener = (ev) => {
         let input = ev.target;
         let type = input.id.match(/(?<=-)[^-]*$/)[0];
@@ -11,14 +11,7 @@ function saveSettings(settings, targetedWindow) {
             return;
         }
         if (input.id == 'number-of-1s-enabled' && targetedWindow == 'ga-cp') {
-            Array.from(document.getElementsByName('mut-type')).forEach((mutType) => {
-                if (input.checked) {
-                    mutType.checked = mutType.value == '0';
-                    settings['mut-type']['value'] = 0;
-                }
-                mutType.classList.toggle('forced-disable', mutType.value != '0' && input.checked);
-                mutType.disabled = input.checked && 0 < parseInt(mutType.value);
-            });
+            toggleMutTypeDisable(input, settings);
         }
     };
     let inputEventListener = (ev) => {
@@ -40,13 +33,8 @@ function saveSettings(settings, targetedWindow) {
             console.log('input available but is not registered in settings.json or registered in wrong way');
             console.log(input);
         }
-        if (input.name != 'co_type')
-            return;
-        let coRate = document.getElementById('co-rate');
-        coRate.disabled = input.value == '2';
-        coRate.classList.toggle('disabled', input.value == '2');
-        coRate.parentElement.parentElement.title = coRate.disabled ? 'Disabled if crossover type set to Uniform' : '';
-        coRate.parentElement.nextElementSibling.firstElementChild.disabled = coRate.disabled;
+        if (input.name == 'co_type')
+            toggleCOInputDisable(input);
     };
     Array.from(document.getElementsByTagName('input')).forEach(input => {
         if (input.type == 'radio') {

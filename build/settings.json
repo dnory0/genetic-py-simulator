@@ -34,6 +34,9 @@
         "pin": true,
         "disable": false
       },
+      "selection-type": {
+        "value": 0
+      },
       "co-rate": {
         "value": 0.15
       },

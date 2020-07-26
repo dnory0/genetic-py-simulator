@@ -13,8 +13,11 @@ let ipcRenderer = window['ipcRenderer'];
 let revertSettings = window['settings'];
 let curSettings = JSON.parse(JSON.stringify(window['settings']));
 delete window['settings'];
-window['affectSettings'](curSettings['renderer']['input'], 'ga-cp');
-window['saveSettings'](curSettings['renderer']['input'], 'ga-cp');
+(() => {
+    const { toggleMutTypeDisable, toggleCOInputDisable } = window['specialParamsCases'];
+    window['affectSettings'](curSettings['renderer']['input'], 'ga-cp', toggleCOInputDisable, toggleMutTypeDisable);
+    window['saveSettings'](curSettings['renderer']['input'], 'ga-cp', toggleCOInputDisable, toggleMutTypeDisable);
+})();
 window['border']();
 let isClosable = true;
 let validatePath = window['validatePath'];
@@ -33,7 +36,7 @@ browseBtns.forEach(function (browseBtn) {
             if (result.canceled)
                 return;
             pathInput.value = result.filePaths[0];
-            validatePathInput(pathInput, type);
+            validatePathInput(pathInput, type).then();
         });
         ipcRenderer.send('browse', type == 'genes-data'
             ? {
@@ -87,7 +90,7 @@ loadBtns.forEach(loadBtn => {
     let type = loadBtn.classList.contains('genes-data') ? 'genes-data' : 'fitness-function';
     let pathInput = pathInputs.find(pathInput => pathInput.classList.contains(type));
     loadBtn.addEventListener('click', () => {
-        validatePathInput(pathInput, type);
+        validatePathInput(pathInput, type).then();
     });
 });
 pathInputs.forEach(pathInput => {
@@ -95,7 +98,7 @@ pathInputs.forEach(pathInput => {
     pathInput.addEventListener('keyup', ev => {
         if (ev.key != 'Enter')
             return;
-        validatePathInput(pathInput, type);
+        validatePathInput(pathInput, type).then();
     });
     setTimeout(() => {
         if (curSettings['renderer']['input'][pathInput.id]['data'] == undefined) {
@@ -145,7 +148,10 @@ showOutputs.forEach(showOutput => {
         saveBtn.disabled = true;
         isClosable = true;
         curSettings = revertSettings;
-        affectSettings(revertSettings['renderer']['input'], 'ga-cp');
+        (() => {
+            const { toggleMutTypeDisable, toggleCOInputDisable } = window['specialParamsCases'];
+            affectSettings(revertSettings['renderer']['input'], 'ga-cp', toggleCOInputDisable, toggleMutTypeDisable);
+        })();
     };
     let eventListener = () => (revertBtn.disabled = saveBtn.disabled = isClosable = false);
     Array.from(document.getElementsByTagName('input')).forEach(input => {
@@ -178,7 +184,7 @@ window['altTriggers']();
 window['params']();
 document.getElementById('random-all-btn').onclick = () => {
     Array.from(document.getElementsByClassName('random-btn')).forEach(randomBtn => {
-        var param = randomBtn.parentElement.parentElement.parentElement;
+        const param = randomBtn.parentElement.parentElement.parentElement;
         if (param.previousElementSibling && !param.previousElementSibling.checked)
             return;
         randomBtn.click();

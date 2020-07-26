@@ -16,8 +16,15 @@ let switchTextfieldable = (textfieldable: HTMLInputElement, forceTFInput: HTMLIn
  *
  * @param settings inputs settings object
  * @param targetedWindow targeted window: ```main``` | ```ga-cp```
+ * @param toggleCOInputDisable disable crossover input if crossover type is 2 (Uniform) which does not require a value
+ * @param toggleMutTypeDisable <ga-cp only> disable mutation type incompatible labels when number of 1s input is checked
  */
-function affectSettings(settings: object, targetedWindow: 'main' | 'ga-cp') {
+function affectSettings(
+    settings: object,
+    targetedWindow: 'main' | 'ga-cp',
+    toggleCOInputDisable: (input: HTMLInputElement) => void,
+    toggleMutTypeDisable?: (input: HTMLInputElement, settings: object) => void,
+) {
   Array.from(document.getElementsByTagName('input')).forEach((input, _, inputs) => {
     if (input.type == 'checkbox') {
       let type = <'enabled' | 'pin'>input.id.match(/(?<=-)[^-]*$/)[0];
@@ -29,14 +36,7 @@ function affectSettings(settings: object, targetedWindow: 'main' | 'ga-cp') {
         return;
       }
       if (input.id == 'number-of-1s-enabled' && targetedWindow == 'ga-cp') {
-        Array.from(document.getElementsByName('mut-type')).forEach((mutType: HTMLInputElement) => {
-          if (input.checked) {
-            mutType.checked = mutType.value == '0';
-            settings['mut-type']['value'] = 0;
-          }
-          mutType.classList.toggle('forced-disable', mutType.value != '0' && input.checked);
-          mutType.disabled = input.checked && 0 < parseInt(mutType.value);
-        });
+        toggleMutTypeDisable(input, settings);
       }
 
       if (input.id == 'force-tf-enabled') {
@@ -63,15 +63,16 @@ function affectSettings(settings: object, targetedWindow: 'main' | 'ga-cp') {
         }
       }
     } else if (input.type == 'radio') {
-      if (settings[input.name.replace('_', '-')]['value'] != input.value) return;
-      input.checked = true;
+      try {
+        if (settings[input.name.replace('_', '-')]['value'] != input.value) return;
+      } catch (e) {
+        console.log('input available but is not registered in settings.json or registered in wrong way');
+        console.log(input);
+      }
 
-      if (input.name != 'co_type') return;
-      let coRate = <HTMLInputElement>document.getElementById('co-rate');
-      coRate.disabled = input.value == '2';
-      coRate.classList.toggle('disabled', input.value == '2');
-      coRate.parentElement.parentElement.title = coRate.disabled ? 'Disabled if crossover type set to Uniform' : '';
-      (<HTMLButtonElement>coRate.parentElement.nextElementSibling.firstElementChild).disabled = coRate.disabled;
+     input.checked = true;
+
+      if (input.name == 'co_type') toggleCOInputDisable(input)
     } else {
       if (input.classList.contains('double-sync')) {
         if (input.getAttribute('synctype') == 'number-of-1sn0s') {

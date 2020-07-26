@@ -4,6 +4,7 @@ let ipcRenderer = window['ipcRenderer'];
 delete window['ipcRenderer'];
 let webFrame = window['webFrame'];
 delete window['webFrame'];
+let { toggleCOInputDisable } = window['specialParamsCases'];
 const prime = document.getElementById('prime-chart');
 const side = document.getElementById('side-chart');
 let playBtn = document.getElementById('play-btn');
@@ -88,9 +89,9 @@ const blinkPlayBtn = () => {
 let zoomViews = () => { };
 const ctrlClicked = (signal, goingToRun) => {
     if (signal == 'step_f')
-        prime.send('step-forward');
+        prime.send('step-forward').then();
     if (signal == 'replay')
-        prime.send('replay');
+        prime.send('replay').then();
     if (signal == 'stop') {
         setClickable(goingToRun);
         toggleDisableOnRun(true);
@@ -106,9 +107,9 @@ stepFBtn.onclick = () => ctrlClicked('step_f', false);
 (() => {
     function toggleFullscreen(fscreenBtn) {
         if (document.fullscreenElement)
-            document.exitFullscreen();
+            document.exitFullscreen().then();
         else
-            fscreenBtn.parentElement.parentElement.requestFullscreen();
+            fscreenBtn.parentElement.parentElement.requestFullscreen().then();
     }
     Array.from(document.getElementsByClassName('fscreen-btn')).forEach((fscreenBtn) => {
         fscreenBtn.onclick = () => toggleFullscreen(fscreenBtn);
@@ -161,9 +162,9 @@ stepFBtn.onclick = () => ctrlClicked('step_f', false);
             exportType.addEventListener('click', () => {
                 clean(eventListener);
                 if (exportBtn.classList.contains('prime'))
-                    prime.send('export', exportType.id.replace('export-', ''));
+                    prime.send('export', exportType.getAttribute('exporttype')).then();
                 else
-                    side.send('export', exportType.id.replace('export-', ''));
+                    side.send('export', exportType.getAttribute('exporttype')).then();
                 exportBtn.click();
             });
         });
@@ -171,9 +172,9 @@ stepFBtn.onclick = () => ctrlClicked('step_f', false);
     Array.from(document.getElementsByClassName('zoom-out-btn')).forEach(zoomOutBtn => {
         zoomOutBtn.addEventListener('click', () => {
             if (zoomOutBtn.classList.contains('prime'))
-                prime.send('zoom-out');
+                prime.send('zoom-out').then();
             else
-                side.send('zoom-out');
+                side.send('zoom-out').then();
         });
     });
 })();
@@ -199,7 +200,9 @@ const sendParameter = (key, value) => {
 let toggleRedDot = () => {
     let inputsSettings = settings['renderer']['input'];
     for (let inputId in inputsSettings) {
-        if (inputId.match(/.*-path/) && inputsSettings[inputId]['data'] == undefined) {
+        if (inputsSettings.hasOwnProperty(inputId) &&
+            inputId.match(/.*-path/) &&
+            inputsSettings[inputId]['data'] == undefined) {
             redDot.classList.toggle('hide', false);
             return;
         }
@@ -221,7 +224,7 @@ document.addEventListener('DOMContentLoaded', function loaded() {
     (() => {
         let ready = () => {
             ready = () => {
-                window['affectSettings'](settings['renderer']['input'], 'main');
+                window['affectSettings'](settings['renderer']['input'], 'main', toggleCOInputDisable);
                 toggleRedDot();
                 sendParams();
                 (() => {
@@ -239,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function loaded() {
                             gaType.addEventListener('change', eventListener);
                     });
                     let lRSwitchUpdater = () => {
-                        prime.send('live-rendering', lRSwitch.checked);
+                        prime.send('live-rendering', lRSwitch.checked).then();
                     };
                     lRSwitch.addEventListener('change', lRSwitchUpdater);
                     lRSwitchUpdater();
@@ -259,7 +262,7 @@ document.addEventListener('DOMContentLoaded', function loaded() {
         side.addEventListener('dom-ready', () => ready());
     })();
     window['params']();
-    window['saveSettings'](settings['renderer']['input'], 'main');
+    window['saveSettings'](settings['renderer']['input'], 'main', toggleCOInputDisable);
     ipcRenderer.on('zoom', (_event, type) => {
         if (type == 'in') {
             if (webFrame.getZoomFactor() < 1.8)
@@ -288,8 +291,8 @@ document.addEventListener('DOMContentLoaded', function loaded() {
                 if (!updatedSettings)
                     return;
                 settings['renderer']['input'] = updatedSettings['renderer']['input'];
-                saveSettings(settings['renderer']['input'], 'main');
-                affectSettings(settings['renderer']['input'], 'main');
+                saveSettings(settings['renderer']['input'], 'main', toggleCOInputDisable);
+                affectSettings(settings['renderer']['input'], 'main', toggleCOInputDisable);
                 toggleRedDot();
                 sendParams();
             });

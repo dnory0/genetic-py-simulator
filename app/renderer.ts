@@ -13,6 +13,8 @@ delete window['ipcRenderer'];
 let webFrame: WebFrame = window['webFrame'];
 delete window['webFrame'];
 
+let { toggleCOInputDisable } = window['specialParamsCases']
+
 /***************************** Views Declaration *****************************
  *****************************************************************************/
 /**
@@ -215,13 +217,13 @@ const ctrlClicked = (signal: string, goingToRun: boolean) => {
    * chart is not going to update that, this fixes it so the live Rendering
    * is enabled for only the this step.
    */
-  if (signal == 'step_f') prime.send('step-forward');
+  if (signal == 'step_f') prime.send('step-forward').then();
   /**
    * clicking replay button (relaunch the algorithm) might show a flash of light of
    * the chart before being removed, this alerts the prime of a replay event so it
    * prevents the flash.
    */
-  if (signal == 'replay') prime.send('replay');
+  if (signal == 'replay') prime.send('replay').then();
   /**
    * in heavy GA (GA that takes considerable amount of time to generate 1 generation)
    * buttons should be stopped on click instead of waiting GA stopped event.
@@ -249,8 +251,8 @@ stepFBtn.onclick = () => ctrlClicked('step_f', false);
 // chart actions functionality
 (() => {
   function toggleFullscreen(fscreenBtn: HTMLButtonElement) {
-    if (document.fullscreenElement) document.exitFullscreen();
-    else fscreenBtn.parentElement.parentElement.requestFullscreen();
+    if (document.fullscreenElement) document.exitFullscreen().then();
+    else fscreenBtn.parentElement.parentElement.requestFullscreen().then();
   }
   // full screen
   Array.from(document.getElementsByClassName('fscreen-btn')).forEach((fscreenBtn: HTMLButtonElement) => {
@@ -310,8 +312,8 @@ stepFBtn.onclick = () => ctrlClicked('step_f', false);
       }
       exportType.addEventListener('click', () => {
         clean(eventListener);
-        if (exportBtn.classList.contains('prime')) prime.send('export', exportType.id.replace('export-', ''));
-        else side.send('export', exportType.id.replace('export-', ''));
+        if (exportBtn.classList.contains('prime')) prime.send('export', exportType.getAttribute('exporttype')).then();
+        else side.send('export', exportType.getAttribute('exporttype')).then();
         exportBtn.click();
       });
     });
@@ -319,8 +321,8 @@ stepFBtn.onclick = () => ctrlClicked('step_f', false);
 
   (<HTMLButtonElement[]>Array.from(document.getElementsByClassName('zoom-out-btn'))).forEach(zoomOutBtn => {
     zoomOutBtn.addEventListener('click', () => {
-      if (zoomOutBtn.classList.contains('prime')) prime.send('zoom-out');
-      else side.send('zoom-out');
+      if (zoomOutBtn.classList.contains('prime')) prime.send('zoom-out').then();
+      else side.send('zoom-out').then();
     });
   });
 })();
@@ -362,9 +364,13 @@ const sendParameter = (key: string, value: any) => {
  * above settings icon if anything not loaded.
  */
 let toggleRedDot = () => {
-  let inputsSettings = <object>settings['renderer']['input'];
+  let inputsSettings: any = <object>settings['renderer']['input'];
   for (let inputId in inputsSettings) {
-    if (inputId.match(/.*-path/) && inputsSettings[inputId]['data'] == undefined) {
+    if (
+      inputsSettings.hasOwnProperty(inputId) &&
+      inputId.match(/.*-path/) &&
+      inputsSettings[inputId]['data'] == undefined
+    ) {
       redDot.classList.toggle('hide', false);
       return;
     }
@@ -401,7 +407,7 @@ document.addEventListener('DOMContentLoaded', function loaded() {
        * triggered after both webviews finish loading.
        */
       ready = () => {
-        window['affectSettings'](settings['renderer']['input'], 'main');
+        window['affectSettings'](settings['renderer']['input'], 'main', toggleCOInputDisable);
         // checks for missing data due to not being loaded by user
         toggleRedDot();
         // send startup settings to pyshell
@@ -425,7 +431,7 @@ document.addEventListener('DOMContentLoaded', function loaded() {
           });
 
           let lRSwitchUpdater = () => {
-            prime.send('live-rendering', lRSwitch.checked);
+            prime.send('live-rendering', lRSwitch.checked).then();
           };
 
           lRSwitch.addEventListener('change', lRSwitchUpdater);
@@ -465,7 +471,7 @@ document.addEventListener('DOMContentLoaded', function loaded() {
   /**
    * add functionality to update settings onchange event for inputs
    */
-  window['saveSettings'](settings['renderer']['input'], 'main');
+  window['saveSettings'](settings['renderer']['input'], 'main', toggleCOInputDisable);
 
   ipcRenderer.on('zoom', (_event: IpcRendererEvent, type: string) => {
     if (type == 'in') {
@@ -495,8 +501,8 @@ document.addEventListener('DOMContentLoaded', function loaded() {
         main.classList.toggle('blur', false);
         if (!updatedSettings) return;
         settings['renderer']['input'] = updatedSettings['renderer']['input'];
-        saveSettings(settings['renderer']['input'], 'main');
-        affectSettings(settings['renderer']['input'], 'main');
+        saveSettings(settings['renderer']['input'], 'main', toggleCOInputDisable);
+        affectSettings(settings['renderer']['input'], 'main', toggleCOInputDisable);
         // checks for missing data due to not being loaded by user
         toggleRedDot();
         // send the new attached settings to pyshell
