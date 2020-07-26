@@ -26,13 +26,13 @@
               <img src="img/save.png" />
             </button>
             <div class="dropdown-content hide">
-              <button title="Export JPEG/JPG" id="export-jpeg">
+              <button title="Export JPEG/JPG" exporttype="jpeg">
                 JPEG/JPG
               </button>
-              <button title="Export PNG (chart without background)" id="export-png">
+              <button title="Export PNG (chart without background)" exporttype="png">
                 PNG (without background)
               </button>
-              <button title="Export SVG" id="export-svg">
+              <button title="Export SVG" exporttype="svg">
                 SVG
               </button>
             </div>
@@ -149,6 +149,35 @@
                         <img src="img/pin.png" />
                       </label>
                     </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="multiline complex-param hide">
+              <div class="param">
+                <div class="param-name">
+                  <p>Selection Type</p>
+                </div>
+                <div class="param-settings">
+                  <div class="param-value type-value">
+                    <label>
+                      <input type="radio" name="selection_type" value="0" />
+                      Random Selection
+                    </label>
+                    <label>
+                      <input type="radio" name="selection_type" value="1" />
+                      Roulette Wheel Selection
+                    </label>
+                    <label>
+                      <input type="radio" name="selection_type" value="2" />
+                      Stochastic Universal Sampling Selection (SUS)
+                    </label>
+                    <label>
+                      <input type="radio" name="selection_type" value="3" />
+                      K-Way Tournament Selection
+                    </label>
+                  </div>
+                  <div class="other-settings">
                   </div>
                 </div>
               </div>
@@ -453,13 +482,13 @@
                 <img src="img/save.png" />
               </button>
               <div class="dropdown-content hide">
-                <button title="Export JPEG/JPG" id="export-jpeg">
+                <button title="Export JPEG/JPG" exporttype="jpeg">
                   JPEG/JPG
                 </button>
-                <button title="Export PNG (chart without background)" id="export-png">
+                <button title="Export PNG (chart without background)" exporttype="png">
                   PNG (without background)
                 </button>
-                <button title="Export SVG" id="export-svg">
+                <button title="Export SVG" exporttype="svg">
                   SVG
                 </button>
               </div>

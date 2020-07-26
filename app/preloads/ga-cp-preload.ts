@@ -17,3 +17,7 @@ window['params'] = require('../modules/params');
 window['validatePath'] = require('../modules/validate-path');
 
 window['settings'] = getGlobal('settings');
+/**
+ * special cases for param handling where instead of being duplicated around it was put in one file
+ */
+window['specialParamsCases'] = require('../modules/special-param-cases')

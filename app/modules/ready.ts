@@ -14,7 +14,7 @@ module.exports = (
       .toString()
       .split(/(?<=\n)/g)
       .map((data: string) => JSON.parse(data))
-      .forEach((data: object) => <any>console.log(data) || treatResponse(data));
+      .forEach((data: object) => treatResponse(data));
   });
 
   // open error listener, this is logged inside the devTool console

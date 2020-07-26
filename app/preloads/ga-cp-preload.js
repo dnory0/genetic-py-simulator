@@ -10,4 +10,5 @@ window['border'] = require('../modules/border');
 window['params'] = require('../modules/params');
 window['validatePath'] = require('../modules/validate-path');
 window['settings'] = getGlobal('settings');
+window['specialParamsCases'] = require('../modules/special-param-cases');
 //# sourceMappingURL=ga-cp-preload.js.map
