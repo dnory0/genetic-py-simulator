@@ -14,8 +14,13 @@ module.exports = (
       .toString()
       .split(/(?<=\n)/g)
       .map((data: string) => JSON.parse(data))
-      .forEach((data: object) => treatResponse(data));
+      .forEach((data: object) => <any>console.log(data) || treatResponse(data));
   });
+
+  // open error listener, this is logged inside the devTool console
+  pyshell.stderr.on('data', (response: Buffer) => {
+        console.error(response.toString())
+    })
 
   // returns webviews zoom factor resetter.
   return () => {

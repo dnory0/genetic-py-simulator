@@ -1,7 +1,7 @@
 {
   "name": "genetic-py",
   "productName": "Genetic Py",
-  "version": "0.4.8-disable-load-on-ga-run",
+  "version": "0.5.0",
   "description": "A Simulator that solves optimization problems using Genetic Algorithms and shows results on charts",
   "homepage": "https://github.com/dnory0/genetic-py.git",
   "repository": {
