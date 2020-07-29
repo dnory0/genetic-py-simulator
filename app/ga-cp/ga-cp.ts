@@ -21,7 +21,7 @@ delete window['settings'];
    * add functionality to update settings onchange event for inputs
    */
   window['saveSettings'](curSettings['renderer']['input'], 'ga-cp', toggleCOInputDisable, toggleMutTypeDisable);
-})()
+})();
 
 window['border']();
 
@@ -221,7 +221,7 @@ showOutputs.forEach(showOutput => {
     (() => {
       const { toggleMutTypeDisable, toggleCOInputDisable } = window['specialParamsCases'];
       affectSettings(revertSettings['renderer']['input'], 'ga-cp', toggleCOInputDisable, toggleMutTypeDisable);
-    })()
+    })();
   };
 
   /**
