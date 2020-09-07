@@ -1,6 +1,6 @@
 let switchTextfieldable = (textfieldable, forceTFInput) => {
     if (textfieldable.classList.contains('double-sync')) {
-        if (textfieldable.disabled) {
+        if (!textfieldable.classList.contains('main-double-sync')) {
             textfieldable.classList.toggle('hide', !forceTFInput.checked);
             return;
         }
@@ -78,6 +78,8 @@ function affectSettings(settings, targetedWindow, toggleCOInputDisable, toggleMu
             catch (e) {
                 console.log(`This should be a new input, add it to settings.json`);
                 console.log(input);
+            }
+            if (input.classList.contains('load-path') && targetedWindow == 'main') {
             }
         }
     });

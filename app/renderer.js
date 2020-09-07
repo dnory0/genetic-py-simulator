@@ -16,9 +16,7 @@ let gaCPBtn = document.getElementById('ga-cp-btn');
 let redDot = document.getElementById('red-dot');
 let gaParams = (Array.from(document.getElementsByClassName('param-value'))
     .filter(paramValue => paramValue.firstElementChild.tagName.toLowerCase() == 'input' || paramValue.classList.contains('double-sync'))
-    .map(paramValue => paramValue.classList.contains('double-sync')
-    ? paramValue.querySelector('input.double-sync:not(:disabled)')
-    : paramValue.firstElementChild));
+    .map(paramValue => paramValue.classList.contains('double-sync') ? paramValue.querySelector('.main-double-sync') : paramValue.firstElementChild));
 let gaTypes = Array.from(document.getElementsByClassName('type-value'))
     .reduce((accum, typeValue) => accum.concat(...Array.from(typeValue.children)), [])
     .map((label) => label.firstElementChild)
@@ -31,9 +29,11 @@ let toggleDisableOnRun = (activate = true) => {
         if (!gaParam.classList.contains('disable-on-run'))
             return;
         settings['renderer']['input'][gaParam.id]['disable'] = !activate;
+        gaParam.parentElement.parentElement.title = activate ? '' : 'Disabled when GA is Running';
+        gaParam.disabled = (gaParam.classList.contains('forced-disable') && gaParam.disabled) || activate;
+        gaParam.parentElement.nextElementSibling.firstElementChild.disabled = activate;
         gaParam.disabled = !activate;
         gaParam.parentElement.nextElementSibling.firstElementChild.disabled = !activate;
-        gaParam.parentElement.parentElement.title = activate ? '' : 'Disabled when GA is Running';
     });
     settings['renderer']['input'][gaTypes[0].name.replace('_', '-')]['disable'] = !activate;
     gaTypes.forEach(gaType => {
@@ -61,6 +61,9 @@ const treatResponse = (response) => {
         isRunning = false;
         blinkPlayBtn();
         switchPlayBtn();
+    }
+    if (response['terminal']) {
+        console.log(`${['', null, undefined, []].includes(response['msg-type']) ? '' : response['msg-type'] + ': '}${response['message'] ? response['message'] : '&lt;message with no content&gt;'}`);
     }
 };
 const switchPlayBtn = () => {
@@ -106,10 +109,13 @@ toStartBtn.onclick = () => ctrlClicked('replay', true);
 stepFBtn.onclick = () => ctrlClicked('step_f', false);
 (() => {
     function toggleFullscreen(fscreenBtn) {
-        if (document.fullscreenElement)
+        if (document.fullscreenElement) {
             document.exitFullscreen().then();
+        }
         else
             fscreenBtn.parentElement.parentElement.requestFullscreen().then();
+        fscreenBtn.firstElementChild.classList.toggle('hide', !document.fullscreenElement);
+        fscreenBtn.lastElementChild.classList.toggle('hide', !!document.fullscreenElement);
     }
     Array.from(document.getElementsByClassName('fscreen-btn')).forEach((fscreenBtn) => {
         fscreenBtn.onclick = () => toggleFullscreen(fscreenBtn);
@@ -120,17 +126,14 @@ stepFBtn.onclick = () => ctrlClicked('step_f', false);
         });
         window.removeEventListener('click', eventListener);
     };
-    Array.from(document.getElementsByClassName('drop-btn')).forEach((exportBtn) => {
-        let dropdownContent = exportBtn.nextElementSibling;
-        let dropdownPointer = dropdownContent.nextElementSibling;
-        let exportTypes = Array.from(dropdownContent.children);
+    Array.from(document.getElementsByClassName('drop-btn')).forEach((dropBtn) => {
+        let dropdownContent = dropBtn.nextElementSibling;
+        let dropdownChildren = Array.from(dropdownContent.children);
         let eventListener = () => {
-            dropdownPointer.classList.toggle('hide', true);
             dropdownContent.classList.toggle('hide', true);
             clean(eventListener);
         };
-        exportBtn.addEventListener('click', () => {
-            dropdownPointer.classList.toggle('hide');
+        dropBtn.addEventListener('click', () => {
             dropdownContent.classList.toggle('hide');
             Array.from(document.getElementsByClassName('resize-cover')).forEach((resizeCover) => {
                 resizeCover.classList.remove('hide');
@@ -143,30 +146,26 @@ stepFBtn.onclick = () => ctrlClicked('step_f', false);
                 }, 0);
             }
         });
-        exportTypes.forEach((exportType, index) => {
-            if (index == 0) {
-                let mouseoverEventListener = () => {
-                    exportType.style.backgroundColor = '#d9d9d9';
-                    dropdownPointer.style.backgroundColor = '#d9d9d9';
-                };
-                let mouseleaveEventListener = () => {
-                    exportType.style.backgroundColor = 'white';
-                    dropdownPointer.style.backgroundColor = 'white';
-                };
-                exportType.addEventListener('mouseover', mouseoverEventListener);
-                exportType.addEventListener('mouseleave', mouseleaveEventListener);
-                dropdownPointer.addEventListener('mouseover', mouseoverEventListener);
-                dropdownPointer.addEventListener('mouseleave', mouseleaveEventListener);
-                dropdownPointer.addEventListener('click', () => exportType.click());
-            }
-            exportType.addEventListener('click', () => {
+        dropdownChildren.forEach((dropdownChild) => {
+            dropdownChild.addEventListener('click', () => {
                 clean(eventListener);
-                if (exportBtn.classList.contains('prime'))
-                    prime.send('export', exportType.getAttribute('exporttype')).then();
-                else
-                    side.send('export', exportType.getAttribute('exporttype')).then();
-                exportBtn.click();
+                let webview = dropBtn.classList.contains('prime') ? prime : side;
+                if (dropBtn.classList.contains('export-img')) {
+                    webview.send('export', dropdownChild.getAttribute('exporttype')).then();
+                }
+                else if (dropBtn.classList.contains('download-data')) {
+                    webview.send('download', dropdownChild.getAttribute('downloadtype')).then();
+                }
+                dropBtn.click();
             });
+        });
+    });
+    Array.from(document.getElementsByClassName('zoom-out-btn')).forEach(zoomOutBtn => {
+        zoomOutBtn.addEventListener('click', () => {
+            if (zoomOutBtn.classList.contains('prime'))
+                prime.send('zoom-out').then();
+            else
+                side.send('zoom-out').then();
         });
     });
     Array.from(document.getElementsByClassName('zoom-out-btn')).forEach(zoomOutBtn => {
@@ -202,7 +201,8 @@ let toggleRedDot = () => {
     for (let inputId in inputsSettings) {
         if (inputsSettings.hasOwnProperty(inputId) &&
             inputId.match(/.*-path/) &&
-            inputsSettings[inputId]['data'] == undefined) {
+            !inputsSettings[inputId]['value'] &&
+            (inputId != 'genes-data-path' || !inputId['data'])) {
             redDot.classList.toggle('hide', false);
             return;
         }
@@ -225,6 +225,15 @@ document.addEventListener('DOMContentLoaded', function loaded() {
         let ready = () => {
             ready = () => {
                 window['affectSettings'](settings['renderer']['input'], 'main', toggleCOInputDisable);
+                fetch(settings['renderer']['input']['genes-data-path']['value'])
+                    .then(res => res.text())
+                    .then(data => {
+                    sendParameter('genes_data', data);
+                    sendParameter('user_code_path', settings['renderer']['input']['fitness-function-path']['value']);
+                })
+                    .catch(() => {
+                    sendParameter('user_code_path', settings['renderer']['input']['fitness-function-path']['value']);
+                });
                 toggleRedDot();
                 sendParams();
                 (() => {
@@ -293,6 +302,17 @@ document.addEventListener('DOMContentLoaded', function loaded() {
                 settings['renderer']['input'] = updatedSettings['renderer']['input'];
                 saveSettings(settings['renderer']['input'], 'main', toggleCOInputDisable);
                 affectSettings(settings['renderer']['input'], 'main', toggleCOInputDisable);
+                if (!settings['renderer']['input']['pop-size']['disable']) {
+                    fetch(settings['renderer']['input']['genes-data-path']['value'])
+                        .then(res => res.text())
+                        .then(data => {
+                        sendParameter('genes_data', data);
+                        sendParameter('user_code_path', settings['renderer']['input']['fitness-function-path']['value']);
+                    })
+                        .catch(() => {
+                        sendParameter('user_code_path', settings['renderer']['input']['fitness-function-path']['value']);
+                    });
+                }
                 toggleRedDot();
                 sendParams();
             });

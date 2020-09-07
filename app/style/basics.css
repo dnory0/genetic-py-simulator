@@ -7,10 +7,7 @@ button {
 }
 
 * {
-  -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
+  user-select: none;
   -webkit-user-drag: none;
 }
 
@@ -21,4 +18,5 @@ body {
   overflow: hidden;
   height: 100%;
 }
+
 /*# sourceMappingURL=basics.css.map */

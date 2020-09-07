@@ -1,4 +1,7 @@
-import { IpcRenderer, OpenDialogReturnValue } from 'electron';
+import { IpcRenderer, OpenDialogReturnValue, SaveDialogReturnValue } from 'electron';
+import { ChildProcess } from 'child_process';
+
+let pyshell: ChildProcess = window['pyshell'];
 
 let ipcRenderer: IpcRenderer = window['ipcRenderer'];
 /**
@@ -35,8 +38,8 @@ let isClosable = true;
  * - ```-1``` if path does not exist.
  * - ```-2``` if path is not an absolute path.
  * - ```-3``` if path does not point to a file.
- * - ```-4``` if the file extention is not equal to any of the given ```ext```.
- * - ```0``` if path matchs all conditions.
+ * - ```-4``` if the file extension is not equal to any of the given ```ext```.
+ * - ```0``` if path matches all conditions.
  *
  * @param filePath file path to check & validate.
  * @param exts extensions array.
@@ -48,13 +51,13 @@ let validatePath: (filePath: string, ...exts: string[]) => number = window['vali
  */
 let browseBtns = <HTMLButtonElement[]>Array.from(document.getElementsByClassName('browse-btn'));
 /**
- * load buttons
+ * load buttons and shows content of genes data files/output of testing fitness function
  */
 let loadBtns = <HTMLButtonElement[]>Array.from(document.getElementsByClassName('load-data-btn'));
 /**
- * show output of loaded path and data
+ * get template of fitness function file
  */
-let showOutputs = <HTMLButtonElement[]>Array.from(document.getElementsByClassName('show-output-btn'));
+let getTemplateBtn = <HTMLButtonElement>document.getElementById('get-template-btn');
 /**
  * inputs that take the path to whether genes data or fitness function
  */
@@ -72,6 +75,8 @@ let closeBtn = <HTMLButtonElement>document.getElementById('close-btn');
  */
 let revertBtn = <HTMLButtonElement>document.getElementById('revert-btn');
 
+let clearTerminalBtn = <HTMLInputElement>document.getElementById('clear-terminal-btn');
+
 browseBtns.forEach(function (browseBtn) {
   let type = browseBtn.classList.contains('genes-data') ? 'genes-data' : 'fitness-function';
   let pathInput = pathInputs.find(pathInput => pathInput.classList.contains(type));
@@ -80,7 +85,7 @@ browseBtns.forEach(function (browseBtn) {
     ipcRenderer.once('browsed-path', (_ev, result: OpenDialogReturnValue) => {
       if (result.canceled) return;
       pathInput.value = result.filePaths[0];
-      validatePathInput(pathInput, type).then();
+      loadBtns.find(loadBtn => loadBtn.classList.contains(type)).click();
     });
 
     ipcRenderer.send(
@@ -99,44 +104,38 @@ browseBtns.forEach(function (browseBtn) {
 });
 
 /**
- * fetch data from the path in pathInput, and checks data validity according to given type
- * @param pathInput holds absolute path of a [```json``` | ```py```] file that holds data
- * @param type ```genes-data``` | ```fitness-function```, data type inside the file
+ * fetch data from the path in pathInput, and checks its validity
+ * @param pathInput holds absolute path of a ```json``` file that holds data
  */
-let validateData = async (pathInput: HTMLInputElement, type: string) => {
+let validateData = async (pathInput: HTMLInputElement) => {
   return await fetch(pathInput.value)
     .then(res => res.text())
     .then(data => {
+      curSettings['renderer']['input'][pathInput.id]['data'] = data;
       try {
-        if (type == 'genes-data') {
-          curSettings['renderer']['input'][pathInput.id]['data'] = JSON.stringify(JSON.parse(data));
-        } else {
-          curSettings['renderer']['input'][pathInput.id]['data'] = data;
-        }
-        return true;
-      } catch (error) {
-        if (type == 'genes-data') {
-          // alert('This json data contains error!')
-          alert('Data has Errors');
-          return false;
-        }
+        JSON.stringify(JSON.parse(data));
+      } catch (e) {
+        return false;
       }
+      return true;
     });
 };
 
+// let validatePython = async ()
+
 /**
- * checks if the path in pathInput is valide, and whether its data is valide according to given type
+ * checks if the path in pathInput is valid, and whether its data is valid according to given type
  * @param pathInput holds absolute path of a [```json``` | ```py```] file that holds data
  * @param type ```genes-data``` | ```fitness-function```, data type inside the file
  */
-let validatePathInput = async (pathInput: HTMLInputElement, type: string) => {
+let validatePathInput = (pathInput: HTMLInputElement, type: string) => {
   clearTimeout(pathInput['bgTimeout']);
   pathInput['bgTimeout'] = setTimeout(() => (pathInput.style.backgroundColor = ''), 1500);
-  clearJSONOutput();
+  if (type == 'genes-data') clearJSONOutput();
   curSettings['renderer']['input'][pathInput.id]['data'] = null;
   pathInput.dispatchEvent(new Event('browsedPath'));
   let extensions = type == 'genes-data' ? ['.json', '.jsonc', '.js'] : ['.py', '.py3'];
-  if (validatePath(pathInput.value, ...extensions) == 0 && (await validateData(pathInput, type))) {
+  if (validatePath(pathInput.value, ...extensions) == 0) {
     pathInput.style.backgroundColor = '#a8fba8';
     return true;
   } else {
@@ -145,14 +144,6 @@ let validatePathInput = async (pathInput: HTMLInputElement, type: string) => {
   }
 };
 
-loadBtns.forEach(loadBtn => {
-  let type = loadBtn.classList.contains('genes-data') ? 'genes-data' : 'fitness-function';
-  let pathInput = pathInputs.find(pathInput => pathInput.classList.contains(type));
-  loadBtn.addEventListener('click', () => {
-    validatePathInput(pathInput, type).then();
-  });
-});
-
 /**
  * to loads data when Enter key pressed inside pathInputs
  */
@@ -160,21 +151,24 @@ pathInputs.forEach(pathInput => {
   let type = pathInput.classList.contains('genes-data') ? 'genes-data' : 'fitness-function';
   pathInput.addEventListener('keyup', ev => {
     if (ev.key != 'Enter') return;
-    validatePathInput(pathInput, type).then();
+    validatePathInput(pathInput, type);
   });
   setTimeout(() => {
     if (curSettings['renderer']['input'][pathInput.id]['data'] == undefined) {
       let loadBtn = loadBtns.find(loadBtn => loadBtn.classList.contains(type));
       let browseBtn = browseBtns.find(browseBtn => browseBtn.classList.contains(type));
       let extensions = type == 'genes-data' ? ['.json', '.jsonc', '.js'] : ['.py', '.py3'];
-      let flikrBtn = validatePath(pathInput.value, ...extensions) == 0 ? loadBtn : browseBtn;
+      let flickerBtn = validatePath(pathInput.value, ...extensions) == 0 ? loadBtn : browseBtn;
 
-      flikrBtn.classList.add('notice-me');
-      setTimeout(() => flikrBtn.classList.add('notice-me-transition'), 0);
-      setTimeout(() => flikrBtn.classList.add('fade-white'), 200);
-      setTimeout(() => flikrBtn.classList.remove('fade-white'), 350);
-      setTimeout(() => flikrBtn.classList.add('fade-white'), 550);
-      setTimeout(() => flikrBtn.classList.remove('notice-me', 'fade-white', 'notice-me-transition'), 750);
+      // there is no way to detect if fitness-function is loaded or not
+      if (type == 'fitness-function' && flickerBtn == loadBtn) return;
+
+      flickerBtn.classList.add('notice-me');
+      setTimeout(() => flickerBtn.classList.add('notice-me-transition'), 0);
+      setTimeout(() => flickerBtn.classList.add('fade-white'), 200);
+      setTimeout(() => flickerBtn.classList.remove('fade-white'), 350);
+      setTimeout(() => flickerBtn.classList.add('fade-white'), 550);
+      setTimeout(() => flickerBtn.classList.remove('notice-me', 'fade-white', 'notice-me-transition'), 750);
     }
   });
 });
@@ -184,22 +178,44 @@ let clearJSONOutput = () => {
   Array.from(treeContainer.getElementsByClassName('json-container')).forEach(jsonContainer => jsonContainer.remove());
 };
 
-showOutputs.forEach(showOutput => {
-  let type = showOutput.classList.contains('genes-data') ? 'genes-data' : 'fitness-function';
+let clearTerminalOutput = () => (clearTerminalBtn.parentElement.nextElementSibling.innerHTML = '');
+
+let loadBtnsPressed = false;
+
+loadBtns.forEach(loadBtn => {
+  let type = loadBtn.classList.contains('genes-data') ? 'genes-data' : 'fitness-function';
   let pathInput = pathInputs.find(pathInput => pathInput.classList.contains(type));
   let treeContainer = document.querySelector('.genes-tree');
-  showOutput.onclick = async () => {
-    // todo: add test fitness-function
+  loadBtn.onclick = async () => {
+    loadBtnsPressed = true;
+    if (!validatePathInput(pathInput, type)) return;
     if (type == 'fitness-function') {
-      alert('no python load for now');
+      pyshell.stdin.write(
+        JSON.stringify({
+          test_user_code_path: pathInput.value,
+        }) + '\n'
+      );
       return;
     }
-    if (await validatePathInput(pathInput, type)) {
-      window['jsonTree'](treeContainer, curSettings['renderer']['input'][pathInput.id]['data']);
+    let validationResult = await validateData(pathInput);
+    pyshell.stdin.write(
+      JSON.stringify({
+        test_genes_data: curSettings['renderer']['input']['genes-data-path']['data'],
+      }) + '\n'
+    );
+    if (validationResult) {
+      window['jsonTree'](treeContainer, curSettings['renderer']['input']['genes-data-path']['data']);
       treeContainer.firstElementChild.classList.add('scrollbar');
     }
   };
 });
+
+getTemplateBtn.onclick = () => {
+  ipcRenderer.send('download-template', {
+    name: 'Python File (.py)',
+    extensions: ['py', 'py3'],
+  });
+};
 
 (() => {
   /**
@@ -214,6 +230,7 @@ showOutputs.forEach(showOutput => {
 
   revertBtn.onclick = () => {
     clearJSONOutput();
+    clearTerminalOutput();
     revertBtn.disabled = true;
     saveBtn.disabled = true;
     isClosable = true;
@@ -239,15 +256,14 @@ showOutputs.forEach(showOutput => {
       if (input.classList.contains('load-path')) {
         // this is triggered when path is browsed using browse button
         input.addEventListener('browsedPath', eventListener);
-      } else {
-        input.addEventListener('keypress', eventListener);
-        input.addEventListener('paste', eventListener);
-        input.addEventListener('keyup', ev => {
-          if (['ArrowUp', 'ArrowDown'].includes(ev.key)) eventListener();
-        });
-        if (input.classList.contains('textfieldable')) {
-          input.addEventListener('change', eventListener);
-        }
+      }
+      input.addEventListener('keypress', eventListener);
+      input.addEventListener('paste', eventListener);
+      input.addEventListener('keyup', ev => {
+        if (['ArrowUp', 'ArrowDown'].includes(ev.key)) eventListener();
+      });
+      if (input.classList.contains('textfieldable')) {
+        input.addEventListener('change', eventListener);
       }
     }
   });
@@ -255,6 +271,8 @@ showOutputs.forEach(showOutput => {
   (<HTMLButtonElement[]>Array.from(document.getElementsByClassName('random-btn'))).forEach(randomBtn =>
     randomBtn.addEventListener('click', eventListener)
   );
+
+  clearTerminalBtn.addEventListener('click', clearTerminalOutput);
 })();
 
 /**
@@ -279,7 +297,7 @@ window['params']();
   });
 };
 /**
- * force textfields input that applies to textfieldable inputs
+ * force textfield type on inputs that applies to textfieldable class
  */
 document.getElementById('force-tf-enabled').addEventListener('change', ev => {
   Array.from(document.getElementsByClassName('textfieldable')).forEach((textfieldable: HTMLInputElement) => {
@@ -288,14 +306,19 @@ document.getElementById('force-tf-enabled').addEventListener('change', ev => {
 });
 
 let toggleDisableOnRun = (disable: boolean) => {
-  (<HTMLInputElement[]>(
-    (<HTMLDivElement[]>Array.from(document.getElementsByClassName('param-value'))).map(paramValue => paramValue.firstElementChild)
-  )).forEach(gaParam => {
+  (<HTMLInputElement[]>(<HTMLDivElement[]>Array.from(document.getElementsByClassName('param-value'))).map(paramValue => {
+    return paramValue.classList.contains('double-sync')
+      ? paramValue.querySelector('.main-double-sync')
+      : paramValue.firstElementChild;
+  })).forEach(gaParam => {
     if (!gaParam.classList.contains('disable-on-run')) return;
     curSettings['renderer']['input'][gaParam.id]['disable'] = disable;
+    gaParam.parentElement.parentElement.title = !disable ? '' : 'Disabled when GA is Running';
     gaParam.disabled = (gaParam.classList.contains('forced-disable') && gaParam.disabled) || disable;
     (<HTMLButtonElement>gaParam.parentElement.nextElementSibling.firstElementChild).disabled = disable;
-    gaParam.parentElement.parentElement.title = !disable ? '' : 'Disabled when GA is Running';
+    try {
+      (<HTMLInputElement>gaParam.parentElement.parentElement.parentElement.previousElementSibling).disabled = disable;
+    } catch (e) {}
   });
 
   let gaTypes = (<HTMLDivElement[]>Array.from(document.getElementsByClassName('type-value')))
@@ -324,6 +347,54 @@ ipcRenderer.on('update-settings', (_ev, activate: boolean) => {
 ipcRenderer.on('close-confirm', () => {
   if (isClosable) ipcRenderer.send('ga-cp-finished');
   else ipcRenderer.send('close-confirm');
+});
+
+let terminal = clearTerminalBtn.parentElement.nextElementSibling;
+
+let treatMessage = (data: object) => {
+  if (!data || !data['terminal']) return;
+  let line = document.createElement('div');
+  line.classList.toggle(data['line-type'], true);
+  line.innerHTML = `${['', null, undefined, []].includes(data['msg-type']) ? '' : data['msg-type'] + ': '}${
+    data['message'] ? data['message'] : '&lt;message with no content&gt;'
+  }`;
+  terminal.appendChild(line);
+};
+
+pyshell.stdout.on('data', (chunk: Buffer) => {
+  if (loadBtnsPressed) {
+    loadBtnsPressed = false;
+    if (terminal.children.length) {
+      treatMessage({
+        terminal: true,
+        message: '--------------------------------------------',
+      });
+    }
+  }
+  // console.log(chunk.toString());
+  chunk
+    .toString()
+    .split(/(?<=\n)/g)
+    .map((data: string) => {
+      try {
+        return JSON.parse(data);
+      } catch (e) {
+        treatMessage({
+          terminal: true,
+          'line-type': 'warning',
+          'msg-type': 'WARNING',
+          message:
+            'Detected uncontrolled output, your GA is not affected, but avoid using a print statement inside the imported python file',
+        });
+        return {};
+      }
+    })
+    .forEach((data: object) => treatMessage(data));
+});
+
+// open error listener, this is logged inside the devTool console, debug reasons only
+pyshell.stderr.on('data', (chunk: Buffer) => {
+  console.error(chunk.toString());
 });
 
 // apply one of the .disable-on-run to be

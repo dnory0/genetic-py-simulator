@@ -1,7 +1,7 @@
 let switchTextfieldable = (textfieldable: HTMLInputElement, forceTFInput: HTMLInputElement) => {
   // additional changes to be made when toggling double-sync inputs
   if (textfieldable.classList.contains('double-sync')) {
-    if (textfieldable.disabled) {
+    if (!textfieldable.classList.contains('main-double-sync')) {
       textfieldable.classList.toggle('hide', !forceTFInput.checked);
       return;
     }
@@ -20,10 +20,10 @@ let switchTextfieldable = (textfieldable: HTMLInputElement, forceTFInput: HTMLIn
  * @param toggleMutTypeDisable <ga-cp only> disable mutation type incompatible labels when number of 1s input is checked
  */
 function affectSettings(
-    settings: object,
-    targetedWindow: 'main' | 'ga-cp',
-    toggleCOInputDisable: (input: HTMLInputElement) => void,
-    toggleMutTypeDisable?: (input: HTMLInputElement, settings: object) => void,
+  settings: object,
+  targetedWindow: 'main' | 'ga-cp',
+  toggleCOInputDisable: (input: HTMLInputElement) => void,
+  toggleMutTypeDisable?: (input: HTMLInputElement, settings: object) => void
 ) {
   Array.from(document.getElementsByTagName('input')).forEach((input, _, inputs) => {
     if (input.type == 'checkbox') {
@@ -70,9 +70,9 @@ function affectSettings(
         console.log(input);
       }
 
-     input.checked = true;
+      input.checked = true;
 
-      if (input.name == 'co_type') toggleCOInputDisable(input)
+      if (input.name == 'co_type') toggleCOInputDisable(input);
     } else {
       if (input.classList.contains('double-sync')) {
         if (input.getAttribute('synctype') == 'number-of-1sn0s') {
@@ -90,6 +90,8 @@ function affectSettings(
       } catch (e) {
         console.log(`This should be a new input, add it to settings.json`);
         console.log(input);
+      }
+      if (input.classList.contains('load-path') && targetedWindow == 'main') {
       }
     }
   });

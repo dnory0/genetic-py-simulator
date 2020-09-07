@@ -2,9 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const ipcRenderer = window['ipcRenderer'];
 delete window['ipcRenderer'];
-let mostFittest = { fitness: -1, individuals: null };
+let mostFittest = { fitness: Number.MIN_SAFE_INTEGER, individuals: null };
 const toggleChartHover = window['toggleChartHover'];
-const clearChart = window['clearChart'];
 const toggleZoom = window['toggleZoom'];
 const treatResponse = (response) => {
     if (response['generation'] !== undefined) {
@@ -16,8 +15,6 @@ const treatResponse = (response) => {
                     genes: response['genes'],
                 },
             ];
-            sideChart.series[0].setData(sideChart.series[1].data.map(aData => [aData.x, 0.5, aData.value]), true, false);
-            sideChart.series[1].setData(response['genes'].map((gene, i) => [i, 2.5, gene]), true, false);
         }
         else if (mostFittest['fitness'] == response['fitness']) {
             mostFittest['individuals'].push({
@@ -25,11 +22,13 @@ const treatResponse = (response) => {
                 genes: response['genes'],
             });
         }
+        if (response['fitness'] < mostFittest['fitness'])
+            return;
+        sideChart.series[0].setData(response['genes'].map((gene, i) => [i, 2.5, gene]), true, false, false);
     }
     else if (response['started']) {
-        clearChart(sideChart);
         sideChart.xAxis[0].setExtremes(null, null, true, true);
-        mostFittest['fitness'] = -1;
+        mostFittest['fitness'] = Number.MIN_SAFE_INTEGER;
         mostFittest['individuals'] = null;
         toggleChartHover(sideChart, response['first-step']);
         toggleZoom(sideChart, response['first-step']);
@@ -98,11 +97,6 @@ let sideChart = window['createChart']('side-chart', {
     },
     series: [
         {
-            name: 'PF',
-            type: 'heatmap',
-            data: [],
-        },
-        {
             name: 'F',
             type: 'heatmap',
             data: [],
@@ -118,9 +112,6 @@ delete window['createChart'];
 window['ready'](treatResponse);
 ipcRenderer.on('export', (_ev, actionType) => {
     switch (actionType) {
-        case 'png':
-            alert('disabled for now because of bugs');
-            break;
         case 'jpeg':
             sideChart.exportChartLocal({
                 type: 'image/jpeg',
@@ -132,6 +123,22 @@ ipcRenderer.on('export', (_ev, actionType) => {
             });
             break;
     }
+});
+function download(filename, text) {
+    var element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+    element.setAttribute('download', filename);
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+}
+ipcRenderer.on('download', (_ev, actionType) => {
+    console.log(JSON.stringify(sideChart.yAxis[0].series[0].data.map(p => p.value)));
+    download(actionType + '.json', actionType == 'list'
+        ? JSON.stringify(sideChart.yAxis[0].series[0].data.map(p => p.value))
+        : JSON.stringify(Object.assign({}, sideChart.yAxis[0].series[0].data.map(p => p.value))));
+    console.log(sideChart.yAxis[0].series[0].data.map(p => p.value));
 });
 ipcRenderer.on('zoom-out', () => {
     sideChart.xAxis[0].setExtremes(null, null, true, true);

@@ -96,7 +96,7 @@ TODO.*
 IDEA.*
 #this is now used on development as current settings insted of default.
 /settings.json
-build/python/__pycache__
-build/python/ff.py
+**/__pycache__
+build/python/ff-temp.py
 build/python/ff-students.py
 /ga simulator notes.txt

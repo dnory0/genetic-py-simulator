@@ -33,37 +33,43 @@ window['createChart'] = require(join(__dirname, '..', 'modules', 'create-chart')
  */
 window['toggleChartHover'] = (chart: Chart, enable: boolean) => {
   chart.update(
-    {
-      tooltip: {
-        enabled: enable,
-      },
-      xAxis: {
-        crosshair: enable,
-      },
-      legend: {
-        itemStyle: {
-          pointerEvents: enable ? 'all' : 'none',
-        },
-        itemCheckboxStyle: {
-          pointerEvents: enable ? 'all' : 'none',
-        },
-      },
-      plotOptions: {
-        series: {
-          marker: {
+    chart.container.parentElement.id == 'prime-chart'
+      ? {
+          tooltip: {
             enabled: enable,
-            radius: enable ? 1.5 : null,
           },
-          states: {
-            hover: {
-              halo: {
-                opacity: enable ? 0.5 : 0,
+          xAxis: {
+            crosshair: enable,
+          },
+          legend: {
+            itemStyle: {
+              pointerEvents: enable ? 'all' : 'none',
+            },
+            itemCheckboxStyle: {
+              pointerEvents: enable ? 'all' : 'none',
+            },
+          },
+          plotOptions: {
+            series: {
+              marker: {
+                enabled: enable,
+                radius: enable ? 1.5 : null,
+              },
+              states: {
+                hover: {
+                  halo: {
+                    opacity: enable ? 0.5 : 0,
+                  },
+                },
               },
             },
           },
+        }
+      : {
+          tooltip: {
+            enabled: enable,
+          },
         },
-      },
-    },
     true,
     false,
     false

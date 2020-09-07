@@ -186,24 +186,6 @@
       z-index: 10001;
     }
   }
-
-  .fullscreenable {
-    > .chart-actions > button.fscreen-btn > img {
-      &:last-child {
-        display: none;
-      }
-    }
-
-    &:fullscreen > .chart-actions > button.fscreen-btn > img {
-      &:first-child {
-        display: none;
-      }
-
-      &:last-child {
-        display: block;
-      }
-    }
-  }
 }
 
 .blur {

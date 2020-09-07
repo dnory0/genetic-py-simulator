@@ -19,7 +19,9 @@ function params() {
 
     if (input.classList.contains('double-sync') && !input.disabled) {
       if (input.getAttribute('synctype') == 'number-of-1sn0s') {
-        const complementaryInput = <HTMLInputElement>input.parentElement.querySelector('input.double-sync:disabled');
+        const complementaryInput = <HTMLInputElement>(
+          input.parentElement.querySelector('input.double-sync:not(.main-double-sync)')
+        );
         const doubleSyncMaxChangeEventListener = (ev: Event) => {
           let relativeInput = <HTMLInputElement>ev.currentTarget;
           setTimeout(() => {
@@ -120,7 +122,7 @@ function params() {
         if (input.max == randomizedValue.toString()) {
           randomizedValue = (parseFloat(randomizedValue) - parseFloat(input.step)).toFixed(isInt ? 0 : 3);
         }
-        let complementaryInput = <HTMLInputElement>input.parentElement.querySelector('input.double-sync:disabled');
+        let complementaryInput = <HTMLInputElement>input.parentElement.querySelector('input.double-sync:not(.main-double-sync)');
         complementaryInput.value = (parseFloat(complementaryInput.max) - parseFloat(randomizedValue)).toFixed(isInt ? 0 : 3);
       }
       input.value = randomizedValue;

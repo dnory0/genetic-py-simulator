@@ -483,15 +483,6 @@ input[type=range]:not(:disabled):hover::-webkit-slider-runnable-track {
 #main .chart-actions .dropdown-content > button {
   z-index: 10001;
 }
-#main .fullscreenable > .chart-actions > button.fscreen-btn > img:last-child {
-  display: none;
-}
-#main .fullscreenable:fullscreen > .chart-actions > button.fscreen-btn > img:first-child {
-  display: none;
-}
-#main .fullscreenable:fullscreen > .chart-actions > button.fscreen-btn > img:last-child {
-  display: block;
-}
 
 .blur {
   pointer-events: none;

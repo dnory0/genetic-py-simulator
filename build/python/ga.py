@@ -1,15 +1,12 @@
-#!/bin/python3
-
+#!/usr/bin/python3
 from time import sleep
 from threading import Thread, Lock, Condition
-from json import loads, dumps
+from json import loads, dumps, JSONDecodeError
 from random import random, randint, randrange
 from sys import argv, exit, maxsize
-from typing import List, Union, Dict
+from typing import List, Union, Dict, Optional, Callable, Tuple, Any
 from functools import reduce
-
-
-# from importlib import import_module
+from importlib.util import spec_from_file_location, module_from_spec
 
 
 class Population:
@@ -58,54 +55,27 @@ class Individual:
                     )
                     if self.genes[-1] == 1:
                         ones_limit -= 1
-                to_json({
-                    'g_number_of_1s': list(filter(lambda gene: gene == 1, self.genes))
-                })
             else:
                 self.genes = [
                     1 if random() >= .5 else 0 for _ in range(genes_num)
                 ]
 
-    # call genes_fitness if possible
     def fitness(self) -> int:
-        return Individual.genes_fitness(self.genes)
-        # return Individual.get_fitness(self.genes, g_genes_data)
+        return Individual.genes_fitness(self.genes, g_genes_data)
 
-    # @staticmethod
-    # def get_fitness(genes: List[int], data: Union[Dict, List, Tuple, Set]) -> Union[int, float]:
-    #     # WARN genes num needs to be multiple of 7
-    #     # this stores visited students to monitor students visited, if student is visited twice,
-    #     # those genes should get very low value to be eliminated.
-    #     visited_students = []
-    #     fitness_values = []
-    #     # 4 groups
-    #     for group_index in range(4):
-    #         group_fitness = 0
-    #         # each group has 7 students, every student is represented with 5 bits
-    #         for student_index in range(7):
-    #             student = genes[
-    #                       group_index * 35 + student_index * 5:
-    #                       group_index * 35 + (student_index + 1) * 5
-    #                       ]
-    #             if student in visited_students:
-    #                 group_fitness += -1000
-    #             else:
-    #                 visited_students.append(student)
-    #                 group_fitness += data.get(
-    #                     int(''.join(str(e) for e in student), 2)
-    #                 )
-    #
-    #         fitness_values.append(group_fitness)
-    #
-    #     if any(group_fitness < 0 for group_fitness in fitness_values):
-    #         return int(sum(fitness_values))
-    #     else:
-    #         return int(sum(fitness_values) / 4 - min(fitness_values))
-
-    # built-in fitness function
     @staticmethod
-    def genes_fitness(genes) -> int:
-        return sum(1 for ind_gene, solution_gene in zip(genes, solution.genes) if int(ind_gene) == solution_gene)
+    def genes_fitness(genes, data) -> int:
+        # call user specified get_fitness if user specified code is available and has a "callable function" get_fitness
+        # else returns 0, wrapped inside try/except so that pyshell process does not exit here with error.
+        # noinspection PyBroadException
+        try:
+            return g_user_code_loader.get_fitness(
+                genes, data
+            ) if g_user_code_loader and hasattr(
+                g_user_code_loader, 'get_fitness'
+            ) else 0
+        except Exception:
+            return 0
 
     def replace_genes(self, genes):
         self.genes = [int(gene) for gene in genes]
@@ -152,14 +122,15 @@ class Evolve:
         :return: couple of 2 individuals
         """
         couple = []
-        chosen_points = [
+        chosen_points: List[Union[int, None]] = [
             randrange(sum_of_fitness // 2 if i == 1 else 0, maxsize * 2 + 1) % sum_of_fitness for i in range(2)
         ]
         for ind in roulette_wheel:
             for chosen_point_index in range(len(chosen_points)):
                 if roulette_wheel.get(ind) < chosen_points[chosen_point_index]:
                     # individual is not the chosen one, its fitness value is extracted from the chosen point value
-                    chosen_points[chosen_point_index] -= roulette_wheel.get(ind)
+                    chosen_points[chosen_point_index] -= roulette_wheel.get(
+                        ind)
                 else:
                     # chosen individual is found for ```chosen_point_index``` chosen point
                     if len(couple) and couple[0] is ind:
@@ -171,7 +142,8 @@ class Evolve:
                         # after a chosen_point reach the chosen individual it is assigned None and filtered later
                         chosen_points[chosen_point_index] = None
             # the chosen point is assigned None when individual is reached, then filtered before next iteration
-            chosen_points = list(filter(lambda chosen_point: not isinstance(chosen_point, type(None)), chosen_points))
+            chosen_points = list(filter(lambda chosen_point: not isinstance(
+                chosen_point, type(None)), chosen_points))
             # if couple has been established there is no need to keep iterating through remaining individuals
             if len(couple) == 2:
                 break
@@ -185,7 +157,8 @@ class Evolve:
         }
         sum_of_fitness = sum(ind.fitness() for ind in pop_individuals)
         for _ in range(len(pop_individuals) // 2):
-            parents.append(Evolve.__stochastic_universal_sampling_spinning(roulette_wheel, sum_of_fitness))
+            parents.append(Evolve.__stochastic_universal_sampling_spinning(
+                roulette_wheel, sum_of_fitness))
             for ind_of_couple in parents[-1]:
                 sum_of_fitness -= roulette_wheel.get(ind_of_couple)
                 roulette_wheel.pop(ind_of_couple)
@@ -198,7 +171,8 @@ class Evolve:
             couple = []
             for _ in range(2):
                 # k way number
-                k_way = 1 if len(pop_individuals) == 1 else randrange(1, len(pop_individuals))
+                k_way = 1 if len(pop_individuals) == 1 else randrange(
+                    1, len(pop_individuals))
                 # a copy of individuals list is used to select k-way individuals to be able to pop chosen individuals
                 selection_individuals = pop_individuals.copy()
                 # k-way individuals to select the best out of them
@@ -209,7 +183,8 @@ class Evolve:
                     # selecting the best out of the k-way individuals to append to couple list
                     selected_k_individuals[-1] if len(selected_k_individuals) == 1
                     else reduce(
-                        lambda chosen_ind, cur_ind: cur_ind if chosen_ind.fitness() < cur_ind.fitness() else chosen_ind,
+                        lambda chosen_ind, cur_ind: cur_ind if chosen_ind.fitness(
+                        ) < cur_ind.fitness() else chosen_ind,
                         selected_k_individuals
                     )
                 )
@@ -280,8 +255,44 @@ class Evolve:
     def update_population(parents: list, offsprings: list):
         for parent_couple, offspring_couple in zip(parents, offsprings):
             for parent, offspring in zip(parent_couple, offspring_couple):
-                if g_update_pop or parent.fitness() < Individual.genes_fitness(offspring):
+                if g_update_pop or parent.fitness() < Individual.genes_fitness(offspring, g_genes_data):
                     parent.replace_genes(offspring)
+
+    @staticmethod
+    def calc_crossover(pop: Population, parents: list) -> list:
+        if g_co_type == 0:
+            co_point = int(g_co_rate * pop.genes_num)
+            offsprings = Evolve.single_point_crossover(parents, co_point)
+        elif g_co_type == 1:
+            g_length = int(g_co_rate * pop.genes_num)
+            co_point = (pop.genes_num - g_length) // 2
+            co_point2 = pop.genes_num - co_point
+            offsprings = Evolve.two_point_and_k_point_crossover(
+                parents, co_point, co_point2
+            )
+        else:
+            offsprings = Evolve.uniform_crossover(parents)
+        return offsprings
+
+    @staticmethod
+    def calc_mutation(pop: Population, offsprings: list) -> list:
+        # list of couples of offsprings, mut_rate is passed here
+        # to avoid being changed by user on the mutation process.
+        offsprings = Evolve.bit_string_mutation(
+            offsprings, pop.genes_num, g_mut_rate
+        ) if g_mut_type == 0 else Evolve.flip_bit_mutation(
+            offsprings, pop.genes_num, g_mut_rate
+        )
+        return offsprings
+
+    @staticmethod
+    def map_to_genes(parents: list) -> list:
+        parents_genes = []
+        for parent1, parent2 in parents:
+            p1_genes = parent1.genes
+            p2_genes = parent2.genes
+            parents_genes.append([p1_genes, p2_genes])
+        return parents_genes
 
     @staticmethod
     def evolve_population(pop: Population):
@@ -297,26 +308,28 @@ class Evolve:
         else:
             parents = Evolve.tournament_selection(pop.individuals.copy())
 
-        # defined here to avoid co_rate being changed by user on the crossover process.
-        if g_co_type == 0:
-            co_point = int(g_co_rate * pop.genes_num)
-            offsprings = Evolve.single_point_crossover(parents, co_point)
-        elif g_co_type == 1:
-            g_length = int(g_co_rate * pop.genes_num)
-            co_point = (pop.genes_num - g_length) // 2
-            co_point2 = pop.genes_num - co_point
-            offsprings = Evolve.two_point_and_k_point_crossover(
-                parents, co_point, co_point2
-            )
+        if g_user_code_loader and hasattr(
+            g_user_code_loader, 'calc_crossover'
+        ):
+            try:
+                offsprings = g_user_code_loader.__getattribute__(
+                    'calc_crossover')(map(Evolve.map_to_genes, parents), g_co_rate, g_genes_num)
+            except Exception:
+                offsprings = Evolve.calc_crossover(pop, parents)
         else:
-            offsprings = Evolve.uniform_crossover(parents)
-        # list of couples of offsprings, mut_rate is passed here
-        # to avoid being changed by user on the mutation process.
-        offsprings = Evolve.bit_string_mutation(
-            offsprings, pop.genes_num, g_mut_rate
-        ) if g_mut_type == 0 else Evolve.flip_bit_mutation(
-            offsprings, pop.genes_num, g_mut_rate
-        )
+            offsprings = Evolve.calc_crossover(pop, parents)
+
+        if g_user_code_loader and hasattr(
+            g_user_code_loader, 'calc_mutation'
+        ):
+            try:
+                offsprings = g_user_code_loader.__getattribute__(
+                    'calc_mutation')(offsprings, g_mut_rate, g_genes_num)
+            except Exception:
+                offsprings = Evolve.calc_mutation(pop, offsprings)
+        else:
+            offsprings = Evolve.calc_mutation(pop, offsprings)
+
         # parents and offsprings are sorted
         Evolve.update_population(parents, offsprings)
         # finished generating the next generation
@@ -344,7 +357,7 @@ class GAThread(Thread):
 
     def run(self):
         # initializing the population
-        pop = Population(g_pop_size, len(solution.genes))
+        pop = Population(g_pop_size, g_genes_num)
         # fittest fitness of the previous generation, used to send deviation value
         prv_fitness = pop.fittest().fitness()
 
@@ -504,22 +517,146 @@ class GAThread(Thread):
             # in case is going to pause but user pressed stop, GA should pass the pause check test to stop
             else:
                 self.__pause_now = False
-            self.join()
+            self.join(10)
+
+
+class UserCodeLoader:
+    def __init__(self, code_path: str, is_testing: bool = False):
+        try:
+            # loading module spec, will raise FileNotFoundError if path is incorrect
+            spec = spec_from_file_location(
+                "module.name",
+                code_path
+            )
+            if is_testing:
+                to_terminal('info', 'INFO', 'File was found.')
+            code_module = module_from_spec(spec)
+            if is_testing:
+                to_terminal('info', 'INFO',
+                            'Module was extracted successfully.')
+            # execute module, any exception can raise of it, common one is SyntaxError
+            spec.loader.exec_module(code_module)
+            if is_testing:
+                to_terminal('info', 'INFO', 'No syntax error raised.')
+            # retrieve the fitness function out of the module,
+            # raises AttributeError if get_fitness is not implemented on module
+            if hasattr(code_module, 'get_fitness'):
+                if callable(code_module.get_fitness):
+                    self.get_fitness: Callable = code_module.get_fitness
+                    if is_testing:
+                        to_terminal('info', 'INFO',
+                                    'Function get_fitness is detected.')
+                else:
+                    to_terminal(
+                        'error',
+                        'ERROR',
+                        'Attribute get_fitness is detected but it is not a callable function, should be callable.'
+                    )
+            else:
+                to_terminal('error', 'ERROR',
+                            'Function get_fitness is not detected.')
+
+            # for calc_crossover detection (not_required from user)
+            if hasattr(code_module, 'calc_crossover'):
+                if callable(code_module.calc_crossover):
+                    test_parents = [
+                        [
+                            Individual(genes_num=g_genes_num).genes for _ in range(2)
+                        ] for _ in range(2)
+                    ]
+                    try:
+                        offsprings = code_module.calc_crossover(
+                            test_parents, g_co_rate, g_genes_num)
+                    except Exception as ex:
+                        pass
+                    else:
+                        if type(offsprings) is list:
+                            self.calc_crossover: Callable = code_module.calc_crossover
+                            if is_testing:
+                                to_terminal('info', 'INFO',
+                                            'Function calc_crossover is detected.')
+                else:
+                    to_terminal(
+                        'warning',
+                        'WARNING',
+                        'Attribute calc_crossover is detected but it is not a callable function, so it is ignored.'
+                    )
+            else:
+                to_terminal('warning', 'WARNING',
+                            'Function calc_crossover is not detected.')
+
+            # for calc_mutation detection (not_required from user)
+            if hasattr(code_module, 'calc_mutation'):
+                if callable(code_module.calc_mutation):
+                    test_offsprings = [
+                        [
+                            Individual(genes_num=g_genes_num).genes for _ in range(2)
+                        ] for _ in range(2)
+                    ]
+                    try:
+                        offsprings = code_module.calc_mutation(
+                            test_offsprings, g_mut_rate, g_genes_num)
+                    except Exception as ex:
+                        pass
+                    else:
+                        self.calc_mutation: Callable = code_module.calc_mutation
+                        if is_testing:
+                            to_terminal('info', 'INFO',
+                                        'Function calc_mutation is detected.')
+                else:
+                    to_terminal(
+                        'warning',
+                        'WARNING',
+                        'Attribute calc_mutation is detected but it is not a callable function, so it is ignored.'
+                    )
+            else:
+                to_terminal('warning', 'WARNING',
+                            'Function calc_mutation is not detected.')
+
+        except (FileNotFoundError, SyntaxError, AttributeError) as ex:
+            to_terminal('error', ex.__getattribute__('__name__'), ex.args)
 
 
 def to_json(word: dict):
-    """ 
+    """
     prints a dict to json and flush it for instant respond (doesn't buffer output)
     """
     print(dumps(word), flush=True)
+
+
+def to_terminal(line_type: str, msg_type: str, *message: Union[str, Tuple[Any], List[Any]]):
+    """
+    prints to terminal
+    """
+    to_json({
+        "terminal": True,
+        "line-type": line_type,
+        "msg-type": msg_type,
+        "message": message[0] if len(message) == 0 else reduce(
+            lambda accum_lines, line: accum_lines + '<br>' + line, message
+        )
+    })
+
+
+def safe_json_loads(json_str: str) -> Union[Dict, List, None]:
+    """
+        Try to load a json string without raising any exception, and print any raised Exception in json format.
+
+        Return (if no Exception is raised) the Loaded JSON (either dict or list type), None otherwise.
+    """
+    try:
+        return loads(json_str)
+    except (JSONDecodeError, TypeError, SyntaxError) as ex:
+        to_terminal('error', 'JSONDecodeError' if isinstance(
+            ex, JSONDecodeError) else ex.__getattribute__('__name__'), ex.args)
+        return None
 
 
 # it's going to hold imported fitness function
 fitness_function = None
 
 # initialized when user sends play, replay or step_f signal if it's first step forward
-ga_thread: Union[GAThread, type(None)] = None
-solution: Union[Individual, type(None)] = None
+ga_thread: Optional[GAThread] = None
 
 # default values for the global settings, changes every time user passes them
 g_co_rate = .5
@@ -538,10 +675,9 @@ g_update_pop = 0
 g_number_of_1s = False
 g_selection_type = 3
 
-g_genes_data: Union[Dict, List, type(None)] = None
-
-
-# g_genes_data = {i: randint(0, 100) if i < 28 else -1000 for i in range(32)}
+g_genes_data: Union[Dict, List, None] = None
+g_test_genes_data: Union[Dict, List, None] = None
+g_user_code_loader: Optional[UserCodeLoader] = None
 
 
 def update_parameters(command: dict):
@@ -562,6 +698,8 @@ def update_parameters(command: dict):
     global g_selection_type
 
     global g_genes_data
+    global g_test_genes_data
+    global g_user_code_loader
 
     if command.get('pop_size'):
         # population size
@@ -602,17 +740,142 @@ def update_parameters(command: dict):
         # else: (it equals 1)
         #   parent is always replaced by offspring
         g_update_pop = int(command.get('update_pop'))
-
-    # if command.get('ff'):
-    #     import_module(command.get('ff'))
     if not isinstance(command.get('number_of_1s'), type(None)):
         g_number_of_1s = False if command.get(
             'number_of_1s') is False else int(command.get('number_of_1s'))
 
-    if not isinstance(command.get('g_genes_data'), type(None)):
-        pass
-    if not isinstance(command.get('fitness_function'), type(None)):
-        pass
+    # test genes data & test user code path to test them,
+    # if no error is generated, supply them without the "test_", so they can be used by GA.
+    if not isinstance(command.get('test_genes_data'), type(None)):
+        g_test_genes_data = safe_json_loads(command.get('test_genes_data'))
+    if not isinstance(command.get('test_user_code_path'), type(None)):
+        test_user_code_loader = UserCodeLoader(
+            command.get('test_user_code_path'), True)
+        if hasattr(test_user_code_loader, 'get_fitness'):
+            test_individual = Individual(genes_num=g_genes_num)
+            try:
+                to_terminal('info', 'INFO', 'Testing get_fitness Function...')
+                result = test_user_code_loader.get_fitness(
+                    test_individual.genes, g_test_genes_data)
+            except TypeError as typeError:
+                to_terminal(
+                    'error',
+                    'TypeError',
+                    *typeError.args,
+                    "given arguments:",
+                    "&nbsp;&nbsp;&nbsp;&nbsp;0: genes of type List[0, 1]",
+                    "&nbsp;&nbsp;&nbsp;&nbsp;1: genes_data of type " + "None" if g_test_genes_data is None else str(
+                        type(g_test_genes_data)
+                    ),
+                )
+            except Exception as ex:
+                to_terminal('error', ex.__getattribute__('__name__') if hasattr(
+                    ex, '__name__') else 'Error', ex.args)
+            else:
+                if isinstance(result, int) or isinstance(result, float):
+                    to_terminal(
+                        'info',
+                        'INFO',
+                        'Detected type ' + ('Integer' if isinstance(result, int) else 'Float') + ', ' +
+                        'if this is the wrong intended type, wrap the return expression with ' +
+                        ('float' if isinstance(result, int) else 'int') +
+                        '() to force the right type.'
+                    )
+                else:
+                    to_terminal(
+                        'warning',
+                        'WARNING',
+                        'return type of get_fitness Function should be whether Integer or Float, Detected type "' +
+                        type(result).__name__ +
+                        '", wrap the return expression with int() or float() to force the right type.'
+                    )
+
+        if hasattr(test_user_code_loader, 'calc_crossover'):
+            test_parents = [
+                [
+                    Individual(genes_num=g_genes_num).genes for _ in range(2)
+                ] for _ in range(2)
+            ]
+            try:
+                to_terminal('info', 'INFO',
+                            'Testing calc_crossover Function...')
+                offsprings = test_user_code_loader.calc_crossover(
+                    test_parents, g_co_rate, g_genes_num)
+            except TypeError as typeError:
+                to_terminal(
+                    'error',
+                    'TypeError',
+                    *typeError.args,
+                )
+            except Exception as ex:
+                to_terminal('error', ex.__getattribute__('__name__') if hasattr(
+                    ex, '__name__') else 'Error', ex.args)
+            else:
+                if offsprings is None:
+                    to_terminal(
+                        'warning',
+                        'WARNING',
+                        'Function calc_crossover returns None, so it is ignored.'
+                    )
+                elif type(offsprings) is list:
+                    to_terminal(
+                        'info',
+                        'INFO',
+                        'Function calc_crossover should work fine.'
+                    )
+                else:
+                    to_terminal(
+                        'warning',
+                        'WARNING',
+                        'Function calc_crossover return type should be list, it is going to be used but maybe you need to check your implementation.'
+                    )
+
+        if hasattr(test_user_code_loader, 'calc_mutation'):
+            test_offsprings = [
+                [
+                    Individual(genes_num=g_genes_num).genes for _ in range(2)
+                ] for _ in range(2)
+            ]
+            try:
+                to_terminal('info', 'INFO',
+                            'Testing calc_mutation Function...')
+                offsprings = test_user_code_loader.calc_mutation(
+                    test_offsprings, g_mut_rate, g_genes_num)
+            except TypeError as typeError:
+                to_terminal(
+                    'error',
+                    'TypeError',
+                    *typeError.args,
+                )
+            except Exception as ex:
+                to_terminal('error', ex.__getattribute__('__name__') if hasattr(
+                    ex, '__name__') else 'Error', ex.args)
+            else:
+                if offsprings is None:
+                    to_terminal(
+                        'warning',
+                        'WARNING',
+                        'Function calc_mutation returns None, so it is ignored.'
+                    )
+                elif type(offsprings) is list:
+                    to_terminal(
+                        'info',
+                        'INFO',
+                        'Function calc_mutation should work fine.'
+                    )
+                else:
+                    to_terminal(
+                        'warning',
+                        'WARNING',
+                        'Function calc_mutation return type should be list, it is going to be used but maybe you need to check your implementation.'
+                    )
+
+    # these are the ones used by GA if provided correctly, for more, see the 2 above, they are used for testing, and if
+    # they did not generate any error, that means they can be supplied as these ones below
+    if not isinstance(command.get('genes_data'), type(None)):
+        g_genes_data = safe_json_loads(command.get('genes_data'))
+    if not isinstance(command.get('user_code_path'), type(None)):
+        g_user_code_loader = UserCodeLoader(command.get('user_code_path'))
 
 
 def init_ga():
@@ -621,9 +884,12 @@ def init_ga():
     """
     global ga_thread
     ga_thread = GAThread()
-    # initialize solution
-    global solution
-    solution = Individual(genes_num=g_genes_num)
+
+
+# possibility to restart pyshell fro main process, this is to detect that pyshell process is ready
+to_json({
+    "loaded": True
+})
 
 
 # possible to add condition here in near future
@@ -657,8 +923,19 @@ while True:
     else:
         # noinspection PyBroadException
         try:
-            load = loads(cmd)
+            loaded = loads(cmd)
         except Exception:
             pass
         else:
-            update_parameters(load)
+            if isinstance(loaded, dict):
+                # noinspection PyBroadException
+                try:
+                    update_parameters(loaded)
+                except Exception:
+                    # unhandled exception
+                    pass
+            else:
+                to_json({
+                    "error": "command given is invalid",
+                    "command": cmd
+                })

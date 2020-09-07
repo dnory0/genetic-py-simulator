@@ -25,10 +25,16 @@ For more, visit: ${homepage}.
 else if (process.argv.some(arg => ['--version', '-v'].includes(arg))) {
     const { name, productName, version, dependencies, devDependencies } = require('../package.json');
     console.log(`${name} (${productName}): ${version}`);
-    for (let dependency in dependencies)
+    for (let dependency in dependencies) {
+        if (!dependencies.hasOwnProperty(dependency))
+            continue;
         console.log(`${dependency}: ${dependencies[dependency].replace('^', '')}`);
-    for (let devDependency in devDependencies)
+    }
+    for (let devDependency in devDependencies) {
+        if (!devDependencies.hasOwnProperty(devDependency))
+            continue;
         console.log(`${devDependency}: ${devDependencies[devDependency].replace('^', '')}`);
+    }
     process.exit();
 }
 const electron_1 = require("electron");
@@ -68,7 +74,7 @@ const createWindow = (filePath, { minWidth, minHeight, width, height, resizable,
             webviewTag,
         },
     });
-    targetWindow.loadFile(filePath);
+    targetWindow.loadFile(filePath).then();
     targetWindow.once('closed', () => {
         targetWindow = null;
     });
@@ -152,7 +158,7 @@ electron_1.app.once('ready', () => {
                 else if (gaChannel == 'browse') {
                     browse(gaWindow, {
                         title: 'Open GA Configuration file',
-                        defaultPath: electron_1.app.getPath('desktop'),
+                        defaultPath: path_1.join(electron_1.app.getAppPath(), '..', 'build', 'examples'),
                         filters: [
                             other,
                             {
@@ -165,6 +171,29 @@ electron_1.app.once('ready', () => {
                         gaWindow.webContents.send('browsed-path', { canceled: true });
                         if (reason)
                             throw reason;
+                    });
+                }
+                else if (gaChannel == 'download-template') {
+                    electron_1.dialog
+                        .showSaveDialog(gaWindow, {
+                        title: 'Save Python Template of Empty Fitness Function',
+                        defaultPath: electron_1.app.getPath('desktop'),
+                        filters: [
+                            other,
+                            {
+                                name: 'All Files',
+                                extensions: ['*'],
+                            },
+                        ],
+                        properties: ['createDirectory', 'showOverwriteConfirmation', 'treatPackageAsDirectory'],
+                    })
+                        .then(result => {
+                        if (!result.filePath)
+                            return;
+                        fs_1.copyFile(path_1.join(electron_1.app.getAppPath(), '..', 'build', 'python', 'ff.py'), result.filePath, err => {
+                            if (err)
+                                console.error(err);
+                        });
                     });
                 }
             });
@@ -184,7 +213,7 @@ electron_1.app.once('ready', () => {
         }
         if (settings['main']['maximized'])
             mainWindow.maximize();
-        mainWindow.setFullScreen(settings['main']['fscreen'] ? true : false);
+        mainWindow.setFullScreen(!!settings['main']['fscreen']);
         mainWindow.show();
     });
     mainWindow.on('close', () => {

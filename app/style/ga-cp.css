@@ -375,7 +375,7 @@ input[type=range]:not(:disabled):hover::-webkit-slider-runnable-track {
 #main .configuration .browse-container .show-output-btn {
   width: 96px;
 }
-#main .configuration .browse-container .get-template-btn {
+#main .configuration .browse-container #get-template-btn {
   width: 96px;
 }
 #main .configuration .border {
@@ -398,6 +398,52 @@ input[type=range]:not(:disabled):hover::-webkit-slider-runnable-track {
   max-height: 350px;
   overflow: auto;
   max-width: calc(100vw - 397px - 16px);
+}
+#main .configuration .params-fitness .genes-tree .json-container * {
+  user-select: text;
+}
+#main .configuration .params-fitness .terminal-frame {
+  border-radius: 3px;
+  background: #1a1a1a;
+  padding: 10px;
+}
+#main .configuration .params-fitness .terminal-frame .clear-terminal {
+  direction: rtl;
+  margin-bottom: 3px;
+}
+#main .configuration .params-fitness .terminal-frame .clear-terminal > button {
+  background-color: #292929;
+  border: 1px #595959 solid;
+  border-radius: 3px;
+  color: #f1f1f1;
+  width: 54px;
+  height: 23px;
+}
+#main .configuration .params-fitness .terminal-frame .clear-terminal > button:hover {
+  background-color: #4a4a4a;
+}
+#main .configuration .params-fitness .terminal-frame .terminal {
+  font-family: monospace;
+  font-size: 13px;
+  color: #dddddd;
+}
+#main .configuration .params-fitness .terminal-frame .terminal > div {
+  user-select: text;
+}
+#main .configuration .params-fitness .terminal-frame .terminal > div.okay {
+  color: #22da26;
+}
+#main .configuration .params-fitness .terminal-frame .terminal > div.info {
+  color: #5397ff;
+}
+#main .configuration .params-fitness .terminal-frame .terminal > div.error {
+  color: #ff5353;
+}
+#main .configuration .params-fitness .terminal-frame .terminal > div.warning {
+  color: #ffe353;
+}
+#main .configuration .params-fitness .terminal-frame .terminal:empty::before {
+  content: "<empty>";
 }
 #main .bottom {
   display: flex;

@@ -1,5 +1,5 @@
 /**
- * add the ability to autosave onto the given settings every time the input changes value.
+ * add the ability to auto save onto the given settings every time the input changes value.
  *
  * @param settings inputs settings object
  * @param targetedWindow targeted window: ```main``` | ```ga-cp```
@@ -7,10 +7,10 @@
  * @param toggleMutTypeDisable <ga-cp only> disable mutation type incompatible labels when number of 1s input is checked
  */
 function saveSettings(
-    settings: object,
-    targetedWindow: 'main' | 'ga-cp',
-    toggleCOInputDisable: (input: HTMLInputElement) => void,
-    toggleMutTypeDisable?: (input: HTMLInputElement, settings: object) => void,
+  settings: object,
+  targetedWindow: 'main' | 'ga-cp',
+  toggleCOInputDisable: (input: HTMLInputElement) => void,
+  toggleMutTypeDisable?: (input: HTMLInputElement, settings: object) => void
 ) {
   let cbEventListener = (ev: Event) => {
     let input = <HTMLInputElement>ev.target;
@@ -47,7 +47,7 @@ function saveSettings(
       console.log(input);
     }
 
-    if (input.name == 'co_type') toggleCOInputDisable(input)
+    if (input.name == 'co_type') toggleCOInputDisable(input);
   };
 
   Array.from(document.getElementsByTagName('input')).forEach(input => {

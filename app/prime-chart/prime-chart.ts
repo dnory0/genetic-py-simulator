@@ -167,7 +167,7 @@ let primeChart: Chart = window['createChart']('prime-chart', {
     },
     // to avoid the action buttons overlapping the tooltip
     positioner(labelWidth, labelHeight, point: Point | TooltipPositionerPointObject) {
-      point = <TooltipPositionerPointObject> point;
+      point = <TooltipPositionerPointObject>point;
       var x =
         point.plotX +
         primeChart.chartWidth -
@@ -207,11 +207,6 @@ let primeChart: Chart = window['createChart']('prime-chart', {
 } as Options);
 delete window['createChart'];
 
-/**
- * an array of for every generation fittest genes
- */
-// window['fittestHistory'] = [];
-
 window['ready'](treatResponse);
 
 ipcRenderer.on('live-rendering', (_ev, newLR: boolean) => (liveRendering.isLive = newLR));
@@ -220,13 +215,6 @@ ipcRenderer.on('replay', () => (liveRendering.replay = true));
 
 ipcRenderer.on('export', (_ev, actionType: string) => {
   switch (actionType) {
-    case 'png':
-      alert('disabled for now because of bugs');
-
-      // primeChart.exportChartLocal({
-      //   type: 'image/png'
-      // });
-      break;
     case 'jpeg':
       primeChart.exportChartLocal({
         type: 'image/jpeg',
@@ -246,70 +234,3 @@ ipcRenderer.on('zoom-out', () => {
   primeChart.redraw(true);
   window['zoomed'] = false;
 });
-// for cornered tooltip
-// var series = this.series.getName();
-// return `
-//     <div style="display: flex;">
-//       <svg width="16" height="14" xmlns="http://www.w3.org/2000/svg">
-//         <g class="highcharts-legend-item highcharts-line-series highcharts-color-0 highcharts-series-0" data-z-index="1" transform="translate(0, -4)">
-//       ${
-//         series == 'CGA'
-//           ? `
-//         <path fill="none" class="highcharts-graph" stroke="#7cb5ec" stroke-width="1.5" d="M 0 11 L 16 11"></path>
-//         <path fill="#7cb5ec" d="M 8 13 A 2 2 0 1 1 8.001999999666667 12.999999000000084 Z" class="highcharts-point" opacity="1"></path>
-//         `
-//           : series == 'Deviation'
-//           ? `
-//           <rect x="2" y="4" width="12" height="12" fill="#434348" rx="6" ry="6" class="highcharts-point" data-z-index="3"></rect>
-//           `
-//           : ''
-//       }
-//         </g>
-//       </svg>
-//       <span style="padding-left: 5px;">
-//         Generation: <b>${
-//           !`${this.x}`.match(/\.5$/)
-//             ? this.x
-//             : `${this.x - 0.5} - ${this.x + 0.5}`
-//         }</b>
-//         <span>,
-//         ${!`${this.x}`.match(/\.5$/) ? 'Fitness' : 'Deviation'}:&nbsp;
-//         </span>
-//         <b>${
-//           !`${this.x}`.match(/\.5$/)
-//             ? this.y
-//             : Math.abs(this.point.high - this.point.low)
-//         }</b>
-//       </span>
-//     </div>
-//     `;
-// },
-// // to avoid the action buttons overlapping the tooltip
-// positioner(
-// labelWidth: number,
-// labelHeight: number,
-// point: TooltipPositionerPointObject
-// ) {
-// // var x =
-// //   point.plotX + labelWidth + 80 < (<Tooltip>this).chart.plotWidth
-// //     ? point.plotX + 28
-// //     : point.plotX - (labelWidth - 48);
-// // var y = point.plotY + (point.plotY > 30 ? 4 : labelHeight + 25);
-// // var x =
-// //   point.plotX + labelWidth + 80 < (<Tooltip>this).chart.plotWidth
-// //     ? point.plotX + 38
-// //     : point.plotX - (labelWidth - 38);
-// // var y = point.plotY + (point.plotY > 30 ? 4 : labelHeight + 25);
-// // return { x, y };
-// return {
-//   x: 0,
-//   y: this.chart.chartHeight - this.label.height + 6
-// };
-// },
-// // shadow: false,
-// // outside: false,
-// // hideDelay: 250
-// borderWidth: 0,
-// backgroundColor: 'transparent',
-// shadow: false,
-// hideDelay: 250

@@ -13,37 +13,43 @@ const { getGlobal } = electron_1.remote;
 window['ipcRenderer'] = electron_1.ipcRenderer;
 window['createChart'] = require(path_1.join(__dirname, '..', 'modules', 'create-chart'));
 window['toggleChartHover'] = (chart, enable) => {
-    chart.update({
-        tooltip: {
-            enabled: enable,
-        },
-        xAxis: {
-            crosshair: enable,
-        },
-        legend: {
-            itemStyle: {
-                pointerEvents: enable ? 'all' : 'none',
+    chart.update(chart.container.parentElement.id == 'prime-chart'
+        ? {
+            tooltip: {
+                enabled: enable,
             },
-            itemCheckboxStyle: {
-                pointerEvents: enable ? 'all' : 'none',
+            xAxis: {
+                crosshair: enable,
             },
-        },
-        plotOptions: {
-            series: {
-                marker: {
-                    enabled: enable,
-                    radius: enable ? 1.5 : null,
+            legend: {
+                itemStyle: {
+                    pointerEvents: enable ? 'all' : 'none',
                 },
-                states: {
-                    hover: {
-                        halo: {
-                            opacity: enable ? 0.5 : 0,
+                itemCheckboxStyle: {
+                    pointerEvents: enable ? 'all' : 'none',
+                },
+            },
+            plotOptions: {
+                series: {
+                    marker: {
+                        enabled: enable,
+                        radius: enable ? 1.5 : null,
+                    },
+                    states: {
+                        hover: {
+                            halo: {
+                                opacity: enable ? 0.5 : 0,
+                            },
                         },
                     },
                 },
             },
-        },
-    }, true, false, false);
+        }
+        : {
+            tooltip: {
+                enabled: enable,
+            },
+        }, true, false, false);
 };
 window['clearChart'] = (chart, categories = false) => {
     if (categories)

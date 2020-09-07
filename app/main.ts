@@ -14,10 +14,15 @@ For more, visit: ${homepage}.
 } else if (process.argv.some(arg => ['--version', '-v'].includes(arg))) {
   const { name, productName, version, dependencies, devDependencies } = require('../package.json');
   console.log(`${name} (${productName}): ${version}`);
-  for (let dependency in <object>dependencies)
+  for (let dependency in <object>dependencies) {
+    if (!dependencies.hasOwnProperty(dependency)) continue;
     console.log(`${dependency}: ${(<string>dependencies[dependency]).replace('^', '')}`);
-  for (let devDependency in <object>devDependencies)
+  }
+
+  for (let devDependency in <object>devDependencies) {
+    if (!devDependencies.hasOwnProperty(devDependency)) continue;
     console.log(`${devDependency}: ${(<string>devDependencies[devDependency]).replace('^', '')}`);
+  }
 
   process.exit();
 }
@@ -33,7 +38,7 @@ import {
   FileFilter,
 } from 'electron';
 import { join } from 'path';
-import { writeFileSync } from 'fs';
+import { writeFileSync, copyFile } from 'fs';
 import { ChildProcess } from 'child_process';
 
 /**
@@ -119,7 +124,7 @@ const createWindow = (
     },
   });
 
-  targetWindow.loadFile(filePath);
+  targetWindow.loadFile(filePath).then();
 
   targetWindow.once('closed', () => {
     /**
@@ -232,8 +237,7 @@ app.once('ready', () => {
             gaWindow,
             {
               title: 'Open GA Configuration file',
-              // TODO: read from runSettings
-              defaultPath: app.getPath('desktop'),
+              defaultPath: join(app.getAppPath(), '..', 'build', 'examples'),
               filters: [
                 <FileFilter>other,
                 {
@@ -249,6 +253,26 @@ app.once('ready', () => {
               if (reason) throw reason;
             }
           );
+        } else if (gaChannel == 'download-template') {
+          dialog
+            .showSaveDialog(gaWindow, {
+              title: 'Save Python Template of Empty Fitness Function',
+              defaultPath: app.getPath('desktop'),
+              filters: [
+                <FileFilter>other,
+                {
+                  name: 'All Files',
+                  extensions: ['*'],
+                },
+              ],
+              properties: ['createDirectory', 'showOverwriteConfirmation', 'treatPackageAsDirectory'],
+            })
+            .then(result => {
+              if (!result.filePath) return; // user cancelled the browse operation
+              copyFile(join(app.getAppPath(), '..', 'build', 'python', 'ff.py'), result.filePath, err => {
+                if (err) console.error(err);
+              });
+            });
         }
       });
       gaWindow.on('close', ev => {
@@ -270,7 +294,7 @@ app.once('ready', () => {
 
     if (settings['main']['maximized']) mainWindow.maximize();
 
-    mainWindow.setFullScreen(settings['main']['fscreen'] ? true : false);
+    mainWindow.setFullScreen(!!settings['main']['fscreen']);
 
     mainWindow.show();
   });

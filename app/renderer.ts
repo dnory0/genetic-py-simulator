@@ -12,8 +12,10 @@ delete window['ipcRenderer'];
  */
 let webFrame: WebFrame = window['webFrame'];
 delete window['webFrame'];
-
-let { toggleCOInputDisable } = window['specialParamsCases']
+/**
+ * special cases where a param need to be forced disabled or similar
+ */
+let { toggleCOInputDisable } = window['specialParamsCases'];
 
 /***************************** Views Declaration *****************************
  *****************************************************************************/
@@ -81,9 +83,7 @@ let gaParams = <HTMLInputElement[]>(
       paramValue => paramValue.firstElementChild.tagName.toLowerCase() == 'input' || paramValue.classList.contains('double-sync')
     )
     .map(paramValue =>
-      paramValue.classList.contains('double-sync')
-        ? paramValue.querySelector('input.double-sync:not(:disabled)')
-        : paramValue.firstElementChild
+      paramValue.classList.contains('double-sync') ? paramValue.querySelector('.main-double-sync') : paramValue.firstElementChild
     )
 );
 /**
@@ -109,7 +109,7 @@ let isGACPOpen = false;
 
 /**
  * toggles ```disable-on-run```, if activate is true it activates
- * inputs with their random buttons, else it disactivates them.
+ * inputs with their random buttons, else it deactivates them.
  *
  * @param activate default is true
  */
@@ -117,9 +117,11 @@ let toggleDisableOnRun = (activate = true) => {
   gaParams.forEach(gaParam => {
     if (!gaParam.classList.contains('disable-on-run')) return;
     settings['renderer']['input'][gaParam.id]['disable'] = !activate;
+    gaParam.parentElement.parentElement.title = activate ? '' : 'Disabled when GA is Running';
+    gaParam.disabled = (gaParam.classList.contains('forced-disable') && gaParam.disabled) || activate;
+    (<HTMLButtonElement>gaParam.parentElement.nextElementSibling.firstElementChild).disabled = activate;
     gaParam.disabled = !activate;
     (<HTMLButtonElement>gaParam.parentElement.nextElementSibling.firstElementChild).disabled = !activate;
-    gaParam.parentElement.parentElement.title = activate ? '' : 'Disabled when GA is Running';
   });
 
   settings['renderer']['input'][gaTypes[0].name.replace('_', '-')]['disable'] = !activate;
@@ -135,7 +137,7 @@ let toggleDisableOnRun = (activate = true) => {
 };
 
 /**
- * figure out what response stands for and act uppon it
+ * figure out what response stands for and act upon it
  * @param response response of pyshell
  */
 const treatResponse = (response: object) => {
@@ -154,6 +156,13 @@ const treatResponse = (response: object) => {
     isRunning = false;
     blinkPlayBtn();
     switchPlayBtn();
+  }
+  if (response['terminal']) {
+    console.log(
+      `${['', null, undefined, []].includes(response['msg-type']) ? '' : response['msg-type'] + ': '}${
+        response['message'] ? response['message'] : '&lt;message with no content&gt;'
+      }`
+    );
   }
 };
 
@@ -200,7 +209,7 @@ const blinkPlayBtn = () => {
 };
 
 /**
- * adjust prime & side webviws to body's zoom
+ * adjust prime & side webviews to body's zoom
  */
 let zoomViews = () => {};
 
@@ -251,8 +260,11 @@ stepFBtn.onclick = () => ctrlClicked('step_f', false);
 // chart actions functionality
 (() => {
   function toggleFullscreen(fscreenBtn: HTMLButtonElement) {
-    if (document.fullscreenElement) document.exitFullscreen().then();
-    else fscreenBtn.parentElement.parentElement.requestFullscreen().then();
+    if (document.fullscreenElement) {
+      document.exitFullscreen().then();
+    } else fscreenBtn.parentElement.parentElement.requestFullscreen().then();
+    fscreenBtn.firstElementChild.classList.toggle('hide', !document.fullscreenElement);
+    fscreenBtn.lastElementChild.classList.toggle('hide', !!document.fullscreenElement);
   }
   // full screen
   Array.from(document.getElementsByClassName('fscreen-btn')).forEach((fscreenBtn: HTMLButtonElement) => {
@@ -267,18 +279,15 @@ stepFBtn.onclick = () => ctrlClicked('step_f', false);
   };
 
   // export to file functionality
-  Array.from(document.getElementsByClassName('drop-btn')).forEach((exportBtn: HTMLButtonElement) => {
-    let dropdownContent = <HTMLDivElement>exportBtn.nextElementSibling;
-    let dropdownPointer = <HTMLDivElement>dropdownContent.nextElementSibling;
-    let exportTypes = Array.from(dropdownContent.children);
+  Array.from(document.getElementsByClassName('drop-btn')).forEach((dropBtn: HTMLButtonElement) => {
+    let dropdownContent = <HTMLDivElement>dropBtn.nextElementSibling;
+    let dropdownChildren = Array.from(dropdownContent.children);
     let eventListener = () => {
-      dropdownPointer.classList.toggle('hide', true);
       dropdownContent.classList.toggle('hide', true);
       clean(eventListener);
     };
 
-    exportBtn.addEventListener('click', () => {
-      dropdownPointer.classList.toggle('hide');
+    dropBtn.addEventListener('click', () => {
       dropdownContent.classList.toggle('hide');
       Array.from(document.getElementsByClassName('resize-cover')).forEach((resizeCover: HTMLDivElement) => {
         resizeCover.classList.remove('hide');
@@ -292,33 +301,29 @@ stepFBtn.onclick = () => ctrlClicked('step_f', false);
       }
     });
 
-    exportTypes.forEach((exportType: HTMLButtonElement, index) => {
-      if (index == 0) {
-        let mouseoverEventListener = () => {
-          exportType.style.backgroundColor = '#d9d9d9';
-
-          dropdownPointer.style.backgroundColor = '#d9d9d9';
-        };
-        let mouseleaveEventListener = () => {
-          exportType.style.backgroundColor = 'white';
-          dropdownPointer.style.backgroundColor = 'white';
-        };
-        exportType.addEventListener('mouseover', mouseoverEventListener);
-        exportType.addEventListener('mouseleave', mouseleaveEventListener);
-        dropdownPointer.addEventListener('mouseover', mouseoverEventListener);
-        dropdownPointer.addEventListener('mouseleave', mouseleaveEventListener);
-
-        dropdownPointer.addEventListener('click', () => exportType.click());
-      }
-      exportType.addEventListener('click', () => {
+    dropdownChildren.forEach((dropdownChild: HTMLButtonElement) => {
+      dropdownChild.addEventListener('click', () => {
         clean(eventListener);
-        if (exportBtn.classList.contains('prime')) prime.send('export', exportType.getAttribute('exporttype')).then();
-        else side.send('export', exportType.getAttribute('exporttype')).then();
-        exportBtn.click();
+        let webview = dropBtn.classList.contains('prime') ? prime : side;
+        if (dropBtn.classList.contains('export-img')) {
+          webview.send('export', dropdownChild.getAttribute('exporttype')).then();
+        } else if (dropBtn.classList.contains('download-data')) {
+          webview.send('download', dropdownChild.getAttribute('downloadtype')).then();
+        }
+        dropBtn.click();
       });
     });
   });
 
+  // zoom out functionality
+  (<HTMLButtonElement[]>Array.from(document.getElementsByClassName('zoom-out-btn'))).forEach(zoomOutBtn => {
+    zoomOutBtn.addEventListener('click', () => {
+      if (zoomOutBtn.classList.contains('prime')) prime.send('zoom-out').then();
+      else side.send('zoom-out').then();
+    });
+  });
+
+  // download data functionality
   (<HTMLButtonElement[]>Array.from(document.getElementsByClassName('zoom-out-btn'))).forEach(zoomOutBtn => {
     zoomOutBtn.addEventListener('click', () => {
       if (zoomOutBtn.classList.contains('prime')) prime.send('zoom-out').then();
@@ -344,12 +349,12 @@ stepFBtn.onclick = () => ctrlClicked('step_f', false);
   hidePane.onclick = togglePane;
   showPane.onclick = togglePane;
 })();
-/******** Declared Glabally to be when default settings are recieved ********/
+/******** Declared Globally to be when default settings are received ********/
 
 /**
- * sends pyshel the input value & the accompanying checkbox value, also changes
+ * sends pyshell the input value & the accompanying checkbox value, also changes
  * number input background to white if needed, note that this method should only
- * be called when number input has valide value, else it might stop the GA.
+ * be called when number input has valid value, else it might stop the GA.
  */
 const sendParameter = (key: string, value: any) => {
   window['sendSig'](
@@ -369,12 +374,15 @@ let toggleRedDot = () => {
     if (
       inputsSettings.hasOwnProperty(inputId) &&
       inputId.match(/.*-path/) &&
-      inputsSettings[inputId]['data'] == undefined
+      !inputsSettings[inputId]['value'] &&
+      (inputId != 'genes-data-path' || !inputId['data'])
     ) {
+      // red dot appears
       redDot.classList.toggle('hide', false);
       return;
     }
   }
+  // red dot disappear
   redDot.classList.toggle('hide', true);
 };
 
@@ -408,6 +416,16 @@ document.addEventListener('DOMContentLoaded', function loaded() {
        */
       ready = () => {
         window['affectSettings'](settings['renderer']['input'], 'main', toggleCOInputDisable);
+        fetch(settings['renderer']['input']['genes-data-path']['value'])
+          .then(res => res.text())
+          .then(data => {
+            sendParameter('genes_data', data);
+            sendParameter('user_code_path', settings['renderer']['input']['fitness-function-path']['value']);
+          })
+          .catch(() => {
+            sendParameter('user_code_path', settings['renderer']['input']['fitness-function-path']['value']);
+          });
+
         // checks for missing data due to not being loaded by user
         toggleRedDot();
         // send startup settings to pyshell
@@ -456,7 +474,7 @@ document.addEventListener('DOMContentLoaded', function loaded() {
     };
 
     /**
-     * whichever did finsh loading last is going to unlock controls for user,
+     * whichever did finish loading last is going to unlock controls for user,
      */
     prime.addEventListener('dom-ready', () => ready());
     side.addEventListener('dom-ready', () => ready());
@@ -485,7 +503,7 @@ document.addEventListener('DOMContentLoaded', function loaded() {
     zoomViews();
   });
 
-  // add resizabality parts of the UI
+  // add resizability parts of the UI
   window['border']();
   delete window['border'];
 
@@ -501,8 +519,22 @@ document.addEventListener('DOMContentLoaded', function loaded() {
         main.classList.toggle('blur', false);
         if (!updatedSettings) return;
         settings['renderer']['input'] = updatedSettings['renderer']['input'];
+        // this is because the input object changes everytime you make changes on GACP
         saveSettings(settings['renderer']['input'], 'main', toggleCOInputDisable);
         affectSettings(settings['renderer']['input'], 'main', toggleCOInputDisable);
+
+        if (!settings['renderer']['input']['pop-size']['disable']) {
+          fetch(settings['renderer']['input']['genes-data-path']['value'])
+            .then(res => res.text())
+            .then(data => {
+              sendParameter('genes_data', data);
+              sendParameter('user_code_path', settings['renderer']['input']['fitness-function-path']['value']);
+            })
+            .catch(() => {
+              sendParameter('user_code_path', settings['renderer']['input']['fitness-function-path']['value']);
+            });
+        }
+
         // checks for missing data due to not being loaded by user
         toggleRedDot();
         // send the new attached settings to pyshell

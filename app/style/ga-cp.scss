@@ -64,7 +64,7 @@
         width: 96px;
       }
 
-      .get-template-btn {
+      #get-template-btn {
         width: 96px;
       }
     }
@@ -90,6 +90,64 @@
           max-height: 350px;
           overflow: auto;
           max-width: calc(100vw - 397px - 16px);
+
+          * {
+            user-select: text;
+          }
+        }
+      }
+
+      .terminal-frame {
+        border-radius: 3px;
+        background: #1a1a1a;
+        padding: 10px;
+
+        .clear-terminal {
+          direction: rtl;
+          margin-bottom: 3px;
+
+          > button {
+            background-color: #292929;
+            border: 1px #595959 solid;
+            border-radius: 3px;
+            color: #f1f1f1;
+            width: 54px;
+            height: 23px;
+
+            &:hover {
+              background-color: #4a4a4a;
+            }
+          }
+        }
+
+        .terminal {
+          font-family: monospace;
+          font-size: 13px;
+          color: #dddddd;
+
+          > div {
+            user-select: text;
+
+            &.okay {
+              color: #22da26;
+            }
+
+            &.info {
+              color: #5397ff;
+            }
+
+            &.error {
+              color: #ff5353;
+            }
+
+            &.warning {
+              color: #ffe353;
+            }
+          }
+
+          &:empty::before {
+            content: '<empty>';
+          }
         }
       }
     }

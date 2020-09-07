@@ -102,8 +102,7 @@
                     K-Way Tournament Selection
                   </label>
                 </div>
-                <div class="other-settings">
-                </div>
+                <div class="other-settings"></div>
               </div>
             </div>
           </div>
@@ -364,7 +363,7 @@
                     id="number-of-1s"
                     name="number_of_1s"
                     pattern="^[-+]?\d*\.?\d*$"
-                    class="textfieldable is-disable-able double-sync"
+                    class="disable-on-run textfieldable is-disable-able double-sync main-double-sync"
                     synctype="number-of-1sn0s"
                     required
                   />
@@ -393,7 +392,6 @@
               <button id="browse-genes-data-btn" class="browse-btn genes-data" title="Browse...">Browse</button>
             </div>
             <div class="other-browse-btns">
-              <button class="show-output-btn genes-data" title="Show Output">Show Output</button>
               <button class="load-data-btn genes-data" title="Load Data">Load</button>
             </div>
           </div>
@@ -402,13 +400,18 @@
             <p class="title pad small">Fitness Function</p>
             <div class="browse">
               <input type="text" id="fitness-function-path" class="load-path fitness-function" />
-              <button id="browse-fitness-function-btn" class="browse-btn fitness-function" title="Browse...">Browse</button>
+              <button id="browse-fitness-function-btn" class="browse-btn fitness-function" title="Browse...">
+                Browse
+              </button>
             </div>
             <div class="other-browse-btns">
-              <button class="get-template-btn fitness-function" title="Get Default Template">Get Template</button>
-              <button class="show-output-btn fitness-function" title="Show Output">Show Output</button>
-              <button class="load-data-btn fitness-function" title="Load Data">Load</button>
+              <button class="fitness-function" id="get-template-btn" title="Get Default Template">Get Template</button>
+              <button class="load-data-btn fitness-function" title="Load Code">Load</button>
             </div>
+          </div>
+          <div class="terminal-frame">
+            <div class="clear-terminal"><button id="clear-terminal-btn">Clear</button></div>
+            <div class="terminal"></div>
           </div>
         </div>
       </div>

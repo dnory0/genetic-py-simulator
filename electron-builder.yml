@@ -5,7 +5,9 @@ files:
   - app
 extraResources:
   - build/python/ga.py
+  - build/python/ff.py
   - build/settings.json
+  - build/examples
 extraFiles:
   - LICENSE
 
@@ -27,9 +29,9 @@ win:
 
 nsis:
   artifactName: ${productName}-Installer.${ext}
-  oneClick : false 
-  allowToChangeInstallationDirectory: true 
-  perMachine : true
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  perMachine: true
   runAfterFinish: false
   unicode: true
   createDesktopShortcut: true

@@ -22,25 +22,21 @@
             </label>
           </div>
           <div class="dropdown">
-            <button class="drop-btn prime" title="Export to a file">
+            <button class="drop-btn prime export-img" title="Export to a file">
               <img src="img/save.png" />
             </button>
             <div class="dropdown-content hide">
               <button title="Export JPEG/JPG" exporttype="jpeg">
                 JPEG/JPG
               </button>
-              <button title="Export PNG (chart without background)" exporttype="png">
-                PNG (without background)
-              </button>
               <button title="Export SVG" exporttype="svg">
                 SVG
               </button>
             </div>
-            <div class="dropdown-pointer hide" title="Export JPEG/JPG"></div>
           </div>
           <button title="Toggle Fullscreen" class="fscreen-btn">
             <img src="img/maximize.png" />
-            <img src="img/minimize.png" />
+            <img src="img/minimize.png" class="hide" />
           </button>
         </div>
         <webview
@@ -177,8 +173,7 @@
                       K-Way Tournament Selection
                     </label>
                   </div>
-                  <div class="other-settings">
-                  </div>
+                  <div class="other-settings"></div>
                 </div>
               </div>
             </div>
@@ -433,7 +428,7 @@
                       id="number-of-1s"
                       name="number_of_1s"
                       pattern="^[-+]?\d*\.?\d*$"
-                      class="textfieldable is-disable-able double-sync"
+                      class="disable-on-run textfieldable is-disable-able double-sync main-double-sync"
                       synctype="number-of-1sn0s"
                       required
                     />
@@ -474,30 +469,39 @@
         </div>
         <div class="side-container fullscreenable">
           <div class="chart-actions">
+            <div class="dropdown">
+              <button class="drop-btn side download-data" title="Download Data">
+                <img src="img/download.png" />
+              </button>
+              <div class="dropdown-content hide">
+                <button title="Download as key-value type data" downloadtype="key-value">
+                  Key-Value Type
+                </button>
+                <button title="Download as list type data" downloadtype="list">
+                  List Type
+                </button>
+              </div>
+            </div>
             <button title="Zoom out" class="zoom-out-btn side">
               <img src="img/zoom-out.png" />
             </button>
             <div class="dropdown">
-              <button class="drop-btn side" title="Export to a file">
+              <button class="drop-btn side export-img" title="Export to a file">
                 <img src="img/save.png" />
               </button>
               <div class="dropdown-content hide">
                 <button title="Export JPEG/JPG" exporttype="jpeg">
                   JPEG/JPG
                 </button>
-                <button title="Export PNG (chart without background)" exporttype="png">
-                  PNG (without background)
-                </button>
                 <button title="Export SVG" exporttype="svg">
                   SVG
                 </button>
               </div>
-              <div class="dropdown-pointer hide" title="Export JPEG/JPG"></div>
             </div>
 
             <button title="Toggle Fullscreen" class="fscreen-btn">
               <img src="img/maximize.png" />
-              <img src="img/minimize.png" />
+              <img src="img/minimize.png" class="hide" />
             </button>
           </div>
           <webview
