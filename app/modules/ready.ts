@@ -17,6 +17,11 @@ module.exports = (
       .forEach((data: object) => treatResponse(data));
   });
 
+  // open error listener, this is logged inside the devTool console, debug reasons only
+  pyshell.stderr.on('data', (response: Buffer) => {
+    console.error(response.toString());
+  });
+
   // returns webviews zoom factor resetter.
   return () => {
     prime.setZoomFactor(webFrame.getZoomFactor());

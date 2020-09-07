@@ -33,6 +33,10 @@ window['border'] = require(join(__dirname, '..', 'modules', 'border.js'));
  */
 window['params'] = require('../modules/params');
 /**
+ * special cases for param handling where instead of being duplicated around it was put in one file
+ */
+window['specialParamsCases'] = require('../modules/special-param-cases')
+/**
  * settings affecter
  */
 window['affectSettings'] = require('../modules/affect-settings');

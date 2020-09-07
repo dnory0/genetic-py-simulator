@@ -1,9 +1,1 @@
-{
-    "version": 3,
-    "mappings": "AAAA,AAAA,UAAU,CAAC;EACT,UAAU,EAAE,MAAM;EAClB,UAAU,EAAE,IAAI;EAOhB,WAAW;EAKX,YAAY;EAKZ,qBAAqB;CAItB;;AAvBD,AAIE,UAJQ,AAIP,mBAAmB,CAAC;EACnB,KAAK,EAAE,IAAI;EACX,MAAM,EAAE,IAAI;CACb;;AAPH,AAUE,UAVQ,AAUP,yBAAyB,CAAC;EACzB,UAAU,EAAE,OAAO;CACpB;;AAZH,AAeE,UAfQ,AAeP,yBAAyB,CAAC;EACzB,UAAU,EAAE,IAAI;CACjB;;AAjBH,AAoBE,UApBQ,AAoBP,yBAAyB,AAAA,MAAM,CAAC;EAC/B,UAAU,EAAE,IAAI;CACjB",
-    "sources": [
-        "scrollbar.scss"
-    ],
-    "names": [],
-    "file": "scrollbar.css"
-}
+{"version":3,"sourceRoot":"","sources":["scrollbar.scss"],"names":[],"mappings":"AAAA;EACE;EACA;AAOA;AAKA;AAKA;;AAfA;EACE;EACA;;AAIF;EACE;;AAIF;EACE;;AAIF;EACE","file":"scrollbar.css"}

@@ -16,7 +16,6 @@
             <p class="title pad">Parameters Configuration</p>
             <button id="random-all-btn" class="random-all-btn">R<span class="alt-trigger">a</span>ndom All</button>
           </div>
-
           <div class="complex-param">
             <div class="param">
               <div class="param-name">
@@ -76,6 +75,34 @@
                     </label>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+          <div class="multiline complex-param">
+            <div class="param">
+              <div class="param-name">
+                <p>Selection Type</p>
+              </div>
+              <div class="param-settings">
+                <div class="param-value type-value">
+                  <label>
+                    <input type="radio" name="selection_type" value="0" />
+                    Random Selection
+                  </label>
+                  <label>
+                    <input type="radio" name="selection_type" value="1" />
+                    Roulette Wheel Selection
+                  </label>
+                  <label>
+                    <input type="radio" name="selection_type" value="2" />
+                    Stochastic Universal Sampling Selection (SUS)
+                  </label>
+                  <label>
+                    <input type="radio" name="selection_type" value="3" />
+                    K-Way Tournament Selection
+                  </label>
+                </div>
+                <div class="other-settings"></div>
               </div>
             </div>
           </div>
@@ -276,7 +303,7 @@
               </div>
             </div>
           </div>
-          <div class="radio complex-param">
+          <div class="multiline complex-param">
             <div class="param">
               <div class="param-name">
                 <p>Update Population</p>
@@ -303,6 +330,57 @@
               </div>
             </div>
           </div>
+          <div class="multiline complex-param sync-param">
+            <input class="param-enabled" type="checkbox" name="number_of_1s_enabled" id="number-of-1s-enabled" />
+            <div class="param">
+              <div class="param-name">
+                <p>Control Number of 1s and 0s</p>
+              </div>
+              <div class="param-settings">
+                <div class="param-value double-sync">
+                  <div class="edge">0</div>
+                  <input
+                    type="text"
+                    inputmode="numeric"
+                    min="1"
+                    max="79"
+                    step="1"
+                    id="number-of-0s"
+                    name="number_of_0s"
+                    pattern="^[-+]?\d*\.?\d*$"
+                    class="textfieldable is-disable-able double-sync"
+                    synctype="number-of-1sn0s"
+                    disabled
+                    required
+                  />
+                  <div class="edge">1</div>
+                  <input
+                    type="text"
+                    inputmode="numeric"
+                    min="1"
+                    max="79"
+                    step="1"
+                    id="number-of-1s"
+                    name="number_of_1s"
+                    pattern="^[-+]?\d*\.?\d*$"
+                    class="disable-on-run textfieldable is-disable-able double-sync main-double-sync"
+                    synctype="number-of-1sn0s"
+                    required
+                  />
+                  <div class="edge">1</div>
+                </div>
+                <div class="other-settings">
+                  <button class="random-btn">Random</button>
+                  <div class="checkbox-wrapper" title="Pin to Main Window">
+                    <input type="checkbox" name="number_of_1s_pin" id="number-of-1s-pin" />
+                    <label for="number-of-1s-pin">
+                      <img src="../img/pin.png" />
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="border ver"></div>
         <div class="params-fitness scrollbar">
@@ -314,7 +392,6 @@
               <button id="browse-genes-data-btn" class="browse-btn genes-data" title="Browse...">Browse</button>
             </div>
             <div class="other-browse-btns">
-              <button class="show-output-btn genes-data" title="Show Output">Show Output</button>
               <button class="load-data-btn genes-data" title="Load Data">Load</button>
             </div>
           </div>
@@ -323,13 +400,18 @@
             <p class="title pad small">Fitness Function</p>
             <div class="browse">
               <input type="text" id="fitness-function-path" class="load-path fitness-function" />
-              <button id="browse-fitness-function-btn" class="browse-btn fitness-function" title="Browse...">Browse</button>
+              <button id="browse-fitness-function-btn" class="browse-btn fitness-function" title="Browse...">
+                Browse
+              </button>
             </div>
             <div class="other-browse-btns">
-              <button class="get-template-btn fitness-function" title="Get Default Template">Get Template</button>
-              <button class="show-output-btn fitness-function" title="Show Output">Show Output</button>
-              <button class="load-data-btn fitness-function" title="Load Data">Load</button>
+              <button class="fitness-function" id="get-template-btn" title="Get Default Template">Get Template</button>
+              <button class="load-data-btn fitness-function" title="Load Code">Load</button>
             </div>
+          </div>
+          <div class="terminal-frame">
+            <div class="clear-terminal"><button id="clear-terminal-btn">Clear</button></div>
+            <div class="terminal"></div>
           </div>
         </div>
       </div>

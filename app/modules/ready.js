@@ -8,6 +8,9 @@ module.exports = (pyshell, prime, side, treatResponse, webFrame) => {
             .map((data) => JSON.parse(data))
             .forEach((data) => treatResponse(data));
     });
+    pyshell.stderr.on('data', (response) => {
+        console.error(response.toString());
+    });
     return () => {
         prime.setZoomFactor(webFrame.getZoomFactor());
         side.setZoomFactor(webFrame.getZoomFactor());

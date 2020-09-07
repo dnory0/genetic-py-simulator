@@ -1,40 +1,28 @@
 .browse {
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
 }
-
-.browse > input[type='text'] {
-  -webkit-box-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
-  height: 20px;
+.browse > input[type=text] {
+  flex: 1;
   outline: none;
   padding: 1px 5px;
   border: thin #a2a2a2 solid;
   border-radius: 3px 0 0 3px;
   font-size: 14px;
 }
-
 .browse > button {
   font-weight: normal;
   outline: none;
-  -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
+  user-select: none;
   margin-left: -1px;
   border: thin #a2a2a2 solid;
   border-radius: 0;
 }
-
 .browse > button img {
   position: relative;
   top: 2px;
   width: 20px;
   height: 20px;
 }
-
 .browse > button:last-child {
   border-radius: 0 3px 3px 0;
 }
@@ -43,4 +31,5 @@
   margin: 10px 0;
   float: right;
 }
+
 /*# sourceMappingURL=browse.css.map */

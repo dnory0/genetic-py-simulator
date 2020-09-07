@@ -10,6 +10,7 @@ window['ready'] = require(path_1.join(__dirname, '..', 'modules', 'ready.js'));
 window['loaded'] = require(path_1.join(__dirname, '..', 'modules', 'loaded.js'));
 window['border'] = require(path_1.join(__dirname, '..', 'modules', 'border.js'));
 window['params'] = require('../modules/params');
+window['specialParamsCases'] = require('../modules/special-param-cases');
 window['affectSettings'] = require('../modules/affect-settings');
 window['saveSettings'] = require('../modules/save-settings');
 window['settings'] = getGlobal('settings');

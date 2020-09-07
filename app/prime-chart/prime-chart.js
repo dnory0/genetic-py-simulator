@@ -152,9 +152,6 @@ ipcRenderer.on('step-forward', () => (liveRendering.stepForward = true));
 ipcRenderer.on('replay', () => (liveRendering.replay = true));
 ipcRenderer.on('export', (_ev, actionType) => {
     switch (actionType) {
-        case 'png':
-            alert('disabled for now because of bugs');
-            break;
         case 'jpeg':
             primeChart.exportChartLocal({
                 type: 'image/jpeg',

@@ -5,59 +5,45 @@ button {
   background-color: white;
   border: thin solid #999999;
 }
-
 button:hover:not(:disabled), button.alt-pressed:not(:disabled) {
   background-color: #d9d9d9;
 }
-
 button:disabled {
   background-color: whitesmoke;
 }
 
-input[type='text']:not(.load-path).valid:focus,
+input[type=text]:not(.load-path).valid:focus,
 input.tab-triggered.valid:focus {
-  -webkit-box-shadow: 0 0 0 1px #6cdf00, 0 0 0 4px rgba(0, 255, 0, 0.3);
-          box-shadow: 0 0 0 1px #6cdf00, 0 0 0 4px rgba(0, 255, 0, 0.3);
+  box-shadow: 0 0 0 1px #6cdf00, 0 0 0 4px rgba(0, 255, 0, 0.3);
 }
-
-input[type='text']:not(.load-path).invalid, input[type='text']:not(.load-path).invalid:focus,
+input[type=text]:not(.load-path).invalid, input[type=text]:not(.load-path).invalid:focus,
 input.tab-triggered.invalid,
 input.tab-triggered.invalid:focus {
-  -webkit-box-shadow: 0 0 0 1px #df0000, 0 0 0 4px rgba(255, 0, 0, 0.3);
-          box-shadow: 0 0 0 1px #df0000, 0 0 0 4px rgba(255, 0, 0, 0.3);
+  box-shadow: 0 0 0 1px #df0000, 0 0 0 4px rgba(255, 0, 0, 0.3);
 }
-
-input[type='text']:not(.load-path):focus,
+input[type=text]:not(.load-path):focus,
 input.tab-triggered:focus {
-  -webkit-box-shadow: 0 0 0 1px #df9a00, 0 0 0 4px rgba(223, 165, 0, 0.3);
-          box-shadow: 0 0 0 1px #df9a00, 0 0 0 4px rgba(223, 165, 0, 0.3);
+  box-shadow: 0 0 0 1px #df9a00, 0 0 0 4px rgba(223, 165, 0, 0.3);
 }
 
-input[type='range'] {
+input[type=range] {
   width: 120px;
   -webkit-appearance: none;
-     -moz-appearance: none;
-          appearance: none;
 }
-
-input[type='range']:not(:disabled) {
+input[type=range]:not(:disabled) {
   cursor: pointer;
 }
-
-input[type='range']:disabled {
+input[type=range]:disabled {
   opacity: 0.6;
 }
-
-input[type='range']::-webkit-slider-runnable-track {
+input[type=range]::-webkit-slider-runnable-track {
   width: 100%;
   height: 5px;
   background: #555555;
   border-radius: 3px;
-  -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
-
-input[type='range']::-webkit-slider-thumb {
+input[type=range]::-webkit-slider-thumb {
   border: thin solid #000000;
   height: 14px;
   width: 14px;
@@ -65,15 +51,12 @@ input[type='range']::-webkit-slider-thumb {
   background: #272727;
   -webkit-appearance: none;
   margin-top: -5px;
-  -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
-
-input[type='range']:not(:disabled):hover::-webkit-slider-thumb {
+input[type=range]:not(:disabled):hover::-webkit-slider-thumb {
   background: #6b6b6b;
 }
-
-input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
+input[type=range]:not(:disabled):hover::-webkit-slider-runnable-track {
   background: #272727;
 }
 
@@ -82,8 +65,7 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
   height: 24px;
   position: relative;
 }
-
-.checkbox-wrapper input[type='checkbox'] {
+.checkbox-wrapper input[type=checkbox] {
   opacity: 0;
   height: 24px;
   width: 24px;
@@ -92,40 +74,30 @@ input[type='range']:not(:disabled):hover::-webkit-slider-runnable-track {
   left: 0;
   border-radius: 2px;
 }
-
-.checkbox-wrapper input[type='checkbox'] + label {
+.checkbox-wrapper input[type=checkbox] + label {
   height: 24px;
   width: 24px;
   padding: 3px;
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
+  box-sizing: border-box;
   position: absolute;
   left: 0;
   border-radius: 2px;
 }
-
-.checkbox-wrapper input[type='checkbox'] + label > img {
+.checkbox-wrapper input[type=checkbox] + label > img {
   opacity: 0.5;
   height: 18px;
 }
-
-.checkbox-wrapper input[type='checkbox'][id$='-pin'] + label > img {
-  -webkit-transition: -webkit-transform 0.2s ease;
-  transition: -webkit-transform 0.2s ease;
+.checkbox-wrapper input[type=checkbox][id$=-pin] + label > img {
   transition: transform 0.2s ease;
-  transition: transform 0.2s ease, -webkit-transform 0.2s ease;
 }
-
-.checkbox-wrapper input[type='checkbox']:not(:disabled) + label:hover {
+.checkbox-wrapper input[type=checkbox]:not(:disabled) + label:hover {
   background-color: #c4c4c4;
 }
-
-.checkbox-wrapper input[type='checkbox']:checked + label > img {
+.checkbox-wrapper input[type=checkbox]:checked + label > img {
   opacity: 1;
 }
-
-.checkbox-wrapper input[type='checkbox'][id$='-pin']:checked + label > img {
-  -webkit-transform: rotate(-45deg);
-          transform: rotate(-45deg);
+.checkbox-wrapper input[type=checkbox][id$=-pin]:checked + label > img {
+  transform: rotate(-45deg);
 }
+
 /*# sourceMappingURL=components.css.map */

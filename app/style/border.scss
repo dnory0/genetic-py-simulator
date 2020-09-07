@@ -1,4 +1,3 @@
-
 /* Borders used between 2 resizable DIVs */
 .border {
   position: relative;
@@ -13,17 +12,14 @@
     > div {
       border-top: thin solid #cebbbb;
     }
-    
   }
 
   &.ver {
-    
     &.resize {
       cursor: ew-resize;
       padding: 0 4px;
     }
-    
-    
+
     > div {
       height: 100%;
       border-left: thin solid #cebbbb;

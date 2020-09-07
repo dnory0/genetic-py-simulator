@@ -1,11 +1,36 @@
-function affectSettings(settings, targetedWindow) {
-    Array.from(document.getElementsByTagName('input')).forEach(input => {
+let switchTextfieldable = (textfieldable, forceTFInput) => {
+    if (textfieldable.classList.contains('double-sync')) {
+        if (!textfieldable.classList.contains('main-double-sync')) {
+            textfieldable.classList.toggle('hide', !forceTFInput.checked);
+            return;
+        }
+        textfieldable.previousElementSibling.classList.toggle('hide', !forceTFInput.checked);
+        textfieldable.nextElementSibling.classList.toggle('hide', forceTFInput.checked);
+    }
+    textfieldable.type = forceTFInput.checked ? 'text' : 'range';
+};
+function affectSettings(settings, targetedWindow, toggleCOInputDisable, toggleMutTypeDisable) {
+    Array.from(document.getElementsByTagName('input')).forEach((input, _, inputs) => {
         if (input.type == 'checkbox') {
             let type = input.id.match(/(?<=-)[^-]*$/)[0];
-            input.checked = settings[input.id.replace(`-${type}`, '')][type];
+            try {
+                input.checked = settings[input.id.replace(`-${type}`, '')][type];
+            }
+            catch (e) {
+                console.log(`This should be a new input, add it to settings.json`);
+                console.log(input);
+                return;
+            }
+            if (input.id == 'number-of-1s-enabled' && targetedWindow == 'ga-cp') {
+                toggleMutTypeDisable(input, settings);
+            }
             if (input.id == 'force-tf-enabled') {
-                Array.from(document.getElementsByClassName('textfieldable')).forEach((textfieldable) => {
-                    textfieldable.type = input.checked ? 'text' : 'range';
+                inputs
+                    .filter(textfieldable => textfieldable.classList.contains('textfieldable'))
+                    .forEach((textfieldable) => {
+                    if (targetedWindow == 'ga-cp')
+                        textfieldable['switchTextfieldable'] = () => switchTextfieldable(textfieldable, input);
+                    switchTextfieldable(textfieldable, input);
                 });
             }
             else if (targetedWindow == 'main') {
@@ -22,27 +47,39 @@ function affectSettings(settings, targetedWindow) {
             }
         }
         else if (input.type == 'radio') {
-            if (settings[input.name.replace('_', '-')]['value'] != input.value)
-                return;
+            try {
+                if (settings[input.name.replace('_', '-')]['value'] != input.value)
+                    return;
+            }
+            catch (e) {
+                console.log('input available but is not registered in settings.json or registered in wrong way');
+                console.log(input);
+            }
             input.checked = true;
-            if (input.name != 'co_type')
-                return;
-            let coRate = document.getElementById('co-rate');
-            coRate.disabled = input.value == '2';
-            coRate.classList.toggle('disabled', input.value == '2');
-            coRate.parentElement.parentElement.title = coRate.disabled ? 'Disabled if crossover type set to Uniform' : '';
-            coRate.parentElement.nextElementSibling.firstElementChild.disabled = coRate.disabled;
+            if (input.name == 'co_type')
+                toggleCOInputDisable(input);
         }
         else {
+            if (input.classList.contains('double-sync')) {
+                if (input.getAttribute('synctype') == 'number-of-1sn0s') {
+                    input.max = (parseInt(document.getElementById('genes-num').value) - 1).toString();
+                }
+            }
             try {
-                input.value = settings[input.id]['value'];
-                if (targetedWindow == 'main' && settings[input.id]['disable-on-run']) {
-                    input.classList.add('disable-on-run');
+                if (input.classList.contains('double-sync') && input.disabled) {
+                    if (input.getAttribute('synctype') == 'number-of-1sn0s') {
+                        input.value = (parseInt(input.max) + 1 - settings['number-of-1s']['value']).toString();
+                    }
+                }
+                else {
+                    input.value = settings[input.id]['value'];
                 }
             }
             catch (e) {
                 console.log(`This should be a new input, add it to settings.json`);
                 console.log(input);
+            }
+            if (input.classList.contains('load-path') && targetedWindow == 'main') {
             }
         }
     });

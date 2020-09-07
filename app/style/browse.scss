@@ -3,7 +3,6 @@
 
   > input[type='text'] {
     flex: 1;
-    height: 20px;
     outline: none;
     padding: 1px 5px;
     border: thin #a2a2a2 solid;
@@ -26,13 +25,10 @@
       height: 20px;
     }
 
-    
     &:last-child {
       border-radius: 0 3px 3px 0;
     }
   }
-  
-  
 }
 
 .other-browse-btns {

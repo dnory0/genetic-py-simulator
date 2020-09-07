@@ -4,12 +4,11 @@
   height: 100%;
   width: 100%;
 }
-
 .resize-cover.for-prime {
   min-height: 280px;
 }
-
 .resize-cover.for-side {
   min-width: 280px;
 }
+
 /*# sourceMappingURL=resize-cover.css.map */

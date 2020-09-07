@@ -34,6 +34,9 @@
         "pin": true,
         "disable": false
       },
+      "selection-type": {
+        "value": 0
+      },
       "co-rate": {
         "value": 0.15
       },
@@ -66,6 +69,11 @@
       "update-pop": {
         "value": 0,
         "pin": false
+      },
+      "number-of-1s": {
+        "value": 40,
+        "pin": false,
+        "enabled": false
       },
       "force-tf": {
         "enabled": false

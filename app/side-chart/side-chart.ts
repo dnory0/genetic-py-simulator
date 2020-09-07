@@ -1,4 +1,4 @@
-import { Chart, Options, TooltipPositionerPointObject, Point } from 'highcharts';
+import { Chart, Options, TooltipPositionerPointObject, Point, chart } from 'highcharts';
 import { IpcRenderer } from 'electron';
 
 /****************************** passed by preload ******************************
@@ -21,7 +21,7 @@ let mostFittest: {
       genes: any[];
     }
   ];
-} = { fitness: -1, individuals: null };
+} = { fitness: Number.MIN_SAFE_INTEGER, individuals: null };
 
 /**
  * enables or disable the hover settings for the passed chart
@@ -29,13 +29,6 @@ let mostFittest: {
  * @param enable decides if to disable hover settings or enable them.
  */
 const toggleChartHover: (chart: Chart, enable: boolean) => void = window['toggleChartHover'];
-
-/**
- * clears chart data and xAxis if needed and redraw instantly
- * @param chart chart to clear its data and xAxis
- * @param categories whether to clear categories, default is false
- */
-const clearChart: (chart: Chart, categories?: boolean) => void = window['clearChart'];
 
 /**
  * enables and disables the zoom functionality for the passed chart
@@ -62,29 +55,23 @@ const treatResponse = (response: object) => {
           genes: response['genes'],
         },
       ];
-
-      sideChart.series[0].setData(
-        sideChart.series[1].data.map(aData => [aData.x, 0.5, aData.value]),
-        true,
-        false
-      );
-
-      sideChart.series[1].setData(
-        (<any[]>response['genes']).map((gene, i) => [i, 2.5, gene]),
-        true,
-        false
-      );
     } else if (mostFittest['fitness'] == response['fitness']) {
       mostFittest['individuals'].push({
         generation: response['generation'],
         genes: response['genes'],
       });
     }
+    if (response['fitness'] < mostFittest['fitness']) return;
+    sideChart.series[0].setData(
+      (<any[]>response['genes']).map((gene, i) => [i, 2.5, gene]),
+      true,
+      false,
+      false
+    );
   } else if (response['started']) {
-    clearChart(sideChart);
     sideChart.xAxis[0].setExtremes(null, null, true, true);
     // clean mostFittest object before start recieving data
-    mostFittest['fitness'] = -1;
+    mostFittest['fitness'] = Number.MIN_SAFE_INTEGER;
     mostFittest['individuals'] = null;
     // disable points on hover on chart if it's not just a step forward
     toggleChartHover(sideChart, response['first-step']);
@@ -143,34 +130,20 @@ let sideChart: Chart = window['createChart']('side-chart', {
       `;
     },
     positioner(labelWidth, labelHeight, point: Point | TooltipPositionerPointObject) {
-      point = <TooltipPositionerPointObject> point;
+      point = <TooltipPositionerPointObject>point;
       var x = point.plotX + labelWidth + 80 < sideChart.plotWidth ? point.plotX + 9 : point.plotX - (labelWidth - 9);
       var y = point.plotY + (point.plotY > 30 ? 8 : labelHeight + 50);
       return { x, y };
-      // return { x: point.plotX + 9, y: point.plotY + 5 };
-      // return {
-      //   x: 0,
-      //   y: this.chart.chartHeight - this.label.height + 6
-      // };
     },
     shadow: false,
     outside: false,
     hideDelay: 250,
     borderRadius: 0,
-    // borderWidth: 0,
-    // backgroundColor: 'transparent',
-    // shadow: false,
-    // hideDelay: 250
   },
   legend: {
     enabled: false,
   },
   series: [
-    {
-      name: 'PF',
-      type: 'heatmap',
-      data: [],
-    },
     {
       name: 'F',
       type: 'heatmap',
@@ -190,12 +163,6 @@ window['ready'](treatResponse);
 
 ipcRenderer.on('export', (_ev, actionType: string) => {
   switch (actionType) {
-    case 'png':
-      alert('disabled for now because of bugs');
-      // sideChart.exportChartLocal({
-      //   type: 'image/png'
-      // });
-      break;
     case 'jpeg':
       sideChart.exportChartLocal({
         type: 'image/jpeg',
@@ -207,6 +174,31 @@ ipcRenderer.on('export', (_ev, actionType: string) => {
       });
       break;
   }
+});
+
+function download(filename, text) {
+  var element = document.createElement('a');
+  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+  element.setAttribute('download', filename);
+
+  element.style.display = 'none';
+  document.body.appendChild(element);
+
+  element.click();
+
+  document.body.removeChild(element);
+}
+
+ipcRenderer.on('download', (_ev, actionType: string) => {
+  console.log(JSON.stringify(sideChart.yAxis[0].series[0].data.map(p => p.value)));
+
+  download(
+    actionType + '.json',
+    actionType == 'list'
+      ? JSON.stringify(sideChart.yAxis[0].series[0].data.map(p => p.value))
+      : JSON.stringify({ ...sideChart.yAxis[0].series[0].data.map(p => p.value) })
+  );
+  console.log(sideChart.yAxis[0].series[0].data.map(p => p.value));
 });
 
 ipcRenderer.on('zoom-out', () => {
