@@ -384,7 +384,7 @@ pyshell.stdout.on('data', (chunk: Buffer) => {
           'line-type': 'warning',
           'msg-type': 'WARNING',
           message:
-            'Detected uncontrolled output, your GA is not affected, but avoid using a print statement inside the imported python file',
+            'Detected uncontrolled output, your GA is not affected, but avoid using a print statement inside the imported python file, use to_terminal() provided with the template.',
         });
         return {};
       }
