@@ -28,14 +28,14 @@
   "author": "Hocine Abdellatif Houari <houarihocine99@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "highcharts": "^8.1.0",
+    "highcharts": "^8.2.0",
     "json-view": "https://github.com/pgrabovets/json-view.git"
   },
   "devDependencies": {
-    "electron": "^8.0.1",
-    "electron-builder": "^22.3.2",
-    "prettier": "^2.0.5",
+    "electron": "8.5.1",
+    "electron-builder": "22.8.0",
+    "prettier": "2.1.1",
     "sass": "^1.26.10",
-    "typescript": "^3.7.5"
+    "typescript": "3.9.7"
   }
 }
