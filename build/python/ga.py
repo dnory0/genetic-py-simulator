@@ -28,11 +28,8 @@ class Population:
         """
         get fittest individual
         """
-        fittest_ind = self.individuals[0]
-        for ind in self.individuals[1:]:
-            if fittest_ind.fitness() < ind.fitness():
-                fittest_ind = ind
-        return fittest_ind
+        individuals = {ind: ind.fitness() for ind in self.individuals}
+        return max(individuals, key=individuals.get)
 
 
 class Individual:
@@ -260,6 +257,7 @@ class Evolve:
 
     @staticmethod
     def calc_crossover(pop: Population, parents: list) -> list:
+        to_terminal('info', 'INFO', 'original crossover function here.')
         if g_co_type == 0:
             co_point = int(g_co_rate * pop.genes_num)
             offsprings = Evolve.single_point_crossover(parents, co_point)
@@ -276,6 +274,8 @@ class Evolve:
 
     @staticmethod
     def calc_mutation(pop: Population, offsprings: list) -> list:
+        to_terminal('info', 'INFO', 'original mutation function here.')
+
         # list of couples of offsprings, mut_rate is passed here
         # to avoid being changed by user on the mutation process.
         offsprings = Evolve.bit_string_mutation(
@@ -311,22 +311,16 @@ class Evolve:
         if g_user_code_loader and hasattr(
             g_user_code_loader, 'calc_crossover'
         ):
-            try:
-                offsprings = g_user_code_loader.__getattribute__(
-                    'calc_crossover')(map(Evolve.map_to_genes, parents), g_co_rate, g_genes_num)
-            except Exception:
-                offsprings = Evolve.calc_crossover(pop, parents)
+            offsprings = g_user_code_loader.__getattribute__(
+                'calc_crossover')(list(Evolve.map_to_genes(parents)), g_co_rate, g_genes_num)
         else:
             offsprings = Evolve.calc_crossover(pop, parents)
 
         if g_user_code_loader and hasattr(
             g_user_code_loader, 'calc_mutation'
         ):
-            try:
-                offsprings = g_user_code_loader.__getattribute__(
-                    'calc_mutation')(offsprings, g_mut_rate, g_genes_num)
-            except Exception:
-                offsprings = Evolve.calc_mutation(pop, offsprings)
+            offsprings = g_user_code_loader.__getattribute__(
+                'calc_mutation')(offsprings, g_mut_rate, g_genes_num)
         else:
             offsprings = Evolve.calc_mutation(pop, offsprings)
 
