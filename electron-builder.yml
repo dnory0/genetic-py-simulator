@@ -8,6 +8,7 @@ extraResources:
   - build/python/ff.py
   - build/settings.json
   - build/examples
+  - build/icons/icon.png
 extraFiles:
   - LICENSE
 
@@ -16,14 +17,12 @@ linux:
     - AppImage
     - deb
     - rpm
-  icon: build/icons/icon.icns
-  category: Science
+  category: Science;Education
 
 win:
   target:
     - nsis
     - portable
-  icon: build/icons/icon.ico
   extraResources:
     - build/python/win/python-${arch}
 
