@@ -113,7 +113,7 @@ const createWindow = (
     resizable,
     minimizable,
     maximizable,
-    icon: join(app.getAppPath(), '..', 'build', 'icons', process.platform == 'win32' ? 'icon.ico' : 'icon.icns'),
+    icon: join(app.getAppPath(), '..', 'build', 'icons', 'icon.png'),
     parent,
     frame,
     modal: true,
