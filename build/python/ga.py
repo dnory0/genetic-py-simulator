@@ -267,7 +267,8 @@ class Evolve:
     def uniform_crossover(parents: list) -> list:
         offsprings = []
         for parent1, parent2 in parents:
-            offspring1 = [], offspring2 = []
+            offspring1 = []
+            offspring2 = []
             for gene1, gene2 in zip(parent1.genes, parent2.genes):
                 if random() > .5:
                     offspring1.append(gene2)
@@ -275,6 +276,7 @@ class Evolve:
                 else:
                     offspring1.append(gene1)
                     offspring2.append(gene2)
+            offsprings.append([offspring1, offspring2])
         return offsprings
 
     @staticmethod
