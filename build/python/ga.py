@@ -62,7 +62,7 @@ class Individual:
 
     @staticmethod
     def genes_fitness(genes, data) -> int:
-        # call user specified get_fitness if user specified code is available and has a "callable function" get_fitness
+        # call user specified get_fitness if user_specified_code is available and has a "callable get_fitness function"
         # else returns 0, wrapped inside try/except so that pyshell process does not exit here with error.
         # noinspection PyBroadException
         try:
@@ -82,6 +82,9 @@ class Individual:
 class Evolve:
     @staticmethod
     def random_selection(pop_individuals: List[Individual]) -> list:
+        """
+        select couples randomally in a way that every individual has the same probability to be selected.
+        """
         return [
             [
                 pop_individuals.pop(randrange(0, len(pop_individuals))) for __ in range(2)
