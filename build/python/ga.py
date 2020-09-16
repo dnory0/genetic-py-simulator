@@ -62,7 +62,7 @@ class Individual:
 
     @staticmethod
     def genes_fitness(genes, data) -> int:
-        # call user specified get_fitness if user specified code is available and has a "callable function" get_fitness
+        # call user specified get_fitness if user_specified_code is available and has a "callable get_fitness function"
         # else returns 0, wrapped inside try/except so that pyshell process does not exit here with error.
         # noinspection PyBroadException
         try:
@@ -82,6 +82,9 @@ class Individual:
 class Evolve:
     @staticmethod
     def random_selection(pop_individuals: List[Individual]) -> list:
+        """
+        select couples randomally in a way that every individual has the same probability to be selected.
+        """
         return [
             [
                 pop_individuals.pop(randrange(0, len(pop_individuals))) for __ in range(2)
@@ -89,62 +92,92 @@ class Evolve:
         ]
 
     @staticmethod
+    def __roulette_wheel_ind_selection(roulette_wheel: Dict[Individual, Union[float, int]], sum_of_fitness) -> Individual:
+        """
+        sub-function designed to be only used by roulette_wheel_selection method, which selects an element in
+        a roulette wheel way.
+        :return: chosen individual.
+        """
+        chosen_point = randrange(0, maxsize * 2 + 1) % sum_of_fitness
+        for ind in roulette_wheel:
+            if roulette_wheel.get(ind) < chosen_point:
+                chosen_point -= roulette_wheel.get(ind)
+            else:
+                return ind
+
+    @staticmethod
     def roulette_wheel_selection(pop_individuals: List[Individual]) -> list:
         parents = []
         roulette_wheel: Dict[Individual, Union[float, int]] = {
             ind: fitness for ind, fitness in zip(pop_individuals, [ind.fitness() for ind in pop_individuals])
         }
-        sum_of_fitness = sum(ind.fitness() for ind in pop_individuals)
+
+        # shift everything if 0 or negative values exist so that everything is greater than 0
+        min_of_fitness = min(fitness for fitness in roulette_wheel.values())
+        if (min_of_fitness <= 0):
+            value_to_add = abs(min_of_fitness) + 1
+            for ind, fitness in roulette_wheel.items():
+                roulette_wheel[ind] = fitness + value_to_add
+
+        sum_of_fitness = sum(fitness for fitness in roulette_wheel.values())
         for _ in range(len(pop_individuals) // 2):
             couple = []
             for __ in range(2):
-                chosen_point = randrange(0, maxsize * 2 + 1) % sum_of_fitness
-                for ind in roulette_wheel:
-                    if roulette_wheel.get(ind) < chosen_point:
-                        chosen_point -= roulette_wheel.get(ind)
-                    else:
-                        sum_of_fitness -= roulette_wheel.get(ind)
-                        couple.append(ind)
-                        roulette_wheel.pop(ind)
-                        break
+                selected_ind = Evolve.__roulette_wheel_ind_selection(
+                    roulette_wheel,
+                    sum_of_fitness
+                )
+                sum_of_fitness -= roulette_wheel.pop(selected_ind)
+                couple.append(selected_ind)
             parents.append(couple)
         return parents
 
     @staticmethod
-    def __stochastic_universal_sampling_spinning(
-            roulette_wheel: Dict[Individual, Union[int, float]], sum_of_fitness: Union[int, float]
-    ) -> list:
+    def __stochastic_universal_sampling_spinning(roulette_wheel: Dict[Individual, Union[int, float]], sum_of_fitness) -> list:
         """
         sub-function designed to be only used by stochastic_universal_sampling_selection
         :return: couple of 2 individuals
         """
         couple = []
         chosen_points: List[Union[int, None]] = [
-            randrange(sum_of_fitness // 2 if i == 1 else 0, maxsize * 2 + 1) % sum_of_fitness for i in range(2)
+            randrange(
+                sum_of_fitness // 2 if index == 1 else 0, maxsize * 2 + 1
+            ) % sum_of_fitness for index in range(2)
         ]
+
         for ind in roulette_wheel:
-            for chosen_point_index in range(len(chosen_points)):
-                if roulette_wheel.get(ind) < chosen_points[chosen_point_index]:
-                    # individual is not the chosen one, its fitness value is extracted from the chosen point value
-                    chosen_points[chosen_point_index] -= roulette_wheel.get(
-                        ind)
-                else:
-                    # chosen individual is found for ```chosen_point_index``` chosen point
-                    if len(couple) and couple[0] is ind:
+            if any(chosen_point <= roulette_wheel.get(ind) for chosen_point in chosen_points):
+                if chosen_points[0] <= roulette_wheel.get(ind):
+                    if len(chosen_points) == 2 and chosen_points[1] <= roulette_wheel.get(ind):
                         # this is when an individual is selected by both points, the best solution is to repeat rolling
                         return Evolve.__stochastic_universal_sampling_spinning(roulette_wheel, sum_of_fitness)
-                    else:
-                        # individual is appended to couple
-                        couple.append(ind)
-                        # after a chosen_point reach the chosen individual it is assigned None and filtered later
-                        chosen_points[chosen_point_index] = None
-            # the chosen point is assigned None when individual is reached, then filtered before next iteration
-            chosen_points = list(filter(lambda chosen_point: not isinstance(
-                chosen_point, type(None)), chosen_points))
-            # if couple has been established there is no need to keep iterating through remaining individuals
-            if len(couple) == 2:
-                break
-        return couple
+                    # in case the second point is still not chosen, subtract the ind fitness of it.
+                    if len(chosen_points) == 2:
+                        chosen_points[1] -= roulette_wheel.get(ind)
+                    chosen_points.pop(0)
+                else:
+                    chosen_points[0] -= roulette_wheel.get(ind)
+                    chosen_points.pop(1)
+                couple.append(ind)
+                if len(couple) == 2:
+                    return couple
+            else:
+                # none hit the chosen_point this time, so reduce fitness value of ind for both chosen points
+                for index in range(len(chosen_points)):
+                    chosen_points[index] -= roulette_wheel.get(ind)
+
+    @staticmethod
+    def __max_couple(roulette_wheel: Dict[Individual, Union[int, float]]) -> list:
+        """
+        in case there are only 2 or 3 individuals left, and using `stochastic_universal_sampling_selection (SUS)`
+        method on them where one of them fitness value is far greater then the other one(s), the SUS is going
+        to run recursively infinite times becuase both chosen_points are more likely to hit this individual,
+        to solve this, just couple the maximum 2 individuals of the remaining.
+        """
+        ind_1 = max(roulette_wheel, key=roulette_wheel.get)
+        roulette_wheel.pop(ind_1)
+        ind_2 = max(roulette_wheel, key=roulette_wheel.get)
+        return [ind_1, ind_2]
 
     @staticmethod
     def stochastic_universal_sampling_selection(pop_individuals: List[Individual]) -> list:
@@ -152,13 +185,29 @@ class Evolve:
         roulette_wheel: Dict[Individual, Union[float, int]] = {
             ind: fitness for ind, fitness in zip(pop_individuals, [ind.fitness() for ind in pop_individuals])
         }
-        sum_of_fitness = sum(ind.fitness() for ind in pop_individuals)
+
+        # shift everything if 0 or negative values exist so that everything is greater than 0
+        min_of_fitness = min(fitness for fitness in roulette_wheel.values())
+        if (min_of_fitness <= 0):
+            value_to_add = abs(min_of_fitness) + 1
+            for ind, fitness in roulette_wheel.items():
+                roulette_wheel[ind] = fitness + value_to_add
+
+        sum_of_fitness = sum(fitness for fitness in roulette_wheel.values())
+
         for _ in range(len(pop_individuals) // 2):
-            parents.append(Evolve.__stochastic_universal_sampling_spinning(
-                roulette_wheel, sum_of_fitness))
-            for ind_of_couple in parents[-1]:
-                sum_of_fitness -= roulette_wheel.get(ind_of_couple)
-                roulette_wheel.pop(ind_of_couple)
+            if (len(roulette_wheel) <= 3):
+                # to prevent recursive loop
+                couple = Evolve.__max_couple(roulette_wheel)
+            else:
+                couple = Evolve.__stochastic_universal_sampling_spinning(
+                    roulette_wheel,
+                    sum_of_fitness
+                )
+                for ind_of_couple in couple:
+                    val = roulette_wheel.pop(ind_of_couple)
+                    sum_of_fitness -= val
+            parents.append(couple)
         return parents
 
     @staticmethod
@@ -218,7 +267,8 @@ class Evolve:
     def uniform_crossover(parents: list) -> list:
         offsprings = []
         for parent1, parent2 in parents:
-            offspring1 = [], offspring2 = []
+            offspring1 = []
+            offspring2 = []
             for gene1, gene2 in zip(parent1.genes, parent2.genes):
                 if random() > .5:
                     offspring1.append(gene2)
@@ -226,6 +276,7 @@ class Evolve:
                 else:
                     offspring1.append(gene1)
                     offspring2.append(gene2)
+            offsprings.append([offspring1, offspring2])
         return offsprings
 
     @staticmethod
