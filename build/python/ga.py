@@ -92,24 +92,43 @@ class Evolve:
         ]
 
     @staticmethod
+    def __roulette_wheel_ind_selection(roulette_wheel: Dict[Individual, Union[float, int]], sum_of_fitness) -> Individual:
+        """
+        sub-function designed to be only used by roulette_wheel_selection method, which selects an element in
+        a roulette wheel way.
+        :return: chosen individual.
+        """
+        chosen_point = randrange(0, maxsize * 2 + 1) % sum_of_fitness
+        for ind in roulette_wheel:
+            if roulette_wheel.get(ind) < chosen_point:
+                chosen_point -= roulette_wheel.get(ind)
+            else:
+                return ind
+
+    @staticmethod
     def roulette_wheel_selection(pop_individuals: List[Individual]) -> list:
         parents = []
         roulette_wheel: Dict[Individual, Union[float, int]] = {
             ind: fitness for ind, fitness in zip(pop_individuals, [ind.fitness() for ind in pop_individuals])
         }
-        sum_of_fitness = sum(ind.fitness() for ind in pop_individuals)
+
+        # shift everything if 0 or negative values exist so that everything is greater than 0
+        min_of_fitness = min(fitness for fitness in roulette_wheel.values())
+        if (min_of_fitness <= 0):
+            value_to_add = abs(min_of_fitness) + 1
+            for ind, fitness in roulette_wheel.items():
+                roulette_wheel[ind] = fitness + value_to_add
+
+        sum_of_fitness = sum(fitness for fitness in roulette_wheel.values())
         for _ in range(len(pop_individuals) // 2):
             couple = []
             for __ in range(2):
-                chosen_point = randrange(0, maxsize * 2 + 1) % sum_of_fitness
-                for ind in roulette_wheel:
-                    if roulette_wheel.get(ind) < chosen_point:
-                        chosen_point -= roulette_wheel.get(ind)
-                    else:
-                        sum_of_fitness -= roulette_wheel.get(ind)
-                        couple.append(ind)
-                        roulette_wheel.pop(ind)
-                        break
+                selected_ind = Evolve.__roulette_wheel_ind_selection(
+                    roulette_wheel,
+                    sum_of_fitness
+                )
+                sum_of_fitness -= roulette_wheel.pop(selected_ind)
+                couple.append(selected_ind)
             parents.append(couple)
         return parents
 
