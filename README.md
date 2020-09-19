@@ -2,7 +2,7 @@
 
 A Simulator that solves optimization problems using Genetic Algorithms and shows results on charts.
 
-> **Note:** The Project is in development stage (anything may change or be removed on the future).
+> **Note:** The Project just hit version 1.0 on sep 2020.
 
 ### This project exists for the following reasons:
 
@@ -13,6 +13,8 @@ A Simulator that solves optimization problems using Genetic Algorithms and shows
 
 You can find corresponding installer or partable to download on [releases](https://github.com/dnory0/genetic-py/releases).
 
+**Note:** make sure python 3.8 or more is installed if you are on linux.
+
 ## Developer?
 
 If you are a developer and you want to run the code on your machine, do the following:
@@ -20,8 +22,8 @@ If you are a developer and you want to run the code on your machine, do the foll
 1. You need to have installed:
 
    - NodeJS (recommended 10.x or above).
-   - Python 3.6 or above.
-   - Yarn (optional, but recommended).
+   - Python 3.8 or above.
+   - Yarn (recommended).
 
 2. Run on CLI:
 
